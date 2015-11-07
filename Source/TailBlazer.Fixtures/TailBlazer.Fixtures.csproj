@@ -89,6 +89,7 @@
   <ItemGroup>
     <Compile Include="FileScanFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReadLinesFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -15,8 +15,6 @@ namespace TailBlazer.Fixtures
         it is build from old fashioned events there is no way to pass in a scheduler.
         If someone has a solution to eliminate Thread.Sleep crap, please let me know
     */
-
-
     public class FileScanFixtures
     {
 
@@ -61,8 +59,11 @@ namespace TailBlazer.Fixtures
                 Thread.Sleep(TimeSpan.FromSeconds(1));
                 File.Delete(file);
                 result.ShouldAllBeEquivalentTo(Enumerable.Range(1, 110).Where(i => i % 2 == 1));
-
             }
         }
+
+
+
+
     }
 }

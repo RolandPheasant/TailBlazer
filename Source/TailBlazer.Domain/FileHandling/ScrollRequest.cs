@@ -2,20 +2,20 @@
 {
     public class ScrollRequest
     {
-        public int NumberOfItems { get;  }
+        public int PageSize { get;  }
         public int FirstIndex { get;  }
-        public ScrollingType Type { get; }
+        public ScrollingMode Mode { get; }
         
-        public ScrollRequest(int numberOfItems)
+        public ScrollRequest(int pageSize)
         {
-            NumberOfItems = numberOfItems;
-            Type = ScrollingType.Tail;
+            PageSize = pageSize;
+            Mode = ScrollingMode.Tail;
         }
-        public ScrollRequest(int numberOfItems, int firstIndex)
+        public ScrollRequest(int pageSize, int firstIndex)
         {
-            NumberOfItems = numberOfItems;
+            PageSize = pageSize;
             FirstIndex = firstIndex;
-            Type = ScrollingType.User;
+            Mode = ScrollingMode.User;
         }
 
     }
