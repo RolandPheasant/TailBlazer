@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileHandling\FileInfoEx.cs" />
+    <Compile Include="Infrastructure\ImmutableList.cs" />
     <Compile Include="Infrastructure\ReactiveEx.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
