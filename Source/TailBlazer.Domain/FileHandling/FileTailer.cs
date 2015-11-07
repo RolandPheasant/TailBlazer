@@ -50,9 +50,14 @@ namespace TailBlazer.Domain.FileHandling
                         ? allLines.Skip(pageSize).ToArray()
                         : allLines.Skip(x.request.FirstIndex).Take(pageSize)).ToArray();
 
-                    //determine new and removed lines
-                    var addedLines = file.ReadLines(newPage.Except(currentPage).ToArray());
-                    var removedLines = file.ReadLines(currentPage.Except(newPage).ToArray());
+
+                    var added = newPage.Except(currentPage).ToArray();
+                    var removed = currentPage.Except(newPage);
+                   
+                    //read new lines frome the file
+                    var addedLines = file.ReadLines(added);
+                    //get old lines from the current collection
+                    var removedLines = lines.Items.Where(l=> removed.Contains(l.Number)).ToArray();
 
                     //finally relect changes in the list
                     lines.Edit(innerList =>
