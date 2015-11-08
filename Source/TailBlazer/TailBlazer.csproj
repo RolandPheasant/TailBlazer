@@ -118,6 +118,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Infrastucture\AutoScroller.cs" />
     <Compile Include="Infrastucture\SchedulerProvider.cs" />
     <Compile Include="Views\FileTailerView.xaml.cs">
       <DependentUpon>FileTailerView.xaml</DependentUpon>

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TailBlazer.Views"
              xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
+             xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:FileTailerViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="300" d:DesignWidth="300">
@@ -57,17 +58,15 @@
 
             </TextBlock>
         </StackPanel>
-        
-        <ListBox Grid.Row="1" 
+
+        <ScrollViewer  Grid.Row="1" 
+                       VerticalScrollBarVisibility="Hidden"
+                       infrastucture:DependencyObjectHook.Receiver="{Binding AutoScroller}">
+            
+
+        <ListBox
                  ItemsSource="{Binding Lines}">
 
-            <!--<ListBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel/>
-                </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>-->
-            
-            
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type local:LineProxy}">
                     <Grid>
@@ -105,5 +104,6 @@
             </ListBox.ItemTemplate>
 
         </ListBox>
+        </ScrollViewer>
     </Grid>
 </UserControl>

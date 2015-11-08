@@ -8,6 +8,7 @@ using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
+using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Views
 {
@@ -26,18 +27,19 @@ namespace TailBlazer.Views
 
             File = fileInfo.FullName;
 
-            var tailer = new FileTailer(fileInfo, this.WhenValueChanged(vm=>vm.SearchText),Observable.Return(new ScrollRequest(40)));
+            var tailer = new FileTailer(fileInfo, this.WhenValueChanged(vm=>vm.SearchText).Throttle(TimeSpan.FromMilliseconds(250)),Observable.Return(new ScrollRequest(40)));
             var totalCount = tailer.TotalLines.Subscribe(total => TotalLines = total);
             var filterCount = tailer.MatchedLines.Subscribe(filtered => FilteredLines = filtered.Length);
 
             //TODO: 1. Add observable to give current end of tail value
 
             var loader = tailer.Lines.Connect()
-                //.Buffer(TimeSpan.FromMilliseconds(125)).FlattenBufferResult()
+           
                 .Transform(line => new LineProxy(line,  (DateTime?)null))
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy.Number))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)
+                .Do(_=> AutoScroller.ScrollToEnd())
                 .Subscribe(a => logger.Info(a.Adds.ToString()), ex => logger.Error(ex, "Oops"));
 
 
@@ -50,6 +52,7 @@ namespace TailBlazer.Views
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         
+        public AutoScroller AutoScroller { get; } = new AutoScroller();
 
         public string SearchText
         {
@@ -68,6 +71,8 @@ namespace TailBlazer.Views
             get { return _filteredLines; }
             set { SetAndRaise(ref _filteredLines, value); }
         }
+
+
 
         public void Dispose()
         {
