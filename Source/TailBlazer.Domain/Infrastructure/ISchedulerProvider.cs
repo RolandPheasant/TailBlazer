@@ -1,6 +1,6 @@
 ﻿using System.Reactive.Concurrency;
 
-namespace Trader.Domain.Infrastucture
+namespace TailBlazer.Domain.Infrastructure
 {
     public interface ISchedulerProvider
     {

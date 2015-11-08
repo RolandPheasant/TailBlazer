@@ -1,0 +1,61 @@
+﻿<UserControl x:Class="TailBlazer.Views.FileTailerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TailBlazer.Views"
+             xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance local:FileTailerViewModel, IsDesignTimeCreatable=False}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal">
+            
+
+        <Viewbox Width="24" Height="24" Margin="4 0 0 0">
+            <Canvas Width="24" Height="24">
+                <Path Data="M3,2H21V2H21V4H20.92L15,9.92V22.91L9,16.91V9.91L3.09,4H3V2M11,16.08L13,18.08V9H13.09L18.09,4H5.92L10.92,9H11V16.08Z" 
+                              Fill="{Binding ElementName=SearchTextBox, Path=BorderBrush}" />
+            </Canvas>
+        </Viewbox>
+
+        <TextBox  x:Name="SearchTextBox" 
+                    wpf:TextFieldAssist.Hint="Search file"
+                    Margin="4 0 0 0"
+                    VerticalAlignment="Center"
+                    MinWidth="125"/>
+        </StackPanel>
+        
+        <ListBox Grid.Row="1" 
+                 ItemsSource="{Binding Lines}">
+
+            <!--<ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>-->
+            
+            
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type local:LineProxy}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" MinWidth="40"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="{Binding Number, Mode=OneWay}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Text, Mode=OneWay}"/>
+                    </Grid>
+                </DataTemplate>
+
+            </ListBox.ItemTemplate>
+
+        </ListBox>
+    </Grid>
+</UserControl>

@@ -1,4 +1,4 @@
-﻿namespace Trader.Domain.Infrastucture
+﻿namespace TailBlazer.Domain.Infrastructure
 {
     public interface IObjectProvider
     {

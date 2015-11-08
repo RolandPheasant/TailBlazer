@@ -65,7 +65,10 @@
     <Compile Include="FileHandling\ScrollingMode.cs" />
     <Compile Include="FileHandling\ScrollRequest.cs" />
     <Compile Include="Infrastructure\Extensions.cs" />
+    <Compile Include="Infrastructure\ILogger.cs" />
     <Compile Include="Infrastructure\ImmutableList.cs" />
+    <Compile Include="Infrastructure\IObjectFactory.cs" />
+    <Compile Include="Infrastructure\ISchedulerProvider.cs" />
     <Compile Include="Infrastructure\ReactiveEx.cs" />
     <Compile Include="FileHandling\Line.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
