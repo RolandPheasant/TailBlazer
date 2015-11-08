@@ -8,6 +8,16 @@
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:FileTailerViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="300" d:DesignWidth="300">
+
+    <Control.Resources>
+
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
+                <!--<ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.TextBox.xaml" />-->
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Control.Resources>
     <Grid >
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
@@ -27,8 +37,25 @@
         <TextBox  x:Name="SearchTextBox" 
                     wpf:TextFieldAssist.Hint="Search file"
                     Margin="4 0 0 0"
+                    Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     VerticalAlignment="Center"
                     MinWidth="125"/>
+
+            <TextBlock
+                Margin="0 0 4 0"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                Text="{Binding  TotalLines, StringFormat='The are \{0} lines in the file'}">
+
+            </TextBlock>
+
+            <TextBlock
+                Margin="2 0 4 0"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                Text="{Binding  FilteredLines, StringFormat='\{0} matching filter'}">
+
+            </TextBlock>
         </StackPanel>
         
         <ListBox Grid.Row="1" 
@@ -53,6 +80,27 @@
                         <TextBlock Grid.Column="1" Text="{Binding Text, Mode=OneWay}"/>
                     </Grid>
                 </DataTemplate>
+
+                <!--<ListBox.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
+                        <Style.Triggers>
+
+                            <DataTrigger Binding="{Binding Removing}" Value="True">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetProperty="(TextBlock.Opacity)"
+                                                From="1.0" To="0.1" Duration="0:0:0.75"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+
+                                </DataTrigger.EnterActions>
+                            </DataTrigger>
+                        </Style.Triggers>
+
+                    </Style>
+                </ListBox.ItemContainerStyle>-->
 
             </ListBox.ItemTemplate>
 

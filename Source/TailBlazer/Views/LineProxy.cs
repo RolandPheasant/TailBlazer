@@ -1,3 +1,4 @@
+using System;
 using TailBlazer.Domain.FileHandling;
 
 namespace TailBlazer.Views
@@ -6,7 +7,7 @@ namespace TailBlazer.Views
     {
         private readonly Line _line;
 
-        public LineProxy(Line line)
+        public LineProxy(Line line, DateTime? dateTime)
         {
             _line = line;
         }

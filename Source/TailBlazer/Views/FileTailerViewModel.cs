@@ -17,6 +17,7 @@ namespace TailBlazer.Views
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
         private int _totalLines;
         private string _searchText;
+        private int _filteredLines;
 
         public FileTailerViewModel(ILogger logger,ISchedulerProvider schedulerProvider, FileInfo fileInfo)
         {
@@ -25,24 +26,23 @@ namespace TailBlazer.Views
 
             File = fileInfo.FullName;
 
-            var xxx = new ReplaySubject<ScrollRequest>(1);
-            xxx.OnNext(new ScrollRequest(40));
+            var tailer = new FileTailer(fileInfo, this.WhenValueChanged(vm=>vm.SearchText),Observable.Return(new ScrollRequest(40)));
+            var totalCount = tailer.TotalLines.Subscribe(total => TotalLines = total);
+            var filterCount = tailer.MatchedLines.Subscribe(filtered => FilteredLines = filtered.Length);
 
-
-            var tailer = new FileTailer(fileInfo, 
-                this.WhenValueChanged(vm=>vm.SearchText),
-               xxx);
+            //TODO: 1. Add observable to give current end of tail value
 
             var loader = tailer.Lines.Connect()
-                .Buffer(TimeSpan.FromMilliseconds(125)).FlattenBufferResult()
-                .Transform(line => new LineProxy(line))
+                //.Buffer(TimeSpan.FromMilliseconds(125)).FlattenBufferResult()
+                .Transform(line => new LineProxy(line,  (DateTime?)null))
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy.Number))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)
                 .Subscribe(a => logger.Info(a.Adds.ToString()), ex => logger.Error(ex, "Oops"));
 
 
-            _cleanUp = new CompositeDisposable(tailer);
+
+            _cleanUp = new CompositeDisposable(tailer, totalCount, loader, filterCount);
 
         }
 
@@ -61,6 +61,12 @@ namespace TailBlazer.Views
         {
             get { return _totalLines; }
             set { SetAndRaise(ref _totalLines, value); }
+        }
+
+        public int FilteredLines
+        {
+            get { return _filteredLines; }
+            set { SetAndRaise(ref _filteredLines, value); }
         }
 
         public void Dispose()

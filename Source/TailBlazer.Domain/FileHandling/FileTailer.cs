@@ -25,10 +25,14 @@ namespace TailBlazer.Domain.FileHandling
             if (textToMatch == null) throw new ArgumentNullException(nameof(textToMatch));
             
             //create list of lines which contain the observable text
-            MatchedLines = file.ScanLineNumbers(textToMatch).Replay(1).RefCount();
-
+            MatchedLines = file.ScanLineNumbers(textToMatch)
+                                .Replay(1)
+                                .RefCount();
+            
             //count of lines.
             TotalLines = file.CountLines();
+
+            //var scroller2 = file.ScanLineNumbers(textToMatch).Subscribe(x => Console.WriteLine(x));
 
             var lines = new SourceList<Line>();
             Lines = lines.AsObservableList();
@@ -55,6 +59,7 @@ namespace TailBlazer.Domain.FileHandling
                    
                     //read new lines frome the file
                     var addedLines = file.ReadLines(added).ToArray();
+
                     //get old lines from the current collection
                     var removedLines = lines.Items.Where(l=> removed.Contains(l.Number)).ToArray();
 

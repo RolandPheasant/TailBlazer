@@ -159,20 +159,6 @@ namespace TailBlazer.Domain.FileHandling
         }
 
 
-        private class ScanningState
-        {
-            public bool Initial { get;  }
-            public int[] Items { get;  }
-
-            public ScanningState(bool initial, int[] items)
-            {
-                Initial = initial;
-                Items = items;
-            }
-        }
-
-
-
         public static IObservable<FileSystemEventArgs> WatchFile(this FileInfo file)
         {
             //TODO: Create a return parameter signature which allows for all events to be monitors in one observable
