@@ -27,7 +27,7 @@ namespace TailBlazer.Domain.FileHandling
             //create list of lines which contain the observable text
             MatchedLines = file.ScanLineNumbers(textToMatch).Replay(1).RefCount();
 
-            //count of lines
+            //count of lines.
             TotalLines = file.CountLines();
 
             var lines = new SourceList<Line>();
@@ -42,20 +42,19 @@ namespace TailBlazer.Domain.FileHandling
                     var mode = x.request.Mode;
                     var pageSize = x.request.PageSize;
                     var allLines = x.allLines;
-                    var currentPage = lines.Items.Select(l => l.Number).ToArray();
+                    var previousPage = lines.Items.Select(l => l.Number).ToArray();
 
                     //If tailing, take the end only. 
                     //Otherwise take the page size and start index from the request
-                    var newPage = (mode == ScrollingMode.Tail
-                        ? allLines.Skip(pageSize).ToArray()
-                        : allLines.Skip(x.request.FirstIndex).Take(pageSize)).ToArray();
-
-
-                    var added = newPage.Except(currentPage).ToArray();
-                    var removed = currentPage.Except(newPage);
+                    var currentPage = (mode == ScrollingMode.Tail
+                        ? allLines.Skip(allLines.Length-pageSize).Take(pageSize).ToArray()
+                        : allLines.Skip(x.request.FirstIndex-1).Take(pageSize)).ToArray();
+                    
+                    var added = currentPage.Except(previousPage).ToArray();
+                    var removed = previousPage.Except(currentPage);
                    
                     //read new lines frome the file
-                    var addedLines = file.ReadLines(added);
+                    var addedLines = file.ReadLines(added).ToArray();
                     //get old lines from the current collection
                     var removedLines = lines.Items.Where(l=> removed.Contains(l.Number)).ToArray();
 
