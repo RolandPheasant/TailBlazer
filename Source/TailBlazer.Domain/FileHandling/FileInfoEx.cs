@@ -92,23 +92,26 @@ namespace TailBlazer.Domain.FileHandling
                     .Scan(Tuple.Create(new ImmutableList<int>(), 0), (state, _) =>
                     {
 
-                        var result = state.Item1;
+                       
                         var i = state.Item2;
-
+                        var newItems = new List<int>();
                         while ((line = reader.ReadLine()) != null)
                         {
                             if (predicate == null)
                             {
                                 i++;
-                                result = result.Add(i);
+                                newItems.Add(i);
                             }
                             else
                             {
                                 i++;
                                 if (!predicate(line)) continue;
-                                result = result.Add(i);
+                                newItems.Add(i);
+
                             }
                         }
+                        var result = state.Item1.Add(newItems.ToArray());
+
                         return Tuple.Create(result,i);
                     } ).Select(tuple=>tuple.Item1.Data)
                     .SubscribeSafe(observer);
