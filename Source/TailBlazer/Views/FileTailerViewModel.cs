@@ -35,7 +35,7 @@ namespace TailBlazer.Views
 
             var loader = tailer.Lines.Connect()
                 .Buffer(TimeSpan.FromMilliseconds(125)).FlattenBufferResult()
-                .Transform(line => new LineProxy(line,  (DateTime?)null))
+                .Transform(line => new LineProxy(line))
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy.Number))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)

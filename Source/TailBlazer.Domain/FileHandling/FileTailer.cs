@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
+using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -25,11 +27,29 @@ namespace TailBlazer.Domain.FileHandling
             if (textToMatch == null) throw new ArgumentNullException(nameof(textToMatch));
             
             //create list of lines which contain the observable text
-            MatchedLines = file.ScanLineNumbers(textToMatch)
-                                .Replay(1)
-                                .RefCount();
-            
-            //count of lines.
+           var matchedLines = textToMatch
+                    .Select(searchText =>
+                    {
+                        Func<string, bool> predicate = null;
+                        if (!string.IsNullOrEmpty(searchText))
+                            predicate = s => s.Contains(searchText, StringComparison.OrdinalIgnoreCase);
+
+                        //get rid of this end of line state thing (make it part of the scan lines observable)
+                        int endOfTail = int.MaxValue;
+
+                        return file.ScanLineNumbers(predicate, eof=> endOfTail=eof)
+                                .Select((matchingLines, index)=> new
+                                {
+                                    matchingLines,
+                                    isInitial = index==0,
+                                    endOfTail
+                                });
+                    }).Switch()
+                    .Replay(1).RefCount();
+
+            MatchedLines = matchedLines.Select(x => x.matchingLines);
+
+          //count of lines.
             TotalLines = file.CountLines();
 
             //var scroller2 = file.ScanLineNumbers(textToMatch).Subscribe(x => Console.WriteLine(x));
@@ -39,14 +59,18 @@ namespace TailBlazer.Domain.FileHandling
             
             //this is the beast! Dynamically combine lines requested by the consumer 
             //with the lines which exist in the file. This enables proper virtualisation of the file 
-            var scroller = MatchedLines
-                .CombineLatest(scrollRequest, (matched, request) => new {allLines = matched , request })
+            var scroller = matchedLines
+                .CombineLatest(scrollRequest, (matched, request) => new {  matched , request })
                 .Subscribe(x =>
                 {
                     var mode = x.request.Mode;
                     var pageSize = x.request.PageSize;
-                    var allLines = x.allLines;
+
+                    var endOfTail = x.matched.endOfTail;
+                    var isInitial = x.matched.isInitial;
+                    var allLines = x.matched.matchingLines;
                     var previousPage = lines.Items.Select(l => l.Number).ToArray();
+
 
                     //If tailing, take the end only. 
                     //Otherwise take the page size and start index from the request
@@ -58,7 +82,7 @@ namespace TailBlazer.Domain.FileHandling
                     var removed = previousPage.Except(currentPage);
                    
                     //read new lines frome the file
-                    var addedLines = file.ReadLines(added).ToArray();
+                    var addedLines = file.ReadLines(added,i=> !isInitial && i > endOfTail).ToArray();
 
                     //get old lines from the current collection
                     var removedLines = lines.Items.Where(l=> removed.Contains(l.Number)).ToArray();

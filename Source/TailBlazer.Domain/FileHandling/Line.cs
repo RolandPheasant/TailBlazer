@@ -6,11 +6,13 @@ namespace TailBlazer.Domain.FileHandling
     {
         public int Number { get;  }
         public string Text { get;  }
+        public DateTime? Timestamp { get;  }
 
-        public Line(int number, string text)
+        public Line(int number, string text, DateTime? timestamp)
         {
             Number = number;
             Text = text;
+            Timestamp = timestamp;
         }
 
         #region Equality

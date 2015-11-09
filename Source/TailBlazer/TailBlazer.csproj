@@ -120,6 +120,8 @@
     </ApplicationDefinition>
     <Compile Include="Infrastucture\AutoScroller.cs" />
     <Compile Include="Infrastucture\SchedulerProvider.cs" />
+    <Compile Include="Infrastucture\SearchableTextControl.cs" />
+    <Compile Include="Infrastucture\SolidColorAnimation.cs" />
     <Compile Include="Views\FileTailerView.xaml.cs">
       <DependentUpon>FileTailerView.xaml</DependentUpon>
     </Compile>
@@ -198,7 +200,6 @@
       <Name>TailBlazer.Domain</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

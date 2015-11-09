@@ -73,8 +73,9 @@ namespace TailBlazer.Domain.FileHandling
         /// </summary>
         /// <param name="file">The file.</param>
         /// <param name="predicate">The predicate.</param>
+        /// <param name="endOfTailChanged">The end of tail changed.</param>
         /// <returns></returns>
-        public static IObservable<int[]> ScanLineNumbers(this FileInfo file, Func<string, bool> predicate = null)
+        public static IObservable<int[]> ScanLineNumbers(this FileInfo file, Func<string, bool> predicate = null, Action<int> endOfTailChanged = null)
         {
 
             return Observable.Create<int[]>(observer =>
@@ -92,8 +93,12 @@ namespace TailBlazer.Domain.FileHandling
                     .Scan(Tuple.Create(new ImmutableList<int>(), 0), (state, _) =>
                     {
 
-                       
+
                         var i = state.Item2;
+
+                        //notify  
+                        endOfTailChanged?.Invoke(i);
+
                         var newItems = new List<int>();
                         while ((line = reader.ReadLine()) != null)
                         {
@@ -112,8 +117,9 @@ namespace TailBlazer.Domain.FileHandling
                         }
                         var result = state.Item1.Add(newItems.ToArray());
 
-                        return Tuple.Create(result,i);
-                    } ).Select(tuple=>tuple.Item1.Data)
+
+                        return Tuple.Create(result, i);
+                    }).Select((tuple,index) => tuple.Item1.Data)
                     .SubscribeSafe(observer);
 
                 return Disposable.Create(() =>
@@ -127,8 +133,8 @@ namespace TailBlazer.Domain.FileHandling
             });
 
         }
-        
-        public static IEnumerable<Line> ReadLines(this FileInfo source, int[] lines)
+
+        public static IEnumerable<Line> ReadLines(this FileInfo source, int[] lines, Func<int, bool> isEndOfTail = null)
         {
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
@@ -141,7 +147,7 @@ namespace TailBlazer.Domain.FileHandling
                         position++;
 
                         if (lines.Contains(position))
-                            yield return new Line(position,line);
+                            yield return new Line(position,line, isEndOfTail==null ? null :(isEndOfTail(position)? DateTime.Now : (DateTime?)null));
                     }
                 }
             }

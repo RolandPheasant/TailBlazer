@@ -15,6 +15,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
                 <!--<ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.TextBox.xaml" />-->
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -37,6 +38,7 @@
 
         <TextBox  x:Name="SearchTextBox" 
                     wpf:TextFieldAssist.Hint="Search file"
+                  
                     Margin="4 0 0 0"
                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     VerticalAlignment="Center"
@@ -76,21 +78,36 @@
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Text="{Binding Number, Mode=OneWay}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding Text, Mode=OneWay}"/>
+                            
+                        <infrastucture:SearchableTextControl Grid.Column="1" 
+                                                            IsHighlight="True"  IsMatchCase="False"
+                                                            SearchText="{Binding ElementName=SearchTextBox,Path=Text}"
+                                                            HighlightBackground="{StaticResource SecondaryAccentBrush}"
+                                                            HighlightForeground="{StaticResource SecondaryAccentForegroundBrush}"
+                                                            Text="{Binding Text}"/>
                     </Grid>
                 </DataTemplate>
 
-                <!--<ListBox.ItemContainerStyle>
+
+
+            </ListBox.ItemTemplate>
+
+                <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
                         <Style.Triggers>
 
-                            <DataTrigger Binding="{Binding Removing}" Value="True">
+                            <DataTrigger Binding="{Binding IsRecent}" Value="True">
                                 <DataTrigger.EnterActions>
                                     <BeginStoryboard>
                                         <Storyboard>
-                                            <DoubleAnimation
-                                                Storyboard.TargetProperty="(TextBlock.Opacity)"
-                                                From="1.0" To="0.1" Duration="0:0:0.75"/>
+                                            <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Background).(SolidColorBrush.Color)" 
+                                                                               FromBrush="{StaticResource SecondaryAccentBrush}" 
+                                                                               Duration="0:0:5"/>
+                                         
+                                            <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Foreground).(SolidColorBrush.Color)" 
+                                                                               ToBrush="{StaticResource SecondaryAccentForegroundBrush}" 
+                                                                               Duration="0:0:5"/>
+
                                         </Storyboard>
                                     </BeginStoryboard>
 
@@ -99,11 +116,9 @@
                         </Style.Triggers>
 
                     </Style>
-                </ListBox.ItemContainerStyle>-->
+                </ListBox.ItemContainerStyle>
 
-            </ListBox.ItemTemplate>
-
-        </ListBox>
+            </ListBox>
         </ScrollViewer>
     </Grid>
 </UserControl>
