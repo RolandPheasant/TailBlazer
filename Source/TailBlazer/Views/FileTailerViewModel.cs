@@ -16,9 +16,7 @@ namespace TailBlazer.Views
     {
         private readonly IDisposable _cleanUp;
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
-        private int _totalLines;
         private string _searchText;
-        private int _filteredLines;
         private bool _tailing;
         private string _lineCountText;
 
@@ -32,15 +30,11 @@ namespace TailBlazer.Views
 
 
             var tailer = new FileTailer(fileInfo, this.WhenValueChanged(vm=>vm.SearchText).Throttle(TimeSpan.FromMilliseconds(125)),Observable.Return(new ScrollRequest(40)));
-            //var totalCount = tailer.TotalLines.Subscribe(total => TotalLines = total);
-            //var filterCount = tailer.MatchedLines.Subscribe(filtered => FilteredLines = filtered.Length);
-
-
             var lineCounter = tailer.TotalLines.CombineLatest(tailer.MatchedLines,(total,matched)=>
             {
                 return total == matched.Length 
-                    ? $"File has {total} lines" 
-                    : $"Showing {matched.Length} of {total} lines";
+                    ? $"File has {total.ToString("#,###")} lines" 
+                    : $"Showing {matched.Length.ToString("#,###")} of {total.ToString("#,###")} lines";
             })
             .Subscribe(text => LineCountText=text);
 

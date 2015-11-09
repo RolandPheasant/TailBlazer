@@ -17,7 +17,10 @@
         WindowStartupLocation="CenterScreen"  
         WindowTransitionsEnabled="False"
        d:DataContext="{d:DesignInstance infrastucture:WindowViewModel, IsDesignTimeCreatable=False}"
-        Title="Tail Blazer" Height="350" Width="525">
+        infrastucture:DependencyObjectHook.Receiver="{Binding DropMonitor}"
+        Title="Tail Blazer" 
+        Height="350"
+        Width="525">
 
     <Window.Resources>
         <ResourceDictionary>

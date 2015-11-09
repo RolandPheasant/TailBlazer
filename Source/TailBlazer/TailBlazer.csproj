@@ -119,6 +119,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Infrastucture\AutoScroller.cs" />
+    <Compile Include="Infrastucture\FileDropMonitor.cs" />
     <Compile Include="Infrastucture\SchedulerProvider.cs" />
     <Compile Include="Infrastucture\SearchableTextControl.cs" />
     <Compile Include="Infrastucture\SolidColorAnimation.cs" />
@@ -140,7 +141,6 @@
     <Compile Include="Infrastucture\AppRegistry.cs" />
     <Compile Include="Infrastucture\BooleanToVisibilityConverter.cs" />
     <Compile Include="Infrastucture\BootStrap.cs" />
-    <Compile Include="Infrastucture\BrushAnimation.cs" />
     <Compile Include="Infrastucture\Command.cs" />
     <Compile Include="Infrastucture\DependencyObjectHook.cs" />
     <Compile Include="Infrastucture\IntertabClient.cs" />

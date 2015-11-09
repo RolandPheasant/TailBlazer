@@ -24,6 +24,8 @@ namespace TailBlazer.Infrastucture
         public ICommand OpenFileCommand { get; }
         public Command ShowInGitHubCommand { get; }
 
+        public FileDropMonitor DropMonitor { get; } = new FileDropMonitor();
+
         public WindowViewModel(IObjectProvider objectProvider, IWindowFactory windowFactory)
         {
             _objectProvider = objectProvider;
@@ -41,10 +43,13 @@ namespace TailBlazer.Infrastucture
             //                                Selected = item;
             //                            });
 
+            var fileDropped = DropMonitor.Dropped.Subscribe(OpenFile);
+
 
             _cleanUp = Disposable.Create(() =>
                                          {
-                                           //  menuController.Dispose();
+                                             fileDropped.Dispose();
+                                             DropMonitor.Dispose();
                                              foreach (var disposable in  Views.Select(vc=>vc.Content).OfType<IDisposable>())
                                                  disposable.Dispose();
                                          });
@@ -57,9 +62,11 @@ namespace TailBlazer.Infrastucture
             var result = dialog.ShowDialog();
             if (result != true) return;
 
-            var file = new FileInfo(dialog.FileName);
+            OpenFile( new FileInfo(dialog.FileName));
+        }
 
-
+        public void OpenFile(FileInfo file)
+        {
             //2. resolve TailViewModel
             var factory = _objectProvider.Get<FileTailerViewModelFactory>();
             var viewModel = factory.Create(file);
@@ -70,7 +77,6 @@ namespace TailBlazer.Infrastucture
             Selected = newItem;
 
         }
-
 
         public ItemActionCallback ClosingTabItemHandler => ClosingTabItemHandlerImpl;
 
