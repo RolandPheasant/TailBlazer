@@ -19,6 +19,8 @@ namespace TailBlazer.Views
         private int _totalLines;
         private string _searchText;
         private int _filteredLines;
+        private bool _tailing;
+        private string _lineCountText;
 
         public FileTailerViewModel(ILogger logger,ISchedulerProvider schedulerProvider, FileInfo fileInfo)
         {
@@ -26,12 +28,22 @@ namespace TailBlazer.Views
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
 
             File = fileInfo.FullName;
+            Tailing = true;
+
 
             var tailer = new FileTailer(fileInfo, this.WhenValueChanged(vm=>vm.SearchText).Throttle(TimeSpan.FromMilliseconds(125)),Observable.Return(new ScrollRequest(40)));
-            var totalCount = tailer.TotalLines.Subscribe(total => TotalLines = total);
-            var filterCount = tailer.MatchedLines.Subscribe(filtered => FilteredLines = filtered.Length);
+            //var totalCount = tailer.TotalLines.Subscribe(total => TotalLines = total);
+            //var filterCount = tailer.MatchedLines.Subscribe(filtered => FilteredLines = filtered.Length);
 
-            //TODO: 1. Add observable to give current end of tail value
+
+            var lineCounter = tailer.TotalLines.CombineLatest(tailer.MatchedLines,(total,matched)=>
+            {
+                return total == matched.Length 
+                    ? $"File has {total} lines" 
+                    : $"Showing {matched.Length} of {total} lines";
+            })
+            .Subscribe(text => LineCountText=text);
+
 
             var loader = tailer.Lines.Connect()
                 .Buffer(TimeSpan.FromMilliseconds(125)).FlattenBufferResult()
@@ -44,7 +56,7 @@ namespace TailBlazer.Views
 
 
 
-            _cleanUp = new CompositeDisposable(tailer, totalCount, loader, filterCount);
+            _cleanUp = new CompositeDisposable(tailer, lineCounter, loader);
 
         }
 
@@ -54,23 +66,36 @@ namespace TailBlazer.Views
         
         public AutoScroller AutoScroller { get; } = new AutoScroller();
 
+        public bool Tailing
+        {
+            get { return _tailing; }
+            set { SetAndRaise(ref _tailing, value); }
+        }
+
         public string SearchText
         {
             get { return _searchText; }
             set { SetAndRaise(ref _searchText, value); }
         }
 
-        public int TotalLines
+        public string LineCountText
         {
-            get { return _totalLines; }
-            set { SetAndRaise(ref _totalLines, value); }
+            get { return _lineCountText; }
+            set { SetAndRaise(ref _lineCountText, value); }
         }
 
-        public int FilteredLines
-        {
-            get { return _filteredLines; }
-            set { SetAndRaise(ref _filteredLines, value); }
-        }
+
+        //public int TotalLines
+        //{
+        //    get { return _totalLines; }
+        //    set { SetAndRaise(ref _totalLines, value); }
+        //}
+
+        //public int FilteredLines
+        //{
+        //    get { return _filteredLines; }
+        //    set { SetAndRaise(ref _filteredLines, value); }
+        //}
 
 
 

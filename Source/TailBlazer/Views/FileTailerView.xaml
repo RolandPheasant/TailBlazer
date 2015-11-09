@@ -8,7 +8,7 @@
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:FileTailerViewModel, IsDesignTimeCreatable=False}"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="400" d:DesignWidth="400">
 
     <Control.Resources>
 
@@ -24,9 +24,17 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
         <StackPanel Orientation="Horizontal">
+            
             
 
         <Viewbox Width="24" Height="24" Margin="4 0 0 0">
@@ -43,24 +51,17 @@
                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     VerticalAlignment="Center"
                     MinWidth="125"/>
-
-            <TextBlock
-                Margin="0 0 4 0"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Right"
-                Text="{Binding  TotalLines, StringFormat='The are \{0} lines in the file'}">
-
-            </TextBlock>
-
-            <TextBlock
-                Margin="2 0 4 0"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Right"
-                Text="{Binding  FilteredLines, StringFormat='\{0} matching filter'}">
-
-            </TextBlock>
         </StackPanel>
 
+            <CheckBox Grid.Column="1"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Center"
+                      IsChecked="{Binding Tailing}"
+                       Margin="0 0 6 0"
+                      >Follow tail</CheckBox>
+            
+        </Grid>
+        
         <ScrollViewer  Grid.Row="1" 
                        VerticalScrollBarVisibility="Hidden"
                        infrastucture:DependencyObjectHook.Receiver="{Binding AutoScroller}">
@@ -120,5 +121,40 @@
 
             </ListBox>
         </ScrollViewer>
+
+
+        <Grid 
+            Height="26"
+            Background="{StaticResource PrimaryHueMidBrush}"
+            Grid.Row="2"
+            Margin = "-4 0 -4 -4">
+            <!--Hack as the margin in the tab control means the botton panel has a margin (cannot be bother retemplating the tab control) -->
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.Resources>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Opacity" Value="0.8"/>
+                    <Setter Property="Margin" Value="5 4 0 4"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Foreground" Value="{StaticResource PrimaryHueMidForegroundBrush}"/>
+                </Style>
+            </Grid.Resources>
+
+
+
+            <StackPanel   Margin="0 0 6 0"
+                    Grid.Column="1" 
+                     Orientation="Horizontal" 
+                     HorizontalAlignment="Right">
+
+                <TextBlock Text="{Binding LineCountText}" />
+            </StackPanel>
+
+
+        </Grid>
     </Grid>
 </UserControl>
