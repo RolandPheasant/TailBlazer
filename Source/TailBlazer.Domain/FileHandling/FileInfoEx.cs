@@ -5,15 +5,19 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using DynamicData.Kernel;
-using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
     public static class FileInfoEx
     {
-        public static IObservable<FileNotification> WatchFile(this FileInfo file, TimeSpan? refreshPeriod = null,
-            IScheduler scheduler = null)
+        /// <summary>
+        /// A simpler alternative to the irritatingly useless FileSystemWatcher
+        /// </summary>
+        /// <param name="file">The file to monitor</param>
+        /// <param name="refreshPeriod">The refresh period.</param>
+        /// <param name="scheduler">The scheduler.</param>
+        /// <returns></returns>
+        public static IObservable<FileNotification> WatchFile(this FileInfo file, TimeSpan? refreshPeriod = null,IScheduler scheduler = null)
         {
             return Observable.Create<FileNotification>(observer =>
             {
@@ -110,74 +114,6 @@ namespace TailBlazer.Domain.FileHandling
                  }).Switch();
         }
 
-
-        /// <summary>
-        /// Produces an observable array of lines in the file which matches the specified predicate.
-        /// If no predicate is supplied all lines are returned.
-        /// </summary>
-        /// <param name="file">The file.</param>
-        /// <param name="predicate">The predicate.</param>
-        /// <param name="endOfTailChanged">The end of tail changed.</param>
-        /// <returns></returns>
-        public static IObservable<int[]> ScanLineNumbers(this FileInfo file, Func<string, bool> predicate = null, Action<int> endOfTailChanged = null)
-        {
-
-            return Observable.Create<int[]>(observer =>
-            {
-                var stream = File.Open(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite);
-                stream.Seek(0, SeekOrigin.Begin);
-
-                var reader = new StreamReader(stream);
-                string line;
-
-                var monitor = file.WatchFile()
-                    .Where(e => e.NotificationType==FileNotificationType.Created || e.NotificationType == FileNotificationType.Changed)
-                    .ToUnit()
-                    .StartWithUnit()
-                    .Scan(Tuple.Create(new ImmutableList<int>(), 0), (state, _) =>
-                    {
-
-
-                        var i = state.Item2;
-
-                        //notify  
-                        endOfTailChanged?.Invoke(i);
-
-                        var newItems = new List<int>();
-                        while ((line = reader.ReadLine()) != null)
-                        {
-                            if (predicate == null)
-                            {
-                                i++;
-                                newItems.Add(i);
-                            }
-                            else
-                            {
-                                i++;
-                                if (!predicate(line)) continue;
-                                newItems.Add(i);
-
-                            }
-                        }
-                        var result = state.Item1.Add(newItems.ToArray());
-
-
-                        return Tuple.Create(result, i);
-                    }).Select((tuple,index) => tuple.Item1.Data)
-                    .SubscribeSafe(observer);
-
-                return Disposable.Create(() =>
-                {
-                    monitor.Dispose();
-                    stream.Close();
-                    stream.Dispose();
-                    reader.Close();
-                    reader.Dispose();
-                });
-            });
-
-        }
-
         public static IEnumerable<Line> ReadLines(this FileInfo source, int[] lines, Func<int, bool> isEndOfTail = null)
         {
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
@@ -196,8 +132,5 @@ namespace TailBlazer.Domain.FileHandling
                 }
             }
         }
-
-
-
     }
 }

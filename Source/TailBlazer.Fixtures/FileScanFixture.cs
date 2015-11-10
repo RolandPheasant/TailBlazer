@@ -26,7 +26,7 @@ namespace TailBlazer.Fixtures
 
             File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i => $"{i}").ToArray());
 
-            using (info.ScanLineNumbers().Subscribe(x => result = x))
+            using (info.WatchFile().ScanFile().Subscribe(x => result = x.MatchingLines))
             {
                 result.ShouldAllBeEquivalentTo(Enumerable.Range(1, 100));
 
@@ -49,7 +49,7 @@ namespace TailBlazer.Fixtures
             File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i => $"{i}").ToArray());
 
             //filter by odd numbers
-            using (info.ScanLineNumbers(i=> int.Parse(i) %2 ==1).Subscribe(x => result = x))
+            using (info.WatchFile().ScanFile().Subscribe(x => result = x.MatchingLines))
             {
                 result.ShouldAllBeEquivalentTo(Enumerable.Range(1, 100).Where(i=>i % 2 == 1));
 

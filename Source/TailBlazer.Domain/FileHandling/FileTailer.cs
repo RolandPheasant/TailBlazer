@@ -68,7 +68,8 @@ namespace TailBlazer.Domain.FileHandling
                     var added = currentPage.Except(previousPage).ToArray();
                     var removed = previousPage.Except(currentPage);
                    
-                    //read new lines frome the file
+                    //TODO: Readline can throw an error, so need to hand this scenario
+                    //read new lines from the file
                     var addedLines = file.ReadLines(added,i=> !isInitial && i > endOfTail).ToArray();
 
                     //get old lines from the current collection
