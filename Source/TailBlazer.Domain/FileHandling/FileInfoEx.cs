@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using DynamicData.Kernel;
 using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
-
-
     public static class FileInfoEx
     {
         /// <summary>
@@ -48,7 +48,8 @@ namespace TailBlazer.Domain.FileHandling
                 };
                 
                 var monitor = file.WatchFile()
-                    .Where(e => e.ChangeType == WatcherChangeTypes.Changed)
+                .Where(e => e.NotificationType == FileNotificationType.Created || e.NotificationType == FileNotificationType.Changed)
+
                     .ToUnit()
                     .StartWithUnit()
                     .Scan(countToEnd(), (total, _) => total + countToEnd())
@@ -87,7 +88,7 @@ namespace TailBlazer.Domain.FileHandling
                 string line;
 
                 var monitor = file.WatchFile()
-                    .Where(e => e.ChangeType == WatcherChangeTypes.Changed)
+                    .Where(e => e.NotificationType==FileNotificationType.Created || e.NotificationType == FileNotificationType.Changed)
                     .ToUnit()
                     .StartWithUnit()
                     .Scan(Tuple.Create(new ImmutableList<int>(), 0), (state, _) =>
@@ -154,50 +155,62 @@ namespace TailBlazer.Domain.FileHandling
         }
 
 
-        public static IObservable<int[]> ScanLineNumbers(this FileInfo source, IObservable<string> textToMatch)
-        {
-            return textToMatch
-                .Select(searchText =>
-                {
-                    Func<string, bool> predicate = null;
-                    if (!string.IsNullOrEmpty(searchText))
-                        predicate = s => s.Contains(searchText, StringComparison.OrdinalIgnoreCase);
-
-                    return source.ScanLineNumbers(predicate);
-                }).Switch();
-        }
-
-
-        public static IObservable<FileSystemEventArgs> WatchFile(this FileInfo file)
+        public static IObservable<FileNotification> WatchFile(this FileInfo file, TimeSpan? refreshPeriod=null, 
+            IScheduler scheduler=null )
         {
             //TODO: Create a return parameter signature which allows for all events to be monitors in one observable
 
-            return Observable.Create<FileSystemEventArgs>(observer =>
+            return Observable.Create<FileNotification>(observer =>
             {
+                var refresh = refreshPeriod ?? TimeSpan.FromMilliseconds(250);
+                scheduler = scheduler ?? Scheduler.Default;
 
-                var watcher = new FileSystemWatcher(file.DirectoryName, file.Name);
-                watcher.EnableRaisingEvents = true;
+                //TODO: create a cool-off period after a poll to account for over running jobs
+               Func<IObservable<FileNotification>> poller =  () => Observable.Interval(refresh, scheduler)
+                                        .Scan((FileNotification)null, (state, _) =>
+                                        {
+                                            return state == null 
+                                                ? new FileNotification(file) 
+                                                : new FileNotification(state);
+                                        }).DistinctUntilChanged();
 
-                var changed = Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>
-                    (h => watcher.Changed += h, h => watcher.Changed -= h)
-                    .Select(ev => ev.EventArgs);
-
-                var deleted = Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>
-                    (h => watcher.Deleted += h, h => watcher.Deleted -= h)
-                    .Select(ev => ev.EventArgs);
-
-                var created = Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>
-                    (h => watcher.Created += h, h => watcher.Created -= h)
-                    .Select(ev => ev.EventArgs);
-
-                var renamed = Observable.FromEventPattern<RenamedEventHandler, RenamedEventArgs>
-                        (h => watcher.Renamed += h, h => watcher.Renamed -= h)
-                        .Select(ev => ev.EventArgs);
-
-                return new CompositeDisposable(watcher, changed.Merge(created).Merge(deleted).SubscribeSafe(observer));
-
+                //in theory, poll merrily away except slow down when there is an error
+                return poller()
+                    .Catch<FileNotification, Exception>(ex => Observable.Return(new FileNotification(file, ex))
+                                                               .Concat(poller().DelaySubscription(TimeSpan.FromSeconds(10))))
+                     .SubscribeSafe(observer);
             });
         }
+        //public static IObservable<FileSystemEventArgs> WatchFile2(this FileInfo file)
+        //{
+        //    //TODO: Create a return parameter signature which allows for all events to be monitors in one observable
+
+        //    return Observable.Create<FileSystemEventArgs>(observer =>
+        //    {
+
+        //        var watcher = new FileSystemWatcher(file.DirectoryName, file.Name);
+        //        watcher.EnableRaisingEvents = true;
+
+        //        var changed = Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>
+        //            (h => watcher.Changed += h, h => watcher.Changed -= h)
+        //            .Select(ev => ev.EventArgs);
+
+        //        var deleted = Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>
+        //            (h => watcher.Deleted += h, h => watcher.Deleted -= h)
+        //            .Select(ev => ev.EventArgs);
+
+        //        var created = Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>
+        //            (h => watcher.Created += h, h => watcher.Created -= h)
+        //            .Select(ev => ev.EventArgs);
+
+        //        var renamed = Observable.FromEventPattern<RenamedEventHandler, RenamedEventArgs>
+        //                (h => watcher.Renamed += h, h => watcher.Renamed -= h)
+        //                .Select(ev => ev.EventArgs);
+
+        //        return new CompositeDisposable(watcher, changed.Merge(created).Merge(deleted).SubscribeSafe(observer));
+
+        //    });
+        //}
 
     }
 }

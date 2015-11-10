@@ -33,16 +33,6 @@ namespace TailBlazer.Infrastucture
             OpenFileCommand =  new Command(OpenFile);
             ShowInGitHubCommand = new Command(()=>   Process.Start("https://github.com/RolandPheasant"));
 
-            //var menuController = Views.ToObservableChangeSet()
-            //                            .Filter(vc => vc.Content is MenuItems)
-            //                            .Transform(vc => (MenuItems)vc.Content)
-            //                            .MergeMany(menuItem => menuItem.ItemCreated)
-            //                            .Subscribe(item =>
-            //                            {
-            //                                Views.Add(item);
-            //                                Selected = item;
-            //                            });
-
             var fileDropped = DropMonitor.Dropped.Subscribe(OpenFile);
 
 

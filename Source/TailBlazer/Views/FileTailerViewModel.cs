@@ -78,21 +78,6 @@ namespace TailBlazer.Views
             set { SetAndRaise(ref _lineCountText, value); }
         }
 
-
-        //public int TotalLines
-        //{
-        //    get { return _totalLines; }
-        //    set { SetAndRaise(ref _totalLines, value); }
-        //}
-
-        //public int FilteredLines
-        //{
-        //    get { return _filteredLines; }
-        //    set { SetAndRaise(ref _filteredLines, value); }
-        //}
-
-
-
         public void Dispose()
         {
             _cleanUp.Dispose();

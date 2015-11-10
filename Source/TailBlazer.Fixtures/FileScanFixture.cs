@@ -8,14 +8,13 @@ using Xunit;
 
 namespace TailBlazer.Fixtures
 {
-
     /*
-        Putting a thread sleep into a test sucks. However the file system watcher 
-        which ScanLineNumbers() is based on is async by nature and since
-        it is build from old fashioned events there is no way to pass in a scheduler.
-        If someone has a solution to eliminate Thread.Sleep crap, please let me know
-    */
-    public class ScanLineNumberFixtures
+            Putting a thread sleep into a test sucks. However the file system watcher 
+            which ScanLineNumbers() is based on is async by nature and since
+            it is build from old fashioned events there is no way to pass in a scheduler.
+            If someone has a solution to eliminate Thread.Sleep crap, please let me know
+        */
+        public class ScanLineNumberFixtures
     {
 
         [Fact]
