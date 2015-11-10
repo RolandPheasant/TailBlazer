@@ -33,8 +33,7 @@ namespace TailBlazer.Fixtures
                 File.AppendAllLines(file, Enumerable.Range(11, 10).Select(i => i.ToString()));
                 scheduler.AdvanceBySeconds(1);
                 result.NotificationType.Should().Be(FileNotificationType.Changed);
-
-
+                
                 File.Delete(file);
                 scheduler.AdvanceBySeconds(1);
                 result.NotificationType.Should().Be(FileNotificationType.Missing);

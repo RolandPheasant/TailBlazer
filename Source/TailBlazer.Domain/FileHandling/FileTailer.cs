@@ -1,11 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
-using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -15,7 +13,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public IObservable<int> TotalLines { get;  }
 
-        public IObservable<int[]> MatchedLines { get; }
+        public IObservable<int> MatchedLines { get; }
 
         public IObservableList<Line> Lines { get; }
 
@@ -34,44 +32,33 @@ namespace TailBlazer.Domain.FileHandling
                         if (!string.IsNullOrEmpty(searchText))
                             predicate = s => s.Contains(searchText, StringComparison.OrdinalIgnoreCase);
 
-                        //get rid of this end of line state thing (make it part of the scan lines observable)
-                        int endOfTail = int.MaxValue;
-
-                        return file.ScanLineNumbers(predicate, eof=> endOfTail=eof)
-                                .Select((matchingLines, index)=> new
-                                {
-                                    matchingLines,
-                                    isInitial = index==0,
-                                    endOfTail
-                                });
+                        return file.WatchFile().ScanFile(predicate);
                     }).Switch()
                     .Replay(1).RefCount();
 
-            MatchedLines = matchedLines.Select(x => x.matchingLines);
+            MatchedLines = matchedLines.Select(x => x.MatchingLines.Length);
 
-          //count of lines.
-            TotalLines = file.CountLines();
+            TotalLines = matchedLines.Select(x => x.TotalLines);
 
-            //var scroller2 = file.ScanLineNumbers(textToMatch).Subscribe(x => Console.WriteLine(x));
-
+            //todo: plug in file missing or error into the screen
+            
             var lines = new SourceList<Line>();
             Lines = lines.AsObservableList();
             
             //this is the beast! Dynamically combine lines requested by the consumer 
             //with the lines which exist in the file. This enables proper virtualisation of the file 
             var scroller = matchedLines
-                .CombineLatest(scrollRequest, (matched, request) => new {  matched , request })
+                .CombineLatest(scrollRequest, (matched, request) => new {scanResult = matched , request })
                 .Subscribe(x =>
                 {
                     var mode = x.request.Mode;
                     var pageSize = x.request.PageSize;
 
-                    var endOfTail = x.matched.endOfTail;
-                    var isInitial = x.matched.isInitial;
-                    var allLines = x.matched.matchingLines;
+                    var endOfTail = x.scanResult.EndOfTail;
+                    var isInitial = x.scanResult.Index==0;
+                    var allLines = x.scanResult.MatchingLines;
                     var previousPage = lines.Items.Select(l => l.Number).ToArray();
-
-
+                    
                     //If tailing, take the end only. 
                     //Otherwise take the page size and start index from the request
                     var currentPage = (mode == ScrollingMode.Tail

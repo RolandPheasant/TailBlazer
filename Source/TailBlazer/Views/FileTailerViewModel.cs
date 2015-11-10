@@ -32,9 +32,9 @@ namespace TailBlazer.Views
             var tailer = new FileTailer(fileInfo, this.WhenValueChanged(vm=>vm.SearchText).Throttle(TimeSpan.FromMilliseconds(125)),Observable.Return(new ScrollRequest(40)));
             var lineCounter = tailer.TotalLines.CombineLatest(tailer.MatchedLines,(total,matched)=>
             {
-                return total == matched.Length 
+                return total == matched 
                     ? $"File has {total.ToString("#,###")} lines" 
-                    : $"Showing {matched.Length.ToString("#,###")} of {total.ToString("#,###")} lines";
+                    : $"Showing {matched.ToString("#,###")} of {total.ToString("#,###")} lines";
             })
             .Subscribe(text => LineCountText=text);
 
