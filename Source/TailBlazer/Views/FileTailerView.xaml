@@ -58,21 +58,46 @@
             <CheckBox Grid.Column="1"
                       HorizontalAlignment="Right"
                       VerticalAlignment="Center"
-                      IsChecked="{Binding Tailing}"
+                      IsChecked="{Binding AutoTail}"
                        Margin="0 0 6 0"
                       >Follow tail</CheckBox>
             
         </Grid>
         
-        <ScrollViewer  Grid.Row="1" 
-                       VerticalScrollBarVisibility="Hidden"
-                       infrastucture:DependencyObjectHook.Receiver="{Binding AutoScroller}">
-            
 
-        <ListBox
+            <ListBox  Grid.Row="1" 
                  ItemsSource="{Binding Lines}">
+            
+            <ListBox.Template>
+                    <ControlTemplate>
+                        <ScrollViewer x:Name="ScrollViewer" 
+                                       infrastucture:DependencyObjectHook.Receiver="{Binding AutoScroller}"
+                                        VerticalScrollBarVisibility="Auto"
+                                        HorizontalScrollBarVisibility="Auto"
+                                       CanContentScroll="True"
+                                      
+                                        Padding="{TemplateBinding Padding}"
+                                        Background="{TemplateBinding Background}" 
+                                        BorderBrush="Transparent" BorderThickness="0" 
+                                        IsTabStop="False">
+                            <ItemsPresenter />
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </ListBox.Template>
 
-            <ListBox.ItemTemplate>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                    <local:VirtualDataPanel ItemHeight="30"
+                                                ScrollReceiver="{Binding}"  
+                                                StartIndex="{Binding FirstRow,Mode=TwoWay}"
+                                                TotalItems="{Binding MatchedLineCount}">
+
+
+                        </local:VirtualDataPanel>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+
+                <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type local:LineProxy}">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -122,7 +147,6 @@
                 </ListBox.ItemContainerStyle>
 
             </ListBox>
-        </ScrollViewer>
 
 
         <Grid 

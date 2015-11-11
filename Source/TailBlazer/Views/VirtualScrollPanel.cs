@@ -7,76 +7,29 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace DynamicData.Client.Infrastructure
+namespace TailBlazer.Views
 {
 
-
-    //public class ScrollViewer2: ScrollViewer
-    //{
-    //    override 
-    //}
-
-    public class BetterVirtualizingStackPanel : VirtualizingStackPanel  
+    public class ScrollValues
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:System.Windows.Controls.VirtualizingStackPanel"/> class.
-        /// </summary>
-        public BetterVirtualizingStackPanel()
+        public int Rows { get;  }
+        public int FirstIndex { get;  }
+
+        public ScrollValues(int rows, int firstIndex)
         {
-        //    base.ItemContainerGenerator.
+            Rows = rows;
+            FirstIndex = firstIndex;
         }
-
-        #region Overrides of VirtualizingStackPanel
-
-        /// <summary>
-        /// Called when the size of the viewport changes.
-        /// </summary>
-        /// <param name="oldViewportSize">The old size of the viewport.</param><param name="newViewportSize">The new size of the viewport.</param>
-        protected override void OnViewportSizeChanged(Size oldViewportSize, Size newViewportSize)
-        {
-            base.OnViewportSizeChanged(oldViewportSize, newViewportSize);
-        }
-
-       // #region Overrides of Panel
-
-        /// <summary>
-        /// Invoked when the <see cref="T:System.Windows.Media.VisualCollection"/> of a visual object is modified.
-        /// </summary>
-        /// <param name="visualAdded">The <see cref="T:System.Windows.Media.Visual"/> that was added to the collection.</param><param name="visualRemoved">The <see cref="T:System.Windows.Media.Visual"/> that was removed from the collection.</param>
-        protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
-        {
-            base.OnVisualChildrenChanged(visualAdded, visualRemoved);
-        }
-
-        #region Overrides of VirtualizingStackPanel
-
-        /// <summary>
-        /// Called when the <see cref="P:System.Windows.Controls.ItemsControl.Items"/> collection that is associated with the <see cref="T:System.Windows.Controls.ItemsControl"/> for this <see cref="T:System.Windows.Controls.Panel"/> changes.
-        /// </summary>
-        /// <param name="sender">The <see cref="T:System.Object"/> that raised the event.</param><param name="args">Provides data for the <see cref="E:System.Windows.Controls.ItemContainerGenerator.ItemsChanged"/> event.</param>
-        protected override void OnItemsChanged(object sender, ItemsChangedEventArgs args)
-        {
-            base.OnItemsChanged(sender, args);
-        }
-
-        #region Overrides of UIElement
-
-        /// <summary>
-        /// Provides class handling for when an access key that is meaningful for this element is invoked. 
-        /// </summary>
-        /// <param name="e">The event data to the access key event. The event data reports which key was invoked, and indicate whether the <see cref="T:System.Windows.Input.AccessKeyManager"/> object that controls the sending of these events also sent this access key invocation to other elements.</param>
-     //   override on
-        #endregion
-
-        #endregion
-
-        //  override 
-
-
-        #endregion
     }
 
 
+    public interface IScrollReceiver
+    {
+        void RequestChange(ScrollValues values);
+    }
+
+
+    //TODO: Rewrite using a panel as the base
     public class VirtualDataPanel : VirtualizingPanel, IScrollInfo
     {
         private const double ScrollLineAmount = 16.0;
@@ -86,42 +39,29 @@ namespace DynamicData.Client.Infrastructure
         private Point _offset;
         private ItemsControl _itemsControl;
         private readonly Dictionary<UIElement, Rect> _childLayouts = new Dictionary<UIElement, Rect>();
-
+        private IRecyclingItemContainerGenerator _itemsGenerator;
+        private bool _isInMeasure;
 
         public static readonly DependencyProperty ItemHeightProperty =
-            DependencyProperty.Register("ItemHeight", typeof(double), typeof(VirtualDataPanel), new PropertyMetadata(1.0, HandleItemDimensionChanged));
+            DependencyProperty.Register("ItemHeight", typeof(double), typeof(VirtualDataPanel), new PropertyMetadata(1.0, OnRequireMeasure));
 
         
         private static readonly DependencyProperty VirtualItemIndexProperty =
             DependencyProperty.RegisterAttached("VirtualItemIndex", typeof(int), typeof(VirtualDataPanel), new PropertyMetadata(-1));
 
         public static readonly DependencyProperty TotalItemsProperty =
-            DependencyProperty.Register("TotalItems", typeof (int), typeof (VirtualDataPanel), new PropertyMetadata(default(int),HandleItemDimensionChanged));
+            DependencyProperty.Register("TotalItems", typeof (int), typeof (VirtualDataPanel), new PropertyMetadata(default(int),OnRequireMeasure));
         
         public static readonly DependencyProperty StartIndexProperty =
-            DependencyProperty.Register("StartIndex", typeof(int), typeof(VirtualDataPanel), new PropertyMetadata(default(int), HandleItemDimensionChanged));
+            DependencyProperty.Register("StartIndex", typeof(int), typeof(VirtualDataPanel), new PropertyMetadata(default(int), OnStartIndexChanged));
 
+        public static readonly DependencyProperty ScrollReceiverProperty = DependencyProperty.Register(
+            "ScrollReceiver", typeof (IScrollReceiver), typeof (VirtualDataPanel), new PropertyMetadata(default(IScrollReceiver)));
 
-        public static readonly DependencyProperty ChangeStartIndexCommandProperty =
-            DependencyProperty.Register("ChangeStartIndexCommand", typeof(ICommand), typeof(VirtualDataPanel), new PropertyMetadata(default(ICommand)));
-
-        public static readonly DependencyProperty ChangeSizeCommandProperty =
-            DependencyProperty.Register("ChangeSizeCommand", typeof (ICommand), typeof (VirtualDataPanel), new PropertyMetadata(default(ICommand)));
-
-
-
-
-        public ICommand ChangeSizeCommand
+        public IScrollReceiver ScrollReceiver
         {
-            get { return (ICommand) GetValue(ChangeSizeCommandProperty); }
-            set { SetValue(ChangeSizeCommandProperty, value); }
-        }
-
-
-        public ICommand ChangeStartIndexCommand
-        {
-            get { return (ICommand)GetValue(ChangeStartIndexCommandProperty); }
-            set { SetValue(ChangeStartIndexCommandProperty, value); }
+            get { return (IScrollReceiver) GetValue(ScrollReceiverProperty); }
+            set { SetValue(ScrollReceiverProperty, value); }
         }
 
         public int StartIndex
@@ -136,11 +76,6 @@ namespace DynamicData.Client.Infrastructure
             set { SetValue(TotalItemsProperty, value); }
         }
         
-        
-        private IRecyclingItemContainerGenerator _itemsGenerator;
-
-        private bool _isInMeasure;
-
         private static int GetVirtualItemIndex(DependencyObject obj)
         {
             return (int)obj.GetValue(VirtualItemIndexProperty);
@@ -157,13 +92,7 @@ namespace DynamicData.Client.Infrastructure
             set { SetValue(ItemHeightProperty, value); }
         }
 
-        public double ItemWidth
-        {
-            get
-            {
-                return _extentSize.Width;
-            }
-        }
+        public double ItemWidth => _extentSize.Width;
 
         public VirtualDataPanel()
         {
@@ -180,33 +109,49 @@ namespace DynamicData.Client.Infrastructure
 
             InvalidateMeasure();
         }
+        
 
+         private static void OnStartIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var panel = (VirtualDataPanel)d;
+            panel.InvalidateMeasure();
+            panel.InvalidateScrollInfo();
+            // panel._firstIndex = panel.StartIndex;
+
+            //panel.InvokeStartIndexCommand(panel._firstIndex);
+
+        }
+
+        private static void OnRequireMeasure(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var panel = (VirtualDataPanel)d;
+            panel.InvalidateMeasure();
+            panel.InvalidateScrollInfo();
+
+        }
+        
         protected override void OnItemsChanged(object sender, ItemsChangedEventArgs args)
         {
             base.OnItemsChanged(sender, args);
-
             InvalidateMeasure();
         }
-
-
+        
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
             base.OnRenderSizeChanged(sizeInfo);
 
-            if (sizeInfo.HeightChanged)
-            {
-                var items = (int)(sizeInfo.NewSize.Height / ItemHeight)+4;
-                InvokeSizeCommand(items);
-            }
+            if (!sizeInfo.HeightChanged) return;
+
+            // var items = (int)(sizeInfo.NewSize.Height / ItemHeight)+4;
+            var items = (int)(sizeInfo.NewSize.Height / ItemHeight) ;
+           // InvalidateScrollInfo();
+            InvokeSizeCommand(items);
+
         }
 
         protected override Size MeasureOverride(Size availableSize)
         {
-
-            if (_itemsControl == null)
-            {
-                return availableSize;
-            }
+            if (_itemsControl == null) return availableSize;
             
             _isInMeasure = true;
             _childLayouts.Clear();
@@ -236,6 +181,9 @@ namespace DynamicData.Client.Infrastructure
                     bool newlyRealized;
 
                     var child = (UIElement)_itemsGenerator.GenerateNext(out newlyRealized);
+
+                    if (child==null) continue;
+
                     SetVirtualItemIndex(child, itemIndex);
 
                     if (newlyRealized)
@@ -256,6 +204,7 @@ namespace DynamicData.Client.Infrastructure
                                 }
 
                                 InsertInternalChild(visualIndex, child);
+                                //InsertInternalChild(visualIndex, child);
                             }
                         }
                         else
@@ -270,15 +219,12 @@ namespace DynamicData.Client.Infrastructure
                     // only prepare the item once it has been added to the visual tree
                     _itemsGenerator.PrepareItemContainer(child);
                     child.Measure(new Size(double.PositiveInfinity, ItemHeight));
-                    actualWidth = Math.Max(actualWidth, child.DesiredSize.Width);
+                    actualWidth = _viewportSize.Width;//  Math.Max(actualWidth, child.DesiredSize.Width);
 
                     _childLayouts.Add(child, new Rect(currentX, currentY, actualWidth, ItemHeight));
                     currentY += ItemHeight;
                 }
             }
-
-
-           // Console.WriteLine(actualWidth);
             RemoveRedundantChildren();
             UpdateScrollInfo(availableSize, extentInfo,actualWidth);
 
@@ -286,18 +232,6 @@ namespace DynamicData.Client.Infrastructure
                                        double.IsInfinity(availableSize.Height) ? 0 : availableSize.Height);
 
             _isInMeasure = false;
-            
-            //if (_size!=desiredSize)
-            //{
-            //    _size = desiredSize;
-
-            //    var xxx = (int)(desiredSize.Height/ItemHeight);
-            //   InvokeSizeCommand(xxx + 5);
-
-            //}
-           
-
-
             return desiredSize;
         }
 
@@ -331,7 +265,6 @@ namespace DynamicData.Client.Infrastructure
             {
                 child.Arrange(_childLayouts[child]);
             }
-
             return finalSize;
         }
 
@@ -341,6 +274,11 @@ namespace DynamicData.Client.Infrastructure
             _extentSize = new Size(actualWidth, extentInfo.Height);
 
             InvalidateScrollInfo();
+        }
+
+        private void InvalidateScrollInfo()
+        {
+            ScrollOwner?.InvalidateScrollInfo();
         }
 
         private void RemoveRedundantChildren()
@@ -373,11 +311,9 @@ namespace DynamicData.Client.Infrastructure
             // in that row
 
             var firstVisibleLine = (int)Math.Floor(_offset.Y / itemHeight);
-
             var firstRealizedIndex = Math.Max(firstVisibleLine - 1, 0);
             var firstRealizedItemLeft = firstRealizedIndex  * ItemWidth - HorizontalOffset;
             var firstRealizedItemTop = (firstRealizedIndex ) * itemHeight - _offset.Y;
-
             var firstCompleteLineTop = (firstVisibleLine == 0 ? firstRealizedItemTop : firstRealizedItemTop + ItemHeight);
             var completeRealizedLines = (int)Math.Ceiling((availableSize.Height - firstCompleteLineTop) / itemHeight);
 
@@ -392,35 +328,111 @@ namespace DynamicData.Client.Infrastructure
             };
         }
 
+        
+
         private ExtentInfo GetVerticalExtentInfo(Size viewPortSize)
         {
             if (_itemsControl == null)
-            {
                 return new ExtentInfo();
-            }
-
+        
             var extentHeight = Math.Max(TotalItems * ItemHeight, viewPortSize.Height);
+            var maxVerticalOffset = extentHeight - viewPortSize.Height;
+            var verticalOffset = (StartIndex /(double) TotalItems)*maxVerticalOffset;
 
             var info = new ExtentInfo()
             {
                 VirtualCount = _itemsControl.Items.Count,
-                VerticalOffset = StartIndex * ItemHeight,
                 TotalCount = TotalItems,
                 Height = extentHeight,
-                MaxVerticalOffset = extentHeight - viewPortSize.Height,
+                VerticalOffset = verticalOffset,
+                MaxVerticalOffset = maxVerticalOffset,
             };
             return info;
         }
 
 
+
+        public void SetHorizontalOffset(double offset)
+        {
+            offset = Clamp(offset, 0, ExtentWidth - ViewportWidth);
+
+            if (offset<0)
+            {
+                _offset.X = 0;
+            }
+            else
+            {
+                _offset = new Point(offset, _offset.Y);
+
+            }
+
+            InvalidateScrollInfo();
+            InvalidateMeasure();
+        }
+
+        public void SetVerticalOffset(double offset)
+        {
+
+            if (double.IsInfinity(offset)) return;
+
+            var diff = (int)((offset - _extentInfo.VerticalOffset) / ItemHeight);
+            InvokeStartIndexCommand(diff);
+        }
+
+        
+        private double Clamp(double value, double min, double max)
+        {
+            return Math.Min(Math.Max(value, min), max);
+        }
+
+        private int _firstIndex;
+        private int _size;
+
+        private void InvokeStartIndexCommand(int lines)
+        {
+            if (_isInMeasure) return;
+
+            var firstIndex = StartIndex + lines;
+            if (firstIndex<0)
+            {
+                firstIndex = 0;
+            }
+            else if (firstIndex + _extentInfo.VirtualCount >_extentInfo.TotalCount)
+            {
+                firstIndex = _extentInfo.TotalCount - _extentInfo.VirtualCount;
+            }
+
+            if (firstIndex == _firstIndex) return;
+
+            _firstIndex = firstIndex;
+         //   StartIndex = firstIndex;
+            ScrollReceiver?.RequestChange(new ScrollValues(_size, _firstIndex+1));
+        }
+ 
+        private void InvokeSizeCommand(int size)
+        {
+            _size = size;
+            ScrollReceiver?.RequestChange(new ScrollValues(size, _firstIndex+1));
+        }
+
+        public bool CanVerticallyScroll {get;set;}
+        public bool CanHorizontallyScroll {get;set;}
+        public double ExtentWidth => _extentSize.Width;
+        public double ExtentHeight => _extentSize.Height;
+        public double ViewportWidth => _viewportSize.Width;
+        public double ViewportHeight => _viewportSize.Height;
+        public double HorizontalOffset => _offset.X;
+        public double VerticalOffset => _offset.Y + _extentInfo.VerticalOffset;
+        public ScrollViewer ScrollOwner {get;set;}
+
         public void LineUp()
         {
-            InvokeStartIndexCommand(-1);
+           // InvokeStartIndexCommand(-1);
         }
 
         public void LineDown()
         {
-            InvokeStartIndexCommand(1);
+          //  InvokeStartIndexCommand(1);
         }
 
         public void LineLeft()
@@ -472,152 +484,21 @@ namespace DynamicData.Client.Infrastructure
         {
             SetHorizontalOffset(HorizontalOffset + ScrollLineAmount * SystemParameters.WheelScrollLines);
         }
-
-        public void SetHorizontalOffset(double offset)
-        {
-            offset = Clamp(offset, 0, ExtentWidth - ViewportWidth);
-
-            if (offset<0)
-            {
-                _offset.X = 0;
-            }
-            else
-            {
-                _offset = new Point(offset, _offset.Y);
-
-            }
-
-            InvalidateScrollInfo();
-            InvalidateMeasure();
-        }
-
-        public void SetVerticalOffset(double offset)
-        {
-
-           
-            var diff = (int)((offset - _extentInfo.VerticalOffset) / ItemHeight);
-            InvokeStartIndexCommand(diff);
-        }
-
-
-
-        private double Clamp(double value, double min, double max)
-        {
-            return Math.Min(Math.Max(value, min), max);
-        }
-
-        private void InvokeStartIndexCommand(int lines)
-        {
-            if (_isInMeasure) return;
-
-            var firstIndex = StartIndex + lines;
-            if (firstIndex<0)
-            {
-                firstIndex = 0;
-            }
-            else if (firstIndex + _extentInfo.VirtualCount >_extentInfo.TotalCount)
-            {
-                firstIndex = _extentInfo.TotalCount - _extentInfo.VirtualCount;
-            }
-
-            Dispatcher.BeginInvoke(new Action(() => ChangeStartIndexCommand.Execute(firstIndex)));
-
-          //  InvalidateScrollInfo();
-          //  InvalidateMeasure();
-        }
-
-        private void InvokeSizeCommand(int size)
-        {
-            if (ChangeSizeCommand == null) 
-                return;
-
-            //if (_isInMeasure)
-            //{
-            //    return;
-            //}
-
-            Dispatcher.BeginInvoke(new Action(() => ChangeSizeCommand.Execute(size)))
-            ;
-            //InvalidateScrollInfo();
-           // InvalidateMeasure();
-        }
-        
         public Rect MakeVisible(Visual visual, Rect rectangle)
         {
             return new Rect();
         }
 
-
-        public bool CanVerticallyScroll
+        private class ItemLayoutInfo
         {
-            get;
-            set;
-        }
-
-        public bool CanHorizontallyScroll
-        {
-            get;
-            set;
-        }
-
-        public double ExtentWidth
-        {
-            get
-            {
-                return _extentSize.Width;
-            }
-        }
-
-        public double ExtentHeight
-        {
-            get { return _extentSize.Height; }
-        }
-
-        public double ViewportWidth
-        {
-            get { return _viewportSize.Width; }
-        }
-
-        public double ViewportHeight
-        {
-            get { return _viewportSize.Height; }
-        }
-
-        public double HorizontalOffset
-        {
-            get { return _offset.X; }
-        }
-
-        public double VerticalOffset
-        {
-            get { return _offset.Y + _extentInfo.VerticalOffset; }
-        }
-
-        public ScrollViewer ScrollOwner
-        {
-            get;
-            set;
-        }
-
-        private void InvalidateScrollInfo()
-        {
-            if (ScrollOwner != null)
-            {
-                ScrollOwner.InvalidateScrollInfo();
-            }
-        }
-
-        private static void HandleItemDimensionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var wrapPanel = (d as VirtualDataPanel);
-
-            wrapPanel.InvalidateMeasure();
+            public int FirstRealizedItemIndex;
+            public double FirstRealizedLineTop;
+            public double FirstRealizedItemLeft;
+            public int LastRealizedItemIndex;
         }
 
 
-
-
-        internal class ExtentInfo
+        private class ExtentInfo
         {
             public int TotalCount;
             public int VirtualCount;
@@ -628,12 +509,4 @@ namespace DynamicData.Client.Infrastructure
         }
     }
 
-
-    public class ItemLayoutInfo
-    {
-        public int FirstRealizedItemIndex;
-        public double FirstRealizedLineTop;
-        public double FirstRealizedItemLeft;
-        public int LastRealizedItemIndex;
-    }
 }

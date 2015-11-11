@@ -129,6 +129,7 @@
     <Compile Include="Views\FileTailerViewModel.cs" />
     <Compile Include="Views\FileTailerViewModelFactory.cs" />
     <Compile Include="Views\LineProxy.cs" />
+    <Compile Include="Views\VirtualScrollPanel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
