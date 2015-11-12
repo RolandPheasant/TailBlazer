@@ -228,7 +228,7 @@ namespace TailBlazer.Views
                 //part 3: Create the elements
                 foreach (var child in children)
                 {
-                    _childLayouts.Add(child, new Rect(currentX, currentY, widestWidth, ItemHeight));
+                    _childLayouts.Add(child, new Rect(currentX, currentY, Math.Max(widestWidth,_viewportSize.Width), ItemHeight));
                     currentY += ItemHeight;
                 }
 
