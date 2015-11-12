@@ -87,13 +87,13 @@
 
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
-                    <local:VirtualDataPanel ItemHeight="30"
+                    <local:VirtualScrollPanel ItemHeight="30"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstRow,Mode=TwoWay}"
                                                 TotalItems="{Binding MatchedLineCount}">
 
 
-                        </local:VirtualDataPanel>
+                        </local:VirtualScrollPanel>
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
 

@@ -30,7 +30,7 @@ namespace TailBlazer.Views
 
 
     //TODO: Rewrite using a panel as the base
-    public class VirtualDataPanel : VirtualizingPanel, IScrollInfo
+    public class VirtualScrollPanel : VirtualizingPanel, IScrollInfo
     {
         private const double ScrollLineAmount = 16.0;
         private Size _extentSize;
@@ -43,20 +43,20 @@ namespace TailBlazer.Views
         private bool _isInMeasure;
 
         public static readonly DependencyProperty ItemHeightProperty =
-            DependencyProperty.Register("ItemHeight", typeof(double), typeof(VirtualDataPanel), new PropertyMetadata(1.0, OnRequireMeasure));
+            DependencyProperty.Register("ItemHeight", typeof(double), typeof(VirtualScrollPanel), new PropertyMetadata(1.0, OnRequireMeasure));
 
         
         private static readonly DependencyProperty VirtualItemIndexProperty =
-            DependencyProperty.RegisterAttached("VirtualItemIndex", typeof(int), typeof(VirtualDataPanel), new PropertyMetadata(-1));
+            DependencyProperty.RegisterAttached("VirtualItemIndex", typeof(int), typeof(VirtualScrollPanel), new PropertyMetadata(-1));
 
         public static readonly DependencyProperty TotalItemsProperty =
-            DependencyProperty.Register("TotalItems", typeof (int), typeof (VirtualDataPanel), new PropertyMetadata(default(int),OnRequireMeasure));
+            DependencyProperty.Register("TotalItems", typeof (int), typeof (VirtualScrollPanel), new PropertyMetadata(default(int),OnRequireMeasure));
         
         public static readonly DependencyProperty StartIndexProperty =
-            DependencyProperty.Register("StartIndex", typeof(int), typeof(VirtualDataPanel), new PropertyMetadata(default(int), OnStartIndexChanged));
+            DependencyProperty.Register("StartIndex", typeof(int), typeof(VirtualScrollPanel), new PropertyMetadata(default(int), OnStartIndexChanged));
 
         public static readonly DependencyProperty ScrollReceiverProperty = DependencyProperty.Register(
-            "ScrollReceiver", typeof (IScrollReceiver), typeof (VirtualDataPanel), new PropertyMetadata(default(IScrollReceiver)));
+            "ScrollReceiver", typeof (IScrollReceiver), typeof (VirtualScrollPanel), new PropertyMetadata(default(IScrollReceiver)));
 
         public IScrollReceiver ScrollReceiver
         {
@@ -94,7 +94,7 @@ namespace TailBlazer.Views
 
         public double ItemWidth => _extentSize.Width;
 
-        public VirtualDataPanel()
+        public VirtualScrollPanel()
         {
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
@@ -113,7 +113,7 @@ namespace TailBlazer.Views
 
          private static void OnStartIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var panel = (VirtualDataPanel)d;
+            var panel = (VirtualScrollPanel)d;
             panel.InvalidateMeasure();
             panel.InvalidateScrollInfo();
             // panel._firstIndex = panel.StartIndex;
@@ -124,7 +124,7 @@ namespace TailBlazer.Views
 
         private static void OnRequireMeasure(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var panel = (VirtualDataPanel)d;
+            var panel = (VirtualScrollPanel)d;
             panel.InvalidateMeasure();
             panel.InvalidateScrollInfo();
 
@@ -155,14 +155,12 @@ namespace TailBlazer.Views
             
             _isInMeasure = true;
             _childLayouts.Clear();
+            _extentInfo = GetVerticalExtentInfo(availableSize);
 
-            var extentInfo = GetVerticalExtentInfo(availableSize);
-            _extentInfo = extentInfo;
-
-            EnsureScrollOffsetIsWithinConstrains(extentInfo);
+            EnsureScrollOffsetIsWithinConstrains(_extentInfo);
 
           //  SetVerticalOffset(extentInfo.VerticalOffset);
-            var layoutInfo = GetLayoutInfo(availableSize, ItemHeight, extentInfo);
+            var layoutInfo = GetLayoutInfo(availableSize, ItemHeight, _extentInfo);
 
             RecycleItems(layoutInfo);
 
@@ -170,12 +168,14 @@ namespace TailBlazer.Views
             var generatorStartPosition = _itemsGenerator.GeneratorPositionFromIndex(layoutInfo.FirstRealizedItemIndex);
 
             var visualIndex = 0;
-            double actualWidth = 0;
+            double widestWidth = 0;
             var currentX = layoutInfo.FirstRealizedItemLeft;
             var currentY = layoutInfo.FirstRealizedLineTop;
 
             using (_itemsGenerator.StartAt(generatorStartPosition, GeneratorDirection.Forward, true))
             {
+                var children = new List<UIElement>();
+
                 for (var itemIndex = layoutInfo.FirstRealizedItemIndex; itemIndex <= layoutInfo.LastRealizedItemIndex; itemIndex++, visualIndex++)
                 {
                     bool newlyRealized;
@@ -183,6 +183,9 @@ namespace TailBlazer.Views
                     var child = (UIElement)_itemsGenerator.GenerateNext(out newlyRealized);
 
                     if (child==null) continue;
+
+
+                    children.Add(child);
 
                     SetVirtualItemIndex(child, itemIndex);
 
@@ -195,17 +198,14 @@ namespace TailBlazer.Views
                         // check if item needs to be moved into a new position in the Children collection
                         if (visualIndex < Children.Count)
                         {
-                            if (!Equals(Children[visualIndex], child))
+                            if (Equals(Children[visualIndex], child)) continue;
+                            var childCurrentIndex = Children.IndexOf(child);
+                            if (childCurrentIndex >= 0)
                             {
-                                var childCurrentIndex = Children.IndexOf(child);
-                                if (childCurrentIndex >= 0)
-                                {
-                                    RemoveInternalChildRange(childCurrentIndex, 1);
-                                }
-
-                                InsertInternalChild(visualIndex, child);
-                                //InsertInternalChild(visualIndex, child);
+                                RemoveInternalChildRange(childCurrentIndex, 1);
                             }
+
+                            InsertInternalChild(visualIndex, child);
                         }
                         else
                         {
@@ -215,24 +215,29 @@ namespace TailBlazer.Views
                             AddInternalChild(child);
                         }
                     }
+                }
 
-                    // only prepare the item once it has been added to the visual tree
+                //part 2: do the measure
+                foreach (var child in children)
+                {
                     _itemsGenerator.PrepareItemContainer(child);
                     child.Measure(new Size(double.PositiveInfinity, ItemHeight));
-                    actualWidth = _viewportSize.Width;//  Math.Max(actualWidth, child.DesiredSize.Width);
+                    widestWidth= Math.Max(widestWidth, child.DesiredSize.Width);
+                }
 
-                    _childLayouts.Add(child, new Rect(currentX, currentY, actualWidth, ItemHeight));
+                //part 3: Create the elements
+                foreach (var child in children)
+                {
+                    _childLayouts.Add(child, new Rect(currentX, currentY, widestWidth, ItemHeight));
                     currentY += ItemHeight;
                 }
+
             }
             RemoveRedundantChildren();
-            UpdateScrollInfo(availableSize, extentInfo,actualWidth);
-
-            var desiredSize = new Size(double.IsInfinity(availableSize.Width) ? 0 : availableSize.Width,
-                                       double.IsInfinity(availableSize.Height) ? 0 : availableSize.Height);
+            UpdateScrollInfo(availableSize, _extentInfo, widestWidth);
 
             _isInMeasure = false;
-            return desiredSize;
+            return availableSize;
         }
 
         private void EnsureScrollOffsetIsWithinConstrains(ExtentInfo extentInfo)
@@ -336,7 +341,7 @@ namespace TailBlazer.Views
                 return new ExtentInfo();
         
             var extentHeight = Math.Max(TotalItems * ItemHeight, viewPortSize.Height);
-            var maxVerticalOffset = extentHeight - viewPortSize.Height;
+            var maxVerticalOffset = extentHeight;// extentHeight - viewPortSize.Height;
             var verticalOffset = (StartIndex /(double) TotalItems)*maxVerticalOffset;
 
             var info = new ExtentInfo()
@@ -397,7 +402,7 @@ namespace TailBlazer.Views
             {
                 firstIndex = 0;
             }
-            else if (firstIndex + _extentInfo.VirtualCount >_extentInfo.TotalCount)
+            else if (firstIndex + _extentInfo.VirtualCount >= _extentInfo.TotalCount)
             {
                 firstIndex = _extentInfo.TotalCount - _extentInfo.VirtualCount;
             }
