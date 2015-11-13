@@ -74,7 +74,8 @@
     <AdornerDecorator>
 
         
-        <Grid   infrastucture:DependencyObjectHook.Receiver="{Binding DropMonitor}">
+        <Grid 
+            infrastucture:DependencyObjectHook.Receiver="{Binding DropMonitor}">
             <!-- -->
             <dockablz:Layout >
                 <dragablz:TabablzControl x:Name="InitialTabablzControl"
