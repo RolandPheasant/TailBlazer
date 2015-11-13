@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Threading;
 using StructureMap;
+using TailBlazer.Views;
 
 namespace TailBlazer.Infrastucture
 {

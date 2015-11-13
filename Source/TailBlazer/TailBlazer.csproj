@@ -38,8 +38,8 @@
     <StartupObject>TailBlazer.Infrastucture.BootStrap</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dragablz, Version=0.0.2.131, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dragablz.0.0.2.131\lib\net45\Dragablz.dll</HintPath>
+    <Reference Include="Dragablz, Version=0.0.2.134, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dragablz.0.0.2.134\lib\net45\Dragablz.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="DynamicData, Version=4.3.0.1086, Culture=neutral, processorArchitecture=MSIL">
@@ -63,7 +63,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="MaterialDesignThemes.Wpf, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignThemes.1.1.1-ci314\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+      <HintPath>..\packages\MaterialDesignThemes.1.1.1-ci325\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="StructureMap, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
@@ -119,7 +119,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Infrastucture\AutoScroller.cs" />
-    <Compile Include="Infrastucture\FileDropMonitor.cs" />
+    <Compile Include="Views\FileDropContainer.cs" />
+    <Compile Include="Views\FileDropMonitor.cs" />
+    <Compile Include="Views\FileIcon.cs" />
     <Compile Include="Infrastucture\SchedulerProvider.cs" />
     <Compile Include="Infrastucture\SearchableTextControl.cs" />
     <Compile Include="Infrastucture\SolidColorAnimation.cs" />
@@ -145,17 +147,21 @@
     <Compile Include="Infrastucture\Command.cs" />
     <Compile Include="Infrastucture\DependencyObjectHook.cs" />
     <Compile Include="Infrastucture\IntertabClient.cs" />
-    <Compile Include="Infrastucture\IWindowFactory.cs" />
+    <Compile Include="Views\IWindowFactory.cs" />
     <Compile Include="Infrastucture\Log4NetLogger.cs" />
     <Compile Include="Infrastucture\ObjectProvider.cs" />
     <Compile Include="Infrastucture\ViewContainer.cs" />
-    <Compile Include="Infrastucture\WindowFactory.cs" />
-    <Compile Include="Infrastucture\WindowViewModel.cs" />
+    <Compile Include="Views\WindowFactory.cs" />
+    <Compile Include="Views\WindowViewModel.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Themes\Colours.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -1,8 +1,9 @@
 ﻿using System;
 using Dragablz;
 using TailBlazer.Domain.Infrastructure;
+using TailBlazer.Infrastucture;
 
-namespace TailBlazer.Infrastucture
+namespace TailBlazer.Views
 {
     public class WindowFactory : IWindowFactory
     {

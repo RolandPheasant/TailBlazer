@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using Dragablz;
+using TailBlazer.Views;
 
 namespace TailBlazer.Infrastucture
 {
@@ -21,7 +22,7 @@ namespace TailBlazer.Infrastucture
 
         public TabEmptiedResponse TabEmptiedHandler(TabablzControl tabControl, Window window)
         {
-            return TabEmptiedResponse.CloseWindowOrLayoutBranch;
+            return TabEmptiedResponse.DoNothing;
         }
     }
 }

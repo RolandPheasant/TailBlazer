@@ -1,4 +1,4 @@
-namespace TailBlazer.Infrastucture
+namespace TailBlazer.Views
 {
     public interface IWindowFactory
     {

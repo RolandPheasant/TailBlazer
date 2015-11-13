@@ -4,21 +4,24 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Windows.Input;
 using Dragablz;
+using DynamicData.Aggregation;
 using DynamicData.Binding;
 using Microsoft.Win32;
 using TailBlazer.Domain.Infrastructure;
-using TailBlazer.Views;
+using TailBlazer.Infrastucture;
 
-namespace TailBlazer.Infrastucture
+namespace TailBlazer.Views
 {
     public class WindowViewModel: AbstractNotifyPropertyChanged, IDisposable
     {
         private readonly IObjectProvider _objectProvider;
         private readonly IDisposable _cleanUp;
         private ViewContainer _selected;
-        
+        private bool _isEmpty;
+
         public ObservableCollection<ViewContainer> Views { get; } = new ObservableCollection<ViewContainer>();
         public IInterTabClient InterTabClient { get; }
         public ICommand OpenFileCommand { get; }
@@ -34,10 +37,15 @@ namespace TailBlazer.Infrastucture
             ShowInGitHubCommand = new Command(()=>   Process.Start("https://github.com/RolandPheasant"));
 
             var fileDropped = DropMonitor.Dropped.Subscribe(OpenFile);
-
+            var isEmptyChecker = Views.ToObservableChangeSet()
+                                    .Count()
+                                    .StartWith(0)
+                                    .Select(count=>count==0)
+                                    .Subscribe(isEmpty=> IsEmpty = isEmpty);
 
             _cleanUp = Disposable.Create(() =>
                                          {
+                                             isEmptyChecker.Dispose();
                                              fileDropped.Dispose();
                                              DropMonitor.Dispose();
                                              foreach (var disposable in  Views.Select(vc=>vc.Content).OfType<IDisposable>())
@@ -86,7 +94,13 @@ namespace TailBlazer.Infrastucture
             get { return _selected; }
             set { SetAndRaise(ref _selected, value); }
         }
-        
+
+        public bool IsEmpty
+        {
+            get { return _isEmpty; }
+            set { SetAndRaise(ref _isEmpty, value); }
+        }
+
         public void Dispose()
         {
             _cleanUp.Dispose();

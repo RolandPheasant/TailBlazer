@@ -31,6 +31,23 @@
             </DataTemplate>
 
 
+
+            <DataTemplate DataType="{x:Type views:FileDropContainer}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <views:FileIcon
+                            BorderThickness="0"
+                            Width="22" 
+                            Height="22" 
+                            Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+
+                        <ItemsControl Margin="4" Grid.Column="1" ItemsSource="{Binding Files}"/>
+                </Grid>
+            </DataTemplate>
         </ResourceDictionary>
         
 
