@@ -10,22 +10,11 @@ using System.Windows.Media;
 namespace TailBlazer.Views
 {
 
-    public class ScrollValues
+
+    public enum ScrollChangeReason
     {
-        public int Rows { get;  }
-        public int FirstIndex { get;  }
-
-        public ScrollValues(int rows, int firstIndex)
-        {
-            Rows = rows;
-            FirstIndex = firstIndex;
-        }
-    }
-
-
-    public interface IScrollReceiver
-    {
-        void RequestChange(ScrollValues values);
+        Automatic,
+        User
     }
 
 
@@ -57,6 +46,15 @@ namespace TailBlazer.Views
 
         public static readonly DependencyProperty ScrollReceiverProperty = DependencyProperty.Register(
             "ScrollReceiver", typeof (IScrollReceiver), typeof (VirtualScrollPanel), new PropertyMetadata(default(IScrollReceiver)));
+
+        public static readonly DependencyProperty AutoScrollProperty = DependencyProperty.Register(
+            "AutoScroll", typeof (bool), typeof (VirtualScrollPanel), new PropertyMetadata(default(bool)));
+
+        public bool AutoScroll
+        {
+            get { return (bool) GetValue(AutoScrollProperty); }
+            set { SetValue(AutoScrollProperty, value); }
+        }
 
         public IScrollReceiver ScrollReceiver
         {
@@ -114,12 +112,10 @@ namespace TailBlazer.Views
          private static void OnStartIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var panel = (VirtualScrollPanel)d;
+            //   panel._firstIndex = Convert.ToInt32(e.NewValue);
+           // panel.CallbackStartIndexChanged(Convert.ToInt32(e.NewValue));
             panel.InvalidateMeasure();
-            panel.InvalidateScrollInfo();
-            // panel._firstIndex = panel.StartIndex;
-
-            //panel.InvokeStartIndexCommand(panel._firstIndex);
-
+        //    panel.InvalidateScrollInfo();
         }
 
         private static void OnRequireMeasure(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -409,15 +405,29 @@ namespace TailBlazer.Views
 
             if (firstIndex == _firstIndex) return;
 
+            if (_firstIndex == firstIndex) return;
             _firstIndex = firstIndex;
-         //   StartIndex = firstIndex;
-            ScrollReceiver?.RequestChange(new ScrollValues(_size, _firstIndex+1));
+            ReportChanges();
+
+        }
+
+        private void ReportChanges(ScrollChangeReason reason = ScrollChangeReason.Automatic)
+        {
+            ScrollReceiver?.ScrollTo(new ScrollValues(_size, _firstIndex,this, reason));
+        }
+
+        private void CallbackStartIndexChanged(int index)
+        {
+            if (_firstIndex == index) return;
+            _firstIndex = index;
+            ReportChanges();
         }
  
         private void InvokeSizeCommand(int size)
         {
+            if (_size == size) return;
             _size = size;
-            ScrollReceiver?.RequestChange(new ScrollValues(size, _firstIndex+1));
+            ReportChanges();
         }
 
         public bool CanVerticallyScroll {get;set;}
@@ -472,6 +482,7 @@ namespace TailBlazer.Views
 
         public void MouseWheelUp()
         {
+            AutoScroll = false;
             InvokeStartIndexCommand(-SystemParameters.WheelScrollLines);
         }
 

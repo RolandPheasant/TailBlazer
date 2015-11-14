@@ -66,7 +66,9 @@ namespace TailBlazer.Domain.FileHandling
                         : allLines.Skip(x.request.FirstIndex-1).Take(pageSize)).ToArray();
                     
                     var added = currentPage.Except(previousPage).ToArray();
-                    var removed = previousPage.Except(currentPage);
+                    var removed = previousPage.Except(currentPage).ToArray();
+
+                    if (added.Length + removed.Length == 0) return;
                    
                     //TODO: Readline can throw an error, so need to hand this scenario
                     //read new lines from the file

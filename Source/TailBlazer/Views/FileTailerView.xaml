@@ -89,7 +89,8 @@
                     <ItemsPanelTemplate>
                     <local:VirtualScrollPanel ItemHeight="30"
                                                 ScrollReceiver="{Binding}"  
-                                                StartIndex="{Binding FirstRow,Mode=TwoWay}"
+                                                AutoScroll="{Binding AutoTail,Mode=TwoWay}"
+                                                StartIndex="{Binding FirstIndex}"
                                                 TotalItems="{Binding MatchedLineCount}">
 
 
@@ -157,7 +158,7 @@
             <!--Hack as the margin in the tab control means the botton panel has a margin (cannot be bother retemplating the tab control) -->
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
+                <!--<ColumnDefinition/>-->
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
@@ -176,6 +177,19 @@
                     Grid.Column="1" 
                      Orientation="Horizontal" 
                      HorizontalAlignment="Right">
+
+                <TextBlock  
+                    Margin="4 0 0 0"
+                   Text="{Binding FirstIndex,StringFormat='\first={0}'}"
+                    VerticalAlignment="Center"
+                    MinWidth="125"/>
+
+                <TextBlock  
+                    Margin="4 0 0 0"
+                    Text="{Binding PageSize,StringFormat='\size={0}'}"
+                    VerticalAlignment="Center"
+                    MinWidth="125"/>
+
 
                 <TextBlock Text="{Binding LineCountText}" />
             </StackPanel>

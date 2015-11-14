@@ -17,7 +17,7 @@ namespace TailBlazer.Infrastucture
 
            var container =  new Container(x=> x.AddRegistry<AppRegistry>());
            var factory = container.GetInstance<WindowFactory>();
-           var window = factory.Create(true);
+           var window = factory.Create();
            container.Configure(x => x.For<Dispatcher>().Add(window.Dispatcher));
 
 

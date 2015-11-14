@@ -17,7 +17,7 @@ namespace TailBlazer.Views
     {
         private readonly IDisposable _cleanUp;
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
-        private readonly ISubject<ScrollValues> _userScrollRequested = new Subject<ScrollValues>();
+        private readonly ISubject<ScrollRequest> _userScrollRequested = new ReplaySubject<ScrollRequest>(1);
 
         public string File { get; }
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
@@ -26,8 +26,9 @@ namespace TailBlazer.Views
         private string _searchText;
         private bool _autoTail;
         private string _lineCountText;
-        private int _firstRow;
+        private int _firstIndex;
         private int _matchedLineCount;
+        private int _pageSize;
 
         public FileTailerViewModel(ILogger logger,ISchedulerProvider schedulerProvider, FileInfo fileInfo)
         {
@@ -39,14 +40,16 @@ namespace TailBlazer.Views
             AutoTail = true;
             
             var filterRequest = this.WhenValueChanged(vm => vm.SearchText).Throttle(TimeSpan.FromMilliseconds(125));
-            var autotail = this.WhenValueChanged(vm => vm.AutoTail)
-                            .CombineLatest(_userScrollRequested, (auto, user) =>
-                            {
-                                return auto ? new ScrollRequest(user.Rows) 
-                                : new ScrollRequest(user.Rows, user.FirstIndex+1);
-                            }).DistinctUntilChanged();
 
-            var tailer = new FileTailer(fileInfo, filterRequest, autotail);
+            var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
+            var indexChanged = this.WhenValueChanged(vm => vm.FirstIndex);
+            var pageSizeChanged = this.WhenValueChanged(vm => vm.PageSize);
+
+            var scroller = _userScrollRequested
+                        .Sample(TimeSpan.FromMilliseconds(50))
+                        .DistinctUntilChanged();
+
+            var tailer = new FileTailer(fileInfo, filterRequest, scroller);
 
 
             //create user display for count line count
@@ -61,12 +64,12 @@ namespace TailBlazer.Views
 
             //load lines into observable collection
             var loader = tailer.Lines.Connect()
-                .Buffer(TimeSpan.FromMilliseconds(125)).FlattenBufferResult()
+             //   .Buffer(TimeSpan.FromMilliseconds(125)).FlattenBufferResult()
                 .Transform(line => new LineProxy(line))
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy.Number))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)
-                .Do(_=> AutoScroller.ScrollToEnd())
+               // .Do(_=> AutoScroller.ScrollToEnd())
                 .Subscribe(a => logger.Info(a.Adds.ToString()), ex => logger.Error(ex, "Oops"));
 
 
@@ -79,8 +82,8 @@ namespace TailBlazer.Views
                 .QueryWhenChanged(lines =>
                 {
                     //use zero based index rather than line number
-                    return lines.Count == 0 ? 0 : lines.Select(l => l.Number).Min() -1 ;
-                }).Subscribe(first=> FirstRow= first-1);
+                    return lines.Count == 0 ? 0 : lines.Select(l => l.Number).Min() -1;
+                }).Subscribe(first=> FirstIndex= first);
 
 
             _cleanUp = new CompositeDisposable(tailer, 
@@ -95,10 +98,15 @@ namespace TailBlazer.Views
 
         }
 
-        void IScrollReceiver.RequestChange(ScrollValues values)
+        void IScrollReceiver.ScrollTo(ScrollValues values)
         {
             if (values == null) throw new ArgumentNullException(nameof(values));
-            _userScrollRequested.OnNext(values);
+
+
+            var mode = AutoTail ? ScrollingMode.Tail : ScrollingMode.User;
+            _userScrollRequested.OnNext(new ScrollRequest(mode, values.PageSize,values.FirstIndex));
+
+            PageSize = values.PageSize;
         }
 
         public bool AutoTail
@@ -107,10 +115,17 @@ namespace TailBlazer.Views
             set { SetAndRaise(ref _autoTail, value); }
         }
 
-        public int FirstRow
+
+        public int PageSize
         {
-            get { return _firstRow; }
-            set { SetAndRaise(ref _firstRow, value); }
+            get { return _pageSize; }
+            set { SetAndRaise(ref _pageSize, value); }
+        }
+
+        public int FirstIndex
+        {
+            get { return _firstIndex; }
+            set { SetAndRaise(ref _firstIndex, value); }
         }
 
         public int MatchedLineCount

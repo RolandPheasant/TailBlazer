@@ -14,7 +14,7 @@ namespace TailBlazer.Views
             _objectProvider = objectProvider;
         }
 
-        public MainWindow Create(bool showMenu=false)
+        public MainWindow Create()
         {
             var window = new MainWindow();
             var model = _objectProvider.Get<WindowViewModel>();

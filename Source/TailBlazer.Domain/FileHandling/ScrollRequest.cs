@@ -18,5 +18,11 @@
             Mode = ScrollingMode.User;
         }
 
+        public ScrollRequest(ScrollingMode mode, int pageSize, int firstIndex)
+        {
+            PageSize = pageSize;
+            FirstIndex = firstIndex;
+            Mode = mode;
+        }
     }
 }
