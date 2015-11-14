@@ -63,8 +63,9 @@ namespace TailBlazer.Domain.FileHandling
                     //Otherwise take the page size and start index from the request
                     var currentPage = (mode == ScrollingMode.Tail
                         ? allLines.Skip(allLines.Length-pageSize).Take(pageSize).ToArray()
-                        : allLines.Skip(x.request.FirstIndex-1).Take(pageSize)).ToArray();
+                        : allLines.Skip(Math.Min(x.request.FirstIndex-1, allLines.Length- pageSize)).Take(pageSize)).ToArray();
                     
+
                     var added = currentPage.Except(previousPage).ToArray();
                     var removed = previousPage.Except(currentPage).ToArray();
 

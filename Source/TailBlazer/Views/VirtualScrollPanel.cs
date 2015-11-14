@@ -112,7 +112,9 @@ namespace TailBlazer.Views
          private static void OnStartIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var panel = (VirtualScrollPanel)d;
-           panel._firstIndex = Convert.ToInt32(e.NewValue);
+            //panel._firstIndex = Convert.ToInt32(e.NewValue);
+
+            panel. CallbackStartIndexChanged(Convert.ToInt32(e.NewValue));
             panel.InvalidateMeasure();
         }
 
@@ -136,9 +138,7 @@ namespace TailBlazer.Views
 
             if (!sizeInfo.HeightChanged) return;
 
-            // var items = (int)(sizeInfo.NewSize.Height / ItemHeight)+4;
             var items = (int)(sizeInfo.NewSize.Height / ItemHeight) ;
-           // InvalidateScrollInfo();
             InvokeSizeCommand(items);
 
         }
@@ -152,8 +152,6 @@ namespace TailBlazer.Views
             _extentInfo = GetVerticalExtentInfo(availableSize);
 
             EnsureScrollOffsetIsWithinConstrains(_extentInfo);
-
-          //  SetVerticalOffset(extentInfo.VerticalOffset);
             var layoutInfo = GetLayoutInfo(availableSize, ItemHeight, _extentInfo);
 
             RecycleItems(layoutInfo);

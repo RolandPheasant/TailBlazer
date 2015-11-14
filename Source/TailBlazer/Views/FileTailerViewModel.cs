@@ -81,6 +81,7 @@ namespace TailBlazer.Views
             var firstIndexMonitor = tailer.Lines.Connect()
                 .QueryWhenChanged(lines =>
                 {
+                    //TODO: Number = line number in file. We also need to translate this to an actual index!
                     //use zero based index rather than line number
                     return lines.Count == 0 ? 0 : lines.Select(l => l.Number).Min() -1;
                 }).Subscribe(first=> FirstIndex= first);
@@ -104,7 +105,7 @@ namespace TailBlazer.Views
 
 
             var mode = AutoTail ? ScrollingMode.Tail : ScrollingMode.User;
-            _userScrollRequested.OnNext(new ScrollRequest(mode, values.PageSize,values.FirstIndex));
+            _userScrollRequested.OnNext(new ScrollRequest(mode, values.PageSize,values.FirstIndex+1));
 
             PageSize = values.PageSize;
         }
