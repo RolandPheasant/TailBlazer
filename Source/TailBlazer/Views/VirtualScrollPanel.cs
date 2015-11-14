@@ -112,10 +112,8 @@ namespace TailBlazer.Views
          private static void OnStartIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var panel = (VirtualScrollPanel)d;
-            //   panel._firstIndex = Convert.ToInt32(e.NewValue);
-           // panel.CallbackStartIndexChanged(Convert.ToInt32(e.NewValue));
+           panel._firstIndex = Convert.ToInt32(e.NewValue);
             panel.InvalidateMeasure();
-        //    panel.InvalidateScrollInfo();
         }
 
         private static void OnRequireMeasure(DependencyObject d, DependencyPropertyChangedEventArgs e)

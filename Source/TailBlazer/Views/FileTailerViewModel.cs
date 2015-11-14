@@ -40,12 +40,13 @@ namespace TailBlazer.Views
             AutoTail = true;
             
             var filterRequest = this.WhenValueChanged(vm => vm.SearchText).Throttle(TimeSpan.FromMilliseconds(125));
-
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
-            var indexChanged = this.WhenValueChanged(vm => vm.FirstIndex);
-            var pageSizeChanged = this.WhenValueChanged(vm => vm.PageSize);
-
             var scroller = _userScrollRequested
+                        .CombineLatest(autoChanged, (user, auto) =>
+                        {
+                            var mode = AutoTail ? ScrollingMode.Tail : ScrollingMode.User;
+                            return  new ScrollRequest(mode, user.PageSize, user.FirstIndex);
+                        })
                         .Sample(TimeSpan.FromMilliseconds(50))
                         .DistinctUntilChanged();
 
@@ -64,12 +65,11 @@ namespace TailBlazer.Views
 
             //load lines into observable collection
             var loader = tailer.Lines.Connect()
-             //   .Buffer(TimeSpan.FromMilliseconds(125)).FlattenBufferResult()
+
                 .Transform(line => new LineProxy(line))
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy.Number))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)
-               // .Do(_=> AutoScroller.ScrollToEnd())
                 .Subscribe(a => logger.Info(a.Adds.ToString()), ex => logger.Error(ex, "Oops"));
 
 
