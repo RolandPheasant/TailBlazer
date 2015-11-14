@@ -5,12 +5,22 @@ namespace TailBlazer.Domain.FileHandling
     public class Line : IEquatable<Line>
     {
         public int Number { get;  }
+        public int Index { get; }
         public string Text { get;  }
         public DateTime? Timestamp { get;  }
 
         public Line(int number, string text, DateTime? timestamp)
         {
             Number = number;
+            Text = text;
+            Timestamp = timestamp;
+        }
+
+
+        public Line(int number, int index, string text, DateTime? timestamp)
+        {
+            Number = number;
+            Index = index;
             Text = text;
             Timestamp = timestamp;
         }

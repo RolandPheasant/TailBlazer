@@ -10,11 +10,8 @@ namespace TailBlazer.Domain.FileHandling
     public class FileTailer: IDisposable
     {
         private readonly IDisposable _cleanUp;
-
         public IObservable<int> TotalLines { get;  }
-
         public IObservable<int> MatchedLines { get; }
-
         public IObservableList<Line> Lines { get; }
 
         public FileTailer(FileInfo file, 
@@ -48,7 +45,7 @@ namespace TailBlazer.Domain.FileHandling
             //this is the beast! Dynamically combine lines requested by the consumer 
             //with the lines which exist in the file. This enables proper virtualisation of the file 
             var scroller = matchedLines
-                .CombineLatest(scrollRequest, (matched, request) => new {scanResult = matched , request })
+                .CombineLatest(scrollRequest, (scanResult, request) => new {scanResult , request })
                 .Subscribe(x =>
                 {
                     var mode = x.request.Mode;
@@ -57,7 +54,9 @@ namespace TailBlazer.Domain.FileHandling
                     var endOfTail = x.scanResult.EndOfTail;
                     var isInitial = x.scanResult.Index==0;
                     var allLines = x.scanResult.MatchingLines;
-                    var previousPage = lines.Items.Select(l => l.Number).ToArray();
+
+
+                    var previousPage = lines.Items.Select(l => new LineIndex(l.Number, l.Index)).ToArray();
                     
                     //If tailing, take the end only. 
                     //Otherwise take the page size and start index from the request
@@ -65,15 +64,21 @@ namespace TailBlazer.Domain.FileHandling
                         ? allLines.Skip(allLines.Length-pageSize).Take(pageSize).ToArray()
                         : allLines.Skip(Math.Min(x.request.FirstIndex-1, allLines.Length- pageSize)).Take(pageSize)).ToArray();
                     
-
                     var added = currentPage.Except(previousPage).ToArray();
-                    var removed = previousPage.Except(currentPage).ToArray();
+                    var removed = previousPage.Except(currentPage).Select(li=>li.Line).ToArray();
 
                     if (added.Length + removed.Length == 0) return;
-                   
+
                     //TODO: Readline can throw an error, so need to hand this scenario
-                    //read new lines from the file
-                    var addedLines = file.ReadLines(added,i=> !isInitial && i > endOfTail).ToArray();
+
+
+                    //read new lines from the file [TODO, need actual index in relative result set]
+                    // var addedLines = file.ReadLines(added,i=> !isInitial && i > endOfTail).ToArray();
+                    var addedLines = file.ReadLines(added, (lineIndex, text) =>
+                    {
+                        var isEndOfTail = !isInitial && lineIndex.Line > endOfTail;
+                        return new Line(lineIndex.Line, lineIndex.Index, text, isEndOfTail ? DateTime.Now : (DateTime?)null);
+                    }).ToArray();
 
                     //get old lines from the current collection
                     var removedLines = lines.Items.Where(l=> removed.Contains(l.Number)).ToArray();

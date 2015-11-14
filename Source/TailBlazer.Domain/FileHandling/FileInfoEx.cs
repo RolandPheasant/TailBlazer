@@ -5,9 +5,64 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.FileHandling
 {
+    public struct LineIndex : IEquatable<LineIndex>
+    {
+        private readonly int _line;
+        private readonly int _index;
+
+        public LineIndex(int line, int index)
+        {
+            _line = line;
+            _index = index;
+        }
+
+        public int Line => _line;
+
+        public int Index => _index;
+
+        #region Equality
+
+        public bool Equals(LineIndex other)
+        {
+            return _line == other._line && _index == other._index;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is LineIndex && Equals((LineIndex) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (_line*397) ^ _index;
+            }
+        }
+
+        public static bool operator ==(LineIndex left, LineIndex right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(LineIndex left, LineIndex right)
+        {
+            return !left.Equals(right);
+        }
+
+        #endregion
+
+        public override string ToString()
+        {
+            return $"{Line} (index={Index})";
+        }
+    }
+
     public static class FileInfoEx
     {
         /// <summary>
@@ -75,26 +130,30 @@ namespace TailBlazer.Domain.FileHandling
                                  var count = state?.TotalLines ?? 0;
                                  var index = state?.Index + 1 ?? 0;
                                  var previousCount = count;
-                                 var previousItems = state?.MatchingLines ?? new int[0];
-                                 var newItems = new List<int>();
+                                 var previousItems = state?.MatchingLines ?? new LineIndex[0];
+                                 var newItems = new List<LineIndex>();
+
+
+                                 var indexInResult = previousItems.Length;
 
                                  while ((line = reader.ReadLine()) != null)
                                  {
+                                     indexInResult ++;
                                      if (predicate == null)
                                      {
                                          count++;
-                                         newItems.Add(count);
+                                         newItems.Add(new LineIndex(count, count));
                                      }
                                      else
                                      {
                                          count++;
                                          if (!predicate(line)) continue;
-                                         newItems.Add(count);
+                                         newItems.Add(new LineIndex(count, indexInResult));
                                      }
                                  }
 
                                  //combine the 2 arrays
-                                 var newLines = new int[previousItems.Length + newItems.Count];
+                                 var newLines = new LineIndex[previousItems.Length + newItems.Count];
                                  previousItems.CopyTo(newLines, 0);
                                  newItems.CopyTo(newLines, previousItems.Length);
                                  
@@ -129,6 +188,56 @@ namespace TailBlazer.Domain.FileHandling
 
                         if (lines.Contains(position))
                             yield return new Line(position,line, isEndOfTail==null ? null :(isEndOfTail(position)? DateTime.Now : (DateTime?)null));
+                    }
+                }
+            }
+        }
+
+        public static IEnumerable<T> ReadLines<T>(this FileInfo source, LineIndex[] lines, Func<LineIndex,string, T>  selector)
+        {
+            IDictionary<int, LineIndex> lookup = lines.ToDictionary(l => l.Line);
+
+            using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            {
+                using (var reader = new StreamReader(stream))
+                {
+                    string line;
+                    int index = 0;
+                    int position = 0;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        position++;
+
+                        var contained = lookup.Lookup(position);
+
+                        if (contained.HasValue)
+                            yield return selector(contained.Value, line);
+
+                    }
+                }
+            }
+        }
+
+
+        public static IEnumerable<T> ReadLines<T>(this FileInfo source, int[] lines, Func<int, T> selector)
+        {
+            using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            {
+                using (var reader = new StreamReader(stream))
+                {
+                    string line;
+                    int index = 0;
+                    int position = 0;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        position++;
+
+                        if (lines.Contains(position))
+                        {
+                            yield return selector(position);
+                            index++;
+                        }
+
                     }
                 }
             }

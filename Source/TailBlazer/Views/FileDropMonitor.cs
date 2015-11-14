@@ -1,6 +1,4 @@
-﻿#region Usings
-
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -13,7 +11,6 @@ using System.Windows.Media;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
 
-#endregion
 
 namespace TailBlazer.Views
 {
@@ -84,7 +81,12 @@ namespace TailBlazer.Views
         }
 
         public IObservable<FileInfo> Dropped => _fileDropped;
-
+        
+        /// <summary>
+        /// Taken shamelessly from https://github.com/punker76/gong-wpf-dragdrop
+        /// 
+        /// Thanks
+        /// </summary>
         private class DragAdorner : Adorner
         {
 
@@ -92,7 +94,7 @@ namespace TailBlazer.Views
             private readonly UIElement _adornment;
             private Point _mousePositon;
 
-            public DragAdorner(UIElement adornedElement, 
+            public DragAdorner(UIElement adornedElement,
                 UIElement adornment,
                 DragDropEffects effects = DragDropEffects.None)
                 : base(adornedElement)

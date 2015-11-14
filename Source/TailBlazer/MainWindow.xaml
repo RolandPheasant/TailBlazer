@@ -9,13 +9,15 @@
         xmlns:dragablz="clr-namespace:Dragablz;assembly=Dragablz"
         xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
         xmlns:views="clr-namespace:TailBlazer.Views"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         
        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"   
-       NonActiveWindowTitleBrush="{DynamicResource PrimaryHueDarkBrush}"
-                      GlowBrush="{DynamicResource AccentColorBrush3}"
+       NonActiveWindowTitleBrush="{DynamicResource WindowTitleColorBrush}"
+            WindowTitleBrush="{DynamicResource WindowTitleColorBrush}"
+        GlowBrush="{DynamicResource AccentColorBrush3}"
         WindowStartupLocation="CenterScreen"  
         WindowTransitionsEnabled="False"
        d:DataContext="{d:DesignInstance views:WindowViewModel, IsDesignTimeCreatable=False}"
@@ -28,7 +30,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/controls.buttons.xaml" />
-
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToggleButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InverredBooleanToVisibilityConverter"/>
@@ -46,7 +48,12 @@
     <controls:MetroWindow.LeftWindowCommands>
         <controls:WindowCommands>
             <StackPanel Orientation="Horizontal">
-                <Button 
+
+                <ToggleButton Width="22" Height="22"
+                    x:Name="MenuToggleButton"
+                    Style="{StaticResource MaterialDesignHamburgerToggleButton}"/>
+
+                <Button Margin="6 0 0 0"
                     Command ="{Binding ShowInGitHubCommand}"
                     ToolTip="Tail Blazer in GitHub">
                     <Rectangle Width="22"
@@ -73,8 +80,15 @@
 
     <AdornerDecorator>
 
-        
-        <Grid 
+
+
+        <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
+            <materialDesign:DrawerHost.LeftDrawerContent>
+                
+                <TextBlock  Text="Under Development" Margin="12" FontSize="32"/>
+            </materialDesign:DrawerHost.LeftDrawerContent>
+                
+            <Grid 
             infrastucture:DependencyObjectHook.Receiver="{Binding DropMonitor}">
             <!-- -->
             <dockablz:Layout >
@@ -127,5 +141,7 @@
 
             </StackPanel>
         </Grid>
+
+        </materialDesign:DrawerHost>    
     </AdornerDecorator> 
 </controls:MetroWindow>
