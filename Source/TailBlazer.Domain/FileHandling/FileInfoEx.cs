@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Text;
 using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.FileHandling
@@ -119,7 +120,7 @@ namespace TailBlazer.Domain.FileHandling
                          var stream = File.Open(createdNotification.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite);
                          stream.Seek(0, SeekOrigin.Begin);
 
-                         var reader = new StreamReader(stream);
+                         var reader = new StreamReader(stream, Encoding.Default, true);
                          string line;
 
                          var notifier = source
@@ -182,7 +183,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
-                using (var reader = new StreamReader(stream))
+                using (var reader = new StreamReader(stream, Encoding.Default, true))
                 {
                     string line;
                     int position = 0;
@@ -204,7 +205,7 @@ namespace TailBlazer.Domain.FileHandling
 
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
-                using (var reader = new StreamReader(stream))
+                using (var reader = new StreamReader(stream, Encoding.Default, true))
                 {
                     string line;
                     int position = 0;
