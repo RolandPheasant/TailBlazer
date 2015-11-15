@@ -26,6 +26,7 @@ That's better. A tail program which is pleasing to my eyes!
  - Filter lines on regex
  - Find in file
  - Conditionally highlight text / lines
+ - Create columns from text
  - Store recent files and folders
  - Don't like green? Choose your own colour
  - Automatic creation of columns

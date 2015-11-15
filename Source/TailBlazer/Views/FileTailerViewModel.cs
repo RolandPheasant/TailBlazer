@@ -27,9 +27,7 @@ namespace TailBlazer.Views
         private string _lineCountText;
         private int _firstIndex;
         private int _matchedLineCount;
-        private int _pageSize;
-        private double _verticalOffset
-            ;
+        private int _pageSize; 
 
         public FileTailerViewModel(ILogger logger,ISchedulerProvider schedulerProvider, FileInfo fileInfo)
         {

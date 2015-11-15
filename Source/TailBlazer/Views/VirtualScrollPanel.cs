@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Input;
 using System.Windows.Media;
 
 namespace TailBlazer.Views
@@ -309,7 +308,6 @@ namespace TailBlazer.Views
             // so that keyboard navigation works properly. For example, when focus is on the first visible item, and the user
             // navigates up, the ListBox selects the previous item, and the scrolls that into view - and this triggers the loading of the rest of the items 
             // in that row
-
             var firstVisibleLine = (int)Math.Floor(_offset.Y / itemHeight);
             var firstRealizedIndex = Math.Max(firstVisibleLine - 1, 0);
             var firstRealizedItemLeft = firstRealizedIndex  * ItemWidth - HorizontalOffset;
@@ -327,9 +325,7 @@ namespace TailBlazer.Views
                 LastRealizedItemIndex = lastRealizedIndex,
             };
         }
-
         
-
         private ExtentInfo GetVerticalExtentInfo(Size viewPortSize)
         {
             if (_itemsControl == null)
