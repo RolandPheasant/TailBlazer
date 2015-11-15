@@ -154,13 +154,7 @@
             Height="26"
             Background="{StaticResource PrimaryHueMidBrush}"
             Grid.Row="2"
-            Margin = "-4 0 -4 -4">
-            <!--Hack as the margin in the tab control means the botton panel has a margin (cannot be bother retemplating the tab control) -->
-
-            <Grid.ColumnDefinitions>
-                <!--<ColumnDefinition/>-->
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
+            Margin = "-4 0 -4 -4"> <!--Hack as the margin in the tab control means the botton panel has a margin (cannot be bother retemplating the tab control) -->
 
             <Grid.Resources>
                 <Style TargetType="{x:Type TextBlock}">
@@ -174,7 +168,6 @@
 
 
             <StackPanel   Margin="0 0 6 0"
-                    Grid.Column="1" 
                      Orientation="Horizontal" 
                      HorizontalAlignment="Right">
 
