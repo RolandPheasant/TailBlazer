@@ -9,7 +9,12 @@ using System.Windows.Media;
 
 namespace TailBlazer.Views
 {
+    public enum ScrollSource
+    {
+        MouseUp,
+        MouseDown,
 
+    }
 
     public enum ScrollChangeReason
     {
@@ -112,8 +117,6 @@ namespace TailBlazer.Views
          private static void OnStartIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var panel = (VirtualScrollPanel)d;
-            //panel._firstIndex = Convert.ToInt32(e.NewValue);
-
             panel. CallbackStartIndexChanged(Convert.ToInt32(e.NewValue));
             panel.InvalidateMeasure();
         }
@@ -369,9 +372,7 @@ namespace TailBlazer.Views
 
         public void SetVerticalOffset(double offset)
         {
-
             if (double.IsInfinity(offset)) return;
-
             var diff = (int)((offset - _extentInfo.VerticalOffset) / ItemHeight);
             InvokeStartIndexCommand(diff);
         }

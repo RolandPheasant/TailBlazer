@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TailBlazer.Domain.Infrastructure
 {
@@ -17,7 +13,7 @@ namespace TailBlazer.Domain.Infrastructure
         }
 
 
-        public static IObservable<CurrentAndPrevious<TSource>>PairWithPrevious<TSource>(this IObservable<TSource> source)
+        public static IObservable<CurrentAndPrevious<TSource>> PairWithPrevious<TSource>(this IObservable<TSource> source)
         {
             return source.Scan(Tuple.Create(default(TSource), default(TSource)),
                 (acc, current) => Tuple.Create(acc.Item2, current))

@@ -5,11 +5,11 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Dragablz;
 using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
-using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Views
 {
@@ -21,7 +21,6 @@ namespace TailBlazer.Views
 
         public string File { get; }
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
-        //public AutoScroller AutoScroller { get; } = new AutoScroller();
 
         private string _searchText;
         private bool _autoTail;
@@ -29,6 +28,8 @@ namespace TailBlazer.Views
         private int _firstIndex;
         private int _matchedLineCount;
         private int _pageSize;
+        private double _verticalOffset
+            ;
 
         public FileTailerViewModel(ILogger logger,ISchedulerProvider schedulerProvider, FileInfo fileInfo)
         {
@@ -98,14 +99,13 @@ namespace TailBlazer.Views
 
         }
 
+
         void IScrollReceiver.ScrollTo(ScrollValues values)
         {
             if (values == null) throw new ArgumentNullException(nameof(values));
-
-
             var mode = AutoTail ? ScrollingMode.Tail : ScrollingMode.User;
-            _userScrollRequested.OnNext(new ScrollRequest(mode, values.PageSize,values.FirstIndex));
 
+            _userScrollRequested.OnNext(new ScrollRequest(mode, values.PageSize,values.FirstIndex));
             PageSize = values.PageSize;
         }
 
@@ -114,8 +114,7 @@ namespace TailBlazer.Views
             get { return _autoTail; }
             set { SetAndRaise(ref _autoTail, value); }
         }
-
-
+        
         public int PageSize
         {
             get { return _pageSize; }
