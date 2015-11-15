@@ -2,13 +2,13 @@
 
 In my day to day professional life I am always tailing log files but have always been disappointed with the freebies on offer.The current crop of free ones all look like they were written in the 1990s, are very ugly and have limited functionality.
 
-So I have decided to rectify this by creating a more modern version.  
+So I have decided to rectify this by creating a more modern version.  The mission statement is:  
 
-The mission statement is it has to be fast, intuitive and functionally rich.
+>It has to be fast, intuitive, functionally rich and the code has to be 100% reactive.
 
 So here we go, my first attempt I have come up with this 
 
-![Tail Blazer](https://github.com/RolandPheasant/TailBlazer/blob/master/Images/Tailing.gif)
+![Tail Blazer](http://github.com/RolandPheasant/TailBlazer/blob/master/Images/Tailing.gif)
 
 That's better. A tail program which is pleasing to my eyes!
 
@@ -33,4 +33,3 @@ That's better. A tail program which is pleasing to my eyes!
 
  - Find in entire folder
  - Tail entire folder
- 
