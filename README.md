@@ -8,7 +8,7 @@ So I have decided to rectify this by creating a more modern version.  The missio
 
 So here we go, my first attempt I have come up with this 
 
-![Tail Blazer](http://github.com/RolandPheasant/TailBlazer/blob/master/Images/Tailing.gif)
+![Tail Blazer](https://github.com/RolandPheasant/TailBlazer/blob/master/Images/Tailing.gif)
 
 That's better. A tail program which is pleasing to my eyes!
 
