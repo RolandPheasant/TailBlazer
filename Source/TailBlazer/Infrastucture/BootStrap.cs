@@ -24,7 +24,7 @@ namespace TailBlazer.Infrastucture
             //run start up jobs
 
             window.Show();
-            app.Run();
+             app.Run();
         }
     }
 }

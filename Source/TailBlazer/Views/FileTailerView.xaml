@@ -178,13 +178,13 @@
                      Orientation="Horizontal" 
                      HorizontalAlignment="Right">
 
-                <TextBlock  
+                <TextBlock  Visibility="Collapsed"
                     Margin="4 0 0 0"
                    Text="{Binding FirstIndex,StringFormat='\first={0}'}"
                     VerticalAlignment="Center"
                     MinWidth="125"/>
 
-                <TextBlock  
+                <TextBlock   Visibility="Collapsed"
                     Margin="4 0 0 0"
                     Text="{Binding PageSize,StringFormat='\size={0}'}"
                     VerticalAlignment="Center"

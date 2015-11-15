@@ -21,7 +21,7 @@ namespace TailBlazer.Views
 
         public string File { get; }
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
-        public AutoScroller AutoScroller { get; } = new AutoScroller();
+        //public AutoScroller AutoScroller { get; } = new AutoScroller();
 
         private string _searchText;
         private bool _autoTail;
@@ -65,7 +65,6 @@ namespace TailBlazer.Views
 
             //load lines into observable collection
             var loader = tailer.Lines.Connect()
-
                 .Transform(line => new LineProxy(line))
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy.Number))
                 .ObserveOn(schedulerProvider.MainThread)

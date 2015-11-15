@@ -138,17 +138,21 @@ namespace TailBlazer.Domain.FileHandling
 
                                  while ((line = reader.ReadLine()) != null)
                                  {
-                                     indexInResult ++;
+                                    
                                      if (predicate == null)
                                      {
+                                 
                                          count++;
                                          newItems.Add(new LineIndex(count, count));
+                                         indexInResult++;
                                      }
                                      else
                                      {
                                          count++;
                                          if (!predicate(line)) continue;
+                                      
                                          newItems.Add(new LineIndex(count, indexInResult));
+                                         indexInResult++;
                                      }
                                  }
 
@@ -195,20 +199,19 @@ namespace TailBlazer.Domain.FileHandling
 
         public static IEnumerable<T> ReadLines<T>(this FileInfo source, LineIndex[] lines, Func<LineIndex,string, T>  selector)
         {
-            IDictionary<int, LineIndex> lookup = lines.ToDictionary(l => l.Line);
+           
+            var cached = lines.ToDictionary(l => l.Line);
 
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
                 using (var reader = new StreamReader(stream))
                 {
                     string line;
-                    int index = 0;
                     int position = 0;
                     while ((line = reader.ReadLine()) != null)
                     {
                         position++;
-
-                        var contained = lookup.Lookup(position);
+                        var contained = cached.Lookup(position);
 
                         if (contained.HasValue)
                             yield return selector(contained.Value, line);
@@ -218,29 +221,5 @@ namespace TailBlazer.Domain.FileHandling
             }
         }
 
-
-        public static IEnumerable<T> ReadLines<T>(this FileInfo source, int[] lines, Func<int, T> selector)
-        {
-            using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
-            {
-                using (var reader = new StreamReader(stream))
-                {
-                    string line;
-                    int index = 0;
-                    int position = 0;
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        position++;
-
-                        if (lines.Contains(position))
-                        {
-                            yield return selector(position);
-                            index++;
-                        }
-
-                    }
-                }
-            }
-        }
     }
 }
