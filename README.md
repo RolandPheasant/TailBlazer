@@ -26,8 +26,7 @@ That's better. A tail program which is pleasing to my eyes!
  - Filter lines on regex
  - Find in file
  - Store recent files and folders
- - Auto tail or scroll mode
- - Don't like green, then choose your own colour
+ - Don't like green? Choose your own colour
 
 ## Future feature list (Folder tail)
 
