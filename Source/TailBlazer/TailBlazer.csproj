@@ -42,12 +42,12 @@
       <HintPath>..\packages\Dragablz.0.0.2.134\lib\net45\Dragablz.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DynamicData, Version=4.3.0.1086, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DynamicData.4.3.0.1086-Beta\lib\net45\DynamicData.dll</HintPath>
+    <Reference Include="DynamicData, Version=4.3.0.1088, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DynamicData.4.3.0.1088-Beta\lib\net45\DynamicData.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DynamicData.Plinq, Version=4.3.0.1086, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DynamicData.4.3.0.1086-Beta\lib\net45\DynamicData.Plinq.dll</HintPath>
+    <Reference Include="DynamicData.Plinq, Version=4.3.0.1088, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DynamicData.4.3.0.1088-Beta\lib\net45\DynamicData.Plinq.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">

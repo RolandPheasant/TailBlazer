@@ -100,6 +100,13 @@ namespace TailBlazer.Views
             PageSize = values.PageSize;
         }
 
+        void IScrollReceiver.ScrollChanged(UserScrollData scrollData)
+        {
+            if (scrollData.Direction== ScrollDirection.Up)
+                AutoTail = false;
+
+        }
+
         public bool AutoTail
         {
             get { return _autoTail; }

@@ -35,8 +35,6 @@ namespace TailBlazer.Fixtures
             {
 
                 tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(Enumerable.Range(91, 10));
-
-
                 File.AppendAllLines(file, Enumerable.Range(101, 10).Select(i => i.ToString()));
 
                 scheduler.AdvanceByMilliSeconds(250);

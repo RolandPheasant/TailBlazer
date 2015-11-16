@@ -16,7 +16,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
-                <!--<ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.TextBox.xaml" />-->
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Control.Resources>
@@ -71,11 +70,9 @@
             <ListBox.Template>
                     <ControlTemplate>
                         <ScrollViewer x:Name="ScrollViewer" 
-                                       infrastucture:DependencyObjectHook.Receiver="{Binding AutoScroller}"
                                         VerticalScrollBarVisibility="Auto"
                                         HorizontalScrollBarVisibility="Auto"
-                                       CanContentScroll="True"
-                                      
+                                        CanContentScroll="True"
                                         Padding="{TemplateBinding Padding}"
                                         Background="{TemplateBinding Background}" 
                                         BorderBrush="Transparent" BorderThickness="0" 
@@ -89,7 +86,6 @@
                     <ItemsPanelTemplate>
                     <local:VirtualScrollPanel ItemHeight="30"
                                                 ScrollReceiver="{Binding}"  
-                                                AutoScroll="{Binding AutoTail,Mode=TwoWay}"
                                                 StartIndex="{Binding FirstIndex}"
                                                 TotalItems="{Binding MatchedLineCount}">
 

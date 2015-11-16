@@ -21,8 +21,25 @@ namespace TailBlazer.Views
         User
     }
 
+    public enum ScrollDirection
+    {
+        Up,
+        Down
+    }
 
-    //TODO: Rewrite using a panel as the base
+    public class UserScrollData
+    {
+        public ScrollDirection Direction { get; }
+        public int Value { get; }
+
+        public UserScrollData(ScrollDirection scrollDirection, int value)
+        {
+            Direction = scrollDirection;
+            Value = value;
+        }
+
+    }
+
     public class VirtualScrollPanel : VirtualizingPanel, IScrollInfo
     {
         private const double ScrollLineAmount = 16.0;
@@ -51,14 +68,14 @@ namespace TailBlazer.Views
         public static readonly DependencyProperty ScrollReceiverProperty = DependencyProperty.Register(
             "ScrollReceiver", typeof (IScrollReceiver), typeof (VirtualScrollPanel), new PropertyMetadata(default(IScrollReceiver)));
 
-        public static readonly DependencyProperty AutoScrollProperty = DependencyProperty.Register(
-            "AutoScroll", typeof (bool), typeof (VirtualScrollPanel), new PropertyMetadata(default(bool)));
+        //public static readonly DependencyProperty AutoScrollProperty = DependencyProperty.Register(
+        //    "AutoScroll", typeof (bool), typeof (VirtualScrollPanel), new PropertyMetadata(default(bool)));
 
-        public bool AutoScroll
-        {
-            get { return (bool) GetValue(AutoScrollProperty); }
-            set { SetValue(AutoScrollProperty, value); }
-        }
+        //public bool AutoScroll
+        //{
+        //    get { return (bool) GetValue(AutoScrollProperty); }
+        //    set { SetValue(AutoScrollProperty, value); }
+        //}
 
         public IScrollReceiver ScrollReceiver
         {
@@ -369,6 +386,9 @@ namespace TailBlazer.Views
         {
             if (double.IsInfinity(offset)) return;
             var diff = (int)((offset - _extentInfo.VerticalOffset) / ItemHeight);
+
+
+
             InvokeStartIndexCommand(diff);
         }
 
@@ -399,6 +419,10 @@ namespace TailBlazer.Views
 
             if (_firstIndex == firstIndex) return;
             _firstIndex = firstIndex;
+
+            OnOffsetChanged(lines > 0 ? ScrollDirection.Down : ScrollDirection.Up, lines);
+
+
             ReportChanges();
 
         }
@@ -406,6 +430,11 @@ namespace TailBlazer.Views
         private void ReportChanges(ScrollChangeReason reason = ScrollChangeReason.Automatic)
         {
             ScrollReceiver?.ScrollTo(new ScrollValues(_size, _firstIndex,this, reason));
+        }
+
+        private void OnOffsetChanged(ScrollDirection direction,int firstRow)
+        {
+            ScrollReceiver?.ScrollChanged(new UserScrollData(direction, firstRow));
         }
 
         private void CallbackStartIndexChanged(int index)
@@ -474,7 +503,6 @@ namespace TailBlazer.Views
 
         public void MouseWheelUp()
         {
-            AutoScroll = false;
             InvokeStartIndexCommand(-SystemParameters.WheelScrollLines);
         }
 
