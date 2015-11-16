@@ -26,7 +26,7 @@ namespace TailBlazer.Fixtures
 
             File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i => $"{i}").ToArray());
 
-            using (info.WatchFile().ScanFile().Subscribe(x => result = x.MaFromSecondsSelect(l=>l.Line).ToArray())            {
+            using (info.WatchFile().ScanFile().Subscribe(x => result = x.MatchingLines.Select(l=>l.Line).ToArray())            {
                 result.ShouldAllBeEquivalentTo(Enumerable.Range(1, 100));
 
                 File.AppendAllLines(file, Enumerable.Range(101, 10).Select(i => $"{i}"));
