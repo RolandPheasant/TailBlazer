@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
@@ -16,7 +17,8 @@ namespace TailBlazer.Domain.FileHandling
 
         public FileTailer(FileInfo file, 
             IObservable<string> textToMatch,
-            IObservable<ScrollRequest> scrollRequest)
+            IObservable<ScrollRequest> scrollRequest,
+            IScheduler scheduler=null)
         {
             if (file == null) throw new ArgumentNullException(nameof(file));
             if (textToMatch == null) throw new ArgumentNullException(nameof(textToMatch));
@@ -29,7 +31,9 @@ namespace TailBlazer.Domain.FileHandling
                         if (!string.IsNullOrEmpty(searchText))
                             predicate = s => s.Contains(searchText, StringComparison.OrdinalIgnoreCase);
 
-                        return file.WatchFile().ScanFile(predicate);
+                        return file
+                                    .WatchFile(scheduler:scheduler ?? Scheduler.Default)
+                                    .ScanFile(predicate);
                     }).Switch()
                     .Replay(1).RefCount();
 

@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using FluentAssertions;
+using Microsoft.Reactive.Testing;
 using TailBlazer.Domain.FileHandling;
 using Xunit;
 
@@ -24,14 +25,13 @@ namespace TailBlazer.Fixtures
         {
             var file = Path.GetTempFileName();
             var info = new FileInfo(file);
-
+            var scheduler  = new TestScheduler();
             var textMatch = Observable.Return((string)null);
             var autoTailer = Observable.Return(new ScrollRequest(10));
-
-
+            
             File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i =>i.ToString()).ToArray());
 
-            using (var tailer = new FileTailer(info, textMatch, autoTailer))
+            using (var tailer = new FileTailer(info, textMatch, autoTailer,scheduler))
             {
 
                 tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(Enumerable.Range(91, 10));
@@ -39,7 +39,7 @@ namespace TailBlazer.Fixtures
 
                 File.AppendAllLines(file, Enumerable.Range(101, 10).Select(i => i.ToString()));
 
-                Thread.Sleep(TimeSpan.FromSeconds(1));
+                scheduler.AdvanceByMilliSeconds(250);
                 File.Delete(file);
                 tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(Enumerable.Range(101, 10));
             }
@@ -50,14 +50,14 @@ namespace TailBlazer.Fixtures
         {
             var file = Path.GetTempFileName();
             var info = new FileInfo(file);
-
+            var scheduler = new TestScheduler();
             var textMatch = Observable.Return((string)"1");
             var autoTailer = Observable.Return(new ScrollRequest(10));
 
 
             File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
 
-            using (var tailer = new FileTailer(info, textMatch, autoTailer))
+            using (var tailer = new FileTailer(info, textMatch, autoTailer, scheduler))
             {
 
                 //lines which contain "1"
@@ -87,7 +87,8 @@ namespace TailBlazer.Fixtures
                     .Select(int.Parse)
                     .ToArray();
 
-                Thread.Sleep(TimeSpan.FromSeconds(1));
+
+                scheduler.AdvanceByMilliSeconds(250);
                 File.Delete(file);
                 tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(expectedLines);
             }
@@ -99,25 +100,23 @@ namespace TailBlazer.Fixtures
         {
             var file = Path.GetTempFileName();
             var info = new FileInfo(file);
-
             var textMatch = Observable.Return((string)null);
-
-
+            var scheduler = new TestScheduler();
             var autoTailer =new ReplaySubject<ScrollRequest>(1);
-            autoTailer.OnNext(new ScrollRequest(10,15));
+            autoTailer.OnNext(new ScrollRequest(10,14));
 
             File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
 
-            using (var tailer = new FileTailer(info, textMatch, autoTailer))
+            using (var tailer = new FileTailer(info, textMatch, autoTailer, scheduler))
             {
 
-                tailer.Lines.Items.Select(l => l.Number)
-                    .ShouldAllBeEquivalentTo(Enumerable.Range(15, 10));
+                tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(Enumerable.Range(15, 10));
 
-                autoTailer.OnNext(new ScrollRequest(15, 50));
+                autoTailer.OnNext(new ScrollRequest(15, 49));
 
              
                 File.Delete(file);
+                scheduler.AdvanceByMilliSeconds(250);
                 tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(Enumerable.Range(50, 15));
             }
          
