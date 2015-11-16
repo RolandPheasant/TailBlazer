@@ -65,6 +65,7 @@
     <Compile Include="FileHandling\FileNotificationType.cs" />
     <Compile Include="FileHandling\FileScanResult.cs" />
     <Compile Include="FileHandling\FileTailer.cs" />
+    <Compile Include="FileHandling\LineIndex.cs" />
     <Compile Include="FileHandling\ScrollingMode.cs" />
     <Compile Include="FileHandling\ScrollRequest.cs" />
     <Compile Include="Infrastructure\Extensions.cs" />

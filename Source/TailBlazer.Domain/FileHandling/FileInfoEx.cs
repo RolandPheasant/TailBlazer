@@ -10,60 +10,6 @@ using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public struct LineIndex : IEquatable<LineIndex>
-    {
-        private readonly int _line;
-        private readonly int _index;
-
-        public LineIndex(int line, int index)
-        {
-            _line = line;
-            _index = index;
-        }
-
-        public int Line => _line;
-
-        public int Index => _index;
-
-        #region Equality
-
-        public bool Equals(LineIndex other)
-        {
-            return _line == other._line && _index == other._index;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            return obj is LineIndex && Equals((LineIndex) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (_line*397) ^ _index;
-            }
-        }
-
-        public static bool operator ==(LineIndex left, LineIndex right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(LineIndex left, LineIndex right)
-        {
-            return !left.Equals(right);
-        }
-
-        #endregion
-
-        public override string ToString()
-        {
-            return $"{Line} (index={Index})";
-        }
-    }
-
     public static class FileInfoEx
     {
         /// <summary>
@@ -133,25 +79,20 @@ namespace TailBlazer.Domain.FileHandling
                                  var previousCount = count;
                                  var previousItems = state?.MatchingLines ?? new LineIndex[0];
                                  var newItems = new List<LineIndex>();
-
-
                                  var indexInResult = previousItems.Length;
 
                                  while ((line = reader.ReadLine()) != null)
                                  {
-                                    
                                      if (predicate == null)
                                      {
-                                 
                                          count++;
-                                         newItems.Add(new LineIndex(count, count));
+                                         newItems.Add(new LineIndex(count, indexInResult));
                                          indexInResult++;
                                      }
                                      else
                                      {
                                          count++;
                                          if (!predicate(line)) continue;
-                                      
                                          newItems.Add(new LineIndex(count, indexInResult));
                                          indexInResult++;
                                      }
@@ -200,9 +141,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public static IEnumerable<T> ReadLines<T>(this FileInfo source, LineIndex[] lines, Func<LineIndex,string, T>  selector)
         {
-           
             var cached = lines.ToDictionary(l => l.Line);
-
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
                 using (var reader = new StreamReader(stream, Encoding.Default, true))
@@ -216,7 +155,6 @@ namespace TailBlazer.Domain.FileHandling
 
                         if (contained.HasValue)
                             yield return selector(contained.Value, line);
-
                     }
                 }
             }

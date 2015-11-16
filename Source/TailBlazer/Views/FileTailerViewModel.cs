@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using Dragablz;
 using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.FileHandling;
@@ -76,14 +75,11 @@ namespace TailBlazer.Views
             var matchedLinesMonitor = tailer.MatchedLines
                 .Subscribe(matched => MatchedLineCount = matched);
 
+            //track first visible index
             var firstIndexMonitor = tailer.Lines.Connect()
-                .QueryWhenChanged(lines =>
-                {
-                    //TODO: Number = line number in file. We also need to translate this to an actual index!
-                    //use zero based index rather than line number
-                    return lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min();
-                }).Subscribe(first=> FirstIndex= first);
-
+                .QueryWhenChanged(lines =>lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min())
+                .Subscribe(first=> FirstIndex= first);
+            
 
             _cleanUp = new CompositeDisposable(tailer, 
                 lineCounter, 
@@ -94,10 +90,7 @@ namespace TailBlazer.Views
                 {
                     _userScrollRequested.OnCompleted();
                 }));
-
         }
-
-
         void IScrollReceiver.ScrollTo(ScrollValues values)
         {
             if (values == null) throw new ArgumentNullException(nameof(values));

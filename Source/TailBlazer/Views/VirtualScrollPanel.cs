@@ -225,7 +225,6 @@ namespace TailBlazer.Views
                     _childLayouts.Add(child, new Rect(currentX, currentY, Math.Max(widestWidth,_viewportSize.Width), ItemHeight));
                     currentY += ItemHeight;
                 }
-
             }
             RemoveRedundantChildren();
             UpdateScrollInfo(availableSize, _extentInfo, widestWidth);

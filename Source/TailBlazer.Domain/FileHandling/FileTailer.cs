@@ -38,7 +38,7 @@ namespace TailBlazer.Domain.FileHandling
             TotalLines = matchedLines.Select(x => x.TotalLines);
 
             //todo: plug in file missing or error into the screen
-            
+
             var lines = new SourceList<Line>();
             Lines = lines.AsObservableList();
             
@@ -50,30 +50,24 @@ namespace TailBlazer.Domain.FileHandling
                 {
                     var mode = x.request.Mode;
                     var pageSize = x.request.PageSize;
-
                     var endOfTail = x.scanResult.EndOfTail;
                     var isInitial = x.scanResult.Index==0;
                     var allLines = x.scanResult.MatchingLines;
-
-
                     var previousPage = lines.Items.Select(l => new LineIndex(l.Number, l.Index)).ToArray();
                     
-                    //If tailing, take the end only. 
+ 
                     //Otherwise take the page size and start index from the request
                     var currentPage = (mode == ScrollingMode.Tail
                         ? allLines.Skip(allLines.Length-pageSize).Take(pageSize).ToArray()
-                        : allLines.Skip(Math.Min(x.request.FirstIndex-1, allLines.Length- pageSize)).Take(pageSize)).ToArray();
+                        : allLines.Skip(x.request.FirstIndex).Take(pageSize)).ToArray();
                     
                     var added = currentPage.Except(previousPage).ToArray();
                     var removed = previousPage.Except(currentPage).Select(li=>li.Line).ToArray();
 
                     if (added.Length + removed.Length == 0) return;
 
-                    //TODO: Readline can throw an error, so need to hand this scenario
-
-
-                    //read new lines from the file [TODO, need actual index in relative result set]
-                    // var addedLines = file.ReadLines(added,i=> !isInitial && i > endOfTail).ToArray();
+                    //TODO: Readline can throw an error, so need to handle this scenario
+                    //read new lines from the file 
                     var addedLines = file.ReadLines(added, (lineIndex, text) =>
                     {
                         var isEndOfTail = !isInitial && lineIndex.Line > endOfTail;
