@@ -8,38 +8,6 @@ using System.Windows.Media;
 
 namespace TailBlazer.Views
 {
-    public enum ScrollSource
-    {
-        MouseUp,
-        MouseDown,
-
-    }
-
-    public enum ScrollChangeReason
-    {
-        Automatic,
-        User
-    }
-
-    public enum ScrollDirection
-    {
-        Up,
-        Down
-    }
-
-    public class UserScrollData
-    {
-        public ScrollDirection Direction { get; }
-        public int Value { get; }
-
-        public UserScrollData(ScrollDirection scrollDirection, int value)
-        {
-            Direction = scrollDirection;
-            Value = value;
-        }
-
-    }
-
     public class VirtualScrollPanel : VirtualizingPanel, IScrollInfo
     {
         private const double ScrollLineAmount = 16.0;
@@ -67,15 +35,6 @@ namespace TailBlazer.Views
 
         public static readonly DependencyProperty ScrollReceiverProperty = DependencyProperty.Register(
             "ScrollReceiver", typeof (IScrollReceiver), typeof (VirtualScrollPanel), new PropertyMetadata(default(IScrollReceiver)));
-
-        //public static readonly DependencyProperty AutoScrollProperty = DependencyProperty.Register(
-        //    "AutoScroll", typeof (bool), typeof (VirtualScrollPanel), new PropertyMetadata(default(bool)));
-
-        //public bool AutoScroll
-        //{
-        //    get { return (bool) GetValue(AutoScrollProperty); }
-        //    set { SetValue(AutoScrollProperty, value); }
-        //}
 
         public IScrollReceiver ScrollReceiver
         {
@@ -116,9 +75,7 @@ namespace TailBlazer.Views
         public VirtualScrollPanel()
         {
             if (!DesignerProperties.GetIsInDesignMode(this))
-            {
                 Dispatcher.BeginInvoke(new Action(Initialize));
-            }
         }
 
         private void Initialize()
@@ -269,7 +226,6 @@ namespace TailBlazer.Views
                         _itemsGenerator.Recycle(generatorPosition, 1);
                     }
                 }
-
                 SetVirtualItemIndex(child, -1);
             }
         }
@@ -386,9 +342,6 @@ namespace TailBlazer.Views
         {
             if (double.IsInfinity(offset)) return;
             var diff = (int)((offset - _extentInfo.VerticalOffset) / ItemHeight);
-
-
-
             InvokeStartIndexCommand(diff);
         }
 
@@ -421,20 +374,17 @@ namespace TailBlazer.Views
             _firstIndex = firstIndex;
 
             OnOffsetChanged(lines > 0 ? ScrollDirection.Down : ScrollDirection.Up, lines);
-
-
             ReportChanges();
-
         }
 
-        private void ReportChanges(ScrollChangeReason reason = ScrollChangeReason.Automatic)
+        private void ReportChanges()
         {
-            ScrollReceiver?.ScrollTo(new ScrollValues(_size, _firstIndex,this, reason));
+            ScrollReceiver?.ScrollTo(new ScrollBoundsArgs(_size, _firstIndex));
         }
 
         private void OnOffsetChanged(ScrollDirection direction,int firstRow)
         {
-            ScrollReceiver?.ScrollChanged(new UserScrollData(direction, firstRow));
+            ScrollReceiver?.ScrollChanged(new ScrollChangedArgs(direction, firstRow));
         }
 
         private void CallbackStartIndexChanged(int index)

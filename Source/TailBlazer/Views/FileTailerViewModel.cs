@@ -17,26 +17,21 @@ namespace TailBlazer.Views
         private readonly IDisposable _cleanUp;
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
         private readonly ISubject<ScrollRequest> _userScrollRequested = new ReplaySubject<ScrollRequest>(1);
-
-        public string File { get; }
-        public ReadOnlyObservableCollection<LineProxy> Lines => _data;
-
         private string _searchText;
-        private bool _autoTail;
+        private bool _autoTail=true;
         private string _lineCountText;
         private int _firstIndex;
         private int _matchedLineCount;
-        private int _pageSize; 
+        private int _pageSize;
 
+        public ReadOnlyObservableCollection<LineProxy> Lines => _data;
+        
         public FileTailerViewModel(ILogger logger,ISchedulerProvider schedulerProvider, FileInfo fileInfo)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
 
-            File = fileInfo.FullName;
-            AutoTail = true;
-            
             var filterRequest = this.WhenValueChanged(vm => vm.SearchText).Throttle(TimeSpan.FromMilliseconds(125));
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
             var scroller = _userScrollRequested
@@ -67,11 +62,11 @@ namespace TailBlazer.Views
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy.Number))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)
-                .Subscribe(a => logger.Info(a.Adds.ToString()), ex => logger.Error(ex, "Oops"));
+                .Subscribe(changes => logger.Info($"Rows changed {changes.Adds} adds, {changes.Removes} removed"), 
+                            ex => logger.Error(ex, "There is a problem with bind data"));
 
 
-            //monitor matching lines and start index 
-            //update local values so the virtual scroll panel can bind to them
+            //monitor matching lines and start index,
             var matchedLinesMonitor = tailer.MatchedLines
                 .Subscribe(matched => MatchedLineCount = matched);
 
@@ -91,20 +86,20 @@ namespace TailBlazer.Views
                     _userScrollRequested.OnCompleted();
                 }));
         }
-        void IScrollReceiver.ScrollTo(ScrollValues values)
+        void IScrollReceiver.ScrollTo(ScrollBoundsArgs boundsArgs)
         {
-            if (values == null) throw new ArgumentNullException(nameof(values));
+            if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));
             var mode = AutoTail ? ScrollingMode.Tail : ScrollingMode.User;
 
-            _userScrollRequested.OnNext(new ScrollRequest(mode, values.PageSize,values.FirstIndex));
-            PageSize = values.PageSize;
+            _userScrollRequested.OnNext(new ScrollRequest(mode, boundsArgs.PageSize,boundsArgs.FirstIndex));
+            PageSize = boundsArgs.PageSize;
+            FirstIndex = boundsArgs.FirstIndex;
         }
 
-        void IScrollReceiver.ScrollChanged(UserScrollData scrollData)
+        void IScrollReceiver.ScrollChanged(ScrollChangedArgs scrollChangedArgs)
         {
-            if (scrollData.Direction== ScrollDirection.Up)
+            if (scrollChangedArgs.Direction== ScrollDirection.Up)
                 AutoTail = false;
-
         }
 
         public bool AutoTail
@@ -147,7 +142,5 @@ namespace TailBlazer.Views
         {
             _cleanUp.Dispose();
         }
-
-
     }
 }
