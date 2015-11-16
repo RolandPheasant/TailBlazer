@@ -48,7 +48,7 @@ namespace TailBlazer.Fixtures
             File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i => $"{i}").ToArray());
 
             //filter by odd numbers
-            using (info.WatchFile().ScanFile(l=>l.int.Parse(l) % 2 == 1).Subscribe(x => result = x.MatchingLines.Select(l=>l.Line).ToArray()))
+            using (info.WatchFile().ScanFile(l=>int.Parse(l) % 2 == 1).Subscribe(x => result = x.MatchingLines.Select(l=>l.Line).ToArray()))
             {
                 result.ShouldAllBeEquivalentTo(Enumerable.Range(1, 100).Where(i=>i % 2 == 1));
 
