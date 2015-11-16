@@ -413,7 +413,7 @@ namespace TailBlazer.Views
         {
             if (_firstIndex == index) return;
             _firstIndex = index;
-            ReportChanges();
+         //   ReportChanges();
         }
  
         private void InvokeSizeCommand(int size)
