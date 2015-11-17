@@ -32,21 +32,17 @@ namespace TailBlazer.Views
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
 
-
-            //user entered filter
             var filterRequest = this.WhenValueChanged(vm => vm.SearchText).Throttle(TimeSpan.FromMilliseconds(125));
-
-            //define scroll to observable
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
-            var scroller = _userScrollRequested.CombineLatest(autoChanged, (user, auto) =>
+            var scroller = _userScrollRequested
+                        .CombineLatest(autoChanged, (user, auto) =>
                         {
-                            var mode = auto ? ScrollingMode.Tail : ScrollingMode.User;
+                            var mode = AutoTail ? ScrollingMode.Tail : ScrollingMode.User;
                             return  new ScrollRequest(mode, user.PageSize, user.FirstIndex);
                         })
-                        .Sample(TimeSpan.FromMilliseconds(125))
+                        .Sample(TimeSpan.FromMilliseconds(150))
                         .DistinctUntilChanged();
 
-            //construct tailer
             var tailer = new FileTailer(fileInfo, filterRequest, scroller);
 
 
@@ -95,7 +91,6 @@ namespace TailBlazer.Views
             if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));
             var mode = AutoTail ? ScrollingMode.Tail : ScrollingMode.User;
 
-            //TODO: get rid of subject (alas each time I have tried to get rid of it, scrolling has been messed up!)
             _userScrollRequested.OnNext(new ScrollRequest(mode, boundsArgs.PageSize,boundsArgs.FirstIndex));
             PageSize = boundsArgs.PageSize;
             FirstIndex = boundsArgs.FirstIndex;
