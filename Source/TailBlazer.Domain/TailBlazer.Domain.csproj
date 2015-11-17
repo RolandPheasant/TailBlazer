@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileHandling\FileInfoEx.cs" />
+    <Compile Include="FileHandling\FileLineReader.cs" />
     <Compile Include="FileHandling\FileNotification.cs" />
     <Compile Include="FileHandling\FileNotificationType.cs" />
     <Compile Include="FileHandling\FileScanResult.cs" />

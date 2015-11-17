@@ -86,14 +86,14 @@ namespace TailBlazer.Domain.FileHandling
                                      if (predicate == null)
                                      {
                                          count++;
-                                         newItems.Add(new LineIndex(count, indexInResult));
+                                         newItems.Add(new LineIndex(count, indexInResult,0,0));
                                          indexInResult++;
                                      }
                                      else
                                      {
                                          count++;
                                          if (!predicate(line)) continue;
-                                         newItems.Add(new LineIndex(count, indexInResult));
+                                         newItems.Add(new LineIndex(count, indexInResult, 0, 0));
                                          indexInResult++;
                                      }
                                  }
