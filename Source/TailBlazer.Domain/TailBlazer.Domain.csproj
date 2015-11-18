@@ -61,12 +61,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileHandling\FileInfoEx.cs" />
-    <Compile Include="FileHandling\FileLineReader.cs" />
+    <Compile Include="FileHandling\LineIndexer.cs" />
     <Compile Include="FileHandling\FileNotification.cs" />
     <Compile Include="FileHandling\FileNotificationType.cs" />
     <Compile Include="FileHandling\FileScanResult.cs" />
     <Compile Include="FileHandling\FileTailer.cs" />
     <Compile Include="FileHandling\LineIndex.cs" />
+    <Compile Include="FileHandling\LineReader.cs" />
     <Compile Include="FileHandling\ScrollingMode.cs" />
     <Compile Include="FileHandling\ScrollRequest.cs" />
     <Compile Include="Infrastructure\Extensions.cs" />
