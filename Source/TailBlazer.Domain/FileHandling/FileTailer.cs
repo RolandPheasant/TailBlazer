@@ -31,9 +31,11 @@ namespace TailBlazer.Domain.FileHandling
                         if (!string.IsNullOrEmpty(searchText))
                             predicate = s => s.Contains(searchText, StringComparison.OrdinalIgnoreCase);
 
-                        return file
-                                    .WatchFile(scheduler:scheduler ?? Scheduler.Default)
+                        return file.WatchFile(scheduler:scheduler ?? Scheduler.Default)
+                                    .TakeWhile(notification => notification.Exists)
+                                    .Repeat()
                                     .ScanFile(predicate);
+
                     }).Switch()
                     .Replay(1).RefCount();
 
@@ -59,7 +61,6 @@ namespace TailBlazer.Domain.FileHandling
                     var allLines = x.scanResult.MatchingLines;
                     var previousPage = lines.Items.Select(l => new LineIndex(l.Number, l.Index)).ToArray();
                     
- 
                     //Otherwise take the page size and start index from the request
                     var currentPage = (mode == ScrollingMode.Tail
                         ? allLines.Skip(allLines.Length-pageSize).Take(pageSize).ToArray()
@@ -70,23 +71,33 @@ namespace TailBlazer.Domain.FileHandling
 
                     if (added.Length + removed.Length == 0) return;
 
-                    //TODO: Readline can throw an error, so need to handle this scenario
-                    //read new lines from the file 
-                    var addedLines = file.ReadLines(added, (lineIndex, text) =>
-                    {
-                        var isEndOfTail = !isInitial && lineIndex.Line > endOfTail;
-                        return new Line(lineIndex.Line, lineIndex.Index, text, isEndOfTail ? DateTime.Now : (DateTime?)null);
-                    }).ToArray();
 
-                    //get old lines from the current collection
-                    var removedLines = lines.Items.Where(l=> removed.Contains(l.Number)).ToArray();
-
-                    //finally relect changes in the list
-                    lines.Edit(innerList =>
+                    try
                     {
-                        innerList.RemoveMany(removedLines);
-                        innerList.AddRange(addedLines);
-                    });
+                        var addedLines = file.ReadLines(added, (lineIndex, text) =>
+                        {
+                            var isEndOfTail = !isInitial && lineIndex.Line > endOfTail;
+                            return new Line(lineIndex.Line, lineIndex.Index, text, isEndOfTail ? DateTime.Now : (DateTime?)null);
+                        }).ToArray();
+
+                        //get old lines from the current collection
+                        var removedLines = lines.Items.Where(l => removed.Contains(l.Number)).ToArray();
+
+                        //finally relect changes in the list
+                        lines.Edit(innerList =>
+                        {
+                            innerList.RemoveMany(removedLines);
+                            innerList.AddRange(addedLines);
+                        });
+                    }
+                    catch (Exception)
+                    {
+                        //Very small chance of an error here but if one is causght the next successful read will recify this
+                        //TODO: 1. Feedback to user that steaming has stopped
+                        //TODO: 2. Place the ReadLines(..) method with the select of an observable
+                    }
+
+
                 });
             _cleanUp = new CompositeDisposable(Lines, scroller, lines);
         }
