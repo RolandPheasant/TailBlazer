@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="TailBlazer.Views.FileTailerView"
+<UserControl x:Class="TailBlazer.Views.FileTailerView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -11,7 +11,6 @@
              d:DesignHeight="400" d:DesignWidth="400">
 
     <Control.Resources>
-
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
@@ -19,7 +18,8 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Control.Resources>
-    <Grid >
+    
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
             <RowDefinition Height="*"/>
@@ -32,44 +32,34 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-        <StackPanel 
-            
-            Orientation="Horizontal">
-            
-            
-
-        <Viewbox Width="24" Height="24" Margin="4 0 0 0">
-            <Canvas Width="24" Height="24">
-                <Path Data="M3,2H21V2H21V4H20.92L15,9.92V22.91L9,16.91V9.91L3.09,4H3V2M11,16.08L13,18.08V9H13.09L18.09,4H5.92L10.92,9H11V16.08Z" 
+            <StackPanel Orientation="Horizontal">
+                <Viewbox Width="24" Height="24" Margin="4 0 0 0">
+                    <Canvas Width="24" Height="24">
+                        <Path Data="M3,2H21V2H21V4H20.92L15,9.92V22.91L9,16.91V9.91L3.09,4H3V2M11,16.08L13,18.08V9H13.09L18.09,4H5.92L10.92,9H11V16.08Z" 
                               Fill="{Binding ElementName=SearchTextBox, Path=BorderBrush}" />
-            </Canvas>
-        </Viewbox>
+                    </Canvas>
+                </Viewbox>
 
-        <TextBox  x:Name="SearchTextBox" 
-                    wpf:TextFieldAssist.Hint="Search file"
-                  
+                <TextBox x:Name="SearchTextBox" 
+                    wpf:TextFieldAssist.Hint="Search file"          
                     Margin="4 0 0 0"
                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     VerticalAlignment="Center"
                     MinWidth="125"/>
-        </StackPanel>
+            </StackPanel>
 
             <CheckBox Grid.Column="1"
                       HorizontalAlignment="Right"
                       VerticalAlignment="Center"
                       IsChecked="{Binding AutoTail}"
-                       Margin="0 0 6 0"
+                      Margin="0 0 6 0"
                       >Follow tail</CheckBox>
-            
         </Grid>
-        
 
-            <ListBox  Grid.Row="1" 
-                 ItemsSource="{Binding Lines}">
-            
+        <ListBox Grid.Row="1" ItemsSource="{Binding Lines}">
             <ListBox.Template>
-                    <ControlTemplate>
-                        <ScrollViewer x:Name="ScrollViewer" 
+                <ControlTemplate>
+                    <ScrollViewer x:Name="ScrollViewer" 
                                         VerticalScrollBarVisibility="Auto"
                                         HorizontalScrollBarVisibility="Auto"
                                         CanContentScroll="True"
@@ -77,24 +67,21 @@
                                         Background="{TemplateBinding Background}" 
                                         BorderBrush="Transparent" BorderThickness="0" 
                                         IsTabStop="False">
-                            <ItemsPresenter />
-                        </ScrollViewer>
-                    </ControlTemplate>
-                </ListBox.Template>
+                        <ItemsPresenter/>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ListBox.Template>
 
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
                     <local:VirtualScrollPanel ItemHeight="30"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
-                                                TotalItems="{Binding MatchedLineCount}">
+                                                TotalItems="{Binding MatchedLineCount}"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
 
-
-                        </local:VirtualScrollPanel>
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-
-                <ListBox.ItemTemplate>
+            <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type local:LineProxy}">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -103,7 +90,6 @@
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Text="{Binding Number, Mode=OneWay}"/>
-                            
                         <infrastucture:SearchableTextControl Grid.Column="1" 
                                                             IsHighlight="True"  IsMatchCase="False"
                                                             SearchText="{Binding ElementName=SearchTextBox,Path=Text}"
@@ -112,45 +98,38 @@
                                                             Text="{Binding Text}"/>
                     </Grid>
                 </DataTemplate>
-
-
-
             </ListBox.ItemTemplate>
 
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
-                        <Style.Triggers>
-
-                            <DataTrigger Binding="{Binding IsRecent}" Value="True">
-                                <DataTrigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Background).(SolidColorBrush.Color)" 
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsRecent}" Value="True">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Background).(SolidColorBrush.Color)" 
                                                                                FromBrush="{StaticResource SecondaryAccentBrush}" 
                                                                                Duration="0:0:5"/>
-                                         
-                                            <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Foreground).(SolidColorBrush.Color)" 
+                                        <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Foreground).(SolidColorBrush.Color)" 
                                                                                ToBrush="{StaticResource SecondaryAccentForegroundBrush}" 
                                                                                Duration="0:0:5"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
 
-                                        </Storyboard>
-                                    </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListBox.ItemContainerStyle>
 
-                                </DataTrigger.EnterActions>
-                            </DataTrigger>
-                        </Style.Triggers>
-
-                    </Style>
-                </ListBox.ItemContainerStyle>
-
-            </ListBox>
-
+        </ListBox>
 
         <Grid 
             Height="26"
             Background="{StaticResource PrimaryHueMidBrush}"
             Grid.Row="2"
-            Margin = "-4 0 -4 -4"> <!--Hack as the margin in the tab control means the botton panel has a margin (cannot be bother retemplating the tab control) -->
+            Margin = "-4 0 -4 -4">
+            <!--Hack as the margin in the tab control means the botton panel has a margin (cannot be bother retemplating the tab control) -->
 
             <Grid.Resources>
                 <Style TargetType="{x:Type TextBlock}">
@@ -160,8 +139,6 @@
                     <Setter Property="Foreground" Value="{StaticResource PrimaryHueMidForegroundBrush}"/>
                 </Style>
             </Grid.Resources>
-
-
 
             <StackPanel   Margin="0 0 6 0"
                      Orientation="Horizontal" 
@@ -179,10 +156,8 @@
                     VerticalAlignment="Center"
                     MinWidth="125"/>
 
-
                 <TextBlock Text="{Binding LineCountText}" />
             </StackPanel>
-
 
         </Grid>
     </Grid>
