@@ -34,6 +34,7 @@ namespace TailBlazer.Fixtures
             using (var tailer = new FileTailer(info, textMatch, autoTailer,scheduler))
             {
 
+                scheduler.AdvanceBySeconds(1);
                 tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(Enumerable.Range(91, 10));
                 File.AppendAllLines(file, Enumerable.Range(101, 10).Select(i => i.ToString()));
 
@@ -68,13 +69,14 @@ namespace TailBlazer.Fixtures
                     .Select(int.Parse)
                     .ToArray();
 
+                scheduler.AdvanceBySeconds(1);
 
                 tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(expectedLines);
 
 
                 File.AppendAllLines(file, Enumerable.Range(101, 10).Select(i => i.ToString()));
 
-
+                scheduler.AdvanceBySeconds(1);
                 //lines which contain "1"
                 expectedLines = Enumerable.Range(1, 110)
                     .Select(i => i.ToString())
@@ -86,7 +88,8 @@ namespace TailBlazer.Fixtures
                     .ToArray();
 
 
-                scheduler.AdvanceByMilliSeconds(250);
+                scheduler.AdvanceBySeconds(1);
+
                 File.Delete(file);
                 tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(expectedLines);
             }

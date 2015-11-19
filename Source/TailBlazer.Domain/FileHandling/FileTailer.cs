@@ -31,7 +31,7 @@ namespace TailBlazer.Domain.FileHandling
                         if (!string.IsNullOrEmpty(searchText))
                             predicate = s => s.Contains(searchText, StringComparison.OrdinalIgnoreCase);
 
-                        return file.WatchFile(scheduler:scheduler ?? Scheduler.Default)
+                        return file.WatchFile(scheduler: scheduler)
                                     .TakeWhile(notification => notification.Exists)
                                     .Repeat()
                                     .ScanFile(predicate);
