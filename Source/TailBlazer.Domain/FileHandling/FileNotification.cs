@@ -14,6 +14,7 @@ namespace TailBlazer.Domain.FileHandling
         public FileNotificationType NotificationType { get; }
         public Exception Error { get; }
 
+
         public FileNotification(FileInfo fileInfo)
         {
             fileInfo.Refresh();
@@ -77,6 +78,11 @@ namespace TailBlazer.Domain.FileHandling
         }
 
         #region Equality
+
+        public static explicit operator FileInfo(FileNotification source)
+        {
+            return source.Info;
+        }
 
         public bool Equals(FileNotification other)
         {

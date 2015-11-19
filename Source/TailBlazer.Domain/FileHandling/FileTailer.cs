@@ -59,7 +59,7 @@ namespace TailBlazer.Domain.FileHandling
                     var endOfTail = x.scanResult.EndOfTail;
                     var isInitial = x.scanResult.Index==0;
                     var allLines = x.scanResult.MatchingLines;
-                    var previousPage = lines.Items.Select(l => new LineIndex(l.Number, l.Index)).ToArray();
+                    var previousPage = lines.Items.Select(l => new LineIndex(l.Number, l.Index, 0, 0)).ToArray();
                     
                     //Otherwise take the page size and start index from the request
                     var currentPage = (mode == ScrollingMode.Tail

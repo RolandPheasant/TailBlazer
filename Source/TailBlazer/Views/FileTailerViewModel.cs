@@ -23,6 +23,7 @@ namespace TailBlazer.Views
         private int _firstIndex;
         private int _matchedLineCount;
         private int _pageSize;
+        private int[] x = Enumerable.Range(1, 1000000000).ToArray();
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         
