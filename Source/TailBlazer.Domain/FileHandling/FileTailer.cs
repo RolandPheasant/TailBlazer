@@ -39,8 +39,18 @@ namespace TailBlazer.Domain.FileHandling
                     }).Switch()
                     .Replay(1).RefCount();
 
-            MatchedLines = matchedLines.Select(x => x.MatchingLines.Length);
 
+            //temp mess for a few days
+            var indexer =      file.WatchFile(scheduler: scheduler)
+                                    .TakeWhile(notification => notification.Exists)
+                                    .Repeat()
+                                    .Index()
+                                    .Subscribe(x =>
+                                    {
+                                        Console.WriteLine(x.Lines);
+                                    });
+
+            MatchedLines = matchedLines.Select(x => x.MatchingLines.Length);
             TotalLines = matchedLines.Select(x => x.TotalLines);
 
             //todo: plug in file missing or error into the screen
@@ -99,7 +109,7 @@ namespace TailBlazer.Domain.FileHandling
 
 
                 });
-            _cleanUp = new CompositeDisposable(Lines, scroller, lines);
+            _cleanUp = new CompositeDisposable(Lines, scroller, lines, indexer);
         }
 
         public void Dispose()

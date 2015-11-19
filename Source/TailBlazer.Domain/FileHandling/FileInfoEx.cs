@@ -27,14 +27,13 @@ namespace TailBlazer.Domain.FileHandling
                 scheduler = scheduler ?? Scheduler.Default;
 
                 //TODO: create a cool-off period after a poll to account for over running jobs
-                Func<IObservable<FileNotification>> poller = () => Observable.Interval(refresh, scheduler)
+                Func<IObservable<FileNotification>> poller = () => Observable.Interval(refresh)
                                         .StartWith(0)
-                                        .Scan((FileNotification)null, (state, _) =>
-                                        {
-                                            return state == null
-                                                ? new FileNotification(file)
-                                                : new FileNotification(state);
-                                        }).DistinctUntilChanged();
+                                        .ObserveOn(scheduler)
+                                        .Scan((FileNotification)null, (state, _) => state == null
+                                                                                ? new FileNotification(file)
+                                                                                : new FileNotification(state))
+                                       .DistinctUntilChanged();
 
                 /*
                     In theory, poll merrily away except slow down when there is an error.
@@ -44,6 +43,40 @@ namespace TailBlazer.Domain.FileHandling
                                                                .Concat(poller().DelaySubscription(TimeSpan.FromSeconds(10))))
                      .SubscribeSafe(observer);
             });
+        }
+
+
+
+
+        /// <summary>
+        /// Indexes all the lines of the specified file notificationn
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <returns></returns>
+        public static IObservable<LineIndexContainer> Index(this IObservable<FileNotification> source)
+        {
+            return source
+                 .Where(n => n.NotificationType == FileNotificationType.Created)
+                 .Select(createdNotification =>
+                 {
+                     return Observable.Create<LineIndexContainer>(observer =>
+                     {
+                         var indexer = new LineIndexer((FileInfo) createdNotification);
+
+                         var notifier = source
+                              .Where(n => n.NotificationType == FileNotificationType.Changed)
+                             .StartWith(createdNotification)
+                             .Scan((LineIndexContainer)null, (state, notification) =>
+                             {
+                                 var lines = indexer.ReadToEnd().ToArray();
+                                 return new LineIndexContainer(lines, state);
+                             })
+                             .SubscribeSafe(observer);
+
+
+                         return new CompositeDisposable(indexer, notifier);;
+                     });
+                 }).Switch();
         }
 
 
