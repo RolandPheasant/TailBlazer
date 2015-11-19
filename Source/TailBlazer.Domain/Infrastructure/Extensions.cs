@@ -24,7 +24,7 @@ namespace System
         public static string Pluralise(this string source, int count)
         {
             if (count == 1) return $"{count} {source}";
-            return $"{count} {source}s"; ;
+            return $"{count} {source}s";
         }
     }
 }

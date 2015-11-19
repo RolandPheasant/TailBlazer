@@ -230,7 +230,7 @@ namespace TailBlazer.Infrastucture
                  //   FontStyle = isHighlight ? FontStyles.Italic : FontStyles.Normal,
 
                     // Set the source text with the style which is Bold.
-                    FontWeight = isHighlight ? FontWeights.Bold : FontWeights.Normal,
+                    FontWeight = isHighlight ? FontWeights.Bold : FontWeights.Normal
                 };
                 return run;
             }
