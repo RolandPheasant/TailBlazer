@@ -14,6 +14,17 @@ namespace TailBlazer.Fixtures
         {
             var file = Path.GetTempFileName();
             var info = new FileInfo(file);
+
+            //File.AppendAllLines(file, Enumerable.Range(1, 100000)
+                
+            //    .GroupBy(i=>i % 100==1)
+
+            //    .Select(i => string.Join(",",i)))
+            //    ;
+                        
+
+
+
             File.AppendAllLines(file, Enumerable.Range(1, 100000).Select(i => $"This is line number {i}"));
 
             var indexer = new LineIndexer(info);
