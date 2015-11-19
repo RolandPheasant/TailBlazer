@@ -1,5 +1,7 @@
 # Tail Blazer
 
+[![Join the chat at https://gitter.im/RolandPheasant/TailBlazer](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/RolandPheasant/TailBlazer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 In my day to day professional life I am always tailing log files but have always been disappointed with the freebies on offer.The current crop of free ones all look like they were written in the 1990s, are very ugly and have limited functionality.
 
 So I have decided to rectify this by creating a more modern version.  The mission statement is:  
