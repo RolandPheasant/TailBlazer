@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Linq;
+using System.Windows;
 using Dragablz;
 using TailBlazer.Views;
 
@@ -22,7 +23,9 @@ namespace TailBlazer.Infrastucture
 
         public TabEmptiedResponse TabEmptiedHandler(TabablzControl tabControl, Window window)
         {
-            return TabEmptiedResponse.DoNothing;
+            return Application.Current.Windows.OfType<MainWindow>().Count() == 1
+                ? TabEmptiedResponse.DoNothing
+                : TabEmptiedResponse.CloseWindowOrLayoutBranch;
         }
     }
 }
