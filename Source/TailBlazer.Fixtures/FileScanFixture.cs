@@ -9,13 +9,8 @@ using Xunit;
 
 namespace TailBlazer.Fixtures
 {
-    /*
-            Putting a thread sleep into a test sucks. However the file system watcher 
-            which ScanLineNumbers() is based on is async by nature and since
-            it is build from old fashioned events there is no way to pass in a scheduler.
-            If someone has a solution to eliminate Thread.Sleep crap, please let me know
-        */
-        public class ScanLineNumberFixtures
+
+        public class IndexLineNumbersFixture
     {
 
         [Fact]
@@ -28,12 +23,13 @@ namespace TailBlazer.Fixtures
 
             File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i => $"{i}").ToArray());
 
-            using (info.WatchFile(scheduler:scheduler).ScanFile().Subscribe(x => result = x.MatchingLines.Select(l => l.Line).ToArray()))
+            using (info.WatchFile(TimeSpan.FromMilliseconds(1), scheduler).Index().Subscribe(x => result = x.Lines.Select((_,idx)=>idx+1).ToArray()))
             {
+                scheduler.AdvanceByMilliSeconds(1);
                 result.ShouldAllBeEquivalentTo(Enumerable.Range(1, 100));
 
                 File.AppendAllLines(file, Enumerable.Range(101, 10).Select(i => $"{i}"));
-                scheduler.AdvanceByMilliSeconds(250);
+                scheduler.AdvanceByMilliSeconds(1);
                 File.Delete(file);
                 result.ShouldAllBeEquivalentTo(Enumerable.Range(1, 110));
 
@@ -50,7 +46,7 @@ namespace TailBlazer.Fixtures
             File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i => $"{i}").ToArray());
 
             //filter by odd numbers
-            using (info.WatchFile(scheduler: scheduler).ScanFile(l=>int.Parse(l) % 2 == 1).Subscribe(x => result = x.MatchingLines.Select(l=>l.Line).ToArray()))
+            using (info.WatchFile(scheduler: scheduler).Index().Subscribe(x => result = x.Lines))
             {
                 result.ShouldAllBeEquivalentTo(Enumerable.Range(1, 100).Where(i=>i % 2 == 1));
 

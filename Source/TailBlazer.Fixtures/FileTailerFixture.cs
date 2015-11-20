@@ -60,7 +60,7 @@ namespace TailBlazer.Fixtures
             {
 
                 //lines which contain "1"
-                var expectedLines = Enumerable.Range(1, 100)
+                int[] expectedLines = Enumerable.Range(1, 100)
                     .Select(i => i.ToString())
                     .Where(s => s.Contains("1"))
                     .Reverse()
@@ -110,7 +110,7 @@ namespace TailBlazer.Fixtures
 
             using (var tailer = new FileTailer(info, textMatch, autoTailer, scheduler))
             {
-
+                scheduler.AdvanceByMilliSeconds(251);
                 tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(Enumerable.Range(15, 10));
 
                 autoTailer.OnNext(new ScrollRequest(15, 49));

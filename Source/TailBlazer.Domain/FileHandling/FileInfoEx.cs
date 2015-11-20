@@ -28,20 +28,20 @@ namespace TailBlazer.Domain.FileHandling
 
                 //TODO: create a cool-off period after a poll to account for over running jobs
                 Func<IObservable<FileNotification>> poller = () => Observable.Interval(refresh, scheduler)
-                                      //  .StartWith(0)
-                                        .ObserveOn(scheduler)
-                                        .Scan((FileNotification)null, (state, _) => state == null
-                                                                                ? new FileNotification(file)
-                                                                                : new FileNotification(state))
-                                       .DistinctUntilChanged();
+                    //  .StartWith(0)
+                    // .ObserveOn(scheduler)
+                    .Scan((FileNotification) null, (state, _) => state == null
+                        ? new FileNotification(file)
+                        : new FileNotification(state))
+                    .DistinctUntilChanged();
 
                 /*
                     In theory, poll merrily away except slow down when there is an error.
                 */
                 return poller()
                     .Catch<FileNotification, Exception>(ex => Observable.Return(new FileNotification(file, ex))
-                                                               .Concat(poller().DelaySubscription(TimeSpan.FromSeconds(10))))
-                     .SubscribeSafe(observer);
+                        .Concat(poller().DelaySubscription(TimeSpan.FromSeconds(10))))
+                    .SubscribeSafe(observer);
             });
         }
 
@@ -104,79 +104,6 @@ namespace TailBlazer.Domain.FileHandling
                 }).Switch();
         }
 
-
-        /// <summary>
-        /// Produces an observable report of lines in the file which matches the specified predicate, together with meta data to
-        /// assist reading the actual file lines
-        /// If no predicate is supplied all lines are returned.
-        /// </summary>
-        /// <param name="source">The source.</param>
-        /// <param name="predicate">The predicate.</param>
-        /// <returns></returns>
-        public static IObservable<FileScanResult> ScanFile(this IObservable<FileNotification> source, Func<string, bool> predicate = null)
-        {
-            return source
-                 .Where(n => n.NotificationType == FileNotificationType.Created)
-                 .Select(createdNotification =>
-                 {
-                     return Observable.Create<FileScanResult>(observer =>
-                     {
-                         var stream = File.Open(createdNotification.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite);
-                         stream.Seek(0, SeekOrigin.Begin);
-
-                         var reader = new StreamReader(stream, Encoding.Default, true);
-                         string line;
-
-                         var notifier = source
-                              .Where(n => n.NotificationType == FileNotificationType.Changed)
-                             .StartWith(createdNotification)
-                             .Scan((FileScanResult)null, (state, notification) =>
-                             {
-                                 var count = state?.TotalLines ?? 0;
-                                 var index = state?.Index + 1 ?? 0;
-                                 var previousCount = count;
-                                 var previousItems = state?.MatchingLines ?? new LineIndex[0];
-                                 var newItems = new List<LineIndex>();
-                                 var indexInResult = previousItems.Length;
-
-                                 while ((line = reader.ReadLine()) != null)
-                                 {
-                                     if (predicate == null)
-                                     {
-                                         count++;
-                                         newItems.Add(new LineIndex(count, indexInResult,0,0));
-                                         indexInResult++;
-                                     }
-                                     else
-                                     {
-                                         count++;
-                                         if (!predicate(line)) continue;
-                                         newItems.Add(new LineIndex(count, indexInResult, 0, 0));
-                                         indexInResult++;
-                                     }
-                                 }
-
-                                 //combine the 2 arrays
-                                 var newLines = new LineIndex[previousItems.Length + newItems.Count];
-                                 previousItems.CopyTo(newLines, 0);
-                                 newItems.CopyTo(newLines, previousItems.Length);
-                                 
-                                 return new FileScanResult(notification, newLines, count, previousCount, index);
-                             })
-                             .SubscribeSafe(observer);
-
-
-                         return Disposable.Create(() =>
-                         {
-                             notifier.Dispose();
-                             stream.Close();
-                             stream.Dispose();
-                             reader.Close();
-                             reader.Dispose();
-                         });
-                     });
-                 }).Switch();
-        }
 
         public static IEnumerable<Line> ReadLines(this FileInfo source, int[] lines, Func<int, bool> isEndOfTail = null)
         {
