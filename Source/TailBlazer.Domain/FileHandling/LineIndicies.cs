@@ -1,20 +1,24 @@
 ﻿namespace TailBlazer.Domain.FileHandling
 {
-    public class LineIndexContainer
+    public class LineIndicies
     {
-        public bool IsInitial { get; }
         public int[] Lines { get; }
-        public int LineCount => Lines.Length;
+        public int Count => Lines.Length;
         public int Diff { get; }
-        public int EndOfTail { get; }
+        public LinesChangedReason ChangedReason { get; }
+        public int TailStartsAt { get; }
 
-        public LineIndexContainer(int[] lines, LineIndexContainer previous = null)
+
+
+
+        public LineIndicies(int[] lines, LineIndicies previous = null)
         {
             if (previous == null)
             {
                 Lines = lines;
-                IsInitial = true;
                 Diff = lines.Length;
+                ChangedReason = LinesChangedReason.Loaded;
+                TailStartsAt = lines.Length - 1;
             }
             else
             {
@@ -23,11 +27,13 @@
                 var latest = new int[previous.Lines.Length + lines.Length];
                 previous.Lines.CopyTo(latest, 0);
                 lines.CopyTo(latest, previous.Lines.Length);
-                Lines = latest;
 
-                IsInitial = false;
+                Lines = latest;
                 Diff = lines.Length;
+                ChangedReason = LinesChangedReason.Tailed;
+                TailStartsAt = previous.Count - 1;
             }
         }
+
     }
 }
