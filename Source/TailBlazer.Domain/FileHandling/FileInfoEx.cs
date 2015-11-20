@@ -28,7 +28,7 @@ namespace TailBlazer.Domain.FileHandling
 
                 //TODO: create a cool-off period after a poll to account for over running jobs
                 Func<IObservable<FileNotification>> poller = () => Observable.Interval(refresh, scheduler)
-                    //  .StartWith(0)
+                      .StartWith(0)
                     // .ObserveOn(scheduler)
                     .Scan((FileNotification) null, (state, _) => state == null
                         ? new FileNotification(file)
