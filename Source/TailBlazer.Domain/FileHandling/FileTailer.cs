@@ -16,6 +16,8 @@ namespace TailBlazer.Domain.FileHandling
         private readonly IDisposable _cleanUp;
         public IObservable<int> TotalLines { get;  }
         public IObservable<int> MatchedLines { get; }
+        public IObservable<long> FileSize { get; }
+
         public IObservableList<Line> Lines { get; }
 
         public FileTailer(FileInfo file, 
@@ -66,7 +68,8 @@ namespace TailBlazer.Domain.FileHandling
             //count total line
             TotalLines = indexer.Select(x => x.Count);
 
-            //todo: plug in file missing or error into the screen
+            FileSize = file.WatchFile(metronome).Select(notification => notification.Size);
+
 
 
             var aggregator = indexer.CombineLatest(matcher, scrollRequest,(idx, mtch, scroll) => new CombinedResult(scroll, mtch, idx))
@@ -110,9 +113,10 @@ namespace TailBlazer.Domain.FileHandling
                 })
                 .RetryWithBackOff((Exception error, int attempts) =>
                 {
-                        //TODO: Log
-                        return TimeSpan.FromSeconds(1);
+                    //todo: plug in file missing or error into the screen
+                    return TimeSpan.FromSeconds(1);
                  })
+                 .Where(fn=> fn.NewLines.Length + fn.OldLines.Length > 0)
                 .Subscribe(changes =>
                 {
                     //update observable list

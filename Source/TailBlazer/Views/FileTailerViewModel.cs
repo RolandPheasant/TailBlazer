@@ -23,7 +23,7 @@ namespace TailBlazer.Views
         private int _firstIndex;
         private int _matchedLineCount;
         private int _pageSize;
-
+        private string _fileSizeText;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         
@@ -51,11 +51,16 @@ namespace TailBlazer.Views
             var lineCounter = tailer.TotalLines.CombineLatest(tailer.MatchedLines,(total,matched)=>
             {
                 return total == matched 
-                    ? $"File has {total.ToString("#,###")} lines" 
-                    : $"Showing {matched.ToString("#,###")} of {total.ToString("#,###")} lines";
+                    ? $"{total.ToString("#,###")} lines" 
+                    : $"{matched.ToString("#,###")} of {total.ToString("#,###")} lines";
             })
             .Subscribe(text => LineCountText=text);
-            
+
+
+            var sizeMonitor = tailer.FileSize
+                .Select(size=> size.FormatWithAbbreviation())
+                .DistinctUntilChanged()
+                .Subscribe(text => FileSizeText = text);
 
             //load lines into observable collection
             var loader = tailer.Lines.Connect()
@@ -82,6 +87,7 @@ namespace TailBlazer.Views
                 loader,
                 firstIndexMonitor,
                 matchedLinesMonitor,
+                sizeMonitor,
                 Disposable.Create(() =>
                 {
                     _userScrollRequested.OnCompleted();
@@ -137,6 +143,12 @@ namespace TailBlazer.Views
         {
             get { return _lineCountText; }
             set { SetAndRaise(ref _lineCountText, value); }
+        }
+
+        public string FileSizeText
+        {
+            get { return _fileSizeText; }
+            set { SetAndRaise(ref _fileSizeText, value); }
         }
 
         public void Dispose()

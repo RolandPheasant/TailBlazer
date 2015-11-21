@@ -21,6 +21,21 @@ namespace System
             return source.NextDouble() > 0.5;
         }
 
+        public static string FormatWithAbbreviation(this long source)
+        {
+            //TODO: not very efficient. Come back to this later
+            //var powereof = Math.Floor(Math.Log10(source));
+            string[] sizes = { "B", "KB", "MB", "GB" };
+            double len = source;
+            int order = 0;
+            while (len >= 1024 && order + 1 < sizes.Length)
+            {
+                order++;
+                len = len / 1024;
+            }
+            return $"{len:0.##} {sizes[order]}";
+        }
+
         public static string Pluralise(this string source, int count)
         {
             if (count == 1) return $"{count} {source}";
@@ -34,6 +49,8 @@ namespace System.Collections.Generic
 
     public static class Extensions
     {
+
+
 
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
         {

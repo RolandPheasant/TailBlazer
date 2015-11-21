@@ -45,7 +45,7 @@ namespace TailBlazer.Fixtures
         }
 
         [Fact]
-        public void AutoTailWithFilter()
+        public void WillNotApplyFilterWhenTextIsLessThan3Character()
         {
             var file = Path.GetTempFileName();
             var info = new FileInfo(file);
@@ -60,12 +60,8 @@ namespace TailBlazer.Fixtures
             {
 
                 //lines which contain "1"
-                int[] expectedLines = Enumerable.Range(1, 100)
+                int[] expectedLines = Enumerable.Range(91, 10)
                     .Select(i => i.ToString())
-                    .Where(s => s.Contains("1"))
-                    .Reverse()
-                    .Take(10)
-                    .Reverse()
                     .Select(int.Parse)
                     .ToArray();
 
@@ -73,25 +69,59 @@ namespace TailBlazer.Fixtures
 
                 tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(expectedLines);
 
+                File.Delete(file);
+                tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(expectedLines);
+            }
+        }
 
-                File.AppendAllLines(file, Enumerable.Range(101, 10).Select(i => i.ToString()));
+        [Fact]
+        public void AutoTailWithFilter()
+        {
+            var file = Path.GetTempFileName();
+            var info = new FileInfo(file);
+            var scheduler = new TestScheduler();
+            var textMatch = Observable.Return("odd");
+            var autoTailer = Observable.Return(new ScrollRequest(10));
 
-                scheduler.AdvanceBySeconds(1);
+
+            File.AppendAllLines(file, Enumerable.Range(1, 100)
+                .Select(i => i%2 == 1 ? $"{i} is an odd number" : $"{i} is an even number").ToArray());
+
+            using (var tailer = new FileTailer(info, textMatch, autoTailer, scheduler))
+            {
+
                 //lines which contain "1"
-                expectedLines = Enumerable.Range(1, 110)
-                    .Select(i => i.ToString())
-                    .Where(s => s.Contains("1"))
+                var expectedLines = Enumerable.Range(1, 100)
+                    .Select(i => i % 2 == 1 ? $"{i} is an odd number" : $"{i} is an even number")
+                    .Where(s => s.Contains("odd"))
                     .Reverse()
                     .Take(10)
                     .Reverse()
-                    .Select(int.Parse)
+                    .ToArray();
+
+                scheduler.AdvanceBySeconds(1);
+
+                tailer.Lines.Items.Select(l => l.Text).ShouldAllBeEquivalentTo(expectedLines);
+
+
+                File.AppendAllLines(file, Enumerable.Range(101, 10)
+                .Select(i => i % 2 == 1 ? $"{i} is an odd number" : $"{i} is an even number").ToArray());
+
+                scheduler.AdvanceBySeconds(1);
+
+                expectedLines = Enumerable.Range(1, 110)
+                    .Select(i => i % 2 == 1 ? $"{i} is an odd number" : $"{i} is an even number")
+                    .Where(s => s.Contains("odd"))
+                    .Reverse()
+                    .Take(10)
+                    .Reverse()
                     .ToArray();
 
 
                 scheduler.AdvanceBySeconds(1);
 
                 File.Delete(file);
-                tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(expectedLines);
+                tailer.Lines.Items.Select(l => l.Text).ShouldAllBeEquivalentTo(expectedLines);
             }
         }
 

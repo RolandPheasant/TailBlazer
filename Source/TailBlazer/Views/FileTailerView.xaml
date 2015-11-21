@@ -156,7 +156,13 @@
                     VerticalAlignment="Center"
                     MinWidth="125"/>
 
-                <TextBlock Text="{Binding LineCountText}" />
+                <TextBlock Text="{Binding FileSizeText}" />
+
+                <Border Margin="4 4 0 4" BorderThickness="1 0 0 0"
+                        Opacity=".6"
+                        BorderBrush="{Binding ElementName=TextBlock,Path=Foreground}"
+                        />
+                <TextBlock  x:Name="TextBlock" Margin="2 0 0 0" Text="{Binding LineCountText}" />
             </StackPanel>
 
         </Grid>
