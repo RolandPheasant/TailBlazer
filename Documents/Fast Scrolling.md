@@ -1,6 +1,6 @@
 # Tail Blazer is fast
 
-I have been doing some performance work over the last several days as Tail Blazer will only be useful to anyone if it can handle large files. I have managed to achieve what I believe to be impressive performance by indexing the files. 
+For those who do not know this app, Tail Blazer is a log tail and file monitoring utlity.  Currently I have been doing some performance work over the last several days as Tail Blazer will only be useful to anyone if it can handle large files. I have managed to achieve what I believe to be impressive performance by indexing the files. 
 
 Indexing has allowed 3 things
 
