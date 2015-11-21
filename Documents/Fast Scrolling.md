@@ -29,3 +29,5 @@ I have not tested this for gigabyte sized files so I am not sure how it will per
 I would love you tech people, testers or system adminstrators out there to try this app out and feed back your experiences.  Should you do so, let me know the size of the file, number of lines and any other info you think useful. The more feedback I get the better I can make this app.
 
 But being I only started this project 2 weeks ago I am very happy for now.
+
+For you techs out there feel free to built this yourself. For the non-techs or people without Visual Studio I will regularly be putting releases  [On the GitHub Release Page](https://github.com/RolandPheasant/TailBlazer/releases) where all you have to do is extract the file and double click TrailBlazer.exe
