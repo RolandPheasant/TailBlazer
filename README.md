@@ -31,12 +31,13 @@ That's better. A tail program which is pleasing to my eyes!
  - Store recent files and folders
  - Don't like green? Choose your own colour
  - Automatic creation of columns
+ - Pipe filter to file
 
 ## Future feature list (Folder tail)
 
  - Find in entire folder
  - Tail entire folder
 
-## Update***
+## Update 1: Performance
 
 I have been doing some major performance work see this  [Fast scrolling](https://github.com/RolandPheasant/TailBlazer/blob/master/Documents/Fast%20Scrolling.md)
