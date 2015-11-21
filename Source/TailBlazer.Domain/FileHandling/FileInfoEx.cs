@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -45,6 +46,27 @@ namespace TailBlazer.Domain.FileHandling
             });
         }
 
+        public static IObservable<FileNotification> WatchFile(this FileInfo file, IObservable<Unit> pulse)
+        {
+            return Observable.Create<FileNotification>(observer =>
+            {
+                //TODO: create a cool-off period after a poll to account for over running jobs
+                Func<IObservable<FileNotification>> poller = () => pulse.StartWith(Unit.Default)
+                    // .ObserveOn(scheduler)
+                    .Scan((FileNotification)null, (state, _) => state == null
+                       ? new FileNotification(file)
+                       : new FileNotification(state))
+                    .DistinctUntilChanged();
+
+                /*
+                    In theory, poll merrily away except slow down when there is an error.
+                */
+                return poller()
+                    .Catch<FileNotification, Exception>(ex => Observable.Return(new FileNotification(file, ex))
+                        .Concat(poller().DelaySubscription(TimeSpan.FromSeconds(10))))
+                    .SubscribeSafe(observer);
+            });
+        }
 
 
 
@@ -72,7 +94,6 @@ namespace TailBlazer.Domain.FileHandling
                                  return new LineIndicies(lines, state);
                              })
                              .SubscribeSafe(observer);
-
 
                          return new CompositeDisposable(indexer, notifier);;
                      });

@@ -4,10 +4,13 @@ namespace TailBlazer.Domain.FileHandling
 {
     public class Line : IEquatable<Line>
     {
+
         public int Number { get;  }
         public int Index { get; }
         public string Text { get;  }
         public DateTime? Timestamp { get;  }
+
+        public LineIndex LineIndex { get; set; }
 
         public Line(int number, string text, DateTime? timestamp)
         {
@@ -23,6 +26,16 @@ namespace TailBlazer.Domain.FileHandling
             Index = index;
             Text = text;
             Timestamp = timestamp;
+        }
+
+        public Line(LineIndex lineIndex, string text, DateTime? timestamp)
+        {
+            LineIndex = lineIndex;
+            Text = text;
+            Timestamp = timestamp;
+
+            Number = LineIndex.Line;
+            Index = LineIndex.Index;
         }
 
         #region Equality

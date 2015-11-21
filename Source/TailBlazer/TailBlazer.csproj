@@ -37,6 +37,10 @@
   <PropertyGroup>
     <StartupObject>TailBlazer.Infrastucture.BootStrap</StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>
+    </ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Dragablz, Version=0.0.2.134, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dragablz.0.0.2.134\lib\net45\Dragablz.dll</HintPath>

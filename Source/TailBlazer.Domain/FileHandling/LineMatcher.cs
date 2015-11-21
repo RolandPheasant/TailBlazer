@@ -14,9 +14,12 @@ namespace TailBlazer.Domain.FileHandling
 
         public Encoding Encoding { get; }
 
-        public int Lines => _index;
+        public int TotalCount => _index;
+
+        public int Count => _matches;
 
         private int _index = -1;
+        private int _matches = -1;
 
         public LineMatcher(FileInfo info, Func<string,bool> predicate, Encoding encoding = null)
         {
@@ -37,7 +40,11 @@ namespace TailBlazer.Domain.FileHandling
             while ((line = _reader.ReadLine()) != null)
             {
                 _index++;
-                if (_predicate(line)) yield return _index;
+                if (_predicate(line))
+                {
+                    _matches++;
+                    yield return _index;
+                }
             }
         }
 

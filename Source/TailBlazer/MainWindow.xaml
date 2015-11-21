@@ -16,7 +16,7 @@
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"   
        NonActiveWindowTitleBrush="{DynamicResource WindowTitleColorBrush}"
-            WindowTitleBrush="{DynamicResource WindowTitleColorBrush}"
+      WindowTitleBrush="{DynamicResource WindowTitleColorBrush}"
         GlowBrush="{DynamicResource AccentColorBrush3}"
         WindowStartupLocation="CenterScreen"  
         WindowTransitionsEnabled="False"

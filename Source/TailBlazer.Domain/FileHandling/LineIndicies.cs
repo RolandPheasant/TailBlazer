@@ -9,8 +9,6 @@
         public int TailStartsAt { get; }
 
 
-
-
         public LineIndicies(int[] lines, LineIndicies previous = null)
         {
             if (previous == null)
