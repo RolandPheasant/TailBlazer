@@ -114,12 +114,13 @@
                 <DataTemplate DataType="{x:Type local:LineProxy}">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" MinWidth="40"/>
+                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="{Binding Number, Mode=OneWay}"/>
+                        <TextBlock Text="{Binding Number, Mode=OneWay}" MinWidth="25"/>
                         <infrastucture:SearchableTextControl Grid.Column="1" 
+                                                             Margin="6 0 0 0"   
                                                             IsHighlight="True"  IsMatchCase="False"
                                                             SearchText="{Binding ElementName=SearchTextBox,Path=Text}"
                                                             HighlightBackground="{StaticResource SecondaryAccentBrush}"

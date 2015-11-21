@@ -188,6 +188,8 @@ namespace TailBlazer.Views
                 //part 2: do the measure
                 foreach (var child in children)
                 {
+
+
                     _itemsGenerator.PrepareItemContainer(child);
                     child.Measure(new Size(double.PositiveInfinity, ItemHeight));
                     widestWidth= Math.Max(widestWidth, child.DesiredSize.Width);
