@@ -93,11 +93,16 @@ namespace TailBlazer.Views
                     _userScrollRequested.OnCompleted();
                 }));
         }
-        void IScrollReceiver.ScrollTo(ScrollBoundsArgs boundsArgs)
+        void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
         {
             if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));
             var mode = AutoTail ? ScrollingMode.Tail : ScrollingMode.User;
 
+            /*
+                I need to get rid of this subject as I prefer functional over imperative. 
+                However due to complexities between the interactions with the VirtualScrollPanel
+                each time I have tried to remove it all hell has broken loose
+            */
             _userScrollRequested.OnNext(new ScrollRequest(mode, boundsArgs.PageSize,boundsArgs.FirstIndex));
             PageSize = boundsArgs.PageSize;
             FirstIndex = boundsArgs.FirstIndex;

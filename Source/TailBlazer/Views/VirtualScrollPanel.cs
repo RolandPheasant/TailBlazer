@@ -379,7 +379,7 @@ namespace TailBlazer.Views
 
         private void ReportChanges()
         {
-            ScrollReceiver?.ScrollTo(new ScrollBoundsArgs(_size, _firstIndex));
+            ScrollReceiver?.ScrollBoundsChanged(new ScrollBoundsArgs(_size, _firstIndex));
         }
 
         private void OnOffsetChanged(ScrollDirection direction,int firstRow)
