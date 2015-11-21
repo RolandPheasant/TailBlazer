@@ -20,12 +20,12 @@ Ah but I hear you think what about if the logs are being written to rapidly.  Fa
 
 And the scrolling is still quick.
 
-Admittedly these log files are being scanned on my machine which is powerful and has an SSD so obviously I need to test the app  over a network share. I would also be happy to receive feedback from about how it performs for you.
+Admittedly these log files are being scanned on my machine which is powerful and has an SSD so obviously I need to test the app  over a network share.
 
-## Further performance work
+## Further performance work and feedback
 
 I have not tested this in Gigabyte files so I am not sure how it will perform. I suspect I will have to improve the initial indexing speed. Also I will be able to improve filtering speed with some parallel processing.  
 
-Please feed back your experiences and when you do let me know the size of the file, number of lines and any other info you think useful.
+Please feed back your experiences and when you do let me know the size of the file, number of lines and any other info you think useful. The more feedback I get the better I can make this app.
 
 But being I only started this project 2 weeks ago I am very happy for now.
