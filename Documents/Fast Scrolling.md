@@ -24,4 +24,8 @@ Admittedly these log files are being scanned on my machine which is powerful and
 
 ## Further performance work
 
-I have not tested this in Gigabyte files so I am not sure how it will perform. I suspect I will have to improve the initial indexing speed. Please feed back your experiences.
+I have not tested this in Gigabyte files so I am not sure how it will perform. I suspect I will have to improve the initial indexing speed. Also I will be able to improve filtering speed with some parallel processing.  
+
+Please feed back your experiences and when you do let me know the size of the file, number of lines and any other info you think useful.
+
+But being I only started this project 2 weeks ago I am very happy for now.
