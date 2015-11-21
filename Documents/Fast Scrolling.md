@@ -14,7 +14,7 @@ The proof of the pudding is in the eating so look at this:
 
 The scrolling is quick with a 76 MB file with almost 700k lines.
 
-Ah but I hear you think what about if the logs are being written to rapidly.  Fair question which is answered in the image below where thousands of log lines are being written as the user scrolls.  So I generated a very busy log file and tried scrolling. 
+Ah but I hear you think what about if the logs are being written to rapidly.  So I generated a very busy log file and tried scrolling to see what would happen.  I abide by the maxim of a picture is worth a thousand words, so here is a picture of a rapidly updating log file whilst a user is interacting.
 
 ![Fast scrolling when busy](https://github.com/RolandPheasant/TailBlazer/blob/master/Images/FastScrollingWhenBusy.gif)
 
