@@ -24,10 +24,10 @@ Admittedly these log files are being scanned on my machine which is powerful and
 
 ## Further performance work and feedback
 
-I have not tested this for gigabyte sized files so I am not sure how it will perform. I suspect I will have to improve the initial indexing speed and perhaps have to look at whether I need another indexing strategy. But without doubt I will be able to improve filtering speed with some parallel processing.  
+I have not tested this for gigabyte sized files so I am not sure how it will perform. I suspect I will have to improve the initial indexing speed and perhaps have to look at whether I need another indexing strategy. But without any testing required I know I will be able to improve the speed of filtering by using parallel processing.
 
-I would love you tech people, testers or system adminstrators out there to try this app out and feed back your experiences.  Should you do so, let me know the size of the file, number of lines and any other info you think useful. The more feedback I get the better I can make this app.
+I would love you tech people, testers or system adminstrators out there to try this app out and feed back your experiences.  Should you do so, let me know the size of the file, number of lines and any other info you think useful. The more feedback I get the better I can make this app. 
 
-But being I only started this project 2 weeks ago I am very happy for now.
+But being as I only started this project 2 weeks ago I am very happy for now.
 
-For you techs out there feel free to build this yourself. For the non-techs or people without Visual Studio I will regularly be putting releases  @ [GitHub Release Page](https://github.com/RolandPheasant/TailBlazer/releases) where all you have to do is extract the file and double click TrailBlazer.exe
+For you techs out there feel free to build this yourself. For the non-techs or people without Visual Studio I will regularly be putting releases  @ [Taile Blazer Release Page](https://github.com/RolandPheasant/TailBlazer/releases) where all you have to do is extract the file and double click TrailBlazer.exe
