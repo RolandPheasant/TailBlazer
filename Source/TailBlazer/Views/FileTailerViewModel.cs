@@ -24,6 +24,7 @@ namespace TailBlazer.Views
         private int _matchedLineCount;
         private int _pageSize;
         private string _fileSizeText;
+        private string _searchHint;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         
@@ -52,10 +53,17 @@ namespace TailBlazer.Views
             {
                 return total == matched 
                     ? $"{total.ToString("#,###")} lines" 
-                    : $"{matched.ToString("#,###")} of {total.ToString("#,###")} lines";
+                    : $"{matched.ToString("#,###0")} of {total.ToString("#,###")} lines";
             })
             .Subscribe(text => LineCountText=text);
 
+            var hintWriter = this.WhenValueChanged(vm => vm.SearchText)
+                .Select(text =>
+                {
+                    if (string.IsNullOrEmpty(text))
+                        return "Type to search";
+                    return text.Length < 3 ? "Enter at least 3 characters" : "Filter applied";
+                }).Subscribe(text=> SearchHint = text);
 
             var sizeMonitor = tailer.FileSize
                 .Select(size=> size.FormatWithAbbreviation())
@@ -88,6 +96,7 @@ namespace TailBlazer.Views
                 firstIndexMonitor,
                 matchedLinesMonitor,
                 sizeMonitor,
+                hintWriter,
                 Disposable.Create(() =>
                 {
                     _userScrollRequested.OnCompleted();
@@ -142,6 +151,13 @@ namespace TailBlazer.Views
         {
             get { return _searchText; }
             set { SetAndRaise(ref _searchText, value); }
+        }
+
+
+        public string SearchHint
+        {
+            get { return _searchHint; }
+            set { SetAndRaise(ref _searchHint, value); }
         }
 
         public string LineCountText

@@ -12,11 +12,11 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         
-       TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"   
-       NonActiveWindowTitleBrush="{DynamicResource WindowTitleColorBrush}"
-      WindowTitleBrush="{DynamicResource WindowTitleColorBrush}"
+        NonActiveWindowTitleBrush="{DynamicResource WindowTitleColorBrush}"
+        WindowTitleBrush="{DynamicResource WindowTitleColorBrush}"
         GlowBrush="{DynamicResource AccentColorBrush3}"
         WindowStartupLocation="CenterScreen"  
         WindowTransitionsEnabled="False"
@@ -45,7 +45,16 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <controls:MetroWindow.LeftWindowCommands>
+
+
+    <controls:MetroWindow.RightWindowCommands>
+        <controls:WindowCommands>
+            
+         <TextBlock Text="{Binding Version}" Opacity="0.6"/>
+        </controls:WindowCommands>
+    </controls:MetroWindow.RightWindowCommands>
+
+     <controls:MetroWindow.LeftWindowCommands>
         <controls:WindowCommands>
             <StackPanel Orientation="Horizontal">
 

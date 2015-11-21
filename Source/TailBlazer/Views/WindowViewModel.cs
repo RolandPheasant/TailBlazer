@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reflection;
 using System.Windows.Input;
 using Dragablz;
 using DynamicData.Aggregation;
@@ -26,6 +27,7 @@ namespace TailBlazer.Views
         public IInterTabClient InterTabClient { get; }
         public ICommand OpenFileCommand { get; }
         public Command ShowInGitHubCommand { get; }
+        public string Version { get; }
 
         public FileDropMonitor DropMonitor { get; } = new FileDropMonitor();
 
@@ -35,6 +37,8 @@ namespace TailBlazer.Views
             InterTabClient = new InterTabClient(windowFactory);
             OpenFileCommand =  new Command(OpenFile);
             ShowInGitHubCommand = new Command(()=>   Process.Start("https://github.com/RolandPheasant"));
+
+            Version = $"v{Assembly.GetEntryAssembly().GetName().Version.ToString(3)}";
 
             var fileDropped = DropMonitor.Dropped.Subscribe(OpenFile);
             var isEmptyChecker = Views.ToObservableChangeSet()
