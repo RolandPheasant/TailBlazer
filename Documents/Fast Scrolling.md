@@ -30,4 +30,4 @@ I would love you tech people, testers or system adminstrators out there to try t
 
 But being I only started this project 2 weeks ago I am very happy for now.
 
-For you techs out there feel free to built this yourself. For the non-techs or people without Visual Studio I will regularly be putting releases  [On the GitHub Release Page](https://github.com/RolandPheasant/TailBlazer/releases) where all you have to do is extract the file and double click TrailBlazer.exe
+For you techs out there feel free to build this yourself. For the non-techs or people without Visual Studio I will regularly be putting releases  @ [GitHub Release Page](https://github.com/RolandPheasant/TailBlazer/releases) where all you have to do is extract the file and double click TrailBlazer.exe
