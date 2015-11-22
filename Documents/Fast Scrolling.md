@@ -1,8 +1,10 @@
 # Tail Blazer is fast
 
-For Tail Blazer to be taken seriously, widely used and relied upon it has to be fast. This is why for several days my priority has been to significantly speed up the time it takes to load lines from a file. Slow performance was apparent with large files when either the file was being written to rapidly or a user was scrolling. This is no trivial problem. In fact it is this performance difficulty which prevented me from creating Tail Blazer years ago. It is also why I only started on this project when I had mentally solved these problems.
+For Tail Blazer to be widely used and relied upon it has to be fast. This is why for several days my priority has been to significantly speed up the time it takes to load lines from a file. Slow performance was apparent with large files when either the file was being written to rapidly or a user was scrolling. 
 
-I have managed to achieve what I believe to be impressive performance by indexing the files and virtualising the viewable area of the screen. 
+Solving this problem is no trivial matter. In fact it is the difficulty of achieving sharp performance when scrolling through large files which prevented me from creating Tail Blazer years ago. It is also why I only started on this project when I had mentally solved these problems.
+
+The good news noew I have managed to achieve what I believe to be impressive performance by indexing the files and virtualising the viewable area of the screen. 
 
 This has allowed 3 things
 
