@@ -1,12 +1,6 @@
-# Tail Blazer is fast
+# Tail Blazer has just got faster
 
-For Tail Blazer to be widely used and relied upon it has to be fast. This is why for several days my priority has been to significantly speed up the time it takes to load lines from a file. Slow performance was apparent with large files when either the file was being written to rapidly or a user was scrolling. 
-
-Solving this problem is no trivial matter. In fact it is the difficulty of achieving sharp performance when scrolling through large files which prevented me from creating Tail Blazer years ago. It is also why I only started on this project when I had mentally solved these problems.
-
-The good news noew I have managed to achieve what I believe to be impressive performance by indexing the files and virtualising the viewable area of the screen. 
-
-This has allowed 3 things
+I have manage to achieve significant performance improvements by in tail blazer indexing files.  This has allowed 3 things
 
  - Rapid lookup of lines of text as a user scrolls or as the log is modified
  - True virtualisation where the only log entry lines in memory are those visible on the screen 
