@@ -41,9 +41,13 @@ That's better. A tail program which is pleasing to my eyes!
  - Find in entire folder
  - Tail entire folder
 
+## Feature requests and any other issues
+
+Feel free to get involved by reporting issues and submitting a feature request. Feedback is welcome and and is required to make this a first class system. But before raising an issue check out [issues](https://github.com/RolandPheasant/TailBlazer/issues) to see whether one has already been raised.  
+
 ## Update 1: Building Tail Blazer
 
-There has been an enthusiastic and indeed overwhelming demand for Tail Blazer and many people have asked where can they can get it.  When I get the time I will create an official packaged release but for now anyone who want to use it can either
+There has been an enthusiastic and indeed overwhelming demand for Tail Blazer and many people have asked where can they get it from.  When I get the time I will create an official packaged release but for now anyone who want to use it can either
 
  - Fork, clone or download the source code and build using Visual Studio 2015
  - Grab the binaries from the [release page](https://github.com/RolandPheasant/TailBlazer/releases), extract and double click TailBlazer.exe to run. These releases will be regularly updated.
@@ -57,10 +61,10 @@ I have been doing some major performance work see this  [Fast scrolling](https:/
 
 For me to produce this application I have used several community led open source projects all of which I love. So if you like this app I recommend checking out the following.
 
-[Dynamic Data](https://gitter.im/RolandPheasant/DynamicData) Rx based collections developed by me!
-[Material Design ToolKit](https://github.com/ButchersBoy/MaterialDesignInXamlToolkit) by my friend and work colleage ButchersBoy.
-[Dragablz](https://github.com/ButchersBoy/Dragablz)  also by ButchersBoy. I think he is showing off now.
-[MahApps](https://github.com/MahApps/MahApps.Metro) which was the first open source project to make WPF truly modern.
-[Structure Map](https://github.com/structuremap/structuremap) a dependency injection framework which defines what a good API is all about.
+ - [Dynamic Data](https://gitter.im/RolandPheasant/DynamicData) Rx based collections developed by me. So please forgive the self-plug.
+ - [Material Design ToolKit](https://github.com/ButchersBoy/MaterialDesignInXamlToolkit) by my friend and work colleage ButchersBoy.
+ - [Dragablz](https://github.com/ButchersBoy/Dragablz)  also by ButchersBoy. I think he is showing off now.
+ - [MahApps](https://github.com/MahApps/MahApps.Metro) which was the first open source project to make WPF truly modern.
+ - [Structure Map](https://github.com/structuremap/structuremap) which is a dependency injection library which defines what a good API is all about.
 
 I have used more projects than these but these are the ones which I feel to be indispensable for any desk top project.
