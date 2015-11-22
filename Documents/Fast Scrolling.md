@@ -1,6 +1,6 @@
 # Tail Blazer has just got faster
 
-I have manage to achieve significant performance improvements by in tail blazer indexing files.  This has allowed 3 things
+I have manage to achieve significant performance improvements in tail blazer by indexing files.  This has allowed 3 things
 
  - Rapid lookup of lines of text as a user scrolls or as the log is modified
  - True virtualisation where the only log entry lines in memory are those visible on the screen 
