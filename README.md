@@ -62,7 +62,7 @@ I have been doing some major performance work see this  [Fast scrolling](https:/
 For me to produce this application I have used several community led open source projects all of which I love. So if you like this app I recommend checking out the following.
 
  - [Dynamic Data](https://gitter.im/RolandPheasant/DynamicData) Rx based collections developed by me. So please forgive the self-plug.
- - [Material Design ToolKit](https://github.com/ButchersBoy/MaterialDesignInXamlToolkit) by my friend and work colleage ButchersBoy.
+ - [Material Design ToolKit](https://github.com/ButchersBoy/MaterialDesignInXamlToolkit) by my friend and work colleage ButchersBoy. This brings WPF into the 21st century.
  - [Dragablz](https://github.com/ButchersBoy/Dragablz)  also by ButchersBoy. I think he is showing off now.
  - [MahApps](https://github.com/MahApps/MahApps.Metro) which was the first open source project to make WPF truly modern.
  - [Structure Map](https://github.com/structuremap/structuremap) which is a dependency injection library which defines what a good API is all about.
