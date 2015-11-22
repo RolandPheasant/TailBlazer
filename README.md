@@ -33,7 +33,6 @@ That's better. A tail program which is pleasing to my eyes!
  - Automatic creation of columns
  - Pipe filter to file
  - Copy text to clipboard
- - Remember recent files and folders
  - Ability to pin a file
 
 ## Future feature list (Folder tail)
