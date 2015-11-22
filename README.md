@@ -45,16 +45,16 @@ That's better. A tail program which is pleasing to my eyes!
 
 Feel free to get involved by reporting issues and submitting a feature request. Feedback is welcome and and is required to make this a first class system. But before raising an issue check out [issues](https://github.com/RolandPheasant/TailBlazer/issues) to see whether one has already been raised.  
 
-## Update 1: Building Tail Blazer
+## Building Tail Blazer
 
 There has been an enthusiastic and indeed overwhelming demand for Tail Blazer and many people have asked where can they get it from.  When I get the time I will create an official packaged release but for now anyone who want to use it can either
 
  - Fork, clone or download the source code and build using Visual Studio 2015
  - Grab the binaries from the [release page](https://github.com/RolandPheasant/TailBlazer/releases), extract and double click TailBlazer.exe to run. These releases will be regularly updated.
 
-## Update 2: Performance
+## Performance
 
-I have been doing some major performance work see this  [Fast scrolling](https://github.com/RolandPheasant/TailBlazer/blob/master/Documents/Fast%20Scrolling.md). And I have to say I am absolutely delighted with the response.
+I have been doing some major performance work see this  [Fast scrolling](https://github.com/RolandPheasant/TailBlazer/blob/master/Documents/Fast%20Scrolling.md). And I have to say I am absolutely delighted with the result.
 
 
 ## Roll call of honour
