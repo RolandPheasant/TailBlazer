@@ -49,6 +49,8 @@ namespace TailBlazer.Domain.FileHandling
                 _postion = _postion + line.Length + _delimiterSize;
                 yield return _postion;
             }
+
+
         }
 
         public void Dispose()

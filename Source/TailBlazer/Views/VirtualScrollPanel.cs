@@ -8,6 +8,11 @@ using System.Windows.Media;
 
 namespace TailBlazer.Views
 {
+    /// <summary>
+    /// This is adapted (butchered!) from VirtualWrapPanel in https://github.com/samueldjack/VirtualCollection
+    /// 
+    /// See http://blog.hibernatingrhinos.com/12515/implementing-a-virtualizingwrappanel
+    /// </summary>
     public class VirtualScrollPanel : VirtualizingPanel, IScrollInfo
     {
         private const double ScrollLineAmount = 16.0;

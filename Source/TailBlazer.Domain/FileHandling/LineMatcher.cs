@@ -13,9 +13,7 @@ namespace TailBlazer.Domain.FileHandling
         private readonly StreamReader _reader;
 
         public Encoding Encoding { get; }
-
         public int TotalCount => _index;
-
         public int Count => _matches;
 
         private int _index = -1;
@@ -29,6 +27,9 @@ namespace TailBlazer.Domain.FileHandling
 
             _stream = File.Open(info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite);
             _reader = new StreamReader(_stream, Encoding, true);
+
+            //TODO 1: Get current encoding from _reader.CurrentEncoding and expose so cusumers can read the lines with the same encoding
+            //TODO 2: Expose line delimiter length so it can be correctly removed from when re-reading a line
         }
 
         public IEnumerable<int> ScanToEnd()
@@ -40,11 +41,9 @@ namespace TailBlazer.Domain.FileHandling
             while ((line = _reader.ReadLine()) != null)
             {
                 _index++;
-                if (_predicate(line))
-                {
-                    _matches++;
-                    yield return _index;
-                }
+                if (!_predicate(line)) continue;
+                _matches++;
+                yield return _index;
             }
         }
 
