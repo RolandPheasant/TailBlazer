@@ -43,7 +43,7 @@ That's better. A tail program which is pleasing to my eyes!
 
 ## Update 1: Building Tail Blazer
 
-There has been an enthusiastic and indeed overwhelming demand for Tail Blazer and many people have asked where they can get it.  When I get the time I will create an official packaged release but for now anyone who want to use it can either
+There has been an enthusiastic and indeed overwhelming demand for Tail Blazer and many people have asked where can they can get it.  When I get the time I will create an official packaged release but for now anyone who want to use it can either
 
  - Fork, clone or download the source code and build using Visual Studio 2015
  - Grab the binaries from the [release page](https://github.com/RolandPheasant/TailBlazer/releases), extract and double click TailBlazer.exe to run. These releases will be regularly updated.
