@@ -1,6 +1,6 @@
 # Tail Blazer is fast
 
-For those who do not know this app, Tail Blazer is a log tail and file monitoring utlity.  Currently I have been doing some performance work over the last several days as Tail Blazer will only be useful to anyone if it can handle large files. I have managed to achieve what I believe to be impressive performance by indexing the files. 
+Currently I have been doing some performance work over the last several days as Tail Blazer will only be useful to anyone if it can handle large files. I have managed to achieve what I believe to be impressive performance by indexing the files. 
 
 Indexing has allowed 3 things
 
@@ -24,10 +24,10 @@ Admittedly these log files are being scanned on my machine which is powerful and
 
 ## Further performance work and feedback
 
-I have not tested this for gigabyte sized files so I am not sure how it will perform. I suspect I will have to improve the initial indexing speed and perhaps have to look at whether I need another indexing strategy. But without any testing required I know I will be able to improve the speed of filtering by using parallel processing.
+I have not tested this for gigabyte sized files so I am not sure how it will perform. I suspect I will have to improve the initial indexing speed and perhaps have to look at whether I need another indexing strategy.Additionally I know I will be able to improve the speed of filtering by using parallel processing.
 
-I would love you tech people, testers or system adminstrators out there to try this app out and feed back your experiences.  Should you do so, let me know the size of the file, number of lines and any other info you think useful. The more feedback I get the better I can make this app. 
+I would love you tech people, testers or system adminstrators out there to trial this app and feed back your experiences.  Should you do so, let me know the size of the file, number of lines and any other info you think useful. The more feedback I get the better I can make this app. 
 
 But being as I only started this project 2 weeks ago I am very happy for now.
 
-For you techs out there feel free to build this yourself. For the non-techs or people without Visual Studio I will regularly be putting releases  @ [Taile Blazer Release Page](https://github.com/RolandPheasant/TailBlazer/releases) where all you have to do is extract the file and double click TrailBlazer.exe
+For you techs out there feel free to build this yourself. For the non-techs or people without Visual Studio 2015 I will regularly be putting releases  @ [Tail Blazer Release Page](https://github.com/RolandPheasant/TailBlazer/releases) where all you have to do is extract the file and double click TrailBlazer.exe
