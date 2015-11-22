@@ -9,7 +9,7 @@ So I have decided to rectify this by creating a more modern version.  The missio
 
 >It has to be fast, intuitive, functionally rich and the code has to be 100% reactive.
 
-So here we go, my first attempt I have come up with this 
+So here we go, my first attempt I have come up with this:  
 
 ![Tail Blazer](https://github.com/RolandPheasant/TailBlazer/blob/master/Images/Tailing.gif)
 
@@ -30,15 +30,37 @@ That's better. A tail program which is pleasing to my eyes!
  - Find in file
  - Conditionally highlight text
  - Store recent files and folders
- - Don't like green? Choose your own colour
  - Automatic creation of columns
  - Pipe filter to file
+ - Copy text to clipboard
+ - Remember recent files and folders
+ - Ability to pin a file
 
 ## Future feature list (Folder tail)
 
  - Find in entire folder
  - Tail entire folder
 
-## Update 1: Performance
+## Update 1: Building Tail Blazer
 
-I have been doing some major performance work see this  [Fast scrolling](https://github.com/RolandPheasant/TailBlazer/blob/master/Documents/Fast%20Scrolling.md)
+There has been an enthusiastic and indeed overwhelming demand for Tail Blazer and many people have asked where they can get it.  When I get the time I will create an official packaged release but for now anyone who want to use it can either
+
+ - Fork, clone or download the source code and build using Visual Studio 2015
+ - Grab the binaries from the [release page](https://github.com/RolandPheasant/TailBlazer/releases), extract and double click TailBlazer.exe to run. These releases will be regularly updated.
+
+## Update 2: Performance
+
+I have been doing some major performance work see this  [Fast scrolling](https://github.com/RolandPheasant/TailBlazer/blob/master/Documents/Fast%20Scrolling.md). And I have to say I am absolutely delighted with the response.
+
+
+## Roll call of honour
+
+For me to produce this application I have used several community led open source projects all of which I love. So if you like this app I recommend checking out the following.
+
+[Dynamic Data](https://gitter.im/RolandPheasant/DynamicData) Rx based collections developed by me!
+[Material Design ToolKit](https://github.com/ButchersBoy/MaterialDesignInXamlToolkit) by my friend and work colleage ButchersBoy.
+[Dragablz](https://github.com/ButchersBoy/Dragablz)  also by ButchersBoy. I think he is showing off now.
+[MahApps](https://github.com/MahApps/MahApps.Metro) which was the first open source project to make WPF truly modern.
+[Structure Map](https://github.com/structuremap/structuremap) a dependency injection framework which defines what a good API is all about.
+
+I have used more projects than these but these are the ones which I feel to be indispensable for any desk top project.
