@@ -72,5 +72,21 @@ namespace TailBlazer.Domain.FileHandling
                 }
             }
         }
+
+        /// <summary>
+        /// Determines the encoding of a file
+        /// </summary>
+        /// <returns></returns>
+        public static Encoding GetEncoding(this FileInfo source)
+        {
+            using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            {
+                using (var reader = new StreamReader(stream, true))
+                {
+                    var something = reader.Peek();
+                    return reader.CurrentEncoding;
+                }
+            }
+        }
     }
 }

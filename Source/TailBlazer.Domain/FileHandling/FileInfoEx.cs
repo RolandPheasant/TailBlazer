@@ -29,8 +29,7 @@ namespace TailBlazer.Domain.FileHandling
 
                 //TODO: create a cool-off period after a poll to account for over running jobs
                 Func<IObservable<FileNotification>> poller = () => Observable.Interval(refresh, scheduler)
-                      .StartWith(0)
-                    // .ObserveOn(scheduler)
+                     // .StartWith(0)
                     .Scan((FileNotification) null, (state, _) => state == null
                         ? new FileNotification(file)
                         : new FileNotification(state))
@@ -52,7 +51,7 @@ namespace TailBlazer.Domain.FileHandling
             {
                 //TODO: create a cool-off period after a poll to account for over running jobs
                 Func<IObservable<FileNotification>> poller = () => pulse.StartWith(Unit.Default)
-                    // .ObserveOn(scheduler)
+
                     .Scan((FileNotification)null, (state, _) => state == null
                        ? new FileNotification(file)
                        : new FileNotification(state))
@@ -91,7 +90,7 @@ namespace TailBlazer.Domain.FileHandling
                              .Scan((LineIndicies)null, (state, notification) =>
                              {
                                  var lines = indexer.ReadToEnd().ToArray();
-                                 return new LineIndicies(lines, state);
+                                 return new LineIndicies(lines, indexer.Encoding, indexer.LineFeedSize, state);
                              })
                              .SubscribeSafe(observer);
 
@@ -144,19 +143,15 @@ namespace TailBlazer.Domain.FileHandling
             }
         }
 
-        public static IEnumerable<T> ReadLines<T>(this FileInfo source, IEnumerable<LineIndex> lines, Func<LineIndex,string, T>  selector, Encoding encoding=null)
+        public static IEnumerable<T> ReadLines<T>(this FileInfo source, IEnumerable<LineIndex> lines, Func<LineIndex,string, T>  selector, Encoding encoding=null, int lineFeedLength=2)
         {
-            encoding = encoding ?? Encoding.Default;
-
-            //TODO: This assumes a windows file whereas Unix / max have length=1.  
-            //This is accounted for on the LineIndexer but we need to pass the length and current encoding here ()
-            const int delimiterLength = 2;
+            encoding = encoding ?? Encoding.UTF8;
 
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
                 foreach (var lineIndex in lines.OrderBy(l=>l.Index))
                 {
-                    var data = new byte[lineIndex.Size- delimiterLength];
+                    var data = new byte[lineIndex.Size- lineFeedLength];
                     stream.Seek(lineIndex.Start, SeekOrigin.Begin);
                     stream.Read(data, 0, data.Length);
 

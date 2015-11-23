@@ -32,4 +32,4 @@ I would love you tech people, testers or system adminstrators out there to trial
 
 But being as I only started this project 2 weeks ago I am very happy for now.
 
-For you techs out there feel free to build this yourself. For the non-techs or people without Visual Studio 2015 I will regularly be putting releases  @ [Tail Blazer Release Page](https://github.com/RolandPheasant/TailBlazer/releases) where all you have to do is extract the file and double click TrailBlazer.exe
+For you techs out there feel free to build this yourself. For the non-techs or people without Visual Studio 2015 I will regularly be putting releases   the  [Tail Blazer release page](https://github.com/RolandPheasant/TailBlazer/releases) where all you have to do is extract the file and double click TrailBlazer.exe

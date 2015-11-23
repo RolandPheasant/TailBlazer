@@ -76,21 +76,21 @@ namespace TailBlazer.Domain.FileHandling
                 .Select(result =>
                 {
                     var scroll = result.Scroll;
-                    var allLines = result.Incidies;
+                    var indicies = result.Incidies;
                     var matched = result.MatchedLines;
 
                     IEnumerable<LineIndex> indices;
                     if (result.MatchedLines.ChangedReason == LineMatchChangedReason.None)
                     {
                         indices = scroll.Mode == ScrollingMode.Tail
-                            ? allLines.GetTail(scroll)
-                            : allLines.GetFromIndex(scroll);
+                            ? indicies.GetTail(scroll)
+                            : indicies.GetFromIndex(scroll);
                     }
                     else
                     {
                         indices = scroll.Mode == ScrollingMode.Tail
-                            ? allLines.GetTail(scroll, matched)
-                            : allLines.GetFromIndex(scroll, matched);
+                            ? indicies.GetTail(scroll, matched)
+                            : indicies.GetFromIndex(scroll, matched);
                     }
 
                     var currentPage = indices.ToArray();
@@ -102,12 +102,10 @@ namespace TailBlazer.Domain.FileHandling
                     //finally we can load the line from the file
                     var newLines =  file.ReadLines(added, (lineIndex, text) =>
                     {
-                        var isEndOfTail = allLines.ChangedReason != LinesChangedReason.Loaded && lineIndex.Line > allLines.TailStartsAt;
+                        var isEndOfTail = indicies.ChangedReason != LinesChangedReason.Loaded && lineIndex.Line > indicies.TailStartsAt;
 
                         return new Line(lineIndex, text, isEndOfTail ? DateTime.Now : (DateTime?) null);
-                    }).ToArray();
-
-
+                    }, indicies.Encoding).ToArray();
 
                     return new { NewLines = newLines, OldLines = removedLines };
                 })

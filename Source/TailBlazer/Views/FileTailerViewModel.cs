@@ -42,7 +42,8 @@ namespace TailBlazer.Views
                             var mode = AutoTail ? ScrollingMode.Tail : ScrollingMode.User;
                             return  new ScrollRequest(mode, user.PageSize, user.FirstIndex);
                         })
-                        .Sample(TimeSpan.FromMilliseconds(150))
+                        .ObserveOn(schedulerProvider.TaskPool)
+                        //.Sample(TimeSpan.FromMilliseconds(150))
                         .DistinctUntilChanged();
 
             var tailer = new FileTailer(fileInfo, filterRequest, scroller);

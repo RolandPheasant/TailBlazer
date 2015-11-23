@@ -9,44 +9,42 @@ namespace TailBlazer.Domain.FileHandling
     {
         private readonly FileInfo _info;
         private readonly FileStream _stream;
-        private readonly StreamReader _reader;
+        private readonly StreamReaderWithPosition _reader;
 
         public  Encoding Encoding { get; }
+
+        public int LineFeedSize => _lineFeedSize;
         public int Positon => _postion;
         public int Lines => _index;
 
         private int _postion;
         private int _index = -1;
 
-        private int _delimiterSize =-1;
+        private int _lineFeedSize =-1;
 
-        public LineIndexer(FileInfo info, Encoding encoding = null)
+        public LineIndexer(FileInfo info)
         {
             _info = info;
-            Encoding = encoding ?? Encoding.Default;
+
+            Encoding = info.GetEncoding();
 
             _stream = File.Open(info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite);
-            _reader = new StreamReader(_stream, Encoding, true);
+            _reader = new StreamReaderWithPosition( _stream, Encoding,false, 10 * 1024);
         }
 
         public IEnumerable<int> ReadToEnd()
         {
-            string line;
-
-            if (_reader.EndOfStream)
-                yield break;
-
-            if (_delimiterSize==-1 )
+            if (_lineFeedSize==-1 )
             {
-                _delimiterSize = _info.FindDelimiter();
-                if (_delimiterSize==-1)
+                _lineFeedSize = _info.FindDelimiter();
+                if (_lineFeedSize==-1)
                     throw new FileLoadException("Cannot determine new line delimiter");
             }
 
-            while ((line = _reader.ReadLine()) != null)
+            while ((_reader.ReadLine()) != null)
             {
                 _index++;
-                _postion = _postion + line.Length + _delimiterSize;
+                _postion = _postion + _reader.LineLength;
                 yield return _postion;
             }
 
