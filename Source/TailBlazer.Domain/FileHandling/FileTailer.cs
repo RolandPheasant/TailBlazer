@@ -17,7 +17,6 @@ namespace TailBlazer.Domain.FileHandling
         public IObservable<int> TotalLines { get;  }
         public IObservable<int> MatchedLines { get; }
         public IObservable<long> FileSize { get; }
-
         public IObservableList<Line> Lines { get; }
 
         public FileTailer(FileInfo file, 

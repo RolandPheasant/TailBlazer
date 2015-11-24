@@ -34,6 +34,8 @@ namespace TailBlazer.Domain.FileHandling
 
         public IEnumerable<int> ReadToEnd()
         {
+            string line = null;
+
             if (_lineFeedSize==-1 )
             {
                 _lineFeedSize = _info.FindDelimiter();
@@ -41,15 +43,15 @@ namespace TailBlazer.Domain.FileHandling
                     throw new FileLoadException("Cannot determine new line delimiter");
             }
 
+
             while ((_reader.ReadLine()) != null)
             {
                 _index++;
                 _postion = _postion + _reader.LineLength;
                 yield return _postion;
             }
-
-
         }
+
 
         public void Dispose()
         {

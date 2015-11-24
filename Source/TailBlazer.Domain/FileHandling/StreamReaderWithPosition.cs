@@ -31,15 +31,11 @@ namespace TailBlazer.Domain.FileHandling
         private bool _checkPreamble;
         private bool _isBlocked;
         private int _lineLength;
-        public int LineLength
-        {
-            get { return _lineLength; }
-        }
+        public int LineLength => _lineLength;
+
         private int _bytesRead;
-        public int BytesRead
-        {
-            get { return _bytesRead; }
-        }
+        public int BytesRead => _bytesRead;
+
         internal StreamReaderWithPosition()
         {
         }

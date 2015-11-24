@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using FluentAssertions;
 using TailBlazer.Domain.FileHandling;
 using Xunit;
@@ -9,37 +10,28 @@ namespace TailBlazer.Fixtures
 {
     public class ReadLinesFixture
     {
-     //   [Fact()]
-        public void ReadFiles()
+        //[Fact()]
+        public void FileWhereThereIsAProblemIndexing()
         {
             var file = Path.GetTempFileName();
-            var info = new FileInfo(file);
-
-
-
-            File.AppendAllLines(file, Enumerable.Range(1, 100000).Select(i => $"This is line number {i}"));
+            var info = new FileInfo(@"U:\Downloads\InventairePerpetuel.txt");
 
             var indexer = new LineIndexer(info);
-            var  items = indexer.ReadToEnd().ToArray();
+            var indexed = indexer.ReadToEnd().ToArray();
+            var indicies = new LineIndicies(indexed, indexer.Encoding,indexer.LineFeedSize);
 
-            var actual = File.ReadAllLines(file).ToArray();
 
 
-            var toRead = Enumerable.Range(0, 1000)
-                .Select(i => items.InferPosition(i))
-                .ToArray();
-                ;
+            //   var tail = indicies.GetTail(new ScrollRequest(1)).ToArray();
+            var tail = indicies.GetTail(new ScrollRequest(1)).ToArray();
 
-            var largest = toRead.Last();
-            var fileLength = file.Length;
-
-            Console.WriteLine();
-            var convertedLines = info.ReadLine(toRead, (li, str) =>
+            Console.WriteLine(indicies.Lines.Last());
+            var convertedLines = info.ReadLine(tail, (li, str) =>
             {
+                Console.WriteLine(li.Size);
+                Console.WriteLine(str.Length);
                 return str;
-            }).ToArray();
-
-            File.Delete(file);
+            }, indicies.Encoding).ToArray();
 
         }
 

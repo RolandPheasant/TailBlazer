@@ -21,19 +21,22 @@ namespace TailBlazer.Domain.FileHandling
         }
 
 
-        public static IEnumerable<T> ReadLine<T>(this FileInfo source, IEnumerable<LineIndex> lines, Func<LineIndex, string, T> selector)
+        public static IEnumerable<T> ReadLine<T>(this FileInfo source, IEnumerable<LineIndex> lines, Func<LineIndex, string, T> selector, Encoding encoding)
         {
+            encoding = encoding ?? source.GetEncoding();
+      
             var indicies = lines.OrderBy(l => l.Index);
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
+                stream.Seek(0, SeekOrigin.Begin);
                 // fast forward to our starting point
                 foreach (var line in indicies)
                 {
-                    var content = new byte[line.Size-2]; //remove line ending (we need to get this scientifically)
+                    var content = new byte[line.Size+1]; //remove line ending (we need to get this scientifically)
                     stream.Seek(line.Start, SeekOrigin.Begin);
                     stream.Read(content, 0, content.Length);
-
-                    var str = Encoding.UTF8.GetString(content);
+  
+                    var str = encoding.GetString(content);
                     yield return selector(line, str);
                 }
             }

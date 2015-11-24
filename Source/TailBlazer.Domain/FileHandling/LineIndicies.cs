@@ -6,7 +6,6 @@ namespace TailBlazer.Domain.FileHandling
     {
         public Encoding Encoding { get;  }
         public int LineFeedSize { get;  }
-
         public int[] Lines { get; }
         public int Count => Lines.Length;
         public int Diff { get; }
@@ -27,7 +26,6 @@ namespace TailBlazer.Domain.FileHandling
             }
             else
             {
-
                 //combine the 2 arrays
                 var latest = new int[previous.Lines.Length + lines.Length];
                 previous.Lines.CopyTo(latest, 0);
