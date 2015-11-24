@@ -414,7 +414,7 @@ namespace TailBlazer.Domain.FileHandling
                     if (ch == '\r' || ch == '\n')
                     {
                         EolChars = 1;
-                        String s;
+                        string s;
                         if (sb != null)
                         {
                             sb.Append(charBuffer, charPos, i - charPos);
@@ -422,7 +422,7 @@ namespace TailBlazer.Domain.FileHandling
                         }
                         else
                         {
-                            s = new String(charBuffer, charPos, i - charPos);
+                            s = new string(charBuffer, charPos, i - charPos);
                         }
                         charPos = i + 1;
                         if (ch == '\r' && (charPos < charLen || ReadBuffer() > 0))
