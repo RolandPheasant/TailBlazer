@@ -1,4 +1,4 @@
-namespace TailBlazer.Domain.Persistence
+namespace TailBlazer.Domain.Settings
 {
     public interface ISettingsStore
     {

@@ -86,6 +86,8 @@
     <Compile Include="Infrastructure\ISchedulerProvider.cs" />
     <Compile Include="Infrastructure\ReactiveEx.cs" />
     <Compile Include="FileHandling\Line.cs" />
+    <Compile Include="Settings\IConverter.cs" />
+    <Compile Include="Settings\ISetting.cs" />
     <Compile Include="Settings\ISettingsStore.cs" />
     <Compile Include="Settings\SettingsStore.cs" />
     <Compile Include="Settings\State.cs" />

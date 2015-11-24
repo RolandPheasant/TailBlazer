@@ -1,16 +1,23 @@
 using System;
 using System.IO;
-using System.Xml;
 using System.Xml.Linq;
 
-namespace TailBlazer.Domain.Persistence
+namespace TailBlazer.Domain.Settings
 {
+
     class FileSettingsStore : ISettingsStore
     {
-
+        /// <summary>
+        /// Gets the location.
+        /// </summary>
+        /// <value>
+        /// The location.
+        /// </value>
         private string Location { get; }
         public FileSettingsStore()
         {
+
+
             Location = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TailBlazer");
         }
 

@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TailBlazer.Domain.Persistence
+﻿namespace TailBlazer.Domain.Settings
 {
     public class State
     {
