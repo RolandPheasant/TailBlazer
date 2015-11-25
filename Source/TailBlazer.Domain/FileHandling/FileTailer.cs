@@ -33,41 +33,37 @@ namespace TailBlazer.Domain.FileHandling
             var locker = new object();
             scrollRequest = scrollRequest.Synchronize(locker);
 
-            var metronome = Observable
-                    .Interval(TimeSpan.FromMilliseconds(250), scheduler ?? Scheduler.Default)
-                    .ToUnit()
-                    .Replay().RefCount();
-
-            //temp mess for a few days
-            var indexer = file.WatchFile(metronome)
-                            .TakeWhile(notification => notification.Exists)
-                            .Repeat()
-                            .Index()
-                            .Synchronize(locker)
-                            .Replay(1).RefCount();
-
             var matcher = textToMatch.Select(searchText =>
             {
                 if (string.IsNullOrEmpty(searchText) || searchText.Length < 3)
                     return Observable.Return(LineMatches.None);
 
-                return file.WatchFile(metronome)
-                    .TakeWhile(notification => notification.Exists)
-                    .Repeat()
+                return file.WatchFile(scheduler:scheduler)
                     .Match(s => s.Contains(searchText, StringComparison.OrdinalIgnoreCase));
 
             }).Switch()
+            .ObserveLatestOn(scheduler)
             .Synchronize(locker)
             .Replay(1).RefCount();
+    
 
+            var fileWatcher = file.WatchFile(scheduler: scheduler)
+                                        .Replay(1).RefCount();
+            
+            var indexer = fileWatcher
+                            .Index()
+                            .Synchronize(locker)
+                            .Replay(1).RefCount();
 
             //count matching lines (all if no filter is specified)
-            MatchedLines = indexer.CombineLatest(matcher, (indicies, matches) => matches == LineMatches.None ? indicies.Count : matches.Count);
+            MatchedLines = indexer
+                        .CombineLatest(matcher, (indicies, matches) => matches == LineMatches.None ? indicies.Count : matches.Count)
+                        .Synchronize(locker);
 
             //count total line
             TotalLines = indexer.Select(x => x.Count);
 
-            FileSize = file.WatchFile(metronome).Select(notification => notification.Size);
+            FileSize = fileWatcher.Select(notification => notification.Size);
 
 
 
@@ -78,19 +74,9 @@ namespace TailBlazer.Domain.FileHandling
                     var indicies = result.Incidies;
                     var matched = result.MatchedLines;
 
-                    IEnumerable<LineIndex> indices;
-                    if (result.MatchedLines.ChangedReason == LineMatchChangedReason.None)
-                    {
-                        indices = scroll.Mode == ScrollingMode.Tail
-                            ? indicies.GetTail(scroll)
-                            : indicies.GetFromIndex(scroll);
-                    }
-                    else
-                    {
-                        indices = scroll.Mode == ScrollingMode.Tail
-                            ? indicies.GetTail(scroll, matched)
-                            : indicies.GetFromIndex(scroll, matched);
-                    }
+                    var indices = result.MatchedLines.ChangedReason == LineMatchChangedReason.None 
+                                    ? indicies.GetIndicies(scroll) 
+                                    : indicies.GetIndicies(scroll,matched);
 
                     var currentPage = indices.ToArray();
                     var previous = lines.Items.Select(l => l.LineIndex).ToArray();
@@ -99,7 +85,7 @@ namespace TailBlazer.Domain.FileHandling
 
                     var added = currentPage.Except(previous).ToArray();
                     //finally we can load the line from the file
-                    var newLines =  file.ReadLines(added, (lineIndex, text) =>
+                    var newLines =  file.ReadLine(added, (lineIndex, text) =>
                     {
                         var isEndOfTail = indicies.ChangedReason != LinesChangedReason.Loaded && lineIndex.Line > indicies.TailStartsAt;
 

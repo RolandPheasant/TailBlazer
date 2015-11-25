@@ -6,30 +6,30 @@ namespace TailBlazer.Domain.FileHandling
 {
     public  static class LineIndexEx
     {
-        public static IEnumerable<LineIndex> GetTail(this LineIndicies source, ScrollRequest scroll)
+        public static IEnumerable<LineIndex> GetIndicies(this LineIndicies source, ScrollRequest scroll)
         {
-            var offset = scroll.PageSize > source.Count ? 0 : source.Count - scroll.PageSize;
+            int first = scroll.FirstIndex;
+            int size = scroll.PageSize;
 
-            return Enumerable.Range(offset, scroll.PageSize)
-                .Select(i =>
-                {
-                    var current = source.Lines[i];
-                    var previous = i == 0 ? 0 : source.Lines[i - 1];
-                    return new LineIndex(i+1,i,previous,current);
-
-                });
+            if (scroll.Mode == ScrollingMode.Tail )
+            {
+                 first = size > source.Count ? 0 : source.Count - size;
+            }
+            else
+            {
+                if (scroll.FirstIndex + size >= source.Count)
+                    first = source.Count - size;
+            }
+            return source.GetIndicies(first, size);
         }
 
-        public static IEnumerable<LineIndex> GetFromIndex(this LineIndicies source, ScrollRequest scroll)
+        private static IEnumerable<LineIndex> GetIndicies(this LineIndicies source, int firstIndex, int pageSize)
         {
 
-            if (scroll.FirstIndex + scroll.PageSize >= source.Count)
-                return source.GetTail(scroll);
-
-            return Enumerable.Range(scroll.FirstIndex, scroll.PageSize)
+            return Enumerable.Range(firstIndex, Math.Min(pageSize,source.Count))
                 .Select(i =>
                 {
-                    var current = source.Lines[i];
+                    var current = source.Lines[i] - 1;
                     var previous = i == 0 ? 0 : source.Lines[i - 1];
                     return new LineIndex(i + 1, i, previous, current);
 
@@ -57,22 +57,37 @@ namespace TailBlazer.Domain.FileHandling
             }
         }
 
-        public static IEnumerable<LineIndex> GetFromIndex(this LineIndicies source, ScrollRequest scroll, LineMatches matches)
+        public static IEnumerable<LineIndex> GetIndicies(this LineIndicies source, ScrollRequest scroll, LineMatches matches)
         {
 
-            if (scroll.FirstIndex + scroll.PageSize > source.Count)
-                return source.GetTail(scroll);
+            int first = scroll.FirstIndex;
+            int size = scroll.PageSize;
 
-            return matches.Lines
-                .Skip(scroll.FirstIndex)
-                .Select((line, index) =>
-                {
-                    //TODO: Why is this different from above
-                    var previous = line == 0 ? 0 : source.Lines[line - 1];
-                    var end = source.Lines[line];
-                    return new LineIndex(line + 1, index + scroll.FirstIndex, previous, end);
-                }).Take(scroll.PageSize);
+
+            if (scroll.Mode == ScrollingMode.Tail)
+            {
+                first = size > matches.Count ? 0 : matches.Count - size;
+            }
+            else
+            {
+                if (first + size >= source.Count)
+                    first = matches.Count - size;
+            }
+
+            var allMatched = Enumerable.Range(first, Math.Min(size,matches.Count))
+                        .Select(index=> matches.Lines[index]).ToArray();
+
+
+            int i = 0;
+            foreach (var line in allMatched)
+            {
+                var start = line == 0 ? 0 : source.Lines[line - 1];
+                var end = source.Lines[line]-1;
+                yield return new LineIndex(line, i + first, start, end);
+                i++;
+            }
         }
+
 
 
     }

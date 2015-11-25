@@ -8,36 +8,33 @@ namespace TailBlazer.Domain.FileHandling
 {
     public static class LineReader
     {
-        public static LineIndex InferPosition(this int[] source, int index)
-        {
-            var current = source[index];
-
-            var previous=0;
-            if (index != 0)
-            {
-                previous = source[index - 1];
-            }
-            return new LineIndex(index+1, index, (long)previous, (long)current);
-        }
-
-
         public static IEnumerable<T> ReadLine<T>(this FileInfo source, IEnumerable<LineIndex> lines, Func<LineIndex, string, T> selector, Encoding encoding)
         {
             encoding = encoding ?? source.GetEncoding();
       
-            var indicies = lines.OrderBy(l => l.Index);
+            var indicies = lines.OrderBy(l => l.Index).ToArray();
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
                 stream.Seek(0, SeekOrigin.Begin);
                 // fast forward to our starting point
-                foreach (var line in indicies)
+
+                int previousLine = -1;
+                using (var reader = new StreamReaderWithPosition(stream, encoding,false))
                 {
-                    var content = new byte[line.Size+1]; //remove line ending (we need to get this scientifically)
-                    stream.Seek(line.Start, SeekOrigin.Begin);
-                    stream.Read(content, 0, content.Length);
-  
-                    var str = encoding.GetString(content);
-                    yield return selector(line, str);
+                    foreach (var index in indicies)
+                    {
+                        var currentLine = index.Line;
+                        var isContinuous = currentLine == previousLine + 1;
+                        if (!isContinuous)
+                        {
+                            reader.DiscardBufferedData();
+                            reader.BaseStream.Seek(index.Start, SeekOrigin.Begin);
+                        }
+
+                        var line = reader.ReadLine();
+                        yield return selector(index, line);
+                        previousLine = currentLine;
+                    }
                 }
             }
         }

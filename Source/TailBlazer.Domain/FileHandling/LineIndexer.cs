@@ -29,13 +29,15 @@ namespace TailBlazer.Domain.FileHandling
             Encoding = info.GetEncoding();
 
             _stream = File.Open(info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite);
-            _reader = new StreamReaderWithPosition( _stream, Encoding,false, 10 * 1024);
+            _reader = new StreamReaderWithPosition( _stream, Encoding, false, 10 * 1024);
         }
 
         public IEnumerable<int> ReadToEnd()
         {
             string line = null;
 
+
+            //TODO: Add check for EndOFStream
             if (_lineFeedSize==-1 )
             {
                 _lineFeedSize = _info.FindDelimiter();

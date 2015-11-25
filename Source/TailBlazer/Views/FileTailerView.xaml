@@ -87,7 +87,7 @@
 
         <ListBox Grid.Row="1" 
                  ItemsSource="{Binding Lines}" 
-                 FontFamily="Courier">
+                 FontFamily="Consolas">
             <ListBox.Template>
                 <ControlTemplate>
                     <ScrollViewer x:Name="ScrollViewer" 
@@ -105,7 +105,7 @@
 
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <local:VirtualScrollPanel ItemHeight="30"
+                    <local:VirtualScrollPanel ItemHeight="22"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
                                                 TotalItems="{Binding MatchedLineCount}"/>
@@ -136,6 +136,11 @@
 
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
+                    <Style.Setters>
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="Height" Value="22"/>
+                    </Style.Setters>
+                    
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsRecent}" Value="True">
                             <DataTrigger.EnterActions>

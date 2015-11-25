@@ -20,30 +20,45 @@ namespace TailBlazer.Domain.FileHandling
         /// <param name="refreshPeriod">The refresh period.</param>
         /// <param name="scheduler">The scheduler.</param>
         /// <returns></returns>
-        public static IObservable<FileNotification> WatchFile(this FileInfo file, TimeSpan? refreshPeriod = null,IScheduler scheduler = null)
+        public static IObservable<FileNotification> WatchFile(this FileInfo file, TimeSpan? refreshPeriod = null,
+            IScheduler scheduler = null)
         {
-            return Observable.Create<FileNotification>(observer =>
+            var poller = Observable.Create<FileNotification>(observer =>
             {
                 var refresh = refreshPeriod ?? TimeSpan.FromMilliseconds(250);
                 scheduler = scheduler ?? Scheduler.Default;
 
-                //TODO: create a cool-off period after a poll to account for over running jobs
-                Func<IObservable<FileNotification>> poller = () => Observable.Interval(refresh, scheduler)
-                     // .StartWith(0)
-                    .Scan((FileNotification) null, (state, _) => state == null
-                        ? new FileNotification(file)
-                        : new FileNotification(state))
-                    .DistinctUntilChanged();
+                FileNotification notification = null;
+                return scheduler.ScheduleRecurringAction(refresh, () =>
+                {
+                    try
+                    {
+                        notification = notification == null
+                            ? new FileNotification(file)
+                            : new FileNotification(notification);
 
-                /*
-                    In theory, poll merrily away except slow down when there is an error.
-                */
-                return poller()
-                    .Catch<FileNotification, Exception>(ex => Observable.Return(new FileNotification(file, ex))
-                        .Concat(poller().DelaySubscription(TimeSpan.FromSeconds(10))))
-                    .SubscribeSafe(observer);
-            });
+                        observer.OnNext(notification);
+                    }
+                    catch (Exception ex)
+                    {
+                        observer.OnError(ex);
+                    }
+
+                });
+
+            }).DistinctUntilChanged()
+                .TakeWhile(notification => notification.Exists)
+                .Repeat();
+
+
+            /*
+                In theory, poll merrily away except slow down when there is an error.
+            */
+            return poller.Catch<FileNotification, Exception>(ex => Observable.Return(new FileNotification(file, ex))
+                    .Concat(poller.DelaySubscription(TimeSpan.FromSeconds(10))));
+
         }
+
 
         public static IObservable<FileNotification> WatchFile(this FileInfo file, IObservable<Unit> pulse)
         {
@@ -142,24 +157,5 @@ namespace TailBlazer.Domain.FileHandling
                 }
             }
         }
-
-        public static IEnumerable<T> ReadLines<T>(this FileInfo source, IEnumerable<LineIndex> lines, Func<LineIndex,string, T>  selector, Encoding encoding=null, int lineFeedLength=2)
-        {
-            encoding = encoding ?? Encoding.UTF8;
-
-            using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
-            {
-                foreach (var lineIndex in lines.OrderBy(l=>l.Index))
-                {
-                    var data = new byte[lineIndex.Size- lineFeedLength];
-                    stream.Seek(lineIndex.Start, SeekOrigin.Begin);
-                    stream.Read(data, 0, data.Length);
-
-                    var result = encoding.GetString(data);
-                    yield return selector(lineIndex, result);
-                }
-            }
-        }
-
     }
 }
