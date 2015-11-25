@@ -23,7 +23,7 @@ namespace TailBlazer.Fixtures
 
 
             //   var tail = indicies.GetTail(new ScrollRequest(1)).ToArray();
-            var tail = indicies.GetTail(new ScrollRequest(1)).ToArray();
+            var tail = indicies.GetIndicies( new ScrollRequest(1)).ToArray();
 
             Console.WriteLine(indicies.Lines.Last());
             var convertedLines = info.ReadLine(tail, (li, str) =>

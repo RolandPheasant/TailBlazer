@@ -25,7 +25,7 @@ namespace TailBlazer.Fixtures
             var autoTailer = Observable.Return(new ScrollRequest(10));
             
             File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i =>i.ToString()).ToArray());
-
+     
             using (var tailer = new FileTailer(info, textMatch, autoTailer,scheduler))
             {
 

@@ -39,16 +39,18 @@ namespace TailBlazer.Domain.FileHandling
                     return Observable.Return(LineMatches.None);
 
                 return file.WatchFile(scheduler:scheduler)
+                     .TakeWhile(notification => notification.Exists).Repeat()
                     .Match(s => s.Contains(searchText, StringComparison.OrdinalIgnoreCase));
 
             }).Switch()
-            .ObserveLatestOn(scheduler)
+         //   .ObserveLatestOn(scheduler)
             .Synchronize(locker)
             .Replay(1).RefCount();
-    
+
 
             var fileWatcher = file.WatchFile(scheduler: scheduler)
-                                        .Replay(1).RefCount();
+                            .TakeWhile(notification => notification.Exists).Repeat()
+                            .Replay(1).RefCount();
             
             var indexer = fileWatcher
                             .Index()

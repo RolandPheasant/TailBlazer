@@ -46,9 +46,8 @@ namespace TailBlazer.Domain.FileHandling
 
                 });
 
-            }).DistinctUntilChanged()
-                .TakeWhile(notification => notification.Exists)
-                .Repeat();
+            }).DistinctUntilChanged();
+              
 
 
             /*
