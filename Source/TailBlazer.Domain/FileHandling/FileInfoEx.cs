@@ -23,7 +23,7 @@ namespace TailBlazer.Domain.FileHandling
         public static IObservable<FileNotification> WatchFile(this FileInfo file, TimeSpan? refreshPeriod = null,
             IScheduler scheduler = null)
         {
-            var poller = Observable.Create<FileNotification>(observer =>
+           return Observable.Create<FileNotification>(observer =>
             {
                 var refresh = refreshPeriod ?? TimeSpan.FromMilliseconds(250);
                 scheduler = scheduler ?? Scheduler.Default;
@@ -41,21 +41,12 @@ namespace TailBlazer.Domain.FileHandling
                     }
                     catch (Exception ex)
                     {
-                        observer.OnError(ex);
+                        notification = new FileNotification(file, ex);
+                        observer.OnNext(notification);
                     }
-
                 });
 
             }).DistinctUntilChanged();
-              
-
-
-            /*
-                In theory, poll merrily away except slow down when there is an error.
-            */
-            return poller.Catch<FileNotification, Exception>(ex => Observable.Return(new FileNotification(file, ex))
-                    .Concat(poller.DelaySubscription(TimeSpan.FromSeconds(10))));
-
         }
 
 

@@ -25,6 +25,8 @@ namespace TailBlazer.Views
         private int _pageSize;
         private string _fileSizeText;
         private string _searchHint;
+        private bool _highlightMatchingText
+            ;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         
@@ -43,7 +45,6 @@ namespace TailBlazer.Views
                             return  new ScrollRequest(mode, user.PageSize, user.FirstIndex);
                         })
                         .ObserveOn(schedulerProvider.TaskPool)
-                        //.Sample(TimeSpan.FromMilliseconds(150))
                         .DistinctUntilChanged();
 
             var tailer = new FileTailer(fileInfo, filterRequest, scroller);
@@ -65,6 +66,9 @@ namespace TailBlazer.Views
                         return "Type to search";
                     return text.Length < 3 ? "Enter at least 3 characters" : "Filter applied";
                 }).Subscribe(text=> SearchHint = text);
+
+            var highlighter = this.WhenValueChanged(vm => vm.SearchText)
+                .Subscribe(searchText => HighlightMatchingText = !string.IsNullOrEmpty(searchText) && searchText.Length >= 3);
 
             var sizeMonitor = tailer.FileSize
                 .Select(size=> size.FormatWithAbbreviation())
@@ -98,6 +102,7 @@ namespace TailBlazer.Views
                 matchedLinesMonitor,
                 sizeMonitor,
                 hintWriter,
+                highlighter,
                 Disposable.Create(() =>
                 {
                     _userScrollRequested.OnCompleted();
@@ -147,6 +152,13 @@ namespace TailBlazer.Views
             get { return _matchedLineCount; }
             set { SetAndRaise(ref _matchedLineCount, value); }
         }
+
+        public bool HighlightMatchingText
+        {
+            get { return _highlightMatchingText; }
+            set { SetAndRaise(ref _highlightMatchingText, value); }
+        }
+
 
         public string SearchText
         {

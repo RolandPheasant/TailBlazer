@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:TailBlazer.Views"
              xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
+            x:Name="Control"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:FileTailerViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="400" d:DesignWidth="400">
@@ -125,7 +126,8 @@
                                    MinWidth="25"/>
                         <infrastucture:SearchableTextControl Grid.Column="1" 
                                                              Margin="6 0 0 0"   
-                                                            IsHighlight="True"  IsMatchCase="False"
+                                                            IsHighlight="{Binding ElementName=Control, Path=DataContext.HighlightMatchingText}"  
+                                                            IsMatchCase="False"
                                                             SearchText="{Binding ElementName=SearchTextBox,Path=Text}"
                                                             HighlightBackground="{StaticResource SecondaryAccentBrush}"
                                                             HighlightForeground="{StaticResource SecondaryAccentForegroundBrush}"
