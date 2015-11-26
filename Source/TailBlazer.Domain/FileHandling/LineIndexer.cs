@@ -34,9 +34,6 @@ namespace TailBlazer.Domain.FileHandling
 
         public IEnumerable<int> ReadToEnd()
         {
-            string line = null;
-
-
             //TODO: Add check for EndOFStream
             if (_lineFeedSize==-1 )
             {
@@ -44,8 +41,7 @@ namespace TailBlazer.Domain.FileHandling
                 if (_lineFeedSize==-1)
                     throw new FileLoadException("Cannot determine new line delimiter");
             }
-
-
+            
             while ((_reader.ReadLine()) != null)
             {
                 _index++;

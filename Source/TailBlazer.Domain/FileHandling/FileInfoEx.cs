@@ -104,7 +104,7 @@ namespace TailBlazer.Domain.FileHandling
                  }).Switch();
         }
 
-        public static IObservable<LineMatches> Match(this IObservable<FileNotification> source, Func<string,bool> predicate)
+        public static IObservable<LineMatches> Match(this IObservable<FileNotification> source, Func<string,bool> predicate, Action<bool> isSearching=null)
         {
             return source
                 .Where(n => n.NotificationType == FileNotificationType.Created)
@@ -119,8 +119,18 @@ namespace TailBlazer.Domain.FileHandling
                             .StartWith(createdNotification)
                             .Scan((LineMatches) null, (state, notification) =>
                             {
-                                var lines = indexer.ScanToEnd().ToArray();
-                                return new LineMatches(lines, state);
+                                var shouldNotifyOfSearch = isSearching != null &&
+                                            notification.NotificationType == FileNotificationType.Created;
+                                try
+                                {
+                                    if (shouldNotifyOfSearch) isSearching(true);
+                                    var lines = indexer.ScanToEnd().ToArray();
+                                    return new LineMatches(lines, state);
+                                }
+                                finally
+                                {
+                                    if (shouldNotifyOfSearch) isSearching(false);
+                                }
                             })
                             .SubscribeSafe(observer);
 

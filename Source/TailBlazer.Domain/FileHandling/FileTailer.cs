@@ -4,8 +4,10 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using DynamicData;
 using DynamicData.Kernel;
+using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -16,6 +18,8 @@ namespace TailBlazer.Domain.FileHandling
         public IObservable<int> MatchedLines { get; }
         public IObservable<long> FileSize { get; }
         public IObservableList<Line> Lines { get; }
+        public IObservable<bool> IsSearching { get;  }
+
 
         public FileTailer(FileInfo file, 
             IObservable<string> textToMatch,
@@ -27,7 +31,10 @@ namespace TailBlazer.Domain.FileHandling
             
             var lines = new SourceList<Line>();
             Lines = lines.AsObservableList();
-            
+
+            var isBusy = new Subject<bool>();
+            IsSearching = isBusy.AsObservable();
+
             var locker = new object();
             scrollRequest = scrollRequest.Synchronize(locker);
 
@@ -38,10 +45,9 @@ namespace TailBlazer.Domain.FileHandling
 
                 return file.WatchFile(scheduler:scheduler)
                      .TakeWhile(notification => notification.Exists).Repeat()
-                    .Match(s => s.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+                     .Match(s => s.Contains(searchText, StringComparison.OrdinalIgnoreCase), isBusy.OnNext);
 
             }).Switch()
-         //   .ObserveLatestOn(scheduler)
             .Synchronize(locker)
             .Replay(1).RefCount();
 
@@ -52,6 +58,7 @@ namespace TailBlazer.Domain.FileHandling
             
             var indexer = fileWatcher
                             .Index()
+                            .ObserveLatestOn(scheduler)
                             .Synchronize(locker)
                             .Replay(1).RefCount();
 
@@ -109,7 +116,7 @@ namespace TailBlazer.Domain.FileHandling
                         if (changes.NewLines.Any())  innerList.AddRange(changes.NewLines);
                     });
                 });
-            _cleanUp = new CompositeDisposable(Lines, lines, aggregator);
+            _cleanUp = new CompositeDisposable(Lines, lines, aggregator, Disposable.Create(()=>isBusy.OnCompleted()));
         }
 
         private class CombinedResult

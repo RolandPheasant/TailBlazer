@@ -16,6 +16,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ProgressBar.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Control.Resources>
@@ -48,7 +49,13 @@
                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     VerticalAlignment="Center"
                     MinWidth="125"/>
-            
+
+                <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"    
+                    Visibility="{Binding Searching, Converter={StaticResource BooleanToVisibilityConverter}}"         
+                    Value="65"
+                    IsIndeterminate="True"
+                    Margin="6 2 0 2" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+
 
                 <StackPanel  
                     VerticalAlignment="Center"

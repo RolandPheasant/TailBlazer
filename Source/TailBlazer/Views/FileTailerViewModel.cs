@@ -17,6 +17,7 @@ namespace TailBlazer.Views
         private readonly IDisposable _cleanUp;
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
         private readonly ISubject<ScrollRequest> _userScrollRequested = new ReplaySubject<ScrollRequest>(1);
+
         private string _searchText;
         private bool _autoTail=true;
         private string _lineCountText;
@@ -25,8 +26,8 @@ namespace TailBlazer.Views
         private int _pageSize;
         private string _fileSizeText;
         private string _searchHint;
-        private bool _highlightMatchingText
-            ;
+        private bool _highlightMatchingText;
+        private bool _searching;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         
@@ -69,6 +70,10 @@ namespace TailBlazer.Views
 
             var highlighter = this.WhenValueChanged(vm => vm.SearchText)
                 .Subscribe(searchText => HighlightMatchingText = !string.IsNullOrEmpty(searchText) && searchText.Length >= 3);
+
+
+            var searching = tailer.IsSearching
+                .Subscribe(isSearching => Searching = isSearching);
 
             var sizeMonitor = tailer.FileSize
                 .Select(size=> size.FormatWithAbbreviation())
@@ -165,6 +170,14 @@ namespace TailBlazer.Views
             get { return _searchText; }
             set { SetAndRaise(ref _searchText, value); }
         }
+
+
+        public bool Searching
+        {
+            get { return _searching; }
+            set { SetAndRaise(ref _searching, value); }
+        }
+
 
 
         public string SearchHint
