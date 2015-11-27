@@ -5,6 +5,11 @@ using System.Text;
 
 namespace TailBlazer.Domain.FileHandling
 {
+    // This class implements a TextReader for reading characters to a Stream. 
+    // This is designed for character input in a particular Encoding,
+    // whereas the Stream class is designed for byte input and output. 
+    //
+
     /// <summary>
     /// Doctored from this
     /// 

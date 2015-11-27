@@ -10,7 +10,7 @@ namespace TailBlazer.Domain.FileHandling
         private readonly FileInfo _info;
         private readonly Func<string, bool> _predicate;
         private readonly FileStream _stream;
-        private readonly StreamReader _reader;
+        private readonly StreamReaderExtended _reader;
 
         public Encoding Encoding { get; }
         public int TotalCount => _index;
@@ -26,7 +26,7 @@ namespace TailBlazer.Domain.FileHandling
             Encoding = encoding ?? Encoding.Default;
 
             _stream = File.Open(info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite);
-            _reader = new StreamReader(_stream, Encoding, true);
+            _reader = new StreamReaderExtended(_stream, Encoding, true);
 
             //TODO 1: Get current encoding from _reader.CurrentEncoding and expose so cusumers can read the lines with the same encoding
             //TODO 2: Expose line delimiter length so it can be correctly removed from when re-reading a line

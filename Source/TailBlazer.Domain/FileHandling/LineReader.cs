@@ -19,7 +19,7 @@ namespace TailBlazer.Domain.FileHandling
                 // fast forward to our starting point
 
                 int previousLine = -1;
-                using (var reader = new StreamReaderWithPosition(stream, encoding,false))
+                using (var reader = new StreamReaderExtended(stream, encoding,false))
                 {
                     foreach (var index in indicies)
                     {
@@ -48,7 +48,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
-                using (var reader = new StreamReader(stream, Encoding.Default, true))
+                using (var reader = new StreamReaderExtended(stream, Encoding.Default, true))
                 {
                     if (reader.EndOfStream)
                         return -1;
@@ -81,7 +81,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
-                using (var reader = new StreamReader(stream, true))
+                using (var reader = new StreamReaderExtended(stream, true))
                 {
                     var something = reader.Peek();
                     return reader.CurrentEncoding;

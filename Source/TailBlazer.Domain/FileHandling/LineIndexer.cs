@@ -9,7 +9,7 @@ namespace TailBlazer.Domain.FileHandling
     {
         private readonly FileInfo _info;
         private readonly FileStream _stream;
-        private readonly StreamReaderWithPosition _reader;
+        private readonly StreamReaderExtended _reader;
 
         public  Encoding Encoding { get; }
 
@@ -29,12 +29,13 @@ namespace TailBlazer.Domain.FileHandling
             Encoding = info.GetEncoding();
 
             _stream = File.Open(info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite);
-            _reader = new StreamReaderWithPosition( _stream, Encoding, false, 10 * 1024);
+            _reader = new StreamReaderExtended( _stream, Encoding, false);
         }
 
         public IEnumerable<int> ReadToEnd()
         {
-            //TODO: Add check for EndOFStream
+            if (_reader.EndOfStream) yield break;
+
             if (_lineFeedSize==-1 )
             {
                 _lineFeedSize = _info.FindDelimiter();
@@ -45,7 +46,7 @@ namespace TailBlazer.Domain.FileHandling
             while ((_reader.ReadLine()) != null)
             {
                 _index++;
-                _postion = _postion + _reader.LineLength;
+                _postion = (int)_reader.AbsolutePosition();
                 yield return _postion;
             }
         }

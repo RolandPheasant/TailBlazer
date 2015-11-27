@@ -143,7 +143,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
-                using (var reader = new StreamReader(stream, Encoding.Default, true))
+                using (var reader = new StreamReaderExtended(stream, Encoding.Default, true))
                 {
                     string line;
                     int position = 0;
