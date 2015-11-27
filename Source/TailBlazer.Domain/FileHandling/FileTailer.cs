@@ -58,7 +58,7 @@ namespace TailBlazer.Domain.FileHandling
             
             var indexer = fileWatcher
                             .Index()
-                            .ObserveLatestOn(scheduler)
+                           // .ObserveLatestOn(scheduler)
                             .Synchronize(locker)
                             .Replay(1).RefCount();
 
