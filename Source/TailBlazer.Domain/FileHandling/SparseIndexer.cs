@@ -24,7 +24,6 @@ namespace TailBlazer.Domain.FileHandling
 
             //1. Get  full length of file
 
-            var indexer = new SparseIndexer(info);
             var start = (int)Math.Max(0, info.Length - tailSize);
             var end = (int)info.Length;
 
