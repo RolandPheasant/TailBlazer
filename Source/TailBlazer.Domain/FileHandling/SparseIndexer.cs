@@ -41,6 +41,14 @@ namespace TailBlazer.Domain.FileHandling
 
         }
 
+
+        //public IObservable<SparseIndex> Run()
+        //{
+        //    return IDisposable
+
+
+        //}
+
         public SparseIndex ScanToEnd(int start, int compression)
         {
             return Scan(start,-1, compression);

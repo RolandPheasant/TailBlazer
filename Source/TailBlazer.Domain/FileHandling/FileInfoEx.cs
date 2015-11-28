@@ -90,9 +90,9 @@ namespace TailBlazer.Domain.FileHandling
                          var indexer = new LineIndexer((FileInfo) createdNotification);
 
                          var notifier = source
-                              .Where(n => n.NotificationType == FileNotificationType.Changed)
+                             .Where(n => n.NotificationType == FileNotificationType.Changed)
                              .StartWith(createdNotification)
-                             .Scan((LineIndicies)null, (state, notification) =>
+                             .Scan((LineIndicies) null, (state, notification) =>
                              {
                                  var lines = indexer.ReadToEnd().ToArray();
                                  return new LineIndicies(lines, indexer.Encoding, indexer.LineFeedSize, state);
