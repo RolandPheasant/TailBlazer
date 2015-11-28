@@ -80,6 +80,8 @@
     <Compile Include="FileHandling\LinesChangedReason.cs" />
     <Compile Include="FileHandling\ScrollingMode.cs" />
     <Compile Include="FileHandling\ScrollRequest.cs" />
+    <Compile Include="FileHandling\SparseIndex.cs" />
+    <Compile Include="FileHandling\SparseIndexer.cs" />
     <Compile Include="FileHandling\StreamReaderExtended.cs" />
     <Compile Include="Infrastructure\Extensions.cs" />
     <Compile Include="Infrastructure\ILogFactory.cs" />
