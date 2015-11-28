@@ -50,7 +50,6 @@ namespace TailBlazer.Domain.FileHandling
             }
             else
             {
-
                 if (first + size >= matches.Count)
                     first = matches.Count - size;
             }

@@ -3,11 +3,44 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
 {
+
     public static class LineReader
     {
+        public static IEnumerable<T> ScanLines<T>(this StreamReaderExtended source,
+                int compression,
+                Func<int, T> selector,
+                Func<string, int,bool> shouldBreak)
+        {
+
+            int i = 0;
+
+        
+
+            if (source.EndOfStream) yield break;
+
+            string line;
+            while ((line=source.ReadLine()) != null)
+            {
+                i++;
+                var position = (int)source.AbsolutePosition();
+
+                if (i == compression)
+                {
+                    yield return selector(position);
+                    i = 0;
+                };
+                
+                if (shouldBreak(line, position))
+                    yield break;
+            }
+
+        }
+
+        
         public static IEnumerable<T> ReadLine<T>(this FileInfo source, IEnumerable<LineIndex> lines, Func<LineIndex, string, T> selector, Encoding encoding)
         {
             encoding = encoding ?? source.GetEncoding();
@@ -38,7 +71,7 @@ namespace TailBlazer.Domain.FileHandling
                 }
             }
         }
-
+        
         /// <summary>
         /// Finds the delimiter by looking for the first line in the file and comparing chars
         /// </summary>

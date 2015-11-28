@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Disposables;
 using DynamicData.Binding;
 
 namespace TailBlazer.Domain.Infrastructure
@@ -16,7 +17,7 @@ namespace TailBlazer.Domain.Infrastructure
         public T Value
         {
             get { return _value; }
-            set { SetAndRaise(ref _value,value);}
+            set { SetAndRaise(ref _value, value); }
         }
 
         public void Dispose()
@@ -24,29 +25,45 @@ namespace TailBlazer.Domain.Infrastructure
             _cleanUp.Dispose();
         }
     }
-    //internal sealed class LazyProperty<T> : AbstractNotifyPropertyChanged, IProperty<T>, IDisposable
-    //{
 
-    //    private Lazy<IDisposable> factory; 
-    //    private readonly IDisposable _cleanUp;
-    //    private T _value;
+    internal sealed class LazyProperty<T> : AbstractNotifyPropertyChanged, IProperty<T>, IDisposable
+    {
 
-    //    public LazyProperty(IObservable<T> source)
-    //    {
-    //        factory = new Lazy<IDisposable>(()=>source.Subscribe(t => Value = t));
+        private Lazy<IDisposable> factory;
+        private readonly SingleAssignmentDisposable _cleanUp = new SingleAssignmentDisposable();
+        private T _value;
 
-    //        _cleanUp = 
-    //    }
+        public LazyProperty(IObservable<T> source)
+        {
+            factory = new Lazy<IDisposable>(() => source.Subscribe(t => Value = t));
 
-    //    public T Value
-    //    {
-    //        get { return _value; }
-    //        set { SetAndRaise(ref _value, value); }
-    //    }
+            //_cleanUp =
+        }
 
-    //    public void Dispose()
-    //    {
-    //        _cleanUp.Dispose();
-    //    }
-    //}
+        public T Value
+        {
+            get
+            {
+                EnsureLoaded();
+                return _value;
+            }
+            private set
+            {
+               
+                SetAndRaise(ref _value, value);
+            }
+        }
+
+        private void EnsureLoaded()
+        {
+            _cleanUp.Disposable = factory.Value;
+        }
+
+        public void Dispose()
+        {
+            _cleanUp.Dispose();
+        }
+
+        //}
+    }
 }

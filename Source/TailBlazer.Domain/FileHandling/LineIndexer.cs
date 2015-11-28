@@ -27,7 +27,6 @@ namespace TailBlazer.Domain.FileHandling
             _info = info;
 
             Encoding = info.GetEncoding();
-
             _stream = File.Open(info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite);
             _reader = new StreamReaderExtended( _stream, Encoding, false);
         }

@@ -71,7 +71,6 @@ namespace TailBlazer.Views
 
         public void OpenFile(FileInfo file)
         {
-            IsLoading = true;
             var scheduler = _objectProvider.Get<ISchedulerProvider>();
 
             scheduler.Background.Schedule(() =>
@@ -84,8 +83,6 @@ namespace TailBlazer.Views
 
                 //3. Display it
                 var newItem = new ViewContainer(file.Name, viewModel);
-
-                IsLoading = false;
                 //do the work on the ui thread
                 scheduler.MainThread.Schedule(() =>
                 {
@@ -118,12 +115,6 @@ namespace TailBlazer.Views
         {
             get { return _isEmpty; }
             set { SetAndRaise(ref _isEmpty, value); }
-        }
-
-        public bool IsLoading
-        {
-            get { return _isLoading; }
-            set { SetAndRaise(ref _isLoading, value); }
         }
 
         public void Dispose()

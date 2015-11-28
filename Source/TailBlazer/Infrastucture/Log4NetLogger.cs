@@ -24,7 +24,7 @@ namespace TailBlazer.Infrastucture
             else
             {
 
-                var startOfGeneric = name.IndexOf("`");
+                var startOfGeneric = name.IndexOf("`", StringComparison.Ordinal);
                 name = name.Substring(0,startOfGeneric);
                 var generics = genericArgs.Select(t=>t.Name).ToDelimited();
                 _log = LogManager.GetLogger($"{name}<{generics}>");
