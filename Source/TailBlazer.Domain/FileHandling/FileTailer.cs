@@ -14,21 +14,25 @@ namespace TailBlazer.Domain.FileHandling
     public class FileTailer: IDisposable
     {
         private readonly IDisposable _cleanUp;
+
         public IObservable<int> TotalLines { get;  }
         public IObservable<int> MatchedLines { get; }
         public IObservable<long> FileSize { get; }
         public IObservableList<Line> Lines { get; }
         public IObservable<bool> IsSearching { get;  }
-
-
+        
         public FileTailer(FileInfo file, 
             IObservable<string> textToMatch,
             IObservable<ScrollRequest> scrollRequest,
+            ILogger logger ,
             IScheduler scheduler=null)
         {
             if (file == null) throw new ArgumentNullException(nameof(file));
             if (textToMatch == null) throw new ArgumentNullException(nameof(textToMatch));
-            
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+
+            logger.Info($"Constructing file tailer for {file.FullName}");
+
             var lines = new SourceList<Line>();
             Lines = lines.AsObservableList();
 
@@ -71,9 +75,7 @@ namespace TailBlazer.Domain.FileHandling
             TotalLines = indexer.Select(x => x.Count);
 
             FileSize = fileWatcher.Select(notification => notification.Size);
-
-
-
+            
             var aggregator = indexer.CombineLatest(matcher, scrollRequest,(idx, mtch, scroll) => new CombinedResult(scroll, mtch, idx))
                 .Select(result =>
                 {
@@ -118,6 +120,8 @@ namespace TailBlazer.Domain.FileHandling
                 });
             _cleanUp = new CompositeDisposable(Lines, lines, aggregator, Disposable.Create(()=>isBusy.OnCompleted()));
         }
+
+
 
         private class CombinedResult
         {

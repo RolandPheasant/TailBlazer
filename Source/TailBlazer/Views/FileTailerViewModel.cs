@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -9,6 +10,7 @@ using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
+using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Views
 {
@@ -20,18 +22,22 @@ namespace TailBlazer.Views
 
         private string _searchText;
         private bool _autoTail=true;
-        private string _lineCountText;
         private int _firstIndex;
-        private int _matchedLineCount;
         private int _pageSize;
-        private string _fileSizeText;
-        private string _searchHint;
-        private bool _highlightMatchingText;
-        private bool _searching;
+
+        public IProperty<bool> ShouldHightlightMatchingText { get; }
+        public IProperty<bool> SearchIsInProgess { get; }
+        public IProperty<string> LineCountText { get; }
+        public IProperty<string> SearchHint { get; }
+        public IProperty<int> MatchedLineCount { get; }
+        public IProperty<string> FileSizeText { get; }
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         
-        public FileTailerViewModel(ILogger logger,ISchedulerProvider schedulerProvider, FileInfo fileInfo)
+        public FileTailerViewModel(ILogger logger,
+            ISchedulerProvider schedulerProvider, 
+            FileInfo fileInfo,
+            IFileTailerFactory fileTailerFactory)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
@@ -48,37 +54,35 @@ namespace TailBlazer.Views
                         .ObserveOn(schedulerProvider.TaskPool)
                         .DistinctUntilChanged();
 
-            var tailer = new FileTailer(fileInfo, filterRequest, scroller);
+            var tailer = fileTailerFactory.Create(fileInfo, filterRequest, scroller);
 
 
             //create user display for count line count
-            var lineCounter = tailer.TotalLines.CombineLatest(tailer.MatchedLines,(total,matched)=>
+            LineCountText = tailer.TotalLines.CombineLatest(tailer.MatchedLines,(total,matched)=>
             {
                 return total == matched 
                     ? $"{total.ToString("#,###")} lines" 
                     : $"{matched.ToString("#,###0")} of {total.ToString("#,###")} lines";
-            })
-            .Subscribe(text => LineCountText=text);
+            }).ForBinding(); 
 
-            var hintWriter = this.WhenValueChanged(vm => vm.SearchText)
-                .Select(text =>
-                {
-                    if (string.IsNullOrEmpty(text))
-                        return "Type to search";
-                    return text.Length < 3 ? "Enter at least 3 characters" : "Filter applied";
-                }).Subscribe(text=> SearchHint = text);
+            SearchHint = this.WhenValueChanged(vm => vm.SearchText)
+                            .Select(text =>
+                            {
+                                if (string.IsNullOrEmpty(text))
+                                    return "Type to search";
+                                return text.Length < 3 ? "Enter at least 3 characters" : "Filter applied";
+                            }).ForBinding();
 
-            var highlighter = this.WhenValueChanged(vm => vm.SearchText)
-                .Subscribe(searchText => HighlightMatchingText = !string.IsNullOrEmpty(searchText) && searchText.Length >= 3);
-
-
-            var searching = tailer.IsSearching
-                .Subscribe(isSearching => Searching = isSearching);
-
-            var sizeMonitor = tailer.FileSize
+            ShouldHightlightMatchingText = this.WhenValueChanged(vm => vm.SearchText)
+                .Select(searchText => !string.IsNullOrEmpty(searchText) && searchText.Length >= 3)
+                .ForBinding();
+            
+            SearchIsInProgess = tailer.IsSearching.ForBinding();
+            
+            FileSizeText = tailer.FileSize
                 .Select(size=> size.FormatWithAbbreviation())
                 .DistinctUntilChanged()
-                .Subscribe(text => FileSizeText = text);
+                .ForBinding();
 
             //load lines into observable collection
             var loader = tailer.Lines.Connect()
@@ -91,28 +95,32 @@ namespace TailBlazer.Views
 
 
             //monitor matching lines and start index,
-            var matchedLinesMonitor = tailer.MatchedLines
-                .Subscribe(matched => MatchedLineCount = matched);
+            MatchedLineCount = tailer.MatchedLines.ForBinding();
 
             //track first visible index
             var firstIndexMonitor = tailer.Lines.Connect()
                 .QueryWhenChanged(lines =>lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min())
+                
                 .Subscribe(first=> FirstIndex= first);
             
 
-            _cleanUp = new CompositeDisposable(tailer, 
-                lineCounter, 
+            _cleanUp = new CompositeDisposable(tailer,
+                LineCountText, 
                 loader,
                 firstIndexMonitor,
-                matchedLinesMonitor,
-                sizeMonitor,
-                hintWriter,
-                highlighter,
+                MatchedLineCount,
+                FileSizeText,
+                SearchHint,
+                ShouldHightlightMatchingText,
+                SearchIsInProgess,
                 Disposable.Create(() =>
                 {
                     _userScrollRequested.OnCompleted();
                 }));
         }
+
+
+
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
         {
             if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));
@@ -152,18 +160,6 @@ namespace TailBlazer.Views
             set { SetAndRaise(ref _firstIndex, value); }
         }
 
-        public int MatchedLineCount
-        {
-            get { return _matchedLineCount; }
-            set { SetAndRaise(ref _matchedLineCount, value); }
-        }
-
-        public bool HighlightMatchingText
-        {
-            get { return _highlightMatchingText; }
-            set { SetAndRaise(ref _highlightMatchingText, value); }
-        }
-
 
         public string SearchText
         {
@@ -171,32 +167,6 @@ namespace TailBlazer.Views
             set { SetAndRaise(ref _searchText, value); }
         }
 
-
-        public bool Searching
-        {
-            get { return _searching; }
-            set { SetAndRaise(ref _searching, value); }
-        }
-
-
-
-        public string SearchHint
-        {
-            get { return _searchHint; }
-            set { SetAndRaise(ref _searchHint, value); }
-        }
-
-        public string LineCountText
-        {
-            get { return _lineCountText; }
-            set { SetAndRaise(ref _lineCountText, value); }
-        }
-
-        public string FileSizeText
-        {
-            get { return _fileSizeText; }
-            set { SetAndRaise(ref _fileSizeText, value); }
-        }
 
         public void Dispose()
         {

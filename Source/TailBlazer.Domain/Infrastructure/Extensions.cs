@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 
 // ReSharper disable once CheckNamespace
@@ -38,9 +39,10 @@ namespace System
 
         public static string Pluralise(this string source, int count)
         {
-            if (count == 1) return $"{count} {source}";
-            return $"{count} {source}s";
+            return count == 1 ? $"{count} {source}" : $"{count} {source}s";
         }
+
+
     }
 }
 
@@ -72,6 +74,31 @@ namespace System.Collections.Generic
                 action(item,i);
                 i++;
             }
+        }
+
+        public static string ToDelimited<T>(this IEnumerable<T> source, string delimiter=",")
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            return string.Join(delimiter, source.WithDelimiter(delimiter));
+
+        }
+
+        public static IEnumerable<string>  WithDelimiter<T>(this IEnumerable<T> source, string delimiter)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            var array = source.AsArray();
+            if (!array.Any()) yield return string.Empty;
+
+            yield return array.Select(t => t.ToString()).First();
+
+            foreach (var item in array.Skip(1))
+                yield return $"{delimiter}{item}";
+
+        }
+
+        public static T[] AsArray<T>(this IEnumerable<T> source)
+        {
+           return source as T[] ?? source.ToArray();
         }
 
     }

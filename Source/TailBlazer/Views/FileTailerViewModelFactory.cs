@@ -1,6 +1,8 @@
 using System;
 using System.IO;
+using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
+
 
 namespace TailBlazer.Views
 {
@@ -12,16 +14,21 @@ namespace TailBlazer.Views
     {
 
         private readonly IObjectProvider _objectProvider;
+        private readonly ILogFactory _logFactory;
 
-        public FileTailerViewModelFactory(IObjectProvider objectProvider)
+        public FileTailerViewModelFactory(IObjectProvider objectProvider, ILogFactory logFactory)
         {
             _objectProvider = objectProvider;
+            _logFactory = logFactory;
         }
 
         public FileTailerViewModel Create(FileInfo fileInfo)
         {
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
-            return new FileTailerViewModel(_objectProvider.Get<ILogger>(), _objectProvider.Get<ISchedulerProvider>(), fileInfo);
+            return new FileTailerViewModel(_logFactory.Create<FileTailerViewModel>(),
+                _objectProvider.Get<ISchedulerProvider>(),
+                fileInfo,
+                _objectProvider.Get<IFileTailerFactory>());
         }
     }
 }

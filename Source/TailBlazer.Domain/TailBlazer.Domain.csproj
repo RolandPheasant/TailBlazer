@@ -63,6 +63,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileHandling\FileInfoEx.cs" />
+    <Compile Include="FileHandling\FileTailerFactory.cs" />
+    <Compile Include="FileHandling\IFileTailerFactory.cs" />
     <Compile Include="FileHandling\LineIndexEx.cs" />
     <Compile Include="FileHandling\LineMatchChangedReason.cs" />
     <Compile Include="FileHandling\LineMatches.cs" />
@@ -80,12 +82,16 @@
     <Compile Include="FileHandling\ScrollRequest.cs" />
     <Compile Include="FileHandling\StreamReaderExtended.cs" />
     <Compile Include="Infrastructure\Extensions.cs" />
+    <Compile Include="Infrastructure\ILogFactory.cs" />
     <Compile Include="Infrastructure\ILogger.cs" />
     <Compile Include="Infrastructure\ImmutableList.cs" />
     <Compile Include="Infrastructure\IObjectFactory.cs" />
+    <Compile Include="Infrastructure\IProperty.cs" />
     <Compile Include="Infrastructure\ISchedulerProvider.cs" />
+    <Compile Include="Infrastructure\HungryProperty.cs" />
     <Compile Include="Infrastructure\ReactiveEx.cs" />
     <Compile Include="FileHandling\Line.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Settings\IConverter.cs" />
     <Compile Include="Settings\ISetting.cs" />
     <Compile Include="Settings\ISettingsStore.cs" />

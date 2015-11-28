@@ -43,8 +43,6 @@ namespace TailBlazer.Domain.FileHandling
             int first = scroll.FirstIndex;
             int size = scroll.PageSize;
 
-            //TODO: If page size increases, it may be that we should fill the page up if current index is after last item 
-
             if (scroll.Mode == ScrollingMode.Tail)
             {
                 first = size > matches.Count ? 0 : matches.Count - size;
@@ -53,11 +51,11 @@ namespace TailBlazer.Domain.FileHandling
             else
             {
 
-                if (first + size >= source.Count)
+                if (first + size >= matches.Count)
                     first = matches.Count - size;
             }
 
-            var allMatched = Enumerable.Range(first, Math.Min(size,matches.Count));
+            var allMatched = Enumerable.Range(Math.Max(first,0) , Math.Min(size,matches.Count));
 
             int i = 0;
             foreach (var index in allMatched)

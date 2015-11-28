@@ -43,7 +43,7 @@
                 </Viewbox>
 
                 <TextBox x:Name="SearchTextBox" 
-                    wpf:TextFieldAssist.Hint="{Binding SearchHint}"          
+                    wpf:TextFieldAssist.Hint="{Binding SearchHint.Value}"          
                     Margin="4 0 0 0"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -51,7 +51,7 @@
                     MinWidth="125"/>
 
                 <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"    
-                    Visibility="{Binding Searching, Converter={StaticResource BooleanToVisibilityConverter}}"         
+                    Visibility="{Binding SearchIsInProgess.Value, Converter={StaticResource BooleanToVisibilityConverter}}"         
                     Value="65"
                     IsIndeterminate="True"
                     Margin="6 2 0 2" VerticalAlignment="Center" HorizontalAlignment="Center"/>
@@ -75,13 +75,13 @@
                     VerticalAlignment="Center"
                     MinWidth="125"/>
 
-                    <TextBlock Text="{Binding FileSizeText}" />
+                    <TextBlock Text="{Binding FileSizeText.Value}" />
 
                     <Border Margin="4 1 0 1" BorderThickness="1 0 0 0"
                         Opacity=".6"
                         BorderBrush="{Binding ElementName=TextBlock2,Path=Foreground}"
                         />
-                    <TextBlock  x:Name="TextBlock2" Margin="2 0 0 0" Text="{Binding LineCountText}" />
+                    <TextBlock  x:Name="TextBlock2" Margin="2 0 0 0" Text="{Binding LineCountText.Value}" />
                 </StackPanel>
             </StackPanel>
 
@@ -116,7 +116,7 @@
                     <local:VirtualScrollPanel ItemHeight="22"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
-                                                TotalItems="{Binding MatchedLineCount}"/>
+                                                TotalItems="{Binding MatchedLineCount.Value}"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
 
@@ -133,7 +133,7 @@
                                    MinWidth="25"/>
                         <infrastucture:SearchableTextControl Grid.Column="1" 
                                                              Margin="6 0 0 0"   
-                                                            IsHighlight="{Binding ElementName=Control, Path=DataContext.HighlightMatchingText}"  
+                                                            IsHighlight="{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"  
                                                             IsMatchCase="False"
                                                             SearchText="{Binding ElementName=SearchTextBox,Path=Text}"
                                                             HighlightBackground="{StaticResource SecondaryAccentBrush}"

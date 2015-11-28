@@ -7,6 +7,7 @@ using System.Threading;
 using FluentAssertions;
 using Microsoft.Reactive.Testing;
 using TailBlazer.Domain.FileHandling;
+using TailBlazer.Infrastucture;
 using Xunit;
 
 namespace TailBlazer.Fixtures
@@ -26,7 +27,7 @@ namespace TailBlazer.Fixtures
             
             File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i =>i.ToString()).ToArray());
      
-            using (var tailer = new FileTailer(info, textMatch, autoTailer,scheduler))
+            using (var tailer = new FileTailer(info, textMatch, autoTailer,new NullLogger(),scheduler))
             {
 
                 scheduler.AdvanceBySeconds(1);
@@ -51,7 +52,7 @@ namespace TailBlazer.Fixtures
 
             File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
 
-            using (var tailer = new FileTailer(info, textMatch, autoTailer, scheduler))
+            using (var tailer = new FileTailer(info, textMatch, autoTailer,new NullLogger(), scheduler))
             {
 
                 //lines which contain "1"
@@ -82,7 +83,7 @@ namespace TailBlazer.Fixtures
             File.AppendAllLines(file, Enumerable.Range(1, 100)
                 .Select(i => i%2 == 1 ? $"{i} is an odd number" : $"{i} is an even number").ToArray());
 
-            using (var tailer = new FileTailer(info, textMatch, autoTailer, scheduler))
+            using (var tailer = new FileTailer(info, textMatch, autoTailer,new NullLogger(), scheduler))
             {
 
                 //lines which contain "1"
@@ -133,7 +134,7 @@ namespace TailBlazer.Fixtures
 
             File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
 
-            using (var tailer = new FileTailer(info, textMatch, autoTailer, scheduler))
+            using (var tailer = new FileTailer(info, textMatch, autoTailer,new NullLogger(), scheduler))
             {
                 scheduler.AdvanceByMilliSeconds(251);
                 tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(Enumerable.Range(15, 10));

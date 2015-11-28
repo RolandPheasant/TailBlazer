@@ -123,6 +123,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Infrastucture\ConsoleLogger.cs" />
+    <Compile Include="Infrastucture\LogFactory.cs" />
     <Compile Include="Views\FileDropContainer.cs" />
     <Compile Include="Views\FileDropMonitor.cs" />
     <Compile Include="Views\FileIcon.cs" />

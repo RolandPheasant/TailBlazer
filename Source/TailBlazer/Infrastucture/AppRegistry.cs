@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using StructureMap.Configuration.DSL;
+using TailBlazer.Domain.Infrastructure;
 using ILogger = TailBlazer.Domain.Infrastructure.ILogger;
 
 namespace TailBlazer.Infrastucture
@@ -24,6 +25,8 @@ namespace TailBlazer.Infrastucture
                 scanner.ExcludeType<ILogger>();
                 scanner.LookForRegistries();
                 scanner.Convention<AppConventions>();
+
+                scanner.AssemblyContainingType<ILogFactory>();
                 scanner.AssemblyContainingType<AppRegistry>();
             });
         }

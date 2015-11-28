@@ -6,8 +6,19 @@ using System.Reactive.Linq;
 
 namespace TailBlazer.Domain.Infrastructure
 {
+    public enum PropertyType
+    {
+        EagerSubscription,
+        LazySubscription
+    }
+
     public static class ReactiveEx
     {
+
+        public static IProperty<T> ForBinding<T>(this IObservable<T> source, PropertyType type = PropertyType.EagerSubscription)
+        {
+            return new HungryProperty<T>(source);
+        }
 
         public static IObservable<TSource> Previous<TSource>(this IObservable<TSource> source)
         {
