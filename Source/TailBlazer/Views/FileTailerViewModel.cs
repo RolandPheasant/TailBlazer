@@ -93,18 +93,15 @@ namespace TailBlazer.Views
                 .Bind(out _data)
                 .Subscribe(changes => logger.Info($"Rows changed {changes.Adds} adds, {changes.Removes} removed"), 
                             ex => logger.Error(ex, "There is a problem with bind data"));
-
-
+            
             //monitor matching lines and start index,
             MatchedLineCount = tailer.MatchedLines.ForBinding();
 
             //track first visible index
             var firstIndexMonitor = tailer.Lines.Connect()
                 .QueryWhenChanged(lines =>lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min())
-                
                 .Subscribe(first=> FirstIndex= first);
-            
-
+           
             _cleanUp = new CompositeDisposable(tailer,
                 LineCountText, 
                 loader,
@@ -155,8 +152,7 @@ namespace TailBlazer.Views
             get { return _autoTail; }
             set { SetAndRaise(ref _autoTail, value); }
         }
-
-
+        
         public int PageSize
         {
             get { return _pageSize; }
