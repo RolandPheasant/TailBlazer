@@ -13,6 +13,7 @@ using DynamicData.Binding;
 using Microsoft.Win32;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
+using System.Reactive.Concurrency;
 
 namespace TailBlazer.Views
 {
@@ -22,6 +23,7 @@ namespace TailBlazer.Views
         private readonly IDisposable _cleanUp;
         private ViewContainer _selected;
         private bool _isEmpty;
+        private bool _isLoading;
 
         public ObservableCollection<ViewContainer> Views { get; } = new ObservableCollection<ViewContainer>();
         public IInterTabClient InterTabClient { get; }
@@ -69,15 +71,28 @@ namespace TailBlazer.Views
 
         public void OpenFile(FileInfo file)
         {
-            //2. resolve TailViewModel
-            var factory = _objectProvider.Get<FileTailerViewModelFactory>();
-            var viewModel = factory.Create(file);
+            IsLoading = true;
+            var scheduler = _objectProvider.Get<ISchedulerProvider>();
 
-            //3. Display it
-            var newItem = new ViewContainer(file.Name, viewModel);
-            Views.Add(newItem);
-            Selected = newItem;
+            scheduler.Background.Schedule(() =>
+            {
+                //Handle errors
 
+                //2. resolve TailViewModel
+                var factory = _objectProvider.Get<FileTailerViewModelFactory>();
+                var viewModel = factory.Create(file);
+
+                //3. Display it
+                var newItem = new ViewContainer(file.Name, viewModel);
+
+                IsLoading = false;
+                //do the work on the ui thread
+                scheduler.MainThread.Schedule(() =>
+                {
+                    Views.Add(newItem);
+                    Selected = newItem;
+                });
+            });
         }
 
         public ItemActionCallback ClosingTabItemHandler => ClosingTabItemHandlerImpl;
@@ -103,6 +118,12 @@ namespace TailBlazer.Views
         {
             get { return _isEmpty; }
             set { SetAndRaise(ref _isEmpty, value); }
+        }
+
+        public bool IsLoading
+        {
+            get { return _isLoading; }
+            set { SetAndRaise(ref _isLoading, value); }
         }
 
         public void Dispose()

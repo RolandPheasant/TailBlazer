@@ -25,12 +25,14 @@ namespace TailBlazer.Views
         private int _firstIndex;
         private int _pageSize;
 
+
         public IProperty<bool> ShouldHightlightMatchingText { get; }
         public IProperty<bool> SearchIsInProgess { get; }
         public IProperty<string> LineCountText { get; }
         public IProperty<string> SearchHint { get; }
         public IProperty<int> MatchedLineCount { get; }
         public IProperty<string> FileSizeText { get; }
+        public IProperty<bool> IsLoading { get; }
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         
@@ -43,6 +45,8 @@ namespace TailBlazer.Views
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
 
+
+
             var filterRequest = this.WhenValueChanged(vm => vm.SearchText).Throttle(TimeSpan.FromMilliseconds(125));
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
             var scroller = _userScrollRequested
@@ -51,19 +55,16 @@ namespace TailBlazer.Views
                             var mode = AutoTail ? ScrollingMode.Tail : ScrollingMode.User;
                             return  new ScrollRequest(mode, user.PageSize, user.FirstIndex);
                         })
-                        .ObserveOn(schedulerProvider.TaskPool)
+                        .ObserveOn(schedulerProvider.Background)
                         .DistinctUntilChanged();
 
             var tailer = fileTailerFactory.Create(fileInfo, filterRequest, scroller);
 
+            IsLoading = tailer.IsLoading.ForBinding();
 
-            //create user display for count line count
-            LineCountText = tailer.TotalLines.CombineLatest(tailer.MatchedLines,(total,matched)=>
-            {
-                return total == matched 
-                    ? $"{total.ToString("#,###")} lines" 
-                    : $"{matched.ToString("#,###0")} of {total.ToString("#,###")} lines";
-            }).ForBinding(); 
+            LineCountText = tailer.TotalLines.CombineLatest(tailer.MatchedLines,(total,matched)=> total == matched 
+                ? $"{total.ToString("#,###")} lines" 
+                : $"{matched.ToString("#,###0")} of {total.ToString("#,###")} lines").ForBinding(); 
 
             SearchHint = this.WhenValueChanged(vm => vm.SearchText)
                             .Select(text =>
@@ -108,6 +109,7 @@ namespace TailBlazer.Views
                 LineCountText, 
                 loader,
                 firstIndexMonitor,
+                IsLoading,
                 MatchedLineCount,
                 FileSizeText,
                 SearchHint,
@@ -118,7 +120,6 @@ namespace TailBlazer.Views
                     _userScrollRequested.OnCompleted();
                 }));
         }
-
 
 
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
@@ -138,8 +139,15 @@ namespace TailBlazer.Views
 
         void IScrollReceiver.ScrollChanged(ScrollChangedArgs scrollChangedArgs)
         {
-            if (scrollChangedArgs.Direction== ScrollDirection.Up)
+            if (scrollChangedArgs.Direction == ScrollDirection.Up)
+            {
                 AutoTail = false;
+            }
+        }
+        public string SearchText
+        {
+            get { return _searchText; }
+            set { SetAndRaise(ref _searchText, value); }
         }
 
         public bool AutoTail
@@ -147,7 +155,8 @@ namespace TailBlazer.Views
             get { return _autoTail; }
             set { SetAndRaise(ref _autoTail, value); }
         }
-        
+
+
         public int PageSize
         {
             get { return _pageSize; }
@@ -159,14 +168,7 @@ namespace TailBlazer.Views
             get { return _firstIndex; }
             set { SetAndRaise(ref _firstIndex, value); }
         }
-
-
-        public string SearchText
-        {
-            get { return _searchText; }
-            set { SetAndRaise(ref _searchText, value); }
-        }
-
+        
 
         public void Dispose()
         {

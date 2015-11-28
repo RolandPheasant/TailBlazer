@@ -20,7 +20,8 @@ namespace TailBlazer.Domain.FileHandling
         public IObservable<long> FileSize { get; }
         public IObservableList<Line> Lines { get; }
         public IObservable<bool> IsSearching { get;  }
-        
+        public IObservable<bool> IsLoading { get; }
+
         public FileTailer(FileInfo file, 
             IObservable<string> textToMatch,
             IObservable<ScrollRequest> scrollRequest,
@@ -65,6 +66,9 @@ namespace TailBlazer.Domain.FileHandling
                            // .ObserveLatestOn(scheduler)
                             .Synchronize(locker)
                             .Replay(1).RefCount();
+
+
+            IsLoading = indexer.Take(1).Select(_=>false).StartWith(true);
 
             //count matching lines (all if no filter is specified)
             MatchedLines = indexer

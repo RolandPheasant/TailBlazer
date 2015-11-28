@@ -8,7 +8,7 @@ namespace TailBlazer.Infrastucture
     {
         public IScheduler MainThread { get; }
 
-        public IScheduler TaskPool { get; } = TaskPoolScheduler.Default;
+        public IScheduler Background { get; } = TaskPoolScheduler.Default;
 
         public SchedulerProvider(Dispatcher dispatcher)
         {

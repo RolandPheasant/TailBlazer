@@ -18,10 +18,29 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ProgressBar.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InverredBooleanToVisibilityConverter"/>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
         </ResourceDictionary>
     </Control.Resources>
-    
+
     <Grid>
+        <wpf:Card 
+            Visibility="{Binding IsLoading.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
+            UniformCornerRadius="14" Padding="4"
+                      VerticalAlignment="Center" HorizontalAlignment="Center" Margin="12 12 12 12">
+            <ProgressBar
+         
+                Style="{StaticResource MaterialDesignCircularProgressBar}" 
+                         Value="50"
+                         IsIndeterminate="True"                         
+                      />
+        </wpf:Card>
+
+
+        <Grid    Visibility="{Binding IsLoading.Value, Converter={StaticResource InverredBooleanToVisibilityConverter}}"
+>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -214,5 +233,7 @@
             </StackPanel>
 
         </Grid>-->
+    </Grid>
+
     </Grid>
 </UserControl>
