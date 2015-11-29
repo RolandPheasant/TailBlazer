@@ -54,7 +54,7 @@ namespace TailBlazer.Domain.FileHandling
                     first = matches.Count - size;
             }
 
-            var allMatched = Enumerable.Range(Math.Max(first,0) , Math.Min(size,matches.Count));
+            var allMatched = Enumerable.Range(Math.Max(first, 0), Math.Min(size, matches.Count));
 
             int i = 0;
             foreach (var index in allMatched)
@@ -62,12 +62,28 @@ namespace TailBlazer.Domain.FileHandling
                 if (index >= matches.Count) continue;
                 var line = matches.Lines[index];
 
-                if (line >= source.Count-1) continue;
+                if (line >= source.Count - 1) continue;
                 var start = line == 0 ? 0 : source.Lines[line - 1];
-                var end = source.Lines[line]-1;
+                var end = source.Lines[line] - 1;
                 yield return new LineIndex(line, i + first, start, end);
                 i++;
             }
+
+
+
+            //int counter = 0;
+            //foreach (var line in matches.Lines.Reverse())
+            //{
+            //    if (line > source.Count - 1) continue;
+
+            //    counter++;
+
+            //    var start = line == 0 ? 0 : source.Lines[line - 1];
+            //    var end = source.Lines[line] - 1;
+            //    yield return new LineIndex(line, matches.Count - counter - 1, start, end);
+
+            //    if (counter == scroll.PageSize) yield break; 
+            //}
         }
 
 

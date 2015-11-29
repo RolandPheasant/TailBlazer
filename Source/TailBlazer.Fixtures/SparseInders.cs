@@ -34,7 +34,7 @@ namespace TailBlazer.Fixtures
                     var totalCount = result.Count;
 
                     //there could be an overlapping index (the index collection will deal with this)
-                    totalCount.Should().Be(10001);
+                    totalCount.Should().Be(10000);
                 }
             }
         
@@ -61,23 +61,10 @@ namespace TailBlazer.Fixtures
                 using (indexer.Result.Subscribe(indicies => result = indicies))
                 {
                     scheduler.AdvanceBy(1);
-
-
-                    //there could be an overlapping index (the index collection will deal with this)
-                    result.Count.Should().Be(10001);
-
-
+                    result.Count.Should().Be(1000);
                     File.AppendAllLines(file, Enumerable.Range(10000, 10).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
-
                     refresher.OnNext(Unit.Default);
-
-                    //force notification
-                    //  indexer.Refresh();
-                   // refresher.OnNext(Unit.Default);
-
-
-
-                    result.Count.Should().Be(10011);
+                    result.Count.Should().Be(10010);
                 }
             }
 

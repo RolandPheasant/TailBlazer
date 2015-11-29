@@ -54,6 +54,8 @@ namespace TailBlazer.Domain.FileHandling
             var startScanningAt = (int)Math.Max(0, info.Length - tailSize);
             _endOfFile = startScanningAt;
 
+   
+
             //2. Scan the tail [TODO: put _endOfFile into observable]
             var tailScanner = refresher
                 .StartWith(Unit.Default)
@@ -66,10 +68,11 @@ namespace TailBlazer.Domain.FileHandling
                 .Do(index=> _endOfFile= index.End)
                 .Publish();
 
+            var locker = new object();
 
             //3. Scan tail when we have the first result from the head
             var tailSubscriber = tailScanner
-               
+                .Synchronize(locker)
                 .Subscribe(tail =>
                 {
                     _indicies.Edit(innerList =>
@@ -80,19 +83,33 @@ namespace TailBlazer.Domain.FileHandling
                     });
                 });
 
-            ////3. Scan the remainder of the file when the tail has been scanned
+            ////4. Scan the remainder of the file when the tail has been scanned
             var headSubscriber = tailScanner.FirstAsync()
-                .Subscribe(head =>
+                .Synchronize(locker)
+                .Subscribe(tail =>
                 {
-                    var estimateLines = EstimateNumberOfLines(head, info);
-                    var estimate = new SparseIndex(0, head.Start, compression, estimateLines, SpareIndexType.Page);
+                    var estimateLines = EstimateNumberOfLines(tail, info);
+                    var estimate = new SparseIndex(0, tail.Start, compression, estimateLines, SpareIndexType.Page);
                     _indicies.Add(estimate);
 
                     scheduler.Schedule(() =>
                     {
-                        var actual = Scan(0, head.Start, compression);
+                        var actual = Scan(0, tail.Start, compression);
+
+
                         _indicies.Edit(innerList =>
                         {
+                            //check for overlapping index
+                            //
+                            if (actual.End > tail.Start)
+                            {
+                                //we have an over lapping index
+                                //in this case we need to remove first entry from the head
+                                var newTail = new SparseIndex(actual.End, tail.End, tail.Indicies.Skip(1).ToArray(), 1, tail.LineCount-1, SpareIndexType.Tail);
+                                innerList.Remove(tail);
+                                innerList.Add(newTail);
+                            }
+                            
                             innerList.Remove(estimate);
                             innerList.Add(actual);
                         });
