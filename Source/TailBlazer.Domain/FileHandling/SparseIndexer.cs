@@ -61,9 +61,11 @@ namespace TailBlazer.Domain.FileHandling
                 .StartWith(Unit.Default)
                 .Select(_ => ScanTail(_endOfFile))
                 .Where(tail => tail != null)
-                .Scan((SparseIndex) null, (previous, latest) =>
+                .Select(tail =>
                 {
-                    return previous == null ? latest : new SparseIndex(latest, previous);
+                    //cannot use scan because reading head may update the last head
+                    var previous = _indicies.Items.FirstOrDefault(si => si.Type == SpareIndexType.Tail);
+                    return previous == null ? tail : new SparseIndex(tail, previous);
                 })
                 .Do(index=> _endOfFile= index.End)
                 .Publish();

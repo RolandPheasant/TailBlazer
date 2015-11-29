@@ -61,8 +61,8 @@ namespace TailBlazer.Fixtures
                 using (indexer.Result.Subscribe(indicies => result = indicies))
                 {
                     scheduler.AdvanceBy(1);
-                    result.Count.Should().Be(1000);
-                    File.AppendAllLines(file, Enumerable.Range(10000, 10).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
+                    result.Count.Should().Be(10000);
+                    File.AppendAllLines(file, Enumerable.Range(10001, 10).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
                     refresher.OnNext(Unit.Default);
                     result.Count.Should().Be(10010);
                 }
