@@ -18,5 +18,14 @@ namespace TailBlazer.Domain.FileHandling
             Compression = compression;
             LineCount = lineCount;
         }
+
+        public SparseIndex(int start, int end,  int compression, int lineCount)
+        {
+            Start = start;
+            End = end;
+            Indicies = new int [0];
+            Compression = compression;
+            LineCount = lineCount;
+        }
     }
 }
