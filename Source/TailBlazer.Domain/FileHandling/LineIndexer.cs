@@ -35,12 +35,12 @@ namespace TailBlazer.Domain.FileHandling
         {
             if (_reader.EndOfStream) yield break;
 
-            if (_lineFeedSize==-1 )
-            {
-                _lineFeedSize = _info.FindDelimiter();
-                if (_lineFeedSize==-1)
-                    throw new FileLoadException("Cannot determine new line delimiter");
-            }
+            //if (_lineFeedSize==-1 )
+            //{
+            //    _lineFeedSize = _info.FindDelimiter();
+            //    if (_lineFeedSize==-1)
+            //        throw new FileLoadException("Cannot determine new line delimiter");
+            //}
             
             while ((_reader.ReadLine()) != null)
             {

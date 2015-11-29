@@ -3,6 +3,7 @@
     public enum LinesChangedReason
     {
         Loaded,
-        Tailed 
+        Tailed,
+        Indexed 
     }
 }

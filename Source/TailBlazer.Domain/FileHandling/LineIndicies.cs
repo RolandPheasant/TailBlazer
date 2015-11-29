@@ -5,7 +5,6 @@ namespace TailBlazer.Domain.FileHandling
     public class LineIndicies
     {
         public Encoding Encoding { get;  }
-        public int LineFeedSize { get;  }
         public int[] Lines { get; }
         public int Count => Lines.Length;
         public int Diff { get; }
@@ -13,10 +12,9 @@ namespace TailBlazer.Domain.FileHandling
         public int TailStartsAt { get; }
 
 
-        public LineIndicies(int[] lines, Encoding encoding, int lineFeedSize, LineIndicies previous = null)
+        public LineIndicies(int[] lines, Encoding encoding,  LineIndicies previous = null)
         {
             Encoding = encoding;
-            LineFeedSize = lineFeedSize;
             if (previous == null)
             {
                 Lines = lines;

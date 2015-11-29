@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Subjects;
 using FluentAssertions;
 using Microsoft.Reactive.Testing;
 using TailBlazer.Domain.FileHandling;
@@ -10,56 +12,74 @@ namespace TailBlazer.Fixtures
 {
     public class SparseIndexerFixture
     {
+
         [Fact]
-        public async void ProduceUncompressed()
+        public  void CanProduceIndices()
         {
             var file = Path.GetTempFileName();
             var info = new FileInfo(file);
             File.AppendAllLines(file, Enumerable.Range(1, 10000).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
-            
-            var indexer = new SparseIndexer(info);
-            var start = (int)Math.Max(0, info.Length - 2000);
-            var end = (int)info.Length;
 
-            var tailIndex = await indexer.ScanAsync(start, end, 1);
-            var startIndex = await indexer.ScanAsync(0, start, 10);
+            var refresher = new Subject<Unit>();
+            var scheduler = new TestScheduler();
 
-              var totalCount = tailIndex.LineCount + startIndex.LineCount;
+            using (var indexer = new SparseIndexer(info, refresher, tailSize: 1000, scheduler: scheduler))
+            {
+      
+                SparseIndicies result = null;
+                using (indexer.Result.Subscribe(indicies => result = indicies))
+                {
+                    //start off the head scanner
+                    scheduler.AdvanceBy(1);
+                    var totalCount = result.Count;
 
-            //there could be an overlapping index (the index collection will deal with this)
-            totalCount.Should().Be(startIndex.End > start ? 10001 : 10000);
-
-            //var averageLineLength = tailIndex.Size / tailIndex.LineCount;
-            //var estimatedLines = info.Length / averageLineLength;
-            //var actualLines = tailIndex.LineCount + startIndex.LineCount;
-
-            File.Delete(file);
+                    //there could be an overlapping index (the index collection will deal with this)
+                    totalCount.Should().Be(10001);
+                }
+            }
+        
+          File.Delete(file);
         }
 
+
         [Fact]
-        public async void WillAutoTail()
+        public  void WillAutoTail()
         {
             var file = Path.GetTempFileName();
             var info = new FileInfo(file);
             var scheduler = new TestScheduler();
             File.AppendAllLines(file, Enumerable.Range(1, 10000).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
 
-            var indexer = new SparseIndexer(info,tailSize:1000, scheduler: scheduler);
-            //var start = (int)Math.Max(0, info.Length - 2000);
-            //var end = (int)info.Length;
 
-            //var tailIndex = await indexer.ScanAsync(start, end, 1);
-            //var startIndex = await indexer.ScanAsync(0, start, 10);
-            scheduler.AdvanceBy(1);
+            var refresher = new Subject<Unit>();
 
-            var totalCount = indexer.Indicies.Items.Sum(si=>si.LineCount);
+            using (var indexer = new SparseIndexer(info, refresher,tailSize: 1000, scheduler: scheduler))
+            {
 
-            //there could be an overlapping index (the index collection will deal with this)
-            totalCount.Should().Be( 10001 );
+                SparseIndicies result = null;
 
-            //var averageLineLength = tailIndex.Size / tailIndex.LineCount;
-            //var estimatedLines = info.Length / averageLineLength;
-            //var actualLines = tailIndex.LineCount + startIndex.LineCount;
+                using (indexer.Result.Subscribe(indicies => result = indicies))
+                {
+                    scheduler.AdvanceBy(1);
+
+
+                    //there could be an overlapping index (the index collection will deal with this)
+                    result.Count.Should().Be(10001);
+
+
+                    File.AppendAllLines(file, Enumerable.Range(10000, 10).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
+
+                    refresher.OnNext(Unit.Default);
+
+                    //force notification
+                    //  indexer.Refresh();
+                   // refresher.OnNext(Unit.Default);
+
+
+
+                    result.Count.Should().Be(10011);
+                }
+            }
 
             File.Delete(file);
         }

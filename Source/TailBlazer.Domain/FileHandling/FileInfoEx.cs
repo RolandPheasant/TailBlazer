@@ -8,6 +8,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
 using DynamicData.Kernel;
+using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -95,11 +96,32 @@ namespace TailBlazer.Domain.FileHandling
                              .Scan((LineIndicies) null, (state, notification) =>
                              {
                                  var lines = indexer.ReadToEnd().ToArray();
-                                 return new LineIndicies(lines, indexer.Encoding, indexer.LineFeedSize, state);
+                                 return new LineIndicies(lines, indexer.Encoding,  state);
                              })
                              .SubscribeSafe(observer);
 
                          return new CompositeDisposable(indexer, notifier);;
+                     });
+                 }).Switch();
+        }
+
+        public static IObservable<SparseIndicies> IndexSparsely(this IObservable<FileNotification> source)
+        {
+            return source
+                 .Where(n => n.NotificationType == FileNotificationType.Created)
+                 .Select(createdNotification =>
+                 {
+                     return Observable.Create<SparseIndicies>(observer =>
+                     {
+                         var refresher = source
+                             .Where(n => n.NotificationType == FileNotificationType.Changed)
+                             .ToUnit();
+
+                         var indexer = new SparseIndexer((FileInfo)createdNotification, refresher);
+
+                         var notifier =indexer.Result.SubscribeSafe(observer);
+
+                         return new CompositeDisposable(indexer, notifier);
                      });
                  }).Switch();
         }
