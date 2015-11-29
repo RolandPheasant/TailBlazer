@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.FileHandling
 {
     public class SparseIndicies: IIndexCollection
     {
         public Encoding Encoding { get; }
-      
         public int Count { get; }
         public int Diff { get; }
         public LinesChangedReason ChangedReason { get; }
@@ -22,7 +22,6 @@ namespace TailBlazer.Domain.FileHandling
         {
 
             Encoding = encoding;
-
             Count = latest.Select(idx => idx.LineCount).Sum();
             Indicies = latest.ToArray();
             Diff = Count - (previous?.Count ?? 0);
@@ -35,7 +34,6 @@ namespace TailBlazer.Domain.FileHandling
             }
             else
             {
-
                 var mostRecent = latest.OrderByDescending(l => l.TimeStamp).First();
 
                 if (mostRecent.Type== SpareIndexType.Tail)
@@ -66,14 +64,18 @@ namespace TailBlazer.Domain.FileHandling
 
             //To find index
             //1. Find first container / Then can calculate how many lines to skip and how many lines to take
-            int container = FindContainer(first);
+            var page = FindPage(first);
+            if (!page.HasValue) yield break;
+
+            var element = page.Value;
+            var relativePosition = (element.Element - element.FirstLine);
+            var indexInContainer = relativePosition/element.Index.Compression;
+            var extraOffset = relativePosition%element.Index.Compression;
+
             throw new NotImplementedException();
             //return Enumerable.Range(first, Math.Min(size, Count))
             //        .Select(i =>
             //        {
-
-
-
             //            var start = i == 0 ? 0 : Lines[i - 1];
             //            var end = Lines[i] - 1;
             //            return new LineIndex(i + 1, i, start, end);
@@ -81,18 +83,33 @@ namespace TailBlazer.Domain.FileHandling
             //        });
         }
 
-        private int FindContainer(int i)
+        private Optional<IndexedContainer> FindPage(int i)
         {
             int firstLineInContainer = 0;
             foreach (var sparseIndex in Indicies)
             {
+               
                // accumulatedCount
                 if (i < sparseIndex.LineCount)
-                    return i;
+                    return new IndexedContainer(i, sparseIndex, firstLineInContainer);;
 
                 firstLineInContainer = firstLineInContainer + sparseIndex.LineCount;
             }
-            return -1;
+            return null;
+        }
+
+        private class IndexedContainer
+        {
+            public int Element { get; }
+            public SparseIndex Index { get; }
+            public int FirstLine { get; }
+
+            public IndexedContainer(int element, SparseIndex index, int firstLine)
+            {
+                Element = element;
+                Index = index;
+                FirstLine = firstLine;
+            }
         }
 
         public IEnumerable<LineIndex> GetIndicies(ScrollRequest scroll, LineMatches matches)
