@@ -4,6 +4,47 @@ using System.Linq;
 
 namespace TailBlazer.Domain.FileHandling
 {
+    public static class SparseIndexEx
+    {
+
+
+        //public static IEnumerable<LineIndex> GetIndicies(this LineIndicies source, ScrollRequest scroll, LineMatches matches)
+        //{
+
+        //    int first = scroll.FirstIndex;
+        //    int size = scroll.PageSize;
+
+        //    if (scroll.Mode == ScrollingMode.Tail)
+        //    {
+        //        first = size > matches.Count ? 0 : matches.Count - size;
+
+        //    }
+        //    else
+        //    {
+        //        if (first + size >= matches.Count)
+        //            first = matches.Count - size;
+        //    }
+
+        //    var allMatched = Enumerable.Range(Math.Max(first, 0), Math.Min(size, matches.Count));
+
+        //    int i = 0;
+        //    foreach (var index in allMatched)
+        //    {
+        //        if (index >= matches.Count) continue;
+        //        var line = matches.Lines[index];
+
+        //        if (line >= source.Count - 1) continue;
+        //        var start = line == 0 ? 0 : source.Lines[line - 1];
+        //        var end = source.Lines[line] - 1;
+        //        yield return new LineIndex(line, i + first, start, end);
+        //        i++;
+        //    }
+        //}
+
+
+
+    }
+
     public  static class LineIndexEx
     {
         public static IEnumerable<LineIndex> GetIndicies(this LineIndicies source, ScrollRequest scroll)
@@ -68,22 +109,6 @@ namespace TailBlazer.Domain.FileHandling
                 yield return new LineIndex(line, i + first, start, end);
                 i++;
             }
-
-
-
-            //int counter = 0;
-            //foreach (var line in matches.Lines.Reverse())
-            //{
-            //    if (line > source.Count - 1) continue;
-
-            //    counter++;
-
-            //    var start = line == 0 ? 0 : source.Lines[line - 1];
-            //    var end = source.Lines[line] - 1;
-            //    yield return new LineIndex(line, matches.Count - counter - 1, start, end);
-
-            //    if (counter == scroll.PageSize) yield break; 
-            //}
         }
 
 

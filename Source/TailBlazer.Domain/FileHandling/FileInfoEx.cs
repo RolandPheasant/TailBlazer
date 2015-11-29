@@ -55,8 +55,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             return Observable.Create<FileNotification>(observer =>
             {
-                //TODO: create a cool-off period after a poll to account for over running jobs
-                Func<IObservable<FileNotification>> poller = () => pulse.StartWith(Unit.Default)
+                 Func<IObservable<FileNotification>> poller = () => pulse.StartWith(Unit.Default)
 
                     .Scan((FileNotification)null, (state, _) => state == null
                        ? new FileNotification(file)
@@ -80,7 +79,7 @@ namespace TailBlazer.Domain.FileHandling
         /// </summary>
         /// <param name="source">The source.</param>
         /// <returns></returns>
-        public static IObservable<LineIndicies> Index(this IObservable<FileNotification> source)
+        public static IObservable<IIndexCollection> Index(this IObservable<FileNotification> source)
         {
             return source
                  .Where(n => n.NotificationType == FileNotificationType.Created)
@@ -105,7 +104,7 @@ namespace TailBlazer.Domain.FileHandling
                  }).Switch();
         }
 
-        public static IObservable<SparseIndicies> IndexSparsely(this IObservable<FileNotification> source)
+        public static IObservable<IIndexCollection> IndexSparsely(this IObservable<FileNotification> source)
         {
             return source
                  .Where(n => n.NotificationType == FileNotificationType.Created)
@@ -118,9 +117,7 @@ namespace TailBlazer.Domain.FileHandling
                              .ToUnit();
 
                          var indexer = new SparseIndexer((FileInfo)createdNotification, refresher);
-
                          var notifier =indexer.Result.SubscribeSafe(observer);
-
                          return new CompositeDisposable(indexer, notifier);
                      });
                  }).Switch();

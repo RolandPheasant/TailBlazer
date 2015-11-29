@@ -65,7 +65,7 @@
     <Compile Include="FileHandling\FileInfoEx.cs" />
     <Compile Include="FileHandling\FileTailerFactory.cs" />
     <Compile Include="FileHandling\IFileTailerFactory.cs" />
-    <Compile Include="FileHandling\LineIndexEx.cs" />
+    <Compile Include="FileHandling\IIndexCollection.cs" />
     <Compile Include="FileHandling\LineMatchChangedReason.cs" />
     <Compile Include="FileHandling\LineMatches.cs" />
     <Compile Include="FileHandling\LineMatcher.cs" />

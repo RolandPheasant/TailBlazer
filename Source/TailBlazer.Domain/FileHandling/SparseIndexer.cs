@@ -24,12 +24,11 @@ namespace TailBlazer.Domain.FileHandling
         public int TailSize { get;  }
 
         public IObservable<SparseIndicies> Result { get; }
-
-
+        
         public SparseIndexer([NotNull] FileInfo info,
             IObservable<Unit> refresher,
             int compression = 10,
-            int tailSize = 100000,
+            int tailSize = 1000000,
             int pageSize = 1000000,
             Encoding encoding = null,
             IScheduler scheduler = null)
@@ -49,12 +48,10 @@ namespace TailBlazer.Domain.FileHandling
                 .ToCollection()
                 .Scan((SparseIndicies)null, (previous, notification) => new SparseIndicies(notification, previous, Encoding));
 
-
             //1. Get  full length of file
             var startScanningAt = (int)Math.Max(0, info.Length - tailSize);
             _endOfFile = startScanningAt;
-
-   
+            
 
             //2. Scan the tail [TODO: put _endOfFile into observable]
             var tailScanner = refresher
@@ -97,12 +94,9 @@ namespace TailBlazer.Domain.FileHandling
                     scheduler.Schedule(() =>
                     {
                         var actual = Scan(0, tail.Start, compression);
-
-
                         _indicies.Edit(innerList =>
                         {
                             //check for overlapping index
-                            //
                             if (actual.End > tail.Start)
                             {
                                 //we have an over lapping index
@@ -156,10 +150,6 @@ namespace TailBlazer.Domain.FileHandling
                         return end!=-1 && lastPosition >= end;
 
                     }).ToArray();
-                }
-                if (lastPosition > end)
-                {
-                    //we have an overlapping line [must remove the last one from the head]
                 }
                 return new SparseIndex(start, lastPosition, lines, compression, count, end==-1 ? SpareIndexType.Tail : SpareIndexType.Page);
             }

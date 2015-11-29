@@ -13,29 +13,29 @@ namespace TailBlazer.Fixtures
   public class IndexLineNumbersFixture
     {
 
-        [Fact]
-        public void IndexLines()
-        {
-            var file = Path.GetTempFileName();
-            var info = new FileInfo(file);
-            int[] result=new int[0];
+        //[Fact]
+        //public void IndexLines()
+        //{
+        //    var file = Path.GetTempFileName();
+        //    var info = new FileInfo(file);
+        //    int[] result=new int[0];
 
-            var subject = new Subject<Unit>();
+        //    var subject = new Subject<Unit>();
 
-            File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i => $"{i}").ToArray());
+        //    File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i => $"{i}").ToArray());
 
-            using (info.WatchFile(subject).Index().Subscribe(x => result = x.Lines.Select((_,idx)=>idx+1).ToArray()))
-            {
+        //    using (info.WatchFile(subject).Index().Subscribe(x => result = x.Lines.Select((_,idx)=>idx+1).ToArray()))
+        //    {
         
-                result.ShouldAllBeEquivalentTo(Enumerable.Range(1, 100));
+        //        result.ShouldAllBeEquivalentTo(Enumerable.Range(1, 100));
 
-                File.AppendAllLines(file, Enumerable.Range(101, 10).Select(i => $"{i}"));
-                subject.OnNext(Unit.Default);
-                File.Delete(file);
-                result.ShouldAllBeEquivalentTo(Enumerable.Range(1, 110));
+        //        File.AppendAllLines(file, Enumerable.Range(101, 10).Select(i => $"{i}"));
+        //        subject.OnNext(Unit.Default);
+        //        File.Delete(file);
+        //        result.ShouldAllBeEquivalentTo(Enumerable.Range(1, 110));
 
-            }
-        }
+        //    }
+        //}
 
         [Fact]
         public void MatchLines()

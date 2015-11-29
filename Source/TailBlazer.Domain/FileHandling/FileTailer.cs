@@ -55,8 +55,7 @@ namespace TailBlazer.Domain.FileHandling
             }).Switch()
             .Synchronize(locker)
             .Replay(1).RefCount();
-
-
+            
             var fileWatcher = file.WatchFile(scheduler: scheduler)
                             .TakeWhile(notification => notification.Exists).Repeat()
                             .Replay(1).RefCount();
@@ -131,9 +130,9 @@ namespace TailBlazer.Domain.FileHandling
         {
             public ScrollRequest Scroll { get;  }
             public LineMatches MatchedLines { get;  }
-            public LineIndicies Incidies { get;  }
+            public IIndexCollection Incidies { get;  }
 
-            public CombinedResult(ScrollRequest scroll, LineMatches matchedLines, LineIndicies incidies)
+            public CombinedResult(ScrollRequest scroll, LineMatches matchedLines, IIndexCollection incidies)
             {
                 Scroll = scroll;
                 MatchedLines = matchedLines;
