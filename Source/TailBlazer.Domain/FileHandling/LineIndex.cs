@@ -2,6 +2,12 @@ using System;
 
 namespace TailBlazer.Domain.FileHandling
 {
+    public enum LineIndexType
+    {
+        Absolute,
+        Relative
+    }
+
     public struct LineIndex : IEquatable<LineIndex>
     {
         public int Line { get; }
@@ -11,13 +17,25 @@ namespace TailBlazer.Domain.FileHandling
         public long Size => End - Start;
         public int Offset { get; }
 
-        public LineIndex(int line, int index, long startPosition, long endPosition, int offset=0)
+        public LineIndexType Type { get; }
+        public LineIndex(int line, int index, long startPosition, long endPosition)
         {
             Line = line;
             Index = index;
             Start = startPosition;
             End = endPosition;
+            Offset = -1;
+            Type= LineIndexType.Absolute;
+        }
+
+        public LineIndex(int line, int index, long startPosition, int offset)
+        {
+            Line = line;
+            Index = index;
+            Start = startPosition;
+            End = -1;
             Offset = offset;
+            Type= LineIndexType.Relative;
         }
 
 

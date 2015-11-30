@@ -22,7 +22,6 @@ namespace TailBlazer.Domain.FileHandling
         public FileInfo Info { get; }
         public int Compression { get;  }
         public int TailSize { get;  }
-
         public IObservable<SparseIndicies> Result { get; }
         
         public SparseIndexer([NotNull] FileInfo info,
@@ -50,7 +49,7 @@ namespace TailBlazer.Domain.FileHandling
 
             //1. Get  full length of file
             var startScanningAt = (int)Math.Max(0, info.Length - tailSize);
-            _endOfFile = startScanningAt;
+            _endOfFile = (int)info.FindNextEndOfLinePosition(startScanningAt);
             
 
             //2. Scan the tail [TODO: put _endOfFile into observable]

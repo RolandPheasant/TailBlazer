@@ -69,28 +69,28 @@ namespace TailBlazer.Domain.FileHandling
 
             var element = page.Value;
             var relativePosition = (element.Element - element.FirstLine);
-            var indexInContainer = relativePosition/element.Index.Compression;
-            var extraOffset = relativePosition%element.Index.Compression;
+            var index = relativePosition/element.Index.Compression;
+            var offset = relativePosition%element.Index.Compression;
+            var start = index==0 ? 0 : element.Index.Indicies[index-1];
 
-            throw new NotImplementedException();
-            //return Enumerable.Range(first, Math.Min(size, Count))
-            //        .Select(i =>
-            //        {
-            //            var start = i == 0 ? 0 : Lines[i - 1];
-            //            var end = Lines[i] - 1;
-            //            return new LineIndex(i + 1, i, start, end);
 
-            //        });
+            foreach (var i in Enumerable.Range(first, Math.Min(size, Count)))
+            {
+                yield return  new LineIndex(i + 1, i, start, offset);
+                offset++;
+            }
         }
 
         private Optional<IndexedContainer> FindPage(int i)
         {
             int firstLineInContainer = 0;
+            int lastLineInContainer = 0;
+
             foreach (var sparseIndex in Indicies)
             {
-               
+                lastLineInContainer += sparseIndex.LineCount;
                // accumulatedCount
-                if (i < sparseIndex.LineCount)
+                if (i < lastLineInContainer)
                     return new IndexedContainer(i, sparseIndex, firstLineInContainer);;
 
                 firstLineInContainer = firstLineInContainer + sparseIndex.LineCount;

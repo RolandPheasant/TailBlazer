@@ -176,5 +176,19 @@ namespace TailBlazer.Domain.FileHandling
                 }
             }
         }
+
+        public static long FindNextEndOfLinePosition(this FileInfo source, long initialPosition)
+        {
+            using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            {
+                stream.Seek(initialPosition, SeekOrigin.Begin);
+                using (var reader = new StreamReaderExtended(stream, Encoding.Default, true))
+                {
+                    if (reader.EndOfStream) return -1;
+                    reader.ReadLine();
+                    return reader.AbsolutePosition();
+                }
+            }
+        }
     }
 }

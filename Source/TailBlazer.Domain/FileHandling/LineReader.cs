@@ -44,30 +44,72 @@ namespace TailBlazer.Domain.FileHandling
         public static IEnumerable<T> ReadLine<T>(this FileInfo source, IEnumerable<LineIndex> lines, Func<LineIndex, string, T> selector, Encoding encoding)
         {
             encoding = encoding ?? source.GetEncoding();
+
       
             var indicies = lines.OrderBy(l => l.Index).ToArray();
+
+            if (indicies.Length==0) yield break;
+
+            var first = indicies[0];
+            var relative = first.Type == LineIndexType.Relative;
+
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
                 stream.Seek(0, SeekOrigin.Begin);
                 // fast forward to our starting point
 
-                int previousLine = -1;
+               
                 using (var reader = new StreamReaderExtended(stream, encoding,false))
                 {
-                    foreach (var index in indicies)
+
+                    if (relative)
                     {
-                        var currentLine = index.Line;
-                        var isContinuous = currentLine == previousLine + 1;
-                        if (!isContinuous)
+                        int previousLine = -1;
+                        long previousStart = -1;
+
+                        foreach (var index in indicies)
                         {
-                            reader.DiscardBufferedData();
-                            reader.BaseStream.Seek(index.Start, SeekOrigin.Begin);
+                            var currentLine = index.Line;
+                            var currentStart = index.Start;
+
+                            var isContinuous = (currentLine == previousLine + 1 && currentStart==previousStart);
+                            if (!isContinuous)
+                            {
+                                reader.DiscardBufferedData();
+                                stream.Seek(first.Start, SeekOrigin.Begin);
+                                
+                                //skip number of lines offset
+                                for (int i = 0; i < index.Offset; i++)
+                                    reader.ReadLine();
+                            }
+
+                            var line = reader.ReadLine();
+                            yield return selector(index, line);
+
+                            previousLine = currentLine;
+                            previousStart = currentStart;
                         }
 
-                        var line = reader.ReadLine();
-                        yield return selector(index, line);
-                        previousLine = currentLine;
                     }
+                    else
+                    {
+                        int previousLine = -1;
+                        foreach (var index in indicies)
+                        {
+                            var currentLine = index.Line;
+                            var isContinuous = currentLine == previousLine + 1;
+                            if (!isContinuous)
+                            {
+                                reader.DiscardBufferedData();
+                                reader.BaseStream.Seek(index.Start, SeekOrigin.Begin);
+                            }
+
+                            var line = reader.ReadLine();
+                            yield return selector(index, line);
+                            previousLine = currentLine;
+                        }
+                    }
+
                 }
             }
         }

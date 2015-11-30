@@ -14,7 +14,6 @@ namespace TailBlazer.Domain.FileHandling
     public class FileTailer: IDisposable
     {
         private readonly IDisposable _cleanUp;
-
         public IObservable<int> TotalLines { get;  }
         public IObservable<int> MatchedLines { get; }
         public IObservable<long> FileSize { get; }
