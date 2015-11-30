@@ -27,7 +27,7 @@ namespace TailBlazer.Fixtures
             using (var indexer = new SparseIndexer(info, refresher, tailSize: 1000, scheduler: scheduler))
             {
 
-                SparseIndicies result = null;
+                SparseIndexCollection result = null;
                 using (indexer.Result.Subscribe(indicies => result = indicies))
 
                 {
@@ -66,7 +66,7 @@ namespace TailBlazer.Fixtures
             using (var indexer = new SparseIndexer(info, refresher, tailSize: 1000, scheduler: scheduler))
             {
       
-                SparseIndicies result = null;
+                SparseIndexCollection result = null;
                 using (indexer.Result.Subscribe(indicies => result = indicies))
                 {
                     //start off the head scanner
@@ -96,7 +96,7 @@ namespace TailBlazer.Fixtures
             using (var indexer = new SparseIndexer(info, refresher,tailSize: 1000, scheduler: scheduler))
             {
 
-                SparseIndicies result = null;
+                SparseIndexCollection result = null;
 
                 using (indexer.Result.Subscribe(indicies => result = indicies))
                 {

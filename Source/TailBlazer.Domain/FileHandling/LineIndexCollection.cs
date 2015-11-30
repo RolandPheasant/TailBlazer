@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class LineIndicies : IIndexCollection
+    public class LineIndexCollection : IIndexCollection
     {
         public Encoding Encoding { get;  }
         public int[] Lines { get; }
@@ -14,7 +14,7 @@ namespace TailBlazer.Domain.FileHandling
         public LinesChangedReason ChangedReason { get; }
         public int TailStartsAt { get; }
         
-        public LineIndicies(int[] lines, Encoding encoding,  LineIndicies previous = null)
+        public LineIndexCollection(int[] lines, Encoding encoding,  LineIndexCollection previous = null)
         {
             Encoding = encoding;
             if (previous == null)

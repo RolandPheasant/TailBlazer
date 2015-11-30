@@ -22,7 +22,7 @@ namespace TailBlazer.Domain.FileHandling
         public FileInfo Info { get; }
         public int Compression { get;  }
         public int TailSize { get;  }
-        public IObservable<SparseIndicies> Result { get; }
+        public IObservable<SparseIndexCollection> Result { get; }
         
         public SparseIndexer([NotNull] FileInfo info,
             IObservable<Unit> refresher,
@@ -45,9 +45,9 @@ namespace TailBlazer.Domain.FileHandling
                 .Connect()
                 .Sort(SortExpressionComparer<SparseIndex>.Ascending(si => si.Start))
                 .ToCollection()
-                .Scan((SparseIndicies)null, (previous, notification) => new SparseIndicies(notification, previous, Encoding));
+                .Scan((SparseIndexCollection)null, (previous, notification) => new SparseIndexCollection(notification, previous, Encoding));
 
-            //1. Get  full length of file
+            //1. Calculate at which point the tail of the file is
             var startScanningAt = (int)Math.Max(0, info.Length - tailSize);
             _endOfFile = startScanningAt==0 ? 0 : (int)info.FindNextEndOfLinePosition(startScanningAt);
             
@@ -60,7 +60,7 @@ namespace TailBlazer.Domain.FileHandling
                 .Select(tail =>
                 {
                     //cannot use scan because reading head may update the last head
-                    var previous = _indicies.Items.FirstOrDefault(si => si.Type == SpareIndexType.Tail);
+                    var previous = _indicies.Items.FirstOrDefault(si => si.Type == IndexType.Tail);
                     return previous == null ? tail : new SparseIndex(tail, previous);
                 })
                 .Do(index=> _endOfFile= index.End)
@@ -75,7 +75,7 @@ namespace TailBlazer.Domain.FileHandling
                 {
                     _indicies.Edit(innerList =>
                     {
-                        var existing = innerList.FirstOrDefault(si => si.Type == SpareIndexType.Tail);
+                        var existing = innerList.FirstOrDefault(si => si.Type == IndexType.Tail);
                         if (existing != null) innerList.Remove(existing);
                         innerList.Add(tail);
                     });
@@ -89,7 +89,7 @@ namespace TailBlazer.Domain.FileHandling
                 .Subscribe(tail =>
                 {
                     var estimateLines = EstimateNumberOfLines(tail, info);
-                    var estimate = new SparseIndex(0, tail.Start, compression, estimateLines, SpareIndexType.Page);
+                    var estimate = new SparseIndex(0, tail.Start, compression, estimateLines, IndexType.Page);
                     _indicies.Add(estimate);
 
                     scheduler.Schedule(() =>
@@ -142,7 +142,7 @@ namespace TailBlazer.Domain.FileHandling
 
                     }).ToArray();
                 }
-                return new SparseIndex(start, lastPosition, lines, compression, count, end==-1 ? SpareIndexType.Tail : SpareIndexType.Page);
+                return new SparseIndex(start, lastPosition, lines, compression, count, end==-1 ? IndexType.Tail : IndexType.Page);
             }
         }
 

@@ -13,14 +13,11 @@ namespace TailBlazer.Domain.FileHandling
 
         public  Encoding Encoding { get; }
 
-        public int LineFeedSize => _lineFeedSize;
         public int Positon => _postion;
         public int Lines => _index;
 
         private int _postion;
         private int _index = -1;
-
-        private int _lineFeedSize =-1;
 
         public LineIndexer(FileInfo info)
         {
@@ -34,13 +31,6 @@ namespace TailBlazer.Domain.FileHandling
         public IEnumerable<int> ReadToEnd()
         {
             if (_reader.EndOfStream) yield break;
-
-            //if (_lineFeedSize==-1 )
-            //{
-            //    _lineFeedSize = _info.FindDelimiter();
-            //    if (_lineFeedSize==-1)
-            //        throw new FileLoadException("Cannot determine new line delimiter");
-            //}
             
             while ((_reader.ReadLine()) != null)
             {

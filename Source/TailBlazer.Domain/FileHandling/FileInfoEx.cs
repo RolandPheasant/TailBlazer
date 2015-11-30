@@ -85,17 +85,17 @@ namespace TailBlazer.Domain.FileHandling
                  .Where(n => n.NotificationType == FileNotificationType.Created)
                  .Select(createdNotification =>
                  {
-                     return Observable.Create<LineIndicies>(observer =>
+                     return Observable.Create<LineIndexCollection>(observer =>
                      {
                          var indexer = new LineIndexer((FileInfo) createdNotification);
 
                          var notifier = source
                              .Where(n => n.NotificationType == FileNotificationType.Changed)
                              .StartWith(createdNotification)
-                             .Scan((LineIndicies) null, (state, notification) =>
+                             .Scan((LineIndexCollection) null, (state, notification) =>
                              {
                                  var lines = indexer.ReadToEnd().ToArray();
-                                 return new LineIndicies(lines, indexer.Encoding,  state);
+                                 return new LineIndexCollection(lines, indexer.Encoding,  state);
                              })
                              .SubscribeSafe(observer);
 
@@ -110,7 +110,7 @@ namespace TailBlazer.Domain.FileHandling
                  .Where(n => n.NotificationType == FileNotificationType.Created)
                  .Select(createdNotification =>
                  {
-                     return Observable.Create<SparseIndicies>(observer =>
+                     return Observable.Create<SparseIndexCollection>(observer =>
                      {
                          var refresher = source
                              .Where(n => n.NotificationType == FileNotificationType.Changed)

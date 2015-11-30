@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -10,7 +9,6 @@ using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
-using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Views
 {
@@ -25,6 +23,7 @@ namespace TailBlazer.Views
         private int _firstIndex;
         private int _pageSize;
 
+        public ReadOnlyObservableCollection<LineProxy> Lines => _data;
 
         public IProperty<bool> ShouldHightlightMatchingText { get; }
         public IProperty<bool> SearchIsInProgess { get; }
@@ -34,8 +33,6 @@ namespace TailBlazer.Views
         public IProperty<string> FileSizeText { get; }
         public IProperty<bool> IsLoading { get; }
 
-        public ReadOnlyObservableCollection<LineProxy> Lines => _data;
-        
         public FileTailerViewModel(ILogger logger,
             ISchedulerProvider schedulerProvider, 
             FileInfo fileInfo,
@@ -45,9 +42,10 @@ namespace TailBlazer.Views
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
 
-
-
+            //An observable which acts as a filter command
             var filterRequest = this.WhenValueChanged(vm => vm.SearchText).Throttle(TimeSpan.FromMilliseconds(125));
+
+            //An observable which acts as a scroll command
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
             var scroller = _userScrollRequested
                         .CombineLatest(autoChanged, (user, auto) =>
@@ -58,14 +56,24 @@ namespace TailBlazer.Views
                         .ObserveOn(schedulerProvider.Background)
                         .DistinctUntilChanged();
 
+            //tailer is the main object used to tail, scroll and filter in a file
             var tailer = fileTailerFactory.Create(fileInfo, filterRequest, scroller);
-
+            
+            //User feedback for when tailer is loading
             IsLoading = tailer.IsLoading.ForBinding();
 
+            //User feedback lines count and filter matches
             LineCountText = tailer.TotalLines.CombineLatest(tailer.MatchedLines,(total,matched)=> total == matched 
                 ? $"{total.ToString("#,###")} lines" 
-                : $"{matched.ToString("#,###0")} of {total.ToString("#,###")} lines").ForBinding(); 
+                : $"{matched.ToString("#,###0")} of {total.ToString("#,###")} lines").ForBinding();
 
+            //User feedback to show file size
+            FileSizeText = tailer.FileSize
+                .Select(size => size.FormatWithAbbreviation())
+                .DistinctUntilChanged()
+                .ForBinding();
+
+            //User feedback to guide them whilst typing
             SearchHint = this.WhenValueChanged(vm => vm.SearchText)
                             .Select(text =>
                             {
@@ -74,15 +82,12 @@ namespace TailBlazer.Views
                                 return text.Length < 3 ? "Enter at least 3 characters" : "Filter applied";
                             }).ForBinding();
 
+            //User feedback to show a search is under way
+            SearchIsInProgess = tailer.IsSearching.ForBinding();
+
+            //Only highlight search text when at least 3 letters have been entered
             ShouldHightlightMatchingText = this.WhenValueChanged(vm => vm.SearchText)
                 .Select(searchText => !string.IsNullOrEmpty(searchText) && searchText.Length >= 3)
-                .ForBinding();
-            
-            SearchIsInProgess = tailer.IsSearching.ForBinding();
-            
-            FileSizeText = tailer.FileSize
-                .Select(size=> size.FormatWithAbbreviation())
-                .DistinctUntilChanged()
                 .ForBinding();
 
             //load lines into observable collection
@@ -112,13 +117,9 @@ namespace TailBlazer.Views
                 SearchHint,
                 ShouldHightlightMatchingText,
                 SearchIsInProgess,
-                Disposable.Create(() =>
-                {
-                    _userScrollRequested.OnCompleted();
-                }));
+                Disposable.Create(_userScrollRequested.OnCompleted));
         }
-
-
+        
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
         {
             if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));
@@ -126,7 +127,7 @@ namespace TailBlazer.Views
 
             /*
                 I need to get rid of this subject as I prefer functional over imperative. 
-                However due to complexities between the interactions with the VirtualScrollPanel
+                However due to complexities int the interactions with the VirtualScrollPanel,
                 each time I have tried to remove it all hell has broken loose
             */
             _userScrollRequested.OnNext(new ScrollRequest(mode, boundsArgs.PageSize,boundsArgs.FirstIndex));
@@ -165,7 +166,6 @@ namespace TailBlazer.Views
             set { SetAndRaise(ref _firstIndex, value); }
         }
         
-
         public void Dispose()
         {
             _cleanUp.Dispose();
