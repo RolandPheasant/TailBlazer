@@ -24,7 +24,7 @@ namespace TailBlazer.Domain.FileHandling
             Index = index;
             Start = startPosition;
             End = endPosition;
-            Offset = -1;
+            Offset = 0;
             Type= LineIndexType.Absolute;
         }
 
@@ -79,6 +79,9 @@ namespace TailBlazer.Domain.FileHandling
 
         public override string ToString()
         {
+            if (Type== LineIndexType.Relative)
+                return $"{Index} ({Line}) {Start}+{Offset}";
+
             return $"{Index} ({Line}) {Start}->{End}, {Size}b";
         }
     }

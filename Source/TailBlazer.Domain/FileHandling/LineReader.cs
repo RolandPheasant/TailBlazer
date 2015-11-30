@@ -56,9 +56,7 @@ namespace TailBlazer.Domain.FileHandling
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
                 stream.Seek(0, SeekOrigin.Begin);
-                // fast forward to our starting point
-
-               
+          
                 using (var reader = new StreamReaderExtended(stream, encoding,false))
                 {
 
@@ -76,11 +74,15 @@ namespace TailBlazer.Domain.FileHandling
                             if (!isContinuous)
                             {
                                 reader.DiscardBufferedData();
-                                stream.Seek(first.Start, SeekOrigin.Begin);
-                                
-                                //skip number of lines offset
-                                for (int i = 0; i < index.Offset; i++)
-                                    reader.ReadLine();
+                                stream.Seek(index.Start, SeekOrigin.Begin);
+
+                                if (index.Offset > 0)
+                                {
+                                    //skip number of lines offset
+                                    for (int i = 0; i < index.Offset; i++)
+                                        reader.ReadLine();
+                                }
+
                             }
 
                             var line = reader.ReadLine();

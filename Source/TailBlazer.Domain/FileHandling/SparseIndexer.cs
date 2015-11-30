@@ -49,7 +49,7 @@ namespace TailBlazer.Domain.FileHandling
 
             //1. Get  full length of file
             var startScanningAt = (int)Math.Max(0, info.Length - tailSize);
-            _endOfFile = (int)info.FindNextEndOfLinePosition(startScanningAt);
+            _endOfFile = startScanningAt==0 ? 0 : (int)info.FindNextEndOfLinePosition(startScanningAt);
             
 
             //2. Scan the tail [TODO: put _endOfFile into observable]
@@ -76,13 +76,15 @@ namespace TailBlazer.Domain.FileHandling
                     _indicies.Edit(innerList =>
                     {
                         var existing = innerList.FirstOrDefault(si => si.Type == SpareIndexType.Tail);
-                        if (existing != null) _indicies.Remove(existing);
-                        _indicies.Add(tail);
+                        if (existing != null) innerList.Remove(existing);
+                        innerList.Add(tail);
                     });
                 });
 
             ////4. Scan the remainder of the file when the tail has been scanned
-            var headSubscriber = tailScanner.FirstAsync()
+            var headSubscriber = _endOfFile==0 
+                ? Disposable.Empty
+                : tailScanner.FirstAsync()
                 .Synchronize(locker)
                 .Subscribe(tail =>
                 {
@@ -95,16 +97,6 @@ namespace TailBlazer.Domain.FileHandling
                         var actual = Scan(0, tail.Start, compression);
                         _indicies.Edit(innerList =>
                         {
-                            //check for overlapping index
-                            if (actual.End > tail.Start)
-                            {
-                                //we have an over lapping index
-                                //in this case we need to remove first entry from the head
-                                var newTail = new SparseIndex(actual.End, tail.End, tail.Indicies.Skip(1).ToArray(), 1, tail.LineCount-1, SpareIndexType.Tail);
-                                innerList.Remove(tail);
-                                innerList.Add(newTail);
-                            }
-                            
                             innerList.Remove(estimate);
                             innerList.Add(actual);
                         });

@@ -60,7 +60,7 @@ namespace TailBlazer.Domain.FileHandling
                             .Replay(1).RefCount();
             
             var indexer = fileWatcher
-                            .Index()
+                            .IndexSparsely()
                            // .ObserveLatestOn(scheduler)
                             .Synchronize(locker)
                             .Replay(1).RefCount();
@@ -98,7 +98,7 @@ namespace TailBlazer.Domain.FileHandling
                     //finally we can load the line from the file
                     var newLines =  file.ReadLine(added, (lineIndex, text) =>
                     {
-                        var isEndOfTail = indicies.ChangedReason != LinesChangedReason.Loaded && lineIndex.Line > indicies.TailStartsAt;
+                        var isEndOfTail = indicies.ChangedReason == LinesChangedReason.Tailed && lineIndex.Line > indicies.TailStartsAt;
 
                         return new Line(lineIndex, text, isEndOfTail ? DateTime.Now : (DateTime?) null);
                     }, indicies.Encoding).ToArray();

@@ -35,14 +35,11 @@ namespace TailBlazer.Domain.FileHandling
             else
             {
                 var mostRecent = latest.OrderByDescending(l => l.TimeStamp).First();
-
-                if (mostRecent.Type== SpareIndexType.Tail)
-                //check which notificaion has changed
                 ChangedReason = mostRecent.Type == SpareIndexType.Tail
                                 ? LinesChangedReason.Tailed
                                 : LinesChangedReason.Paged;
 
-                TailStartsAt = previous.TailStartsAt;
+                TailStartsAt = previous.Count-1;
 
             }
         }
@@ -68,10 +65,10 @@ namespace TailBlazer.Domain.FileHandling
             if (!page.HasValue) yield break;
 
             var element = page.Value;
-            var relativePosition = (element.Element - element.FirstLine);
-            var index = relativePosition/element.Index.Compression;
-            var offset = relativePosition%element.Index.Compression;
-            var start = index==0 ? 0 : element.Index.Indicies[index-1];
+            var relativePosition = (element.Index - element.FirstLine);
+            var index = relativePosition/element.SparseIndex.Compression;
+            var offset = relativePosition%element.SparseIndex.Compression;
+            var start = index==0 ? 0 : element.SparseIndex.Indicies[index-1];
 
 
             foreach (var i in Enumerable.Range(first, Math.Min(size, Count)))
@@ -100,14 +97,14 @@ namespace TailBlazer.Domain.FileHandling
 
         private class IndexedContainer
         {
-            public int Element { get; }
-            public SparseIndex Index { get; }
+            public int Index { get; }
+            public SparseIndex SparseIndex { get; }
             public int FirstLine { get; }
 
-            public IndexedContainer(int element, SparseIndex index, int firstLine)
+            public IndexedContainer(int index, SparseIndex sparseIndex, int firstLine)
             {
-                Element = element;
                 Index = index;
+                SparseIndex = sparseIndex;
                 FirstLine = firstLine;
             }
         }
@@ -133,18 +130,27 @@ namespace TailBlazer.Domain.FileHandling
 
             int i = 0;
 
-            throw new NotImplementedException();
-            //foreach (var index in allMatched)
-            //{
-            //    if (index >= matches.Count) continue;
-            //    var line = matches.Lines[index];
 
-            //    if (line >= Count - 1) continue;
-            //    var start = line == 0 ? 0 : Lines[line - 1];
-            //    var end = Lines[line] - 1;
-            //    yield return new LineIndex(line, i + first, start, end);
-            //    i++;
-            //}
+            foreach (var item in allMatched)
+            {
+                if (item >= matches.Count) continue;
+                var line = matches.Lines[item];
+
+                if (line>=Count-1) continue;
+
+                var page = FindPage(line);
+                if (!page.HasValue) yield break;
+
+                var element = page.Value;
+                var relativePosition = (element.Index - element.FirstLine);
+                var index = relativePosition / element.SparseIndex.Compression;
+
+                var offset = relativePosition % element.SparseIndex.Compression;
+                var start = index == 0 ? 0 : element.SparseIndex.Indicies[index - 1];
+
+                yield return new LineIndex(line, i + first, start, offset);
+                i++;
+            }
         }
     }
 }
