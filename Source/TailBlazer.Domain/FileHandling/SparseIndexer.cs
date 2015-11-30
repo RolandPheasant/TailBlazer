@@ -12,6 +12,19 @@ using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
 {
+    /*
+        This class is attempt #1 to sparsely index the line numbers in a file.
+
+        It aims to:
+
+           1. Enable quick access to any specified line in a file
+           2. Index according to a compression rate i.e. no need to index every line [less memory]
+           3. Dynamically resize head / middle / tail index containers as file grows [Future refactor]
+           4. Ensure Tail is initally small and can be returned to the consumer very quickly
+
+            An alternative solution to what I got now is to do a triple index (as per point 3).
+            In doing so it would make the rx easier and get rid of the need for the observable list
+      */
     public class SparseIndexer: IDisposable
     {
         private readonly IDisposable _cleanUp;
@@ -28,7 +41,6 @@ namespace TailBlazer.Domain.FileHandling
             IObservable<Unit> refresher,
             int compression = 10,
             int tailSize = 1000000,
-            int pageSize = 1000000,
             Encoding encoding = null,
             IScheduler scheduler = null)
         {
@@ -51,7 +63,6 @@ namespace TailBlazer.Domain.FileHandling
             var startScanningAt = (int)Math.Max(0, info.Length - tailSize);
             _endOfFile = startScanningAt==0 ? 0 : (int)info.FindNextEndOfLinePosition(startScanningAt);
             
-
             //2. Scan the tail [TODO: put _endOfFile into observable]
             var tailScanner = refresher
                 .StartWith(Unit.Default)

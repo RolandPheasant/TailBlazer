@@ -96,7 +96,7 @@ namespace TailBlazer.Views
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy.Number))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)
-                .Subscribe(changes => logger.Info($"Rows changed {changes.Adds} adds, {changes.Removes} removed"), 
+                .Subscribe(changes => logger.Info($"Rows changed. {changes.Adds} adds, {changes.Removes} removed"), 
                             ex => logger.Error(ex, "There is a problem with bind data"));
             
             //monitor matching lines and start index,

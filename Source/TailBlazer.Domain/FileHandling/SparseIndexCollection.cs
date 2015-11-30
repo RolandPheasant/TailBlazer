@@ -38,7 +38,6 @@ namespace TailBlazer.Domain.FileHandling
                                 : LinesChangedReason.Paged;
 
                 TailStartsAt = previous.Count-1;
-
             }
         }
 
@@ -87,8 +86,6 @@ namespace TailBlazer.Domain.FileHandling
             var allMatched = Enumerable.Range(Math.Max(first, 0), Math.Min(size, matches.Count));
 
             int i = 0;
-
-
             foreach (var item in allMatched)
             {
                 if (item >= matches.Count) continue;
@@ -102,7 +99,7 @@ namespace TailBlazer.Domain.FileHandling
             }
         }
 
-        private RelativeIndex CalculateRelativeIndex(int i)
+        private RelativeIndex CalculateRelativeIndex(int index)
         {
             int firstLineInContainer = 0;
             int lastLineInContainer = 0;
@@ -110,14 +107,26 @@ namespace TailBlazer.Domain.FileHandling
             foreach (var sparseIndex in Indicies)
             {
                 lastLineInContainer += sparseIndex.LineCount;
-                if (i < lastLineInContainer)
+                if (index < lastLineInContainer)
                 {
-                    var relativePosition = (i - firstLineInContainer);
+                    //It could be that the user is scrolling into a part of the file
+                    //which is still being indexed. 
+                    //In this case we need to estimate where to scroll to
+                    if (sparseIndex.LineCount != 0 && sparseIndex.Indicies.Length == 0)
+                    {
+                        //return estimate here!
+                        var lines = sparseIndex.LineCount;
+                        var bytes = sparseIndex.End - sparseIndex.Start;
+                        var bytesPerLine = bytes/lines;
+                        var estimate = index*bytesPerLine;
+                        return new RelativeIndex(index, estimate, 0);
+                    }
 
-                    var index = relativePosition / sparseIndex.Compression;
+                    var relativePosition = (index - firstLineInContainer);
+                    var relativeIndex = relativePosition / sparseIndex.Compression;
                     var offset = relativePosition % sparseIndex.Compression;
-                    var start = index == 0 ? 0 : sparseIndex.Indicies[index - 1];
-                    return new RelativeIndex(i, start, offset);
+                    var start = relativeIndex == 0 ? 0 : sparseIndex.Indicies[relativeIndex - 1];
+                    return new RelativeIndex(index, start, offset);
                 }
                 firstLineInContainer = firstLineInContainer + sparseIndex.LineCount;
             }
