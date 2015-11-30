@@ -18,7 +18,7 @@ namespace TailBlazer.Fixtures
 
             var indexer = new LineIndexer(info);
             var indexed = indexer.ReadToEnd().ToArray();
-            var indicies = new LineIndicies(indexed, indexer.Encoding);
+            var indicies = new LineIndexCollection(indexed, indexer.Encoding);
 
 
 

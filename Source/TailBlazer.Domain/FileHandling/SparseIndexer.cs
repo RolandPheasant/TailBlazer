@@ -12,6 +12,19 @@ using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
 {
+    /*
+        This class is attempt #1 to sparsely index the line numbers in a file.
+
+        It aims to:
+
+           1. Enable quick access to any specified line in a file
+           2. Index according to a compression rate i.e. no need to index every line [less memory]
+           3. Dynamically resize head / middle / tail index containers as file grows [Future refactor]
+           4. Ensure Tail is initally small and can be returned to the consumer very quickly
+
+            An alternative solution to what I got now is to do a triple index (as per point 3).
+            In doing so it would make the rx easier and get rid of the need for the observable list
+      */
     public class SparseIndexer: IDisposable
     {
         private readonly IDisposable _cleanUp;
@@ -22,15 +35,12 @@ namespace TailBlazer.Domain.FileHandling
         public FileInfo Info { get; }
         public int Compression { get;  }
         public int TailSize { get;  }
-
-        public IObservable<SparseIndicies> Result { get; }
-
-
+        public IObservable<SparseIndexCollection> Result { get; }
+        
         public SparseIndexer([NotNull] FileInfo info,
             IObservable<Unit> refresher,
             int compression = 10,
-            int tailSize = 100000,
-            int pageSize = 1000000,
+            int tailSize = 1000000,
             Encoding encoding = null,
             IScheduler scheduler = null)
         {
@@ -47,50 +57,55 @@ namespace TailBlazer.Domain.FileHandling
                 .Connect()
                 .Sort(SortExpressionComparer<SparseIndex>.Ascending(si => si.Start))
                 .ToCollection()
-                .Scan((SparseIndicies)null, (previous, notification) => new SparseIndicies(notification, previous, Encoding));
+                .Scan((SparseIndexCollection)null, (previous, notification) => new SparseIndexCollection(notification, previous, Encoding));
 
-
-            //1. Get  full length of file
+            //1. Calculate at which point the tail of the file is
             var startScanningAt = (int)Math.Max(0, info.Length - tailSize);
-            _endOfFile = startScanningAt;
-
+            _endOfFile = startScanningAt==0 ? 0 : (int)info.FindNextEndOfLinePosition(startScanningAt);
+            
             //2. Scan the tail [TODO: put _endOfFile into observable]
             var tailScanner = refresher
                 .StartWith(Unit.Default)
                 .Select(_ => ScanTail(_endOfFile))
                 .Where(tail => tail != null)
-                .Scan((SparseIndex) null, (previous, latest) =>
+                .Select(tail =>
                 {
-                    return previous == null ? latest : new SparseIndex(latest, previous);
+                    //cannot use scan because reading head may update the last head
+                    var previous = _indicies.Items.FirstOrDefault(si => si.Type == IndexType.Tail);
+                    return previous == null ? tail : new SparseIndex(tail, previous);
                 })
                 .Do(index=> _endOfFile= index.End)
                 .Publish();
 
+            var locker = new object();
 
             //3. Scan tail when we have the first result from the head
             var tailSubscriber = tailScanner
-               
+                .Synchronize(locker)
                 .Subscribe(tail =>
                 {
                     _indicies.Edit(innerList =>
                     {
-                        var existing = innerList.FirstOrDefault(si => si.Type == SpareIndexType.Tail);
-                        if (existing != null) _indicies.Remove(existing);
-                        _indicies.Add(tail);
+                        var existing = innerList.FirstOrDefault(si => si.Type == IndexType.Tail);
+                        if (existing != null) innerList.Remove(existing);
+                        innerList.Add(tail);
                     });
                 });
 
-            ////3. Scan the remainder of the file when the tail has been scanned
-            var headSubscriber = tailScanner.FirstAsync()
-                .Subscribe(head =>
+            ////4. Scan the remainder of the file when the tail has been scanned
+            var headSubscriber = _endOfFile==0 
+                ? Disposable.Empty
+                : tailScanner.FirstAsync()
+                .Synchronize(locker)
+                .Subscribe(tail =>
                 {
-                    var estimateLines = EstimateNumberOfLines(head, info);
-                    var estimate = new SparseIndex(0, head.Start, compression, estimateLines, SpareIndexType.Page);
+                    var estimateLines = EstimateNumberOfLines(tail, info);
+                    var estimate = new SparseIndex(0, tail.Start, compression, estimateLines, IndexType.Page);
                     _indicies.Add(estimate);
 
                     scheduler.Schedule(() =>
                     {
-                        var actual = Scan(0, head.Start, compression);
+                        var actual = Scan(0, tail.Start, compression);
                         _indicies.Edit(innerList =>
                         {
                             innerList.Remove(estimate);
@@ -138,11 +153,7 @@ namespace TailBlazer.Domain.FileHandling
 
                     }).ToArray();
                 }
-                if (lastPosition > end)
-                {
-                    //we have an overlapping line [must remove the last one from the head]
-                }
-                return new SparseIndex(start, lastPosition, lines, compression, count, end==-1 ? SpareIndexType.Tail : SpareIndexType.Page);
+                return new SparseIndex(start, lastPosition, lines, compression, count, end==-1 ? IndexType.Tail : IndexType.Page);
             }
         }
 

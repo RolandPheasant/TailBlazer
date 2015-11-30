@@ -14,7 +14,6 @@ namespace TailBlazer.Domain.FileHandling
     public class FileTailer: IDisposable
     {
         private readonly IDisposable _cleanUp;
-
         public IObservable<int> TotalLines { get;  }
         public IObservable<int> MatchedLines { get; }
         public IObservable<long> FileSize { get; }
@@ -55,19 +54,16 @@ namespace TailBlazer.Domain.FileHandling
             }).Switch()
             .Synchronize(locker)
             .Replay(1).RefCount();
-
-
+            
             var fileWatcher = file.WatchFile(scheduler: scheduler)
                             .TakeWhile(notification => notification.Exists).Repeat()
                             .Replay(1).RefCount();
             
             var indexer = fileWatcher
-                            .Index()
-                           // .ObserveLatestOn(scheduler)
+                            .IndexSparsely()
                             .Synchronize(locker)
                             .Replay(1).RefCount();
-
-
+            
             IsLoading = indexer.Take(1).Select(_=>false).StartWith(true);
 
             //count matching lines (all if no filter is specified)
@@ -100,7 +96,8 @@ namespace TailBlazer.Domain.FileHandling
                     //finally we can load the line from the file
                     var newLines =  file.ReadLine(added, (lineIndex, text) =>
                     {
-                        var isEndOfTail = indicies.ChangedReason != LinesChangedReason.Loaded && lineIndex.Line > indicies.TailStartsAt;
+                        var isEndOfTail = indicies.ChangedReason == LinesChangedReason.Tailed 
+                                                    && lineIndex.Line > indicies.TailStartsAt;
 
                         return new Line(lineIndex, text, isEndOfTail ? DateTime.Now : (DateTime?) null);
                     }, indicies.Encoding).ToArray();
@@ -131,9 +128,9 @@ namespace TailBlazer.Domain.FileHandling
         {
             public ScrollRequest Scroll { get;  }
             public LineMatches MatchedLines { get;  }
-            public LineIndicies Incidies { get;  }
+            public IIndexCollection Incidies { get;  }
 
-            public CombinedResult(ScrollRequest scroll, LineMatches matchedLines, LineIndicies incidies)
+            public CombinedResult(ScrollRequest scroll, LineMatches matchedLines, IIndexCollection incidies)
             {
                 Scroll = scroll;
                 MatchedLines = matchedLines;

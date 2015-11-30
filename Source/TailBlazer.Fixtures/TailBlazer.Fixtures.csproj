@@ -97,7 +97,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SparseInders.cs" />
+    <Compile Include="SparseIndexerFixture.cs" />
     <Compile Include="FileScanFixture.cs" />
     <Compile Include="FileTailerFixture.cs" />
     <Compile Include="FileWatchFixture.cs" />

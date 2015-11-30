@@ -148,5 +148,23 @@ namespace TailBlazer.Fixtures
             }
          
         }
+
+        [Fact]
+        public void AnEmptyFileDoesNotBomb()
+        {
+            var file = Path.GetTempFileName();
+            var info = new FileInfo(file);
+            var scheduler = new TestScheduler();
+            var textMatch = Observable.Return((string)null);
+            var autoTailer = Observable.Return(new ScrollRequest(10));
+            
+            using (var tailer = new FileTailer(info, textMatch, autoTailer, new NullLogger(), scheduler))
+            {
+                scheduler.AdvanceBySeconds(1);
+                File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
+                scheduler.AdvanceBySeconds(1);
+                tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(Enumerable.Range(91, 10));
+            }
+        }
     }
 }

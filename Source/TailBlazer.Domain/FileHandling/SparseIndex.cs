@@ -3,12 +3,6 @@ using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public enum SpareIndexType
-    {
-        Tail,
-        Page
-    }
-
     public class SparseIndex
     {
         public int Start { get; }
@@ -18,13 +12,13 @@ namespace TailBlazer.Domain.FileHandling
         public int LineCount { get; }
         public int IndexCount => Indicies.Length;
 
-        public SpareIndexType Type { get; }
+        public IndexType Type { get; }
 
         public int Size => End - Start;
 
         public DateTime TimeStamp { get; } = DateTime.Now;
 
-        public SparseIndex(int start, int end, int[] indicies, int compression, int lineCount, SpareIndexType type)
+        public SparseIndex(int start, int end, int[] indicies, int compression, int lineCount, IndexType type)
         {
             Start = start;
             End = end;
@@ -35,7 +29,7 @@ namespace TailBlazer.Domain.FileHandling
         }
         
 
-        public SparseIndex(int start, int end,  int compression, int lineCount, SpareIndexType type)
+        public SparseIndex(int start, int end,  int compression, int lineCount, IndexType type)
         {
             Start = start;
             End = end;

@@ -30,6 +30,10 @@ namespace TailBlazer.Domain.Settings
             //write the version [should be an attribute]
             //write for the  version [should be an Element]
 
+            //new StringWriter()
+            //new XMLTextWriter()
+            //writer.writeelement()
+
             throw new NotImplementedException();
 
         }

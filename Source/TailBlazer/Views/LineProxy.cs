@@ -5,17 +5,18 @@ namespace TailBlazer.Views
 {
     public class LineProxy
     {
-        private readonly Line _line;
+        public Line Line { get; }
+        public int Number => Line.Number;
+        public string Text => Line.Text;
+        public bool IsRecent { get; }
 
         public LineProxy(Line line)
         {
-            _line = line;
+            Line = line;
             IsRecent = line.Timestamp.HasValue && DateTime.Now.Subtract(line.Timestamp.Value).TotalSeconds < 2;
         }
 
-        public int Number => _line.Number;
-        public string Text => _line.Text;
 
-        public bool IsRecent { get; }
+  
     }
 }

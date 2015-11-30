@@ -2,38 +2,48 @@ using System;
 
 namespace TailBlazer.Domain.FileHandling
 {
+    public enum LineIndexType
+    {
+        Absolute,
+        Relative
+    }
+
     public struct LineIndex : IEquatable<LineIndex>
     {
-        private readonly int _line;
-        private readonly int _index;
-        private readonly long _startPosition;
-        private readonly long _endPosition;
+        public int Line { get; }
+        public int Index { get; }
+        public long Start { get; }
+        public long End { get; }
+        public long Size => End - Start;
+        public int Offset { get; }
 
+        public LineIndexType Type { get; }
         public LineIndex(int line, int index, long startPosition, long endPosition)
         {
-            _line = line;
-            _index = index;
-            _startPosition = startPosition;
-            _endPosition = endPosition;
+            Line = line;
+            Index = index;
+            Start = startPosition;
+            End = endPosition;
+            Offset = 0;
+            Type= LineIndexType.Absolute;
         }
 
-        public int Line => _line;
-
-        public int Index => _index;
-
-        public long Start => _startPosition;
-
-        public long End => _endPosition;
-
-        public long Size => _endPosition - _startPosition;
-
+        public LineIndex(int line, int index, long startPosition, int offset)
+        {
+            Line = line;
+            Index = index;
+            Start = startPosition;
+            End = -1;
+            Offset = offset;
+            Type= LineIndexType.Relative;
+        }
 
 
         #region Equality
 
         public bool Equals(LineIndex other)
         {
-            return _line == other._line && _index == other._index;
+            return Line == other.Line && Index == other.Index && Start == other.Start && End == other.End && Offset == other.Offset;
         }
 
         public override bool Equals(object obj)
@@ -46,7 +56,12 @@ namespace TailBlazer.Domain.FileHandling
         {
             unchecked
             {
-                return (_line*397) ^ _index;
+                var hashCode = Line;
+                hashCode = (hashCode*397) ^ Index;
+                hashCode = (hashCode*397) ^ Start.GetHashCode();
+                hashCode = (hashCode*397) ^ End.GetHashCode();
+                hashCode = (hashCode*397) ^ Offset;
+                return hashCode;
             }
         }
 
@@ -64,7 +79,10 @@ namespace TailBlazer.Domain.FileHandling
 
         public override string ToString()
         {
-            return $"{Line} (index={Index})";
+            if (Type== LineIndexType.Relative)
+                return $"{Index} ({Line}) {Start}+{Offset}";
+
+            return $"{Index} ({Line}) {Start}->{End}, {Size}b";
         }
     }
 }

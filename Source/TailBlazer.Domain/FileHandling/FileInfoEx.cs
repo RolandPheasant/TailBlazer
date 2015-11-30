@@ -55,8 +55,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             return Observable.Create<FileNotification>(observer =>
             {
-                //TODO: create a cool-off period after a poll to account for over running jobs
-                Func<IObservable<FileNotification>> poller = () => pulse.StartWith(Unit.Default)
+                 Func<IObservable<FileNotification>> poller = () => pulse.StartWith(Unit.Default)
 
                     .Scan((FileNotification)null, (state, _) => state == null
                        ? new FileNotification(file)
@@ -80,23 +79,23 @@ namespace TailBlazer.Domain.FileHandling
         /// </summary>
         /// <param name="source">The source.</param>
         /// <returns></returns>
-        public static IObservable<LineIndicies> Index(this IObservable<FileNotification> source)
+        public static IObservable<IIndexCollection> Index(this IObservable<FileNotification> source)
         {
             return source
                  .Where(n => n.NotificationType == FileNotificationType.Created)
                  .Select(createdNotification =>
                  {
-                     return Observable.Create<LineIndicies>(observer =>
+                     return Observable.Create<LineIndexCollection>(observer =>
                      {
                          var indexer = new LineIndexer((FileInfo) createdNotification);
 
                          var notifier = source
                              .Where(n => n.NotificationType == FileNotificationType.Changed)
                              .StartWith(createdNotification)
-                             .Scan((LineIndicies) null, (state, notification) =>
+                             .Scan((LineIndexCollection) null, (state, notification) =>
                              {
                                  var lines = indexer.ReadToEnd().ToArray();
-                                 return new LineIndicies(lines, indexer.Encoding,  state);
+                                 return new LineIndexCollection(lines, indexer.Encoding,  state);
                              })
                              .SubscribeSafe(observer);
 
@@ -105,22 +104,20 @@ namespace TailBlazer.Domain.FileHandling
                  }).Switch();
         }
 
-        public static IObservable<SparseIndicies> IndexSparsely(this IObservable<FileNotification> source)
+        public static IObservable<IIndexCollection> IndexSparsely(this IObservable<FileNotification> source)
         {
             return source
                  .Where(n => n.NotificationType == FileNotificationType.Created)
                  .Select(createdNotification =>
                  {
-                     return Observable.Create<SparseIndicies>(observer =>
+                     return Observable.Create<SparseIndexCollection>(observer =>
                      {
                          var refresher = source
                              .Where(n => n.NotificationType == FileNotificationType.Changed)
                              .ToUnit();
 
                          var indexer = new SparseIndexer((FileInfo)createdNotification, refresher);
-
                          var notifier =indexer.Result.SubscribeSafe(observer);
-
                          return new CompositeDisposable(indexer, notifier);
                      });
                  }).Switch();
@@ -176,6 +173,20 @@ namespace TailBlazer.Domain.FileHandling
                         if (lines.Contains(position))
                             yield return new Line(position,line, isEndOfTail==null ? null :(isEndOfTail(position)? DateTime.Now : (DateTime?)null));
                     }
+                }
+            }
+        }
+
+        public static long FindNextEndOfLinePosition(this FileInfo source, long initialPosition)
+        {
+            using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            {
+                stream.Seek(initialPosition, SeekOrigin.Begin);
+                using (var reader = new StreamReaderExtended(stream, Encoding.Default, true))
+                {
+                    if (reader.EndOfStream) return -1;
+                    reader.ReadLine();
+                    return reader.AbsolutePosition();
                 }
             }
         }

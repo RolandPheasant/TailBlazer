@@ -4,6 +4,6 @@
     {
         Loaded,
         Tailed,
-        Indexed 
+        Paged 
     }
 }
