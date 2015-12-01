@@ -104,6 +104,23 @@ namespace TailBlazer.Domain.FileHandling
                  }).Switch();
         }
 
+        public static IObservable<FileSegments> WithSegments(this IObservable<FileNotification> source)
+        {
+            return source
+                 .Where(n => n.NotificationType == FileNotificationType.Created)
+                 .Select(createdNotification =>
+                 {
+                     return Observable.Create<FileSegments>(observer =>
+                     {
+                         var refresher = source
+                             .Where(n => n.NotificationType == FileNotificationType.Changed)
+                             .ToUnit();
+
+                         var indexer = new FileSegmenter((FileInfo)createdNotification, refresher);
+                         return indexer.Segments.SubscribeSafe(observer);
+                     });
+                 }).Switch();
+        }
         public static IObservable<IIndexCollection> IndexSparsely(this IObservable<FileNotification> source)
         {
             return source
@@ -188,6 +205,14 @@ namespace TailBlazer.Domain.FileHandling
                     reader.ReadLine();
                     return reader.AbsolutePosition();
                 }
+            }
+        }
+
+        public static long GetFileLength(this FileInfo source)
+        {
+            using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            {
+                return stream.Length;
             }
         }
     }

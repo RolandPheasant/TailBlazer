@@ -1,39 +1,54 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reactive.Disposables;
-using DynamicData;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public sealed class FileSegmenter: IDisposable
+    /*
+        Dynamically split the file into manageable chunks.
+
+        Should resize as files grow [Not implemented yet]
+
+        This is very useful for 
+        i) partitioned searching
+        ii) specific moonitoring of the head
+        iii) fast loading of initial file
+    */
+
+    public sealed class FileSegmenter
     {
         private readonly FileInfo _info;
         private readonly int _initialTail;
         private readonly int _tailSize;
         private readonly int _segmentSize;
-        //dynamically split the file into segments according to the size of file.
-        //as the file size changes, allow these segments to dynamically resize
 
-       //additionally seperately  monitor the head of the file??
-       
-       //this is very useful for parallelising searches searches.
-       private readonly IObservableCache<FileSegment,int> _cache = new SourceCache<FileSegment, int>(fs=>fs.Index);
-
-        private IDisposable _cleanup;
+        public IObservable<FileSegments> Segments { get; }
 
         public FileSegmenter(FileInfo info,
+                                IObservable<Unit> refresher, 
                                 int initialTail= 10000, 
                                 int tailSize = 10000000,
                                 int segmentSize=25000000)
         {
+            if (refresher == null) throw new ArgumentNullException(nameof(refresher));
             _info = info;
             _initialTail = initialTail;
             _tailSize = tailSize;
             _segmentSize = segmentSize;
-            //calculate 
+ 
+            Segments = refresher.StartWithUnit()
+                .Scan((FileSegments) null, (previous, current) =>
+                {
+                    if (previous==null)
+                        return new FileSegments(LoadSegments().ToArray());
 
-            _cleanup = new CompositeDisposable(_cache);
+                    var newLength = info.GetFileLength();
+                    return new FileSegments(newLength, previous);
+                });
         }
 
         public IEnumerable<FileSegment> LoadSegments()
@@ -51,9 +66,7 @@ namespace TailBlazer.Domain.FileHandling
                 yield break;
             }
 
-            var headStartsAt = _info.FindNextEndOfLinePosition(_initialTail);
-
-
+            var headStartsAt = _info.FindNextEndOfLinePosition(fileLength -_initialTail);
             long currentEnfOfPage = 0;
             long previousEndOfPage = 0;
 
@@ -79,9 +92,5 @@ namespace TailBlazer.Domain.FileHandling
             yield return new FileSegment(index, headStartsAt, fileLength, FileSegmentType.Head);
         }
 
-        public void Dispose()
-        {
-
-        }
     }
 }
