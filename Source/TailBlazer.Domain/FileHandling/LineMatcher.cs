@@ -27,9 +27,6 @@ namespace TailBlazer.Domain.FileHandling
 
             _stream = File.Open(info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite);
             _reader = new StreamReaderExtended(_stream, Encoding, true);
-
-            //TODO 1: Get current encoding from _reader.CurrentEncoding and expose so cusumers can read the lines with the same encoding
-            //TODO 2: Expose line delimiter length so it can be correctly removed from when re-reading a line
         }
 
         public IEnumerable<int> ScanToEnd()

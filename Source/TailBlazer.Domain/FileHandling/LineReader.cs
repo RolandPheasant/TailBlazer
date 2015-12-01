@@ -17,9 +17,6 @@ namespace TailBlazer.Domain.FileHandling
         {
 
             int i = 0;
-
-        
-
             if (source.EndOfStream) yield break;
 
             string line;
@@ -37,17 +34,34 @@ namespace TailBlazer.Domain.FileHandling
                 if (shouldBreak(line, position))
                     yield break;
             }
-
         }
 
-        
+        public static IEnumerable<T> SearchLines<T>(this StreamReaderExtended source,
+            Func<string, bool> predicate,
+            Func<int, T> selector,
+            Func<string, int, bool> shouldBreak)
+        {
+            if (source.EndOfStream) yield break;
+
+            string line;
+            while ((line = source.ReadLine()) != null)
+            {
+                var position = (int) source.AbsolutePosition();
+
+                if (predicate(line))
+                    yield return selector(position);
+
+                if (shouldBreak(line, position))
+                    yield break;
+            }
+        }
+
+
         public static IEnumerable<T> ReadLine<T>(this FileInfo source, IEnumerable<LineIndex> lines, Func<LineIndex, string, T> selector, Encoding encoding)
         {
             encoding = encoding ?? source.GetEncoding();
 
-      
             var indicies = lines.OrderBy(l => l.Index).ToArray();
-
             if (indicies.Length==0) yield break;
 
             var first = indicies[0];
@@ -82,7 +96,6 @@ namespace TailBlazer.Domain.FileHandling
                                     for (int i = 0; i < index.Offset; i++)
                                         reader.ReadLine();
                                 }
-
                             }
 
                             var line = reader.ReadLine();

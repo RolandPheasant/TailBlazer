@@ -63,6 +63,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileHandling\FileInfoEx.cs" />
+    <Compile Include="FileHandling\FileSearch.cs" />
+    <Compile Include="FileHandling\FileSearchResult.cs" />
+    <Compile Include="FileHandling\FileSegmenter.cs" />
     <Compile Include="FileHandling\FileTailerFactory.cs" />
     <Compile Include="FileHandling\IFileTailerFactory.cs" />
     <Compile Include="FileHandling\IIndexCollection.cs" />
@@ -74,7 +77,6 @@
     <Compile Include="FileHandling\LineIndexer.cs" />
     <Compile Include="FileHandling\FileNotification.cs" />
     <Compile Include="FileHandling\FileNotificationType.cs" />
-    <Compile Include="FileHandling\FileScanResult.cs" />
     <Compile Include="FileHandling\FileTailer.cs" />
     <Compile Include="FileHandling\LineIndex.cs" />
     <Compile Include="FileHandling\LineReader.cs" />

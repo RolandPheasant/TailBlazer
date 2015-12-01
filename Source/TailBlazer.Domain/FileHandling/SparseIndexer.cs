@@ -63,6 +63,9 @@ namespace TailBlazer.Domain.FileHandling
             var startScanningAt = (int)Math.Max(0, info.Length - tailSize);
             _endOfFile = startScanningAt==0 ? 0 : (int)info.FindNextEndOfLinePosition(startScanningAt);
             
+            if (Info.Length==0)
+                _indicies.Add(new SparseIndex(0,0,1,0, IndexType.Tail));
+
             //2. Scan the tail [TODO: put _endOfFile into observable]
             var tailScanner = refresher
                 .StartWith(Unit.Default)
