@@ -3,6 +3,7 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 
 namespace TailBlazer.Domain.Infrastructure
 {
@@ -55,6 +56,12 @@ namespace TailBlazer.Domain.Infrastructure
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             return source.StartWith(Unit.Default);
+        }
+
+        public static void Once(this ISubject<Unit> source)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            source.OnNext(Unit.Default);
         }
 
         public static IObservable<T> ObserveLatestOn<T>(this IObservable<T> source, IScheduler scheduler=null)

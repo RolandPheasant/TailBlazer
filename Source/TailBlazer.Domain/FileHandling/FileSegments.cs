@@ -12,6 +12,8 @@ namespace TailBlazer.Domain.FileHandling
 
         public FileSegment Tail => Segments[Count - 1];
 
+        public long FileLength => Tail.End;
+
         public FileSegments(FileSegment[] segments)
         {
             if (segments.Length == 0)
@@ -23,17 +25,15 @@ namespace TailBlazer.Domain.FileHandling
             Reason = FileSegmentChangedReason.Loaded;
         }
 
-
-
-
         public FileSegments(long newLength, FileSegments previous)
         {
             Reason = FileSegmentChangedReason.Tailed;
             var last = previous.Tail;
             Segments = previous.Segments;
+            Count = Segments.Length;
             Segments[Count-1] = new FileSegment(last, newLength);
             TailStartsAt = last.End;
-            Count = Segments.Length;
+
         }
     }
 }

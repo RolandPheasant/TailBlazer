@@ -23,24 +23,22 @@ namespace TailBlazer.Domain.FileHandling
     {
         private readonly FileInfo _info;
         private readonly int _initialTail;
-        private readonly int _tailSize;
         private readonly int _segmentSize;
 
         public IObservable<FileSegments> Segments { get; }
 
         public FileSegmenter(FileInfo info,
                                 IObservable<Unit> refresher, 
-                                int initialTail= 10000, 
-                                int tailSize = 10000000,
+                                int initialTail= 100000, 
                                 int segmentSize=25000000)
         {
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
             _info = info;
             _initialTail = initialTail;
-            _tailSize = tailSize;
             _segmentSize = segmentSize;
  
-            Segments = refresher.StartWithUnit()
+            Segments = refresher
+                //.StartWithUnit()
                 .Scan((FileSegments) null, (previous, current) =>
                 {
                     if (previous==null)
@@ -48,7 +46,7 @@ namespace TailBlazer.Domain.FileHandling
 
                     var newLength = info.GetFileLength();
                     return new FileSegments(newLength, previous);
-                });
+                }).Replay(1).RefCount();
         }
 
         public IEnumerable<FileSegment> LoadSegments()
@@ -89,7 +87,7 @@ namespace TailBlazer.Domain.FileHandling
 
 
             index ++;
-            yield return new FileSegment(index, headStartsAt, fileLength, FileSegmentType.Head);
+            yield return new FileSegment(index, headStartsAt, fileLength, FileSegmentType.Tail);
         }
 
     }

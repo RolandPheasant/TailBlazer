@@ -113,7 +113,9 @@ namespace TailBlazer.Domain.FileHandling
                      return Observable.Create<FileSegments>(observer =>
                      {
                          var refresher = source
+                            
                              .Where(n => n.NotificationType == FileNotificationType.Changed)
+                             .StartWith(createdNotification)
                              .ToUnit();
 
                          var indexer = new FileSegmenter((FileInfo)createdNotification, refresher);
