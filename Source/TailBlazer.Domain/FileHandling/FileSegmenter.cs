@@ -38,11 +38,11 @@ namespace TailBlazer.Domain.FileHandling
             _segmentSize = segmentSize;
  
             Segments = refresher
-                //.StartWithUnit()
+                .StartWithUnit()
                 .Scan((FileSegments) null, (previous, current) =>
                 {
                     if (previous==null)
-                        return new FileSegments(LoadSegments().ToArray());
+                        return new FileSegments(info, LoadSegments().ToArray());
 
                     var newLength = info.GetFileLength();
                     return new FileSegments(newLength, previous);
@@ -54,7 +54,7 @@ namespace TailBlazer.Domain.FileHandling
             var fileLength = _info.Length;
             if (fileLength == 0)
             {
-                yield return new FileSegment(0,0,0, FileSegmentType.Tail); 
+                yield return new FileSegment(0, 0,0, FileSegmentType.Tail); 
                 yield break;
             }
 
@@ -74,7 +74,7 @@ namespace TailBlazer.Domain.FileHandling
                 var approximateEndOfPage = currentEnfOfPage + _segmentSize;
                 if (approximateEndOfPage >= headStartsAt)
                 {
-                    yield return new FileSegment(index, previousEndOfPage,headStartsAt,FileSegmentType.Head);
+                    yield return new FileSegment( index, previousEndOfPage,headStartsAt,FileSegmentType.Head);
                     break;
                 }
                 currentEnfOfPage = _info.FindNextEndOfLinePosition(approximateEndOfPage);

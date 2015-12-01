@@ -123,6 +123,21 @@ namespace TailBlazer.Domain.FileHandling
                      });
                  }).Switch();
         }
+
+        public static IObservable<IIndexCollection> IndexSparsely(this IObservable<FileSegments> source)
+        {
+
+            return Observable.Create<SparseIndexCollection>(observer =>
+            {
+         
+
+
+                var indexer = new SparseIndexer2(source);
+                var notifier = indexer.Result.SubscribeSafe(observer);
+                return new CompositeDisposable(indexer, notifier);
+            });
+        }
+
         public static IObservable<IIndexCollection> IndexSparsely(this IObservable<FileNotification> source)
         {
             return source

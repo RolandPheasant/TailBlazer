@@ -63,7 +63,7 @@ namespace TailBlazer.Fixtures
                 result.Should().BeNull();
 
                 File.AppendAllLines(file,
-                    Enumerable.Range(1, 1000).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
+                    Enumerable.Range(1, 10000).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
                 refresher.Once();
 
                 result.Should().NotBeNull();
