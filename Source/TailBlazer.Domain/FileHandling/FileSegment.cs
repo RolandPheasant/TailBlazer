@@ -2,7 +2,7 @@ using System;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class FileSegment
+    public class FileSegment : IEquatable<FileSegment>
     {
         public int Index { get; }
         public long Start { get;  }
@@ -28,8 +28,20 @@ namespace TailBlazer.Domain.FileHandling
 
         #region Equality
 
-        protected bool Equals(FileSegment other)
+        public static bool operator ==(FileSegment left, FileSegment right)
         {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(FileSegment left, FileSegment right)
+        {
+            return !Equals(left, right);
+        }
+
+        public bool Equals(FileSegment other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
             return Index == other.Index && Start == other.Start && End == other.End && Type == other.Type;
         }
 

@@ -1,11 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using DynamicData;
 using DynamicData.Binding;
@@ -169,10 +169,10 @@ namespace TailBlazer.Domain.FileHandling
     public class SparseIndexer2 : IDisposable
     {
         private readonly IDisposable _cleanUp;
-        private long _endOfFile;
         private readonly ISourceList<SparseIndex> _indicies = new SourceList<SparseIndex>();
+     //   private readonly ISourceCache<FileSegment,int> _segments = new SourceCache<FileSegment, int>(segment=> segment.Index);
 
-        public Encoding Encoding { get; }
+        public Encoding Encoding { get; private set; }
         public FileInfo Info { get; private set; }
         public int Compression { get; }
         public int TailSize { get; }
@@ -185,14 +185,12 @@ namespace TailBlazer.Domain.FileHandling
             IScheduler scheduler = null)
         {
             if (fileSegments == null) throw new ArgumentNullException(nameof(fileSegments));
-            scheduler = scheduler ?? Scheduler.Default;
 
-       //     Info = info;
+            scheduler = scheduler ?? Scheduler.Default;
             Compression = compression;
             TailSize = tailSize;
-        //    Encoding = encoding ?? info.GetEncoding();
 
-            //0. create  a resulting index object from the collection of index fragments
+            //1. create  a resulting index object from the collection of index fragments
             Result = _indicies
                 .Connect()
                 .Sort(SortExpressionComparer<SparseIndex>.Ascending(si => si.Start))
@@ -201,93 +199,63 @@ namespace TailBlazer.Domain.FileHandling
 
             var shared = fileSegments.Publish();
 
+            //2. Get information from segment info
             var infoSubscriber = shared.Select(segments => segments.Info)
                 .Take(1)
-                .Subscribe(info => Info = info);
-
-            var tailSubscriber =
-                shared.Subscribe(segments =>
+                .Subscribe(info =>
                 {
-                    if (segments.Reason == FileSegmentChangedReason.Loaded)
+                    Info = info;
+                    Encoding = encoding ?? info.GetEncoding();
+                });
+            
+            //var changedSegments = _segments.Connect()
+            //                .IgnoreUpdateWhen((current, previous) => previous == current)
+            //                .Transform()
+            //                .AsObservableCache();
+
+          //  var loader = shared.Subscribe(segments=>_segments.AddOrUpdate(segments.Segments));
+
+
+            //3. Scan the tail so results can be returned quickly
+            var tailScanner= shared.Select(segments => segments.Tail).DistinctUntilChanged()
+                                    .ObserveOn(scheduler)
+                                    .Scan((SparseIndex)null, (previous, current) => Scan(previous?.End ?? current.Start, -1, 1))
+                                    .Publish();
+
+            //4. estimate =
+            var tailSubscriber = tailScanner.Subscribe(tail =>
+                                        {
+                                            _indicies.Edit(innerList =>
+                                            {
+                                                var existing = innerList.FirstOrDefault(si => si.Type == IndexType.Tail);
+                                                if (existing != null) innerList.Remove(existing);
+                                                innerList.Add(tail);
+                                            });
+                                        });
+
+
+            //Scan the remainer -> TODO: Scan segments, or just forget about line numbers
+            var headSubscriber = tailScanner.FirstAsync()
+                .Subscribe(tail =>
+                {
+                    //Need iterate one at a time through the 
+                    var estimateLines = EstimateNumberOfLines(tail, Info);
+                    var estimate = new SparseIndex(0, tail.Start, compression, estimateLines, IndexType.Page);
+                    _indicies.Add(estimate);
+
+                    scheduler.Schedule(() =>
                     {
-                        //first time load. Set up scan and count for all items
-                     
-                        
-                    
-                         //from here, can maintain collection   
-                    }
-                    else
-                    {
-                        //tailed
-                        // load latest head and refresh indicies
-
-                        //also check whether a new element has been added to the index container
-                  
-                    }
-
-
-
+                        var actual = Scan(0, tail.Start, compression);
+                        _indicies.Edit(innerList =>
+                        {
+                            innerList.Remove(estimate);
+                            innerList.Add(actual);
+                        });
+                    });
                 });
 
-            //1. Calculate at which point the tail of the file is
-            //var startScanningAt = (int)Math.Max(0, info.Length - tailSize);
-            //_endOfFile = startScanningAt == 0 ? 0 : (int)info.FindNextEndOfLinePosition(startScanningAt);
 
-            //if (Info.Length == 0)
-            //    _indicies.Add(new SparseIndex(0, 0, 1, 0, IndexType.Tail));
-
-            //2. Scan the tail [TODO: put _endOfFile into observable]
-            //var tailScanner = refresher
-            //    .StartWith(Unit.Default)
-            //    .Select(_ => ScanTail(_endOfFile))
-            //    .Where(tail => tail != null)
-            //    .Select(tail =>
-            //    {
-            //        //cannot use scan because reading head may update the last head
-            //        var previous = _indicies.Items.FirstOrDefault(si => si.Type == IndexType.Tail);
-            //        return previous == null ? tail : new SparseIndex(tail, previous);
-            //    })
-            //    .Do(index => _endOfFile = index.End)
-            //    .Publish();
-
-            //var locker = new object();
-
-            //3. Scan tail when we have the first result from the head
-            //var tailSubscriber = tailScanner
-            //    .Synchronize(locker)
-            //    .Subscribe(tail =>
-            //    {
-            //        _indicies.Edit(innerList =>
-            //        {
-            //            var existing = innerList.FirstOrDefault(si => si.Type == IndexType.Tail);
-            //            if (existing != null) innerList.Remove(existing);
-            //            innerList.Add(tail);
-            //        });
-            //    });
-
-            ////4. Scan the remainder of the file when the tail has been scanned
-            //var headSubscriber = _endOfFile == 0
-            //    ? Disposable.Empty
-            //    : tailScanner.FirstAsync()
-            //    .Synchronize(locker)
-            //    .Subscribe(tail =>
-            //    {
-            //        var estimateLines = EstimateNumberOfLines(tail, info);
-            //        var estimate = new SparseIndex(0, tail.Start, compression, estimateLines, IndexType.Page);
-            //        _indicies.Add(estimate);
-
-            //        scheduler.Schedule(() =>
-            //        {
-            //            var actual = Scan(0, tail.Start, compression);
-            //            _indicies.Edit(innerList =>
-            //            {
-            //                innerList.Remove(estimate);
-            //                innerList.Add(actual);
-            //            });
-            //        });
-            //    });
-
-            _cleanUp = new CompositeDisposable(infoSubscriber,_indicies, tailSubscriber, shared.Connect());
+            _cleanUp = new CompositeDisposable(infoSubscriber,_indicies, tailSubscriber, tailSubscriber, headSubscriber, tailScanner.Connect(), shared.Connect());
         }
 
         private int EstimateNumberOfLines(SparseIndex tail, FileInfo info)
@@ -298,15 +266,11 @@ namespace TailBlazer.Domain.FileHandling
             return (int)estimatedLines;
         }
 
-        //private SparseIndex ScanTail(long start)
-        //{
-        //    return Scan(start, -1, 1);
-        //}
-        private SparseIndex Scan(FileInfo info, long start, long end, int compression)
+        private SparseIndex Scan( long start, long end, int compression)
         {
             int count = 0;
             long lastPosition = 0;
-            using (var stream = File.Open(info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
                 long[] lines;
                 using (var reader = new StreamReaderExtended(stream, Encoding, false))

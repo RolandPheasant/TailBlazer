@@ -60,7 +60,7 @@ namespace TailBlazer.Fixtures
 
             using (var indexer = segmenter.Segments.Subscribe(segment => result = segment))
             {
-                result.Should().BeNull();
+                result.Should().NotBeNull();
 
                 File.AppendAllLines(file,
                     Enumerable.Range(1, 10000).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());

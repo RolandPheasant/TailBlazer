@@ -15,7 +15,7 @@ namespace TailBlazer.Domain.FileHandling
 
         This is very useful for 
         i) partitioned searching
-        ii) specific moonitoring of the head
+        ii) specific monitoring of the head
         iii) fast loading of initial file
     */
 
@@ -41,9 +41,11 @@ namespace TailBlazer.Domain.FileHandling
                 .StartWithUnit()
                 .Scan((FileSegments) null, (previous, current) =>
                 {
-                    if (previous==null)
+                    if (previous == null || previous.FileLength == 0)
+                    {
+                        _info.Refresh();
                         return new FileSegments(info, LoadSegments().ToArray());
-
+                    }
                     var newLength = info.GetFileLength();
                     return new FileSegments(newLength, previous);
                 }).Replay(1).RefCount();
@@ -51,6 +53,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public IEnumerable<FileSegment> LoadSegments()
         {
+
             var fileLength = _info.Length;
             if (fileLength == 0)
             {

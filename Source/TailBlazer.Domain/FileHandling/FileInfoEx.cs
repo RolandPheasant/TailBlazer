@@ -129,9 +129,6 @@ namespace TailBlazer.Domain.FileHandling
 
             return Observable.Create<SparseIndexCollection>(observer =>
             {
-         
-
-
                 var indexer = new SparseIndexer2(source);
                 var notifier = indexer.Result.SubscribeSafe(observer);
                 return new CompositeDisposable(indexer, notifier);
@@ -140,21 +137,24 @@ namespace TailBlazer.Domain.FileHandling
 
         public static IObservable<IIndexCollection> IndexSparsely(this IObservable<FileNotification> source)
         {
-            return source
-                 .Where(n => n.NotificationType == FileNotificationType.Created)
-                 .Select(createdNotification =>
-                 {
-                     return Observable.Create<SparseIndexCollection>(observer =>
-                     {
-                         var refresher = source
-                             .Where(n => n.NotificationType == FileNotificationType.Changed)
-                             .ToUnit();
 
-                         var indexer = new SparseIndexer((FileInfo)createdNotification, refresher);
-                         var notifier =indexer.Result.SubscribeSafe(observer);
-                         return new CompositeDisposable(indexer, notifier);
-                     });
-                 }).Switch();
+            return source.WithSegments().IndexSparsely();
+
+            //return source
+            //     .Where(n => n.NotificationType == FileNotificationType.Created)
+            //     .Select(createdNotification =>
+            //     {
+            //         return Observable.Create<SparseIndexCollection>(observer =>
+            //         {
+            //             var refresher = source
+            //                 .Where(n => n.NotificationType == FileNotificationType.Changed)
+            //                 .ToUnit();
+
+            //             var indexer = new SparseIndexer((FileInfo)createdNotification, refresher);
+            //             var notifier =indexer.Result.SubscribeSafe(observer);
+            //             return new CompositeDisposable(indexer, notifier);
+            //         });
+            //     }).Switch();
         }
 
         public static IObservable<LineMatches> Match(this IObservable<FileNotification> source, Func<string,bool> predicate, Action<bool> isSearching=null)
