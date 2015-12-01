@@ -23,7 +23,6 @@ namespace TailBlazer.Views
         private readonly IDisposable _cleanUp;
         private ViewContainer _selected;
         private bool _isEmpty;
-        private bool _isLoading;
 
         public ObservableCollection<ViewContainer> Views { get; } = new ObservableCollection<ViewContainer>();
         public IInterTabClient InterTabClient { get; }

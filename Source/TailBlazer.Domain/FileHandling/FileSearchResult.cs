@@ -4,11 +4,11 @@ namespace TailBlazer.Domain.FileHandling
 {
     public class FileSearchResult
     {
-        public int Start { get; }
-        public int End { get; }
-        public int[] Indicies { get; }
+        public long Start { get; }
+        public long End { get; }
+        public long[] Indicies { get; }
 
-        public FileSearchResult(int start, int end, int[] indicies)
+        public FileSearchResult(long start, long end, long[] indicies)
         {
             if (indicies == null) throw new ArgumentNullException(nameof(indicies));
             Start = start;

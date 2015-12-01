@@ -5,20 +5,20 @@ namespace TailBlazer.Domain.FileHandling
 {
     public class SparseIndex
     {
-        public int Start { get; }
-        public int End { get; }
-        public int[] Indicies { get; }
+        public long Start { get; }
+        public long End { get; }
+        public long[] Indicies { get; }
         public int Compression { get; }
         public int LineCount { get; }
         public int IndexCount => Indicies.Length;
 
         public IndexType Type { get; }
 
-        public int Size => End - Start;
+        public long Size => End - Start;
 
         public DateTime TimeStamp { get; } = DateTime.Now;
 
-        public SparseIndex(int start, int end, int[] indicies, int compression, int lineCount, IndexType type)
+        public SparseIndex(long start, long end, long[] indicies, int compression, int lineCount, IndexType type)
         {
             Start = start;
             End = end;
@@ -29,11 +29,11 @@ namespace TailBlazer.Domain.FileHandling
         }
         
 
-        public SparseIndex(int start, int end,  int compression, int lineCount, IndexType type)
+        public SparseIndex(long start, long end,  int compression, int lineCount, IndexType type)
         {
             Start = start;
             End = end;
-            Indicies = new int [0];
+            Indicies = new long[0];
             Compression = compression;
             LineCount = lineCount;
             Type = type;
@@ -51,7 +51,7 @@ namespace TailBlazer.Domain.FileHandling
             Type = latest.Type;
 
             //combine latest arrays
-            var items = new int[previous.Indicies.Length + latest.Indicies.Length];
+            var items = new long[previous.Indicies.Length + latest.Indicies.Length];
             previous.Indicies.CopyTo(items, 0);
             latest.Indicies.CopyTo(items, previous.Indicies.Length);
             Indicies = items;

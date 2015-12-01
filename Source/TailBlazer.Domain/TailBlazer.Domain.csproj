@@ -65,7 +65,9 @@
     <Compile Include="FileHandling\FileInfoEx.cs" />
     <Compile Include="FileHandling\FileSearch.cs" />
     <Compile Include="FileHandling\FileSearchResult.cs" />
+    <Compile Include="FileHandling\FileSegment.cs" />
     <Compile Include="FileHandling\FileSegmenter.cs" />
+    <Compile Include="FileHandling\FileSegmentType.cs" />
     <Compile Include="FileHandling\FileTailerFactory.cs" />
     <Compile Include="FileHandling\IFileTailerFactory.cs" />
     <Compile Include="FileHandling\IIndexCollection.cs" />

@@ -28,7 +28,7 @@ namespace TailBlazer.Domain.FileHandling
     public class SparseIndexer: IDisposable
     {
         private readonly IDisposable _cleanUp;
-        private int _endOfFile;
+        private long _endOfFile;
         private readonly ISourceList<SparseIndex> _indicies = new SourceList<SparseIndex>();
 
         public Encoding Encoding { get; }
@@ -131,18 +131,18 @@ namespace TailBlazer.Domain.FileHandling
             return (int) estimatedLines;
         }
 
-        private SparseIndex ScanTail(int start)
+        private SparseIndex ScanTail(long start)
         {
             return Scan(start,-1, 1);
         }
 
-        private SparseIndex Scan(int start, int end, int compression)
+        private SparseIndex Scan(long start, long end, int compression)
         {
             int count = 0;
-            int lastPosition = 0;
+            long lastPosition = 0;
             using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
-                int[] lines;
+                long[] lines;
                 using (var reader = new StreamReaderExtended(stream, Encoding, false))
                 { 
                     stream.Seek(start, SeekOrigin.Begin);

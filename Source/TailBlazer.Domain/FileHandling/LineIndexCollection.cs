@@ -8,13 +8,13 @@ namespace TailBlazer.Domain.FileHandling
     public class LineIndexCollection : IIndexCollection
     {
         public Encoding Encoding { get;  }
-        public int[] Lines { get; }
+        public long[] Lines { get; }
         public int Count => Lines.Length;
         public int Diff { get; }
         public LinesChangedReason ChangedReason { get; }
-        public int TailStartsAt { get; }
+        public long TailStartsAt { get; }
         
-        public LineIndexCollection(int[] lines, Encoding encoding,  LineIndexCollection previous = null)
+        public LineIndexCollection(long[] lines, Encoding encoding,  LineIndexCollection previous = null)
         {
             Encoding = encoding;
             if (previous == null)
@@ -27,7 +27,7 @@ namespace TailBlazer.Domain.FileHandling
             else
             {
                 //combine the 2 arrays
-                var latest = new int[previous.Lines.Length + lines.Length];
+                var latest = new long[previous.Lines.Length + lines.Length];
                 previous.Lines.CopyTo(latest, 0);
                 lines.CopyTo(latest, previous.Lines.Length);
 

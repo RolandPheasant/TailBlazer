@@ -13,10 +13,10 @@ namespace TailBlazer.Domain.FileHandling
 
         public  Encoding Encoding { get; }
 
-        public int Positon => _postion;
+        public long Positon => _postion;
         public int Lines => _index;
 
-        private int _postion;
+        private long _postion;
         private int _index = -1;
 
         public LineIndexer(FileInfo info)
@@ -28,14 +28,14 @@ namespace TailBlazer.Domain.FileHandling
             _reader = new StreamReaderExtended( _stream, Encoding, false);
         }
 
-        public IEnumerable<int> ReadToEnd()
+        public IEnumerable<long> ReadToEnd()
         {
             if (_reader.EndOfStream) yield break;
             
             while ((_reader.ReadLine()) != null)
             {
                 _index++;
-                _postion = (int)_reader.AbsolutePosition();
+                _postion = _reader.AbsolutePosition();
                 yield return _postion;
             }
         }

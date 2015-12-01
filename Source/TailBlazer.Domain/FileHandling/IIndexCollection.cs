@@ -9,7 +9,7 @@ namespace TailBlazer.Domain.FileHandling
         int Count { get; }
         int Diff { get; }
         LinesChangedReason ChangedReason { get; }
-        int TailStartsAt { get; }
+        long TailStartsAt { get; }
         
         IEnumerable<LineIndex> GetIndicies(ScrollRequest scroll);
         IEnumerable<LineIndex> GetIndicies(ScrollRequest scroll, LineMatches matches);

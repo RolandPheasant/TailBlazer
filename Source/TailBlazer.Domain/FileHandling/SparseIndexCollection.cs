@@ -11,7 +11,7 @@ namespace TailBlazer.Domain.FileHandling
         public int Count { get; }
         public int Diff { get; }
         public LinesChangedReason ChangedReason { get; }
-        public int TailStartsAt { get; }
+        public long TailStartsAt { get; }
         private SparseIndex[] Indicies { get; }
 
         public SparseIndexCollection(IReadOnlyCollection<SparseIndex> latest,
@@ -136,10 +136,10 @@ namespace TailBlazer.Domain.FileHandling
         private class RelativeIndex
         {
             public int Index { get; }
-            public int Start { get; }
+            public long Start { get; }
             public int LinesOffset { get; }
 
-            public RelativeIndex(int index, int start, int linesOffset)
+            public RelativeIndex(int index, long start, int linesOffset)
             {
                 Index = index;
                 Start = start;

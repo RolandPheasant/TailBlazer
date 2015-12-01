@@ -97,6 +97,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileSegmentFixture.cs" />
     <Compile Include="SparseIndexerFixture.cs" />
     <Compile Include="FileScanFixture.cs" />
     <Compile Include="FileTailerFixture.cs" />

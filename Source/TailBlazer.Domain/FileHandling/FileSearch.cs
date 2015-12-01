@@ -53,10 +53,10 @@ namespace TailBlazer.Domain.FileHandling
 
         private FileSearchResult Search(int start, int end)
         {
-            int lastPosition = 0;
+            long lastPosition = 0;
             using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
-                int[] lines;
+                long[] lines;
                 using (var reader = new StreamReaderExtended(stream, Encoding, false))
                 {
                     stream.Seek(start, SeekOrigin.Begin);

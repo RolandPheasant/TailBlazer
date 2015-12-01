@@ -12,8 +12,8 @@ namespace TailBlazer.Domain.FileHandling
     {
         public static IEnumerable<T> ScanLines<T>(this StreamReaderExtended source,
                 int compression,
-                Func<int, T> selector,
-                Func<string, int,bool> shouldBreak)
+                Func<long, T> selector,
+                Func<string, long, bool> shouldBreak)
         {
 
             int i = 0;
@@ -38,8 +38,8 @@ namespace TailBlazer.Domain.FileHandling
 
         public static IEnumerable<T> SearchLines<T>(this StreamReaderExtended source,
             Func<string, bool> predicate,
-            Func<int, T> selector,
-            Func<string, int, bool> shouldBreak)
+            Func<long, T> selector,
+            Func<string, long, bool> shouldBreak)
         {
             if (source.EndOfStream) yield break;
 
