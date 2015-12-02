@@ -12,10 +12,48 @@ namespace TailBlazer.Fixtures
 {
     public class SparseIndexerFixture
     {
+        [Fact]
+        public void CanReadIndiciesBack_SmallFile()
+        {
+            var file = Path.GetTempFileName();
+            var info = new FileInfo(file);
+            File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
 
+            var refresher = new Subject<Unit>();
+            var scheduler = new TestScheduler();
+
+            using (var indexer = new SparseIndexer(info, refresher, scheduler: scheduler))
+            {
+
+                SparseIndexCollection result = null;
+                using (indexer.Result.Subscribe(indicies => result = indicies))
+
+                {
+                    //start off the head scanner
+                    scheduler.AdvanceBy(1);
+
+                    var head = result.GetIndicies(new ScrollRequest(10, 0));
+                    var headText = info.ReadLine(head, (index, text) => text, indexer.Encoding).ToArray();
+                    var headExpected = Enumerable.Range(1, 10).Select(i => $"This is line number {i.ToString("00000000")}");
+                    headText.ShouldAllBeEquivalentTo(headExpected);
+
+                    var tail = result.GetIndicies(new ScrollRequest(10));
+                    var tailText = info.ReadLine(tail, (index, text) => text, indexer.Encoding).ToArray();
+                    var tailExpected = Enumerable.Range(91, 10).Select(i => $"This is line number {i.ToString("00000000")}").ToArray();
+                    tailText.ShouldAllBeEquivalentTo(tailExpected);
+
+                    var mid = result.GetIndicies(new ScrollRequest(10, 20));
+                    var midText = info.ReadLine(mid, (index, text) => text, indexer.Encoding).ToArray();
+                    var midExpected = Enumerable.Range(21, 10).Select(i => $"This is line number {i.ToString("00000000")}").ToArray();
+                    midText.ShouldAllBeEquivalentTo(midExpected);
+                }
+            }
+
+            File.Delete(file);
+        }
 
         [Fact]
-        public void CanReadIndiciesBack()
+        public void CanReadIndiciesBack_LargeFile()
         {
             var file = Path.GetTempFileName();
             var info = new FileInfo(file);

@@ -113,7 +113,6 @@ namespace TailBlazer.Domain.FileHandling
                      return Observable.Create<FileSegments>(observer =>
                      {
                          var refresher = source
-                            
                              .Where(n => n.NotificationType == FileNotificationType.Changed)
                              .StartWith(createdNotification)
                              .ToUnit();
@@ -151,10 +150,10 @@ namespace TailBlazer.Domain.FileHandling
             //                 .ToUnit();
 
             //             var indexer = new SparseIndexer((FileInfo)createdNotification, refresher);
-            //             var notifier =indexer.Result.SubscribeSafe(observer);
+            //             var notifier = indexer.Result.SubscribeSafe(observer);
             //             return new CompositeDisposable(indexer, notifier);
             //         });
-            //     }).Switch();
+           //      }).Switch();
         }
 
         public static IObservable<LineMatches> Match(this IObservable<FileNotification> source, Func<string,bool> predicate, Action<bool> isSearching=null)

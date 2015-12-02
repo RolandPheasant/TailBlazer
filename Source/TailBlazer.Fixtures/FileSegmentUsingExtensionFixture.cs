@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reactive;
@@ -10,24 +10,22 @@ using Xunit;
 
 namespace TailBlazer.Fixtures
 {
-    public class FileSegmentFixture
+    public class FileSegment_UsingExtensionFixture
     {
         [Fact]
-        public void FileChanged()
+        public void ExistingFileChaned()
         {
             //need to make this test
             var file = Path.GetTempFileName();
             var info = new FileInfo(file);
 
-            File.AppendAllLines(file,
-                Enumerable.Range(1, 1000).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
+            File.AppendAllLines(file,Enumerable.Range(1, 10000).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
 
             var refresher = new Subject<Unit>();
 
-            var segmenter = new FileSegmenter(info, refresher, 1000);
             FileSegments result = null;
 
-            using (var indexer = segmenter.Segments.Subscribe(segment => result = segment))
+            using (var indexer = info.WatchFile(refresher).WithSegments().Subscribe(segment => result = segment))
             {
                 result.Should().NotBeNull();
                 result.Count.Should().BeGreaterOrEqualTo(2);
@@ -48,7 +46,7 @@ namespace TailBlazer.Fixtures
         }
 
         [Fact]
-        public void NotifiesOfSegmentWhenFileIsCreated()
+        public void NewFileCreated()
         {
             //need to make this test
             var file = Path.GetTempFileName();
@@ -58,7 +56,7 @@ namespace TailBlazer.Fixtures
             var segmenter = new FileSegmenter(info, refresher, 1000);
             FileSegments result = null;
 
-            using (var indexer = segmenter.Segments.Subscribe(segment => result = segment))
+            using (var indexer = info.WatchFile(refresher).WithSegments().Subscribe(segment => result = segment))
             {
                 result.Should().NotBeNull();
 
