@@ -6,7 +6,6 @@ using DynamicData;
 
 namespace TailBlazer.Domain.FileHandling
 {
-
     public class FileSegments
     {
         public FileInfo Info { get;  }
@@ -33,16 +32,18 @@ namespace TailBlazer.Domain.FileHandling
 
         public FileSegments(long newLength, FileSegments previous)
         {
+            //All this assumes it is the tail which has changed, but that may not be so
             Reason = FileSegmentChangedReason.Tailed;
-
             Info = previous.Info;
 
             var last = previous.Tail;
-            Segments = previous.Segments;
-          
-            Segments[Count-1] = new FileSegment(last, newLength);
-            Count = Segments.Length;
             TailStartsAt = last.End;
+
+            var segments = previous.Segments;
+            segments[segments.Length-1] = new FileSegment(last, newLength);
+            Segments = segments;
+            Count = Segments.Length;
+
 
         }
     }
