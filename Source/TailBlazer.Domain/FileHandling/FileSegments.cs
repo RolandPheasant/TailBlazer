@@ -1,9 +1,12 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
+using DynamicData;
 
 namespace TailBlazer.Domain.FileHandling
 {
+
     public class FileSegments
     {
         public FileInfo Info { get;  }
@@ -31,12 +34,14 @@ namespace TailBlazer.Domain.FileHandling
         public FileSegments(long newLength, FileSegments previous)
         {
             Reason = FileSegmentChangedReason.Tailed;
+
             Info = previous.Info;
 
             var last = previous.Tail;
             Segments = previous.Segments;
-            Count = Segments.Length;
+          
             Segments[Count-1] = new FileSegment(last, newLength);
+            Count = Segments.Length;
             TailStartsAt = last.End;
 
         }

@@ -64,6 +64,11 @@ namespace TailBlazer.Domain.FileHandling
             var indexer = fileWatcher
                             .IndexSparsely()
                             .Synchronize(locker)
+                            .RetryWithBackOff((Exception error, int attempts) =>
+                            {
+                                //todo: plug in file missing or error into the screen
+                                return TimeSpan.FromSeconds(1);
+                            })
                             .Replay(1).RefCount();
             
             IsLoading = indexer.Take(1).Select(_=>false).StartWith(true);
@@ -106,11 +111,7 @@ namespace TailBlazer.Domain.FileHandling
 
                     return new { NewLines = newLines, OldLines = removedLines };
                 })
-                .RetryWithBackOff((Exception error, int attempts) =>
-                {
-                    //todo: plug in file missing or error into the screen
-                    return TimeSpan.FromSeconds(1);
-                 })
+
                  .Where(fn=> fn.NewLines.Length + fn.OldLines.Length > 0)
                 .Subscribe(changes =>
                 {

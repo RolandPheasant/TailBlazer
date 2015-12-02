@@ -7,6 +7,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
+using DynamicData;
 using DynamicData.Kernel;
 using TailBlazer.Domain.Infrastructure;
 
@@ -72,37 +73,10 @@ namespace TailBlazer.Domain.FileHandling
             });
         }
 
-
-
-        /// <summary>
-        /// Indexes all the lines of the specified file notificationn
-        /// </summary>
-        /// <param name="source">The source.</param>
-        /// <returns></returns>
-        public static IObservable<IIndexCollection> Index(this IObservable<FileNotification> source)
-        {
-            return source
-                 .Where(n => n.NotificationType == FileNotificationType.Created)
-                 .Select(createdNotification =>
-                 {
-                     return Observable.Create<LineIndexCollection>(observer =>
-                     {
-                         var indexer = new LineIndexer((FileInfo) createdNotification);
-
-                         var notifier = source
-                             .Where(n => n.NotificationType == FileNotificationType.Changed)
-                             .StartWith(createdNotification)
-                             .Scan((LineIndexCollection) null, (state, notification) =>
-                             {
-                                 var lines = indexer.ReadToEnd().ToArray();
-                                 return new LineIndexCollection(lines, indexer.Encoding,  state);
-                             })
-                             .SubscribeSafe(observer);
-
-                         return new CompositeDisposable(indexer, notifier);;
-                     });
-                 }).Switch();
-        }
+        //public static DynamicFileSegments Dynamic(this IObservable<FileSegments> source)
+        //{
+        //    return new DynamicFileSegments(source);
+        //}
 
         public static IObservable<FileSegments> WithSegments(this IObservable<FileNotification> source)
         {
@@ -125,35 +99,21 @@ namespace TailBlazer.Domain.FileHandling
 
         public static IObservable<IIndexCollection> IndexSparsely(this IObservable<FileSegments> source)
         {
-
-            return Observable.Create<SparseIndexCollection>(observer =>
+            return Observable.Defer(() =>
             {
-                var indexer = new SparseIndexer2(source);
-                var notifier = indexer.Result.SubscribeSafe(observer);
-                return new CompositeDisposable(indexer, notifier);
+                return Observable.Create<SparseIndexCollection>(observer =>
+                {
+                    var indexer = new SparseIndexer2(source);
+                    var notifier = indexer.Result.SubscribeSafe(observer);
+                    return new CompositeDisposable(indexer, notifier);
+                });
             });
+
         }
 
         public static IObservable<IIndexCollection> IndexSparsely(this IObservable<FileNotification> source)
         {
-
             return source.WithSegments().IndexSparsely();
-
-            //return source
-            //     .Where(n => n.NotificationType == FileNotificationType.Created)
-            //     .Select(createdNotification =>
-            //     {
-            //         return Observable.Create<SparseIndexCollection>(observer =>
-            //         {
-            //             var refresher = source
-            //                 .Where(n => n.NotificationType == FileNotificationType.Changed)
-            //                 .ToUnit();
-
-            //             var indexer = new SparseIndexer((FileInfo)createdNotification, refresher);
-            //             var notifier = indexer.Result.SubscribeSafe(observer);
-            //             return new CompositeDisposable(indexer, notifier);
-            //         });
-           //      }).Switch();
         }
 
         public static IObservable<LineMatches> Match(this IObservable<FileNotification> source, Func<string,bool> predicate, Action<bool> isSearching=null)
@@ -222,6 +182,15 @@ namespace TailBlazer.Domain.FileHandling
                     return reader.AbsolutePosition();
                 }
             }
+        }
+
+        public static long FindNextEndOfLinePosition(this StreamReaderExtended source, long initialPosition,
+            SeekOrigin origin= SeekOrigin.Current)
+        {
+
+            if (source.EndOfStream) return -1;
+            source.ReadLine();
+            return source.AbsolutePosition();
         }
 
         public static long GetFileLength(this FileInfo source)

@@ -11,11 +11,23 @@ using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
 {
+    /*
+    This class is attempt #2 to sparsely index the line numbers in a file.
+
+    It aims to:
+
+       1. Enable quick access to any specified line in a file
+       2. Index according to a compression rate i.e. no need to index every line [less memory]
+       3. Dynamically resize head / middle / tail index containers as file grows [Future refactor]
+       4. Ensure Tail is initally small and can be returned to the consumer very quickly
+
+        An alternative solution to what I got now is to do a triple index (as per point 3).
+        In doing so it would make the rx easier and get rid of the need for the observable list
+  */
     public class SparseIndexer2 : IDisposable
     {
         private readonly IDisposable _cleanUp;
         private readonly ISourceList<SparseIndex> _indicies = new SourceList<SparseIndex>();
-        //   private readonly ISourceCache<FileSegment,int> _segments = new SourceCache<FileSegment, int>(segment=> segment.Index);
 
         public Encoding Encoding { get; private set; }
         public FileInfo Info { get; private set; }
@@ -53,14 +65,6 @@ namespace TailBlazer.Domain.FileHandling
                     Info = info;
                     Encoding = encoding ?? info.GetEncoding();
                 });
-            
-            //var changedSegments = _segments.Connect()
-            //                .IgnoreUpdateWhen((current, previous) => previous == current)
-            //                .Transform()
-            //                .AsObservableCache();
-
-            //  var loader = shared.Subscribe(segments=>_segments.AddOrUpdate(segments.Segments));
-
 
             //3. Scan the tail so results can be returned quickly
             var tailScanner= shared.Select(segments => segments.Tail).DistinctUntilChanged()
@@ -100,6 +104,9 @@ namespace TailBlazer.Domain.FileHandling
                     var estimateLines = EstimateNumberOfLines(tail, Info);
                     var estimate = new SparseIndex(0, tail.Start, compression, estimateLines, IndexType.Page);
                     _indicies.Add(estimate);
+
+                    //keep it as an estimate for files over 250 gig
+                    if (tail.Start > 250000000) return;
 
                     scheduler.Schedule(() =>
                     {

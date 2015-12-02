@@ -114,7 +114,10 @@
 
         <ListBox Grid.Row="1" 
                  ItemsSource="{Binding Lines}" 
-                 FontFamily="Consolas">
+                 FontFamily="Consolas"
+                 SelectionMode="Extended">
+            <!--<ListBox.KeyBind></ListBox.KeyBind>-->
+            
             <ListBox.Template>
                 <ControlTemplate>
                     <ScrollViewer x:Name="ScrollViewer" 

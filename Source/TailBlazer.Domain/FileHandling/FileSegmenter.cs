@@ -8,6 +8,8 @@ using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
+
+
     /*
         Dynamically split the file into manageable chunks.
 
@@ -37,6 +39,8 @@ namespace TailBlazer.Domain.FileHandling
             _initialTail = initialTail;
             _segmentSize = segmentSize;
  
+
+            //TODO: Re-segment as file grows.
             Segments = refresher
                 .StartWithUnit()
                 .Scan((FileSegments) null, (previous, current) =>
@@ -57,7 +61,7 @@ namespace TailBlazer.Domain.FileHandling
             var fileLength = _info.Length;
             if (fileLength == 0)
             {
-                yield return new FileSegment(0, 0,0, FileSegmentType.Tail); 
+                yield return new FileSegment(0, 0, 0, FileSegmentType.Tail);
                 yield break;
             }
 
@@ -66,31 +70,37 @@ namespace TailBlazer.Domain.FileHandling
                 yield return new FileSegment(0, 0, fileLength, FileSegmentType.Tail);
                 yield break;
             }
-
-            var headStartsAt = _info.FindNextEndOfLinePosition(fileLength -_initialTail);
-            long currentEnfOfPage = 0;
-            long previousEndOfPage = 0;
-
-            int index = 0;
-            do
+            using (var stream = File.Open(_info.FullName, FileMode.Open, FileAccess.Read,FileShare.Delete | FileShare.ReadWrite))
             {
-                var approximateEndOfPage = currentEnfOfPage + _segmentSize;
-                if (approximateEndOfPage >= headStartsAt)
+                stream.Seek(0, SeekOrigin.Begin);
+                using (var reader = new StreamReaderExtended(stream, true))
                 {
-                    yield return new FileSegment( index, previousEndOfPage,headStartsAt,FileSegmentType.Head);
-                    break;
+                    var headStartsAt = reader.FindNextEndOfLinePosition(fileLength - _initialTail);
+                    long currentEnfOfPage = 0;
+                    long previousEndOfPage = 0;
+
+                    int index = 0;
+                    do
+                    {
+                        var approximateEndOfPage = currentEnfOfPage + _segmentSize;
+                        if (approximateEndOfPage >= headStartsAt)
+                        {
+                            yield return new FileSegment(index, previousEndOfPage, headStartsAt, FileSegmentType.Head);
+                            break;
+                        }
+                        currentEnfOfPage = reader.FindNextEndOfLinePosition(approximateEndOfPage);
+                        yield return new FileSegment(index, previousEndOfPage, currentEnfOfPage, FileSegmentType.Head);
+
+                        index++;
+                        previousEndOfPage = currentEnfOfPage;
+
+                    } while (true);
+
+
+                    index ++;
+                    yield return new FileSegment(index, headStartsAt, fileLength, FileSegmentType.Tail);
                 }
-                currentEnfOfPage = _info.FindNextEndOfLinePosition(approximateEndOfPage);
-                yield return new FileSegment(index, previousEndOfPage, currentEnfOfPage, FileSegmentType.Head);
-
-                index++;
-                previousEndOfPage = currentEnfOfPage;
-
-            } while (true);
-
-
-            index ++;
-            yield return new FileSegment(index, headStartsAt, fileLength, FileSegmentType.Tail);
+            }
         }
 
     }
