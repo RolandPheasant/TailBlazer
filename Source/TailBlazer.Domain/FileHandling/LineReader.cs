@@ -23,7 +23,7 @@ namespace TailBlazer.Domain.FileHandling
             while ((line=source.ReadLine()) != null)
             {
                 i++;
-                var position = (int)source.AbsolutePosition();
+                var position = source.AbsolutePosition();
 
                 if (i == compression)
                 {
@@ -46,7 +46,7 @@ namespace TailBlazer.Domain.FileHandling
             string line;
             while ((line = source.ReadLine()) != null)
             {
-                var position = (int) source.AbsolutePosition();
+                var position = source.AbsolutePosition();
 
                 if (predicate(line))
                     yield return selector(position);

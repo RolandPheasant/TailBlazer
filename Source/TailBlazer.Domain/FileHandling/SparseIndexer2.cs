@@ -43,9 +43,7 @@ namespace TailBlazer.Domain.FileHandling
                 .Scan((SparseIndexCollection)null, (previous, notification) => new SparseIndexCollection(notification, previous, Encoding))
                 .Replay(1).RefCount();
 
-            var shared = fileSegments
-                .Do(x=>Console.WriteLine(x))
-                .Replay(1).RefCount();
+            var shared = fileSegments.Replay(1).RefCount();
 
             //2. Get information from segment info
             var infoSubscriber = shared.Select(segments => segments.Info)
@@ -67,7 +65,16 @@ namespace TailBlazer.Domain.FileHandling
             //3. Scan the tail so results can be returned quickly
             var tailScanner= shared.Select(segments => segments.Tail).DistinctUntilChanged()
               //  .ObserveOn(scheduler)
-                .Scan((SparseIndex)null, (previous, current) => Scan(previous?.End ?? current.Start, -1, 1))
+                .Scan((SparseIndex)null, (previous, current) =>
+                {
+                   
+                    if (previous == null)
+                    {
+                        return Scan(current.Start, -1, 1);
+                    }
+                    var latest=Scan(previous.End , -1, 1);
+                    return latest == null ? null : new SparseIndex(latest,previous);
+                })
                 .Where(tail=>tail!=null)
                 .Replay(1).RefCount();
 
@@ -87,6 +94,8 @@ namespace TailBlazer.Domain.FileHandling
             var headSubscriber = tailScanner.FirstAsync()
                 .Subscribe(tail =>
                 {
+                    if (tail.Start == 0) return;
+
                     //Need iterate one at a time through the 
                     var estimateLines = EstimateNumberOfLines(tail, Info);
                     var estimate = new SparseIndex(0, tail.Start, compression, estimateLines, IndexType.Page);
