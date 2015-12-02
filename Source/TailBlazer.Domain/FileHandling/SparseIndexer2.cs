@@ -68,7 +68,7 @@ namespace TailBlazer.Domain.FileHandling
 
             //3. Scan the tail so results can be returned quickly
             var tailScanner= shared.Select(segments => segments.Tail).DistinctUntilChanged()
-              //  .ObserveOn(scheduler)
+                .ObserveOn(scheduler)
                 .Scan((SparseIndex)null, (previous, current) =>
                 {
                    

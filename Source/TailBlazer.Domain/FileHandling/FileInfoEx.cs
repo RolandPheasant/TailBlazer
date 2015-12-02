@@ -73,10 +73,6 @@ namespace TailBlazer.Domain.FileHandling
             });
         }
 
-        //public static DynamicFileSegments Dynamic(this IObservable<FileSegments> source)
-        //{
-        //    return new DynamicFileSegments(source);
-        //}
 
         public static IObservable<FileSegments> WithSegments(this IObservable<FileNotification> source)
         {
@@ -189,6 +185,7 @@ namespace TailBlazer.Domain.FileHandling
         {
 
             if (source.EndOfStream) return -1;
+            source.BaseStream.Seek(initialPosition, origin);
             source.ReadLine();
             return source.AbsolutePosition();
         }

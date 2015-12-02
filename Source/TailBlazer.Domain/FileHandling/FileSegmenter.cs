@@ -48,7 +48,8 @@ namespace TailBlazer.Domain.FileHandling
                     if (previous == null || previous.FileLength == 0)
                     {
                         _info.Refresh();
-                        return new FileSegments(info, LoadSegments().ToArray());
+                        var segments = LoadSegments().ToArray();
+                        return new FileSegments(info, segments);
                     }
                     var newLength = info.GetFileLength();
                     return new FileSegments(newLength, previous);
