@@ -38,6 +38,7 @@ namespace TailBlazer.Domain.FileHandling
         public SparseIndexer2([NotNull] IObservable<FileSegments> fileSegments,
             int compression = 10,
             int tailSize = 1000000,
+            int sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing= 250000000,
             Encoding encoding = null,
             IScheduler scheduler = null)
         {
@@ -106,7 +107,7 @@ namespace TailBlazer.Domain.FileHandling
                     _indicies.Add(estimate);
 
                     //keep it as an estimate for files over 250 gig
-                    if (tail.Start > 250000000) return;
+                    if (tail.Start > sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing) return;
 
                     scheduler.Schedule(() =>
                     {
