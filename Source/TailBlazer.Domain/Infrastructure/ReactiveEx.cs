@@ -111,5 +111,32 @@ namespace TailBlazer.Domain.Infrastructure
             });
         }
 
+        /// <summary>
+        /// from here http://haacked.com/archive/2012/10/08/writing-a-continueafter-method-for-rx.aspx/
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TRet"></typeparam>
+        /// <param name="observable"></param>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        public static IObservable<TRet> ContinueAfter<T, TRet>(
+          this IObservable<T> observable, Func<IObservable<TRet>> selector)
+        {
+            return observable.AsCompletion().SelectMany(_ => selector());
+        }
+
+        public static IObservable<Unit> AsCompletion<T>(this IObservable<T> observable)
+        {
+            return Observable.Create<Unit>(observer =>
+            {
+                Action onCompleted = () =>
+                {
+                    observer.OnNext(Unit.Default);
+                    observer.OnCompleted();
+                };
+                return observable.Subscribe(_ => { }, observer.OnError, onCompleted);
+            });
+        }
+
     }
 }
