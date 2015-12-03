@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -38,8 +39,34 @@ namespace TailBlazer.Domain.FileHandling
             Type= LineIndexType.Relative;
         }
 
+        #region Comparison
 
+
+
+        #endregion
+        
         #region Equality
+
+        private sealed class LineEqualityComparer : IEqualityComparer<LineIndex>
+        {
+            public bool Equals(LineIndex x, LineIndex y)
+            {
+                return x.Line == y.Line;
+            }
+
+            public int GetHashCode(LineIndex obj)
+            {
+                return obj.Line;
+            }
+        }
+
+        private static readonly IEqualityComparer<LineIndex> LineComparerInstance = new LineEqualityComparer();
+
+        public static IEqualityComparer<LineIndex> LineComparer
+        {
+            get { return LineComparerInstance; }
+        }
+
 
         public bool Equals(LineIndex other)
         {

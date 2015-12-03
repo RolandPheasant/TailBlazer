@@ -95,10 +95,10 @@ namespace TailBlazer.Domain.FileHandling
 
                     var currentPage = indices.ToArray();
                     var previous = lines.Items.Select(l => l.LineIndex).ToArray();
-                    var removed = previous.Except(currentPage).ToArray();
+                    var removed = previous.Except(currentPage, LineIndex.LineComparer).ToArray();
                     var removedLines = lines.Items.Where(l=> removed.Contains(l.LineIndex)).ToArray();
 
-                    var added = currentPage.Except(previous).ToArray();
+                    var added = currentPage.Except(previous, LineIndex.LineComparer).ToArray();
                     //finally we can load the line from the file
                     var newLines =  file.ReadLine(added, (lineIndex, text) =>
                     {

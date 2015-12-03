@@ -10,12 +10,15 @@ namespace TailBlazer.Domain.FileHandling
         public FileSegmentType Type { get;  }
         public long Size => End - Start;
 
+        public FileSegmentKey Key { get; }
+
         public FileSegment(int index, long start, long end, FileSegmentType type)
         {
             Index = index;
             Start = start;
             End = end;
             Type = type;
+            Key=new FileSegmentKey(index,type);
         }
 
         public FileSegment(FileSegment previous, long end)
@@ -24,6 +27,7 @@ namespace TailBlazer.Domain.FileHandling
             Start = previous.Start;
             End = end;
             Type = previous.Type;
+            Key = previous.Key;
         }
 
         #region Equality

@@ -28,7 +28,9 @@ namespace TailBlazer.Fixtures
 
             using (var search = new FileSearch(segments, str => str.Contains("9")))
             {
-
+                pulse.Once();
+                File.AppendAllLines(file, Enumerable.Range(101, 10).Select(i => i.ToString()).ToArray());
+                pulse.Once();
             }
 
             File.Delete(file);

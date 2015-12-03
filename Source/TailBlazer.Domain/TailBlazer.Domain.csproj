@@ -68,7 +68,10 @@
     <Compile Include="FileHandling\FileSegment.cs" />
     <Compile Include="FileHandling\FileSegmentChangedReason.cs" />
     <Compile Include="FileHandling\FileSegmenter.cs" />
+    <Compile Include="FileHandling\FileSegmentKey.cs" />
     <Compile Include="FileHandling\FileSegments.cs" />
+    <Compile Include="FileHandling\FileSegmentSearch.cs" />
+    <Compile Include="FileHandling\FileSegmentSearchStatus.cs" />
     <Compile Include="FileHandling\FileSegmentType.cs" />
     <Compile Include="FileHandling\FileTailerFactory.cs" />
     <Compile Include="FileHandling\IFileTailerFactory.cs" />

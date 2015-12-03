@@ -29,8 +29,9 @@ namespace TailBlazer.Domain.FileHandling
 
         private readonly IScheduler _scheduler;
         private readonly Func<string, bool> _predicate;
-        private readonly IObservableCache<SearchableSegment, int> _segments;
+        private readonly IObservableCache<FileSegment, FileSegmentKey> _segments;
         private readonly IDisposable _cleanUp ;
+        public IObservable<bool> IsSearching { get; }
 
         public FileSearch([NotNull] IObservable<FileSegments> segments, [NotNull] Func<string, bool> predicate,IScheduler scheduler =null)
         {
@@ -41,40 +42,47 @@ namespace TailBlazer.Domain.FileHandling
             _scheduler = scheduler ?? Scheduler.Default;
 
             var shared = segments.Publish();
-            var loader = shared.FirstAsync().Subscribe(s => Info = s.Info);
+            var infoLoader = shared.FirstAsync().Subscribe(s => Info = s.Info);
 
-            //these are the elements which ca be searched
+            //Create a list of elements which are to be searched
             _segments = shared.Select(s => s.Segments)
-                .ToObservableChangeSet(s => s.Index)
-                .Transform(segment=> new SearchableSegment(segment))
+                .ToObservableChangeSet(s => s.Key)
+                .IgnoreUpdateWhen((current,previous)=>current==previous)
                 .AsObservableCache();
 
-            //1. Search tail always: find a way to directly watch the SearchableSegment for the tail only
-            var tailSearch = _segments.Connect()
+
+            var searchData= new SourceCache<FileSegmentSearch, FileSegmentKey>(s=>s.Key);
+            
+            IsSearching = searchData.Connect()
                 .QueryWhenChanged(query =>
                 {
-                    return query.Items.OrderByDescending(seg => seg.Segment.Index).First();
-                })
-                .Scan((SearchableSegment)null, (previous, current) =>
+                    return query.Items.Any(search => search.Status == FileSegmentSearchStatus.Searching);
+                }).DistinctUntilChanged();
+
+            //initialise a pending state for all segments
+            var loader = _segments.Connect()
+                .Transform(fs => new FileSegmentSearch(fs))
+                .PopulateInto(searchData);
+
+            var tailSearch = _segments.WatchValue(FileSegmentKey.Tail)
+                .Scan((FileSegmentSearch) null, (previous, current) =>
                 {
-                    //problem here is each SearchableSegment is replaced when the head updates,
-                    // so we probably need to maintain a seperate cahce results and manually
-                    //manage each search
+                    if (previous == null)
+                    {
+                        var result = Search(current.Start, current.End);
+                        return new FileSegmentSearch(current, result);
+                    }
+                    else
+                    {
+                        var result = Search(previous.Segment.End, current.End);
+                        return new FileSegmentSearch(previous, result);
+                    }
+                }).Subscribe(tail=> searchData.AddOrUpdate(tail));
+                                
 
-                    //In which case we need 2 search threads
-                    //1. Tail search always
-                    //2. Queue of items to be searched
-                    //3. When results are obtained, update destination cache.
-                    return null;
-                })   
-                .Subscribe();
-
-            //search remainder of the file in predeterminied order and take one step at a time
-            var body = shared.Select(s => s.Tail)
-                .Subscribe();
-
-            _cleanUp = new CompositeDisposable(shared.Connect(), _segments, loader);
+            _cleanUp = new CompositeDisposable(shared.Connect(), _segments, loader, tailSearch, infoLoader);
         }
+
 
 
         public IObservable<FileSearchResult> Search()
@@ -93,18 +101,7 @@ namespace TailBlazer.Domain.FileHandling
             });
         }
 
-        private class SearchableSegment
-        {
-            public FileSegment Segment { get; }
 
-            public SearchableSegment(FileSegment segment)
-            {
-                Segment = segment;
-            }
-
-          //  public 
-
-        }
 
         private FileSearchResult Search(long start, long end)
         {
