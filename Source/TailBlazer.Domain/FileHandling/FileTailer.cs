@@ -57,7 +57,6 @@ namespace TailBlazer.Domain.FileHandling
             
             var fileWatcher = file.WatchFile(scheduler: scheduler)
                             .DistinctUntilChanged()
-                        
                             .TakeWhile(notification => notification.Exists).Repeat()
                             .Replay(1).RefCount();
             

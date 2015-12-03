@@ -69,7 +69,7 @@ namespace TailBlazer.Domain.FileHandling
 
             //3. Scan the tail so results can be returned quickly
             var tailScanner= shared.Select(segments => segments.Tail).DistinctUntilChanged()
-                .ObserveOn(scheduler)
+                //.ObserveOn(scheduler)
                 .Scan((SparseIndex)null, (previous, current) =>
                 {
                    
@@ -106,7 +106,7 @@ namespace TailBlazer.Domain.FileHandling
                     var estimate = new SparseIndex(0, tail.Start, compression, estimateLines, IndexType.Page);
                     _indicies.Add(estimate);
 
-                    //keep it as an estimate for files over 250 gig
+                    //keep it as an estimate for files over 250 meg
                     if (tail.Start > sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing) return;
 
                     scheduler.Schedule(() =>

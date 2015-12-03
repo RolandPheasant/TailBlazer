@@ -159,7 +159,7 @@ namespace TailBlazer.Fixtures
             
             using (var tailer = new FileTailer(info, textMatch, autoTailer, new NullLogger(), scheduler))
             {
-                scheduler.AdvanceBySeconds(1);
+                scheduler.AdvanceByMilliSeconds(1);
                 File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
                 scheduler.AdvanceBySeconds(1);
                 tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(Enumerable.Range(91, 10));
