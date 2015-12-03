@@ -19,7 +19,7 @@ namespace TailBlazer.Domain.FileHandling
             }
             else
             {
-                if (index <= 0) throw new ArgumentOutOfRangeException(nameof(index));
+                if (index < 0) throw new ArgumentOutOfRangeException(nameof(index));
                 _value = index;
             }
         }
