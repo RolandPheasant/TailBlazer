@@ -85,21 +85,21 @@ namespace TailBlazer.Domain.FileHandling
 
 
 
-        public IObservable<FileSearchResult> Search()
-        {
-            return Observable.Create<FileSearchResult>(observer =>
-            {
-                //1. Segment files: Scan tail first
-                //2. Provide user feedback?
+        //public IObservable<FileSearchResult> Search()
+        //{
+        //    return Observable.Create<FileSearchResult>(observer =>
+        //    {
+        //        //1. Segment files: Scan tail first
+        //        //2. Provide user feedback?
 
-                _scheduler.Schedule(() =>
-                {
-                    var searchResult= Search(0, Info.Length);
-                });
+        //        _scheduler.Schedule(() =>
+        //        {
+        //            var searchResult= Search(0, Info.Length);
+        //        });
 
-                return new CompositeDisposable();
-            });
-        }
+        //        return new CompositeDisposable();
+        //    });
+        //}
 
 
 
