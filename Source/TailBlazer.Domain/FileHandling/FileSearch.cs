@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Aggregation;
 using TailBlazer.Domain.Annotations;
+using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -77,31 +78,36 @@ namespace TailBlazer.Domain.FileHandling
                         var result = Search(previous.Segment.End, current.End);
                         return new FileSegmentSearch(previous, result);
                     }
-                }).Subscribe(tail=> searchData.AddOrUpdate(tail));
-                                
+                }).Publish();
+            
+            var tailSubscriber = tailSearch
+                                .Subscribe(tail => searchData.AddOrUpdate(tail));
 
-            _cleanUp = new CompositeDisposable(shared.Connect(), _segments, loader, tailSearch, infoLoader);
+            var headSubscriber = tailSearch.Take(1).ContinueAfter(() =>
+            {
+
+                return searchData
+                    .Connect(sd => sd.Segment.Type == FileSegmentType.Head && sd.Status == FileSegmentSearchStatus.Pending)
+                   // .Flatten()
+                    .SelectMany(changes=>changes.Select(c=>c.Current).OrderByDescending(c=>c.Segment.Index).ToArray())
+                    .ObserveOn(_scheduler)
+                    .Do(head => searchData.AddOrUpdate(new FileSegmentSearch(head.Segment,FileSegmentSearchStatus.Searching) ))
+                    .Select(fss =>
+                    {
+                        var result = Search(fss.Segment.Start, fss.Segment.End);
+                        return new FileSegmentSearch(fss, result);
+                    });
+            })
+           .Subscribe(head => searchData.AddOrUpdate(head));
+
+            _cleanUp = new CompositeDisposable(shared.Connect(), 
+                _segments, 
+                loader,
+                tailSubscriber,
+                headSubscriber,
+                tailSearch.Connect(),
+                infoLoader);
         }
-
-
-
-        //public IObservable<FileSearchResult> Search()
-        //{
-        //    return Observable.Create<FileSearchResult>(observer =>
-        //    {
-        //        //1. Segment files: Scan tail first
-        //        //2. Provide user feedback?
-
-        //        _scheduler.Schedule(() =>
-        //        {
-        //            var searchResult= Search(0, Info.Length);
-        //        });
-
-        //        return new CompositeDisposable();
-        //    });
-        //}
-
-
 
         private FileSearchResult Search(long start, long end)
         {
