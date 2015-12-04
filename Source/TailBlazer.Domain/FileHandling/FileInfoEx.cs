@@ -117,7 +117,7 @@ namespace TailBlazer.Domain.FileHandling
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
-            return source.WatchFile(scheduler:scheduler).WithSegments().Search(predicate);
+            return source.WatchFile(scheduler:scheduler).WithSegments().Search(predicate,scheduler);
         }
 
         public static IObservable<FileSearchResult> Search(this IObservable<FileNotification> source,Func<string, bool> predicate, IScheduler scheduler = null)
@@ -136,7 +136,7 @@ namespace TailBlazer.Domain.FileHandling
             return Observable.Create<FileSearchResult>(observer =>
             {
                 var searcher = new FileSearch(source, predicate, scheduler);
-                var publisher = searcher.Result.SubscribeSafe(observer);
+                var publisher = searcher.SearchResult.SubscribeSafe(observer);
                 return new CompositeDisposable(publisher, searcher);
             });
         }

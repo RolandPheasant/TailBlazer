@@ -119,7 +119,7 @@ namespace TailBlazer.Domain.Infrastructure
         /// <param name="observable"></param>
         /// <param name="selector"></param>
         /// <returns></returns>
-        public static IObservable<TRet> ContinueAfter<T, TRet>(
+        public static IObservable<TRet> WithContinuation<T, TRet>(
           this IObservable<T> observable, Func<IObservable<TRet>> selector)
         {
             return observable.AsCompletion().SelectMany(_ => selector());

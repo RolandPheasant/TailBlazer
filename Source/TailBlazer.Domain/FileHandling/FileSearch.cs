@@ -10,28 +10,20 @@ using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    //1. produce list of searchable segments
-    //2. Order them to search - end segments first 
-    //3. On search complete find next segment to search on.
-    //4. User should be able to cancel / resume any time
-    //5  Before and after each search provide user with some feedback
-    //6. Always have an active search for the tail item
-    //7. Maybe a way to limit the number of matched items
-
     /// <summary>
-    /// Fast and flexible file searching:
+    /// Responsive and flexible file searching.
     /// 
     /// See https://github.com/RolandPheasant/TailBlazer/issues/42
     /// </summary>
     public class FileSearch: IDisposable
     {
-        public FileInfo Info { get; private set; }
-
         private readonly IScheduler _scheduler;
         private readonly Func<string, bool> _predicate;
-
         private readonly IDisposable _cleanUp ;
-        public IObservable<FileSearchResult> Result { get; set; }
+
+        private FileInfo Info { get; set; }
+        public IObservable<FileSearchResult> SearchResult { get;  }
+
         public FileSearch([NotNull] IObservable<FileSegmentCollection> segments, [NotNull] Func<string, bool> predicate,IScheduler scheduler =null)
         {
             if (segments == null) throw new ArgumentNullException(nameof(segments));
@@ -43,21 +35,26 @@ namespace TailBlazer.Domain.FileHandling
             var shared = segments.Publish();
             var infoLoader = shared.FirstAsync().Subscribe(s => Info = s.Info);
 
-            //Create a list of elements which are to be searched
+            //Create a cache of segments which are to be searched
             var segmentCache = shared.Select(s => s.Segments)
                 .ToObservableChangeSet(s => s.Key)
                 .IgnoreUpdateWhen((current,previous)=>current==previous)
                 .AsObservableCache();
             
+            //manually maintained search results and status
             var searchData= new SourceCache<FileSegmentSearch, FileSegmentKey>(s=>s.Key);
             
-            Result = searchData.Connect().QueryWhenChanged(query => new FileSearchResult(query.Items));
+            //this is the result which forms the API
+            SearchResult = searchData.Connect()
+                        .QueryWhenChanged(query => new FileSearchResult(query.Items))
+                        .StartWith(FileSearchResult.None);
 
             //initialise a pending state for all segments
             var loader = segmentCache.Connect()
                 .Transform(fs => new FileSegmentSearch(fs))
                 .PopulateInto(searchData);
 
+            //scan end of file, then tail
             var tailSearch = segmentCache.WatchValue(FileSegmentKey.Tail)
                 .Scan((FileSegmentSearch) null, (previous, current) =>
                 {
@@ -69,17 +66,18 @@ namespace TailBlazer.Domain.FileHandling
                     else
                     {
                         var result = Search(previous.Segment.End, current.End);
-                        if (result == null) return previous;
-                        return new FileSegmentSearch(previous, result);
+                        return result == null ? previous : new FileSegmentSearch(previous, result);
                     }
                 })
                 .DistinctUntilChanged()
                 .Publish();
             
+            //start tailing
             var tailSubscriber = tailSearch
                                 .Subscribe(tail => searchData.AddOrUpdate(tail));
 
-            var headSubscriber = tailSearch.Take(1).ContinueAfter(() =>
+            //load the rest of the file segment by segment, reporting status after each search
+            var headSubscriber = tailSearch.Take(1).WithContinuation(() =>
             {
                 var locker = new object();
                 return searchData
@@ -105,14 +103,6 @@ namespace TailBlazer.Domain.FileHandling
                 infoLoader);
         }
 
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
-        /// <returns></returns>
         private FileSegmentSearchResult Search(long start, long end)
         {
             long lastPosition = 0;
@@ -135,7 +125,6 @@ namespace TailBlazer.Domain.FileHandling
                 return new FileSegmentSearchResult(start, lastPosition, lines);
             }
         }
-
         public void Dispose()
         {
             _cleanUp.Dispose();

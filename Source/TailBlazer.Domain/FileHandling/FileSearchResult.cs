@@ -6,9 +6,8 @@ namespace TailBlazer.Domain.FileHandling
     public class FileSearchResult
     {
         public static readonly FileSearchResult None = new FileSearchResult();
-
         public long[] Matches { get; }
-        public int TotalMatches => Matches.Length;
+        public int Total => Matches.Length;
         public int SegmentsCompleted { get; }
         public int Segments { get; }
         public bool IsSearching { get; }

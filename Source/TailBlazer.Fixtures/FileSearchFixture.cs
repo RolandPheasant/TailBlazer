@@ -1,7 +1,8 @@
-
+using System;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Subjects;
+using FluentAssertions;
 using Microsoft.Reactive.Testing;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
@@ -12,22 +13,115 @@ namespace TailBlazer.Fixtures
     public class FileSearchFixture
     {
         [Fact]
-        public void SearchWillReturnSomething()
+        public void EmptyFile()
         {
-            var scheduler = new TestScheduler();
             var pulse = new Subject<Unit>();
 
             using (var file = new TestFile())
             {
+                FileSearchResult fileSearchResult = null;
+
+                using (file.Info.WatchFile(pulse)
+                    .Search(str => str.Contains("9"))
+                    .Subscribe(x => fileSearchResult = x))
+                {
+                    fileSearchResult.Segments.Should().Be(1);
+                    fileSearchResult.SegmentsCompleted.Should().Be(1);
+                    fileSearchResult.IsSearching.Should().Be(false);
+                    fileSearchResult.Total.Should().Be(0);
+                }
+            }
+        }
+
+        [Fact]
+        public void NotExistingFile()
+        {
+            var pulse = new Subject<Unit>();
+
+            using (var file = new TestFile())
+            {
+                file.Delete();
+
+                FileSearchResult fileSearchResult = null;
+
+                using (file.Info.WatchFile(pulse)
+                    .Search(str => str.Contains("9"))
+                    .Subscribe(x => fileSearchResult = x))
+                {
+                    fileSearchResult.Should().Be(FileSearchResult.None);
+                }
+            }
+        }
+
+        [Fact]
+        public void SearchOnDataWhenFileIsPopulated()
+        {
+            var pulse = new Subject<Unit>();
+
+            using (var file = new TestFile())
+            {
+                FileSearchResult fileSearchResult = null;
                 file.Append(Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
 
-                var segments = file.Info.WatchFile(pulse).WithSegments();
-
-                using (var search = new FileSearch(segments, str => str.Contains("9")))
+                using (file.Info.WatchFile(pulse)
+                    .Search(str => str.Contains("9"))
+                    .Subscribe(x => fileSearchResult = x))
                 {
+                    fileSearchResult.Matches.Length.Should().NotBe(0);
+                }
+            }
+        }
+        [Fact]
+        public void InitiallyEmptyThenLinesAdded()
+        {
+            var scheduler = new TestScheduler();
+
+            using (var file = new TestFile())
+            {
+                FileSearchResult fileSearchResult = null;
+                
+                using (file.Info.WatchFile(scheduler:scheduler)
+                    .Search(str => str.Contains("9"))
+                    .Subscribe(x => fileSearchResult = x))
+                {
+                    scheduler.AdvanceBy(1);
+                    file.Append(Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
+                    scheduler.AdvanceByMilliSeconds(250);
+                    fileSearchResult.Matches.Length.Should().Be(19);
+                }
+            }
+        }
+
+        [Fact]
+        public void WillContinuallyTail()
+        {
+            var scheduler = new TestScheduler();
+            var pulse = new Subject<Unit>();
+            
+            using (var file = new TestFile())
+            {
+                FileSearchResult fileSearchResult = null;
+                file.Append(Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
+
+                using (file.Info.WatchFile(pulse)
+                    .Search(str => str.Contains("9"), scheduler)
+                    .Subscribe(x => fileSearchResult = x))
+                {
+                  // scheduler.AdvanceBy(1);
+
+                  //  scheduler.AdvanceByMilliSeconds(250);
                     pulse.Once();
-                    file.Append(Enumerable.Range(101, 10).Select(i => i.ToString()).ToArray());
+                    fileSearchResult.Matches.Length.Should().Be(19);
+
+                    file.Append(new [] {"9","20"});
+                    scheduler.AdvanceBySeconds(10);
                     pulse.Once();
+                    fileSearchResult.Matches.Length.Should().Be(20);
+
+                    file.Append(new[] { "9999" });
+                    scheduler.AdvanceByMilliSeconds(275);
+                    pulse.Once();
+                    fileSearchResult.Matches.Length.Should().Be(21);
                 }
             }
         }
