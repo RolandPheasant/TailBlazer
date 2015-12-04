@@ -3,12 +3,6 @@ using System.Collections.Generic;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public enum LineIndexType
-    {
-        Absolute,
-        Relative
-    }
-
     public struct LineIndex : IEquatable<LineIndex>
     {
         public int Line { get; }

@@ -3,13 +3,11 @@
     public class LineMatches
     {
         public readonly static LineMatches None = new LineMatches(); 
-
         public int[] Lines { get; }
         public int Count => Lines.Length;
         public int Diff { get; }
         public LineMatchChangedReason ChangedReason { get; }
-
-
+        
         private LineMatches()
         {
             ChangedReason= LineMatchChangedReason.None;

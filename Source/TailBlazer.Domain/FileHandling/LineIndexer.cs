@@ -39,8 +39,6 @@ namespace TailBlazer.Domain.FileHandling
                 yield return _postion;
             }
         }
-
-
         public void Dispose()
         {
             _stream.Dispose();

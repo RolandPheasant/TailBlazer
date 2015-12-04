@@ -61,7 +61,7 @@ namespace TailBlazer.Domain.FileHandling
                             .Replay(1).RefCount();
             
             var indexer = fileWatcher
-                            .IndexSparsely()
+                            .Index()
                             .Synchronize(locker)
                             .RetryWithBackOff((Exception error, int attempts) =>
                             {

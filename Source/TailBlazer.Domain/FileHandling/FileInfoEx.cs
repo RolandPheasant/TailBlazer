@@ -93,7 +93,7 @@ namespace TailBlazer.Domain.FileHandling
                  }).Switch();
         }
 
-        public static IObservable<IIndexCollection> IndexSparsely(this IObservable<FileSegmentCollection> source)
+        public static IObservable<IIndexCollection> Index(this IObservable<FileSegmentCollection> source)
         {
             return Observable.Defer(() =>
             {
@@ -107,9 +107,9 @@ namespace TailBlazer.Domain.FileHandling
 
         }
 
-        public static IObservable<IIndexCollection> IndexSparsely(this IObservable<FileNotification> source)
+        public static IObservable<IIndexCollection> Index(this IObservable<FileNotification> source)
         {
-            return source.WithSegments().IndexSparsely();
+            return source.WithSegments().Index();
         }
 
         public static IObservable<FileSearchResult> Search(this FileInfo source, Func<string, bool> predicate, IScheduler scheduler=null)

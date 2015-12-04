@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
 {
-
-    public static class LineReader
+    public static class LineReaderEx
     {
         public static IEnumerable<T> ScanLines<T>(this StreamReaderExtended source,
                 int compression,

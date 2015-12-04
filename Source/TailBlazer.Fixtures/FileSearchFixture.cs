@@ -1,7 +1,6 @@
-using System.IO;
+
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Microsoft.Reactive.Testing;
 using TailBlazer.Domain.FileHandling;
@@ -15,25 +14,22 @@ namespace TailBlazer.Fixtures
         [Fact]
         public void SearchWillReturnSomething()
         {
-            var file = Path.GetTempFileName();
-            var info = new FileInfo(file);
             var scheduler = new TestScheduler();
             var pulse = new Subject<Unit>();
-            
-            File.AppendAllLines(file, Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
 
-            var segments = info
-                        .WatchFile(pulse)
-                        .WithSegments();
-
-            using (var search = new FileSearch(segments, str => str.Contains("9")))
+            using (var file = new TestFile())
             {
-                pulse.Once();
-                File.AppendAllLines(file, Enumerable.Range(101, 10).Select(i => i.ToString()).ToArray());
-                pulse.Once();
-            }
+                file.Append(Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
 
-            File.Delete(file);
+                var segments = file.Info.WatchFile(pulse).WithSegments();
+
+                using (var search = new FileSearch(segments, str => str.Contains("9")))
+                {
+                    pulse.Once();
+                    file.Append(Enumerable.Range(101, 10).Select(i => i.ToString()).ToArray());
+                    pulse.Once();
+                }
+            }
         }
     }
 }
