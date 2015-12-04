@@ -1,24 +1,20 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
-using DynamicData;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class FileSegments
+    public class FileSegmentCollection
     {
         public FileInfo Info { get;  }
         public FileSegment[] Segments { get;  }
         public long TailStartsAt { get;  }
         public int Count { get;  }
         public FileSegmentChangedReason Reason { get; }
-
         public FileSegment Tail => Segments[Count - 1];
-
         public long FileLength => Tail.End;
 
-        public FileSegments(FileInfo fileInfo, FileSegment[] segments)
+        public FileSegmentCollection(FileInfo fileInfo, FileSegment[] segments)
         {
             if (segments.Length == 0)
                 throw new ArgumentException("Argument is empty collection", nameof(segments));
@@ -30,7 +26,7 @@ namespace TailBlazer.Domain.FileHandling
             Reason = FileSegmentChangedReason.Loaded;
         }
 
-        public FileSegments(long newLength, FileSegments previous)
+        public FileSegmentCollection(long newLength, FileSegmentCollection previous)
         {
             //All this assumes it is the tail which has changed, but that may not be so
             Reason = FileSegmentChangedReason.Tailed;

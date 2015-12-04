@@ -27,7 +27,7 @@ namespace TailBlazer.Domain.FileHandling
         private readonly int _initialTail;
         private readonly int _segmentSize;
 
-        public IObservable<FileSegments> Segments { get; }
+        public IObservable<FileSegmentCollection> Segments { get; }
 
         public FileSegmenter(FileInfo info,
                                 IObservable<Unit> refresher, 
@@ -43,16 +43,16 @@ namespace TailBlazer.Domain.FileHandling
             //TODO: Re-segment as file grows.
             Segments = refresher
                 .StartWithUnit()
-                .Scan((FileSegments) null, (previous, current) =>
+                .Scan((FileSegmentCollection) null, (previous, current) =>
                 {
                     if (previous == null || previous.FileLength == 0)
                     {
                         _info.Refresh();
                         var segments = LoadSegments().ToArray();
-                        return new FileSegments(info, segments);
+                        return new FileSegmentCollection(info, segments);
                     }
                     var newLength = info.GetFileLength();
-                    return new FileSegments(newLength, previous);
+                    return new FileSegmentCollection(newLength, previous);
                 }).Replay(1).RefCount();
         }
 

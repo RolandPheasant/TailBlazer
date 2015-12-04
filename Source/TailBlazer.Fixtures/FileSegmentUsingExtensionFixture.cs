@@ -23,7 +23,7 @@ namespace TailBlazer.Fixtures
 
             var refresher = new Subject<Unit>();
 
-            FileSegments result = null;
+            FileSegmentCollection result = null;
 
             using (var indexer = info.WatchFile(refresher).WithSegments().Subscribe(segment => result = segment))
             {
@@ -54,7 +54,7 @@ namespace TailBlazer.Fixtures
             var refresher = new Subject<Unit>();
 
             var segmenter = new FileSegmenter(info, refresher, 1000);
-            FileSegments result = null;
+            FileSegmentCollection result = null;
 
             using (var indexer = info.WatchFile(refresher).WithSegments().Subscribe(segment => result = segment))
             {

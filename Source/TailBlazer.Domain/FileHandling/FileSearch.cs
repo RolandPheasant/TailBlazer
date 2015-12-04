@@ -5,7 +5,6 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
-using DynamicData.Aggregation;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.Infrastructure;
 
@@ -30,11 +29,10 @@ namespace TailBlazer.Domain.FileHandling
 
         private readonly IScheduler _scheduler;
         private readonly Func<string, bool> _predicate;
-        private readonly IObservableCache<FileSegment, FileSegmentKey> _segments;
-        private readonly IDisposable _cleanUp ;
-        public IObservable<bool> IsSearching { get; }
 
-        public FileSearch([NotNull] IObservable<FileSegments> segments, [NotNull] Func<string, bool> predicate,IScheduler scheduler =null)
+        private readonly IDisposable _cleanUp ;
+        public IObservable<FileSearchResult> Result { get; set; }
+        public FileSearch([NotNull] IObservable<FileSegmentCollection> segments, [NotNull] Func<string, bool> predicate,IScheduler scheduler =null)
         {
             if (segments == null) throw new ArgumentNullException(nameof(segments));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
@@ -46,26 +44,21 @@ namespace TailBlazer.Domain.FileHandling
             var infoLoader = shared.FirstAsync().Subscribe(s => Info = s.Info);
 
             //Create a list of elements which are to be searched
-            _segments = shared.Select(s => s.Segments)
+            var segmentCache = shared.Select(s => s.Segments)
                 .ToObservableChangeSet(s => s.Key)
                 .IgnoreUpdateWhen((current,previous)=>current==previous)
                 .AsObservableCache();
-
-
+            
             var searchData= new SourceCache<FileSegmentSearch, FileSegmentKey>(s=>s.Key);
             
-            IsSearching = searchData.Connect()
-                .QueryWhenChanged(query =>
-                {
-                    return query.Items.Any(search => search.Status == FileSegmentSearchStatus.Searching);
-                }).DistinctUntilChanged();
+            Result = searchData.Connect().QueryWhenChanged(query => new FileSearchResult(query.Items));
 
             //initialise a pending state for all segments
-            var loader = _segments.Connect()
+            var loader = segmentCache.Connect()
                 .Transform(fs => new FileSegmentSearch(fs))
                 .PopulateInto(searchData);
 
-            var tailSearch = _segments.WatchValue(FileSegmentKey.Tail)
+            var tailSearch = segmentCache.WatchValue(FileSegmentKey.Tail)
                 .Scan((FileSegmentSearch) null, (previous, current) =>
                 {
                     if (previous == null)
@@ -76,21 +69,24 @@ namespace TailBlazer.Domain.FileHandling
                     else
                     {
                         var result = Search(previous.Segment.End, current.End);
+                        if (result == null) return previous;
                         return new FileSegmentSearch(previous, result);
                     }
-                }).Publish();
+                })
+                .DistinctUntilChanged()
+                .Publish();
             
             var tailSubscriber = tailSearch
                                 .Subscribe(tail => searchData.AddOrUpdate(tail));
 
             var headSubscriber = tailSearch.Take(1).ContinueAfter(() =>
             {
-
+                var locker = new object();
                 return searchData
                     .Connect(sd => sd.Segment.Type == FileSegmentType.Head && sd.Status == FileSegmentSearchStatus.Pending)
-                   // .Flatten()
                     .SelectMany(changes=>changes.Select(c=>c.Current).OrderByDescending(c=>c.Segment.Index).ToArray())
                     .ObserveOn(_scheduler)
+                    .Synchronize(locker)
                     .Do(head => searchData.AddOrUpdate(new FileSegmentSearch(head.Segment,FileSegmentSearchStatus.Searching) ))
                     .Select(fss =>
                     {
@@ -100,8 +96,8 @@ namespace TailBlazer.Domain.FileHandling
             })
            .Subscribe(head => searchData.AddOrUpdate(head));
 
-            _cleanUp = new CompositeDisposable(shared.Connect(), 
-                _segments, 
+            _cleanUp = new CompositeDisposable(shared.Connect(),
+                segmentCache, 
                 loader,
                 tailSubscriber,
                 headSubscriber,
@@ -109,7 +105,15 @@ namespace TailBlazer.Domain.FileHandling
                 infoLoader);
         }
 
-        private FileSearchResult Search(long start, long end)
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
+        private FileSegmentSearchResult Search(long start, long end)
         {
             long lastPosition = 0;
             using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
@@ -119,7 +123,7 @@ namespace TailBlazer.Domain.FileHandling
                 {
                     stream.Seek(start, SeekOrigin.Begin);
                     if (reader.EndOfStream)
-                        return null;
+                        return new FileSegmentSearchResult(start,end);
 
                     lines = reader.SearchLines(_predicate, i => i, (line, position) =>
                     {
@@ -128,7 +132,7 @@ namespace TailBlazer.Domain.FileHandling
 
                     }).ToArray();
                 }
-                return new FileSearchResult(start, lastPosition, lines);
+                return new FileSegmentSearchResult(start, lastPosition, lines);
             }
         }
 

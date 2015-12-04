@@ -65,11 +65,12 @@
     <Compile Include="FileHandling\FileInfoEx.cs" />
     <Compile Include="FileHandling\FileSearch.cs" />
     <Compile Include="FileHandling\FileSearchResult.cs" />
+    <Compile Include="FileHandling\FileSegmentSearchResult.cs" />
     <Compile Include="FileHandling\FileSegment.cs" />
     <Compile Include="FileHandling\FileSegmentChangedReason.cs" />
     <Compile Include="FileHandling\FileSegmenter.cs" />
     <Compile Include="FileHandling\FileSegmentKey.cs" />
-    <Compile Include="FileHandling\FileSegments.cs" />
+    <Compile Include="FileHandling\FileSegmentCollection.cs" />
     <Compile Include="FileHandling\FileSegmentSearch.cs" />
     <Compile Include="FileHandling\FileSegmentSearchStatus.cs" />
     <Compile Include="FileHandling\FileSegmentType.cs" />

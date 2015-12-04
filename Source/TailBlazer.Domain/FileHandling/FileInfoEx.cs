@@ -74,13 +74,13 @@ namespace TailBlazer.Domain.FileHandling
         }
 
 
-        public static IObservable<FileSegments> WithSegments(this IObservable<FileNotification> source)
+        public static IObservable<FileSegmentCollection> WithSegments(this IObservable<FileNotification> source)
         {
             return source
                  .Where(n => n.NotificationType == FileNotificationType.Created)
                  .Select(createdNotification =>
                  {
-                     return Observable.Create<FileSegments>(observer =>
+                     return Observable.Create<FileSegmentCollection>(observer =>
                      {
                          var refresher = source
                              .Where(n => n.NotificationType == FileNotificationType.Changed)
@@ -93,7 +93,7 @@ namespace TailBlazer.Domain.FileHandling
                  }).Switch();
         }
 
-        public static IObservable<IIndexCollection> IndexSparsely(this IObservable<FileSegments> source)
+        public static IObservable<IIndexCollection> IndexSparsely(this IObservable<FileSegmentCollection> source)
         {
             return Observable.Defer(() =>
             {
@@ -110,6 +110,27 @@ namespace TailBlazer.Domain.FileHandling
         public static IObservable<IIndexCollection> IndexSparsely(this IObservable<FileNotification> source)
         {
             return source.WithSegments().IndexSparsely();
+        }
+
+        public static IObservable<FileSearchResult> Search(this IObservable<FileNotification> source,Func<string, bool> predicate)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
+            return source.WithSegments().Search(predicate);
+        }
+
+        public static IObservable<FileSearchResult> Search(this IObservable<FileSegmentCollection> source, Func<string, bool> predicate)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
+            return Observable.Create<FileSearchResult>(observer =>
+            {
+                var searcher = new FileSearch(source, predicate);
+                var publisher = searcher.Result.SubscribeSafe(observer);
+                return new CompositeDisposable(publisher, searcher);
+            });
         }
 
         public static IObservable<LineMatches> Match(this IObservable<FileNotification> source, Func<string,bool> predicate, Action<bool> isSearching=null)
@@ -181,7 +202,7 @@ namespace TailBlazer.Domain.FileHandling
         }
 
         public static long FindNextEndOfLinePosition(this StreamReaderExtended source, long initialPosition,
-            SeekOrigin origin= SeekOrigin.Current)
+            SeekOrigin origin= SeekOrigin.Begin)
         {
 
             if (source.EndOfStream) return -1;

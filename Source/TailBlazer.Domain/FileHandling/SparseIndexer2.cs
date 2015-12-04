@@ -35,7 +35,7 @@ namespace TailBlazer.Domain.FileHandling
         public int TailSize { get; }
         public IObservable<SparseIndexCollection> Result { get; }
 
-        public SparseIndexer2([NotNull] IObservable<FileSegments> fileSegments,
+        public SparseIndexer2([NotNull] IObservable<FileSegmentCollection> fileSegments,
             int compression = 10,
             int tailSize = 1000000,
             int sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing= 250000000,
