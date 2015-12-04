@@ -53,6 +53,30 @@ namespace TailBlazer.Fixtures
             }
         }
 
+        //[Fact]
+        //Cannot recreate the file as something is hanging on to it.
+        public void CreateFileLater()
+        {
+            var pulse = new Subject<Unit>();
+
+            using (var file = new TestFile())
+            {
+                file.Delete();
+
+                FileSearchResult fileSearchResult = null;
+
+                using (file.Info.WatchFile(pulse)
+                    .Search(str => str.Contains("9"))
+                    .Subscribe(x => fileSearchResult = x))
+                {
+                    fileSearchResult.Should().Be(FileSearchResult.None);
+                    file.Create();
+                    pulse.Once();
+                    fileSearchResult.Should().NotBe(FileSearchResult.None);
+                }
+            }
+        }
+
         [Fact]
         public void SearchOnDataWhenFileIsPopulated()
         {
@@ -107,19 +131,16 @@ namespace TailBlazer.Fixtures
                     .Search(str => str.Contains("9"), scheduler)
                     .Subscribe(x => fileSearchResult = x))
                 {
-                  // scheduler.AdvanceBy(1);
-
-                  //  scheduler.AdvanceByMilliSeconds(250);
                     pulse.Once();
                     fileSearchResult.Matches.Length.Should().Be(19);
 
                     file.Append(new [] {"9","20"});
-                    scheduler.AdvanceBySeconds(10);
+                   // scheduler.AdvanceBySeconds(10);
                     pulse.Once();
                     fileSearchResult.Matches.Length.Should().Be(20);
 
                     file.Append(new[] { "9999" });
-                    scheduler.AdvanceByMilliSeconds(275);
+                 //   scheduler.AdvanceByMilliSeconds(275);
                     pulse.Once();
                     fileSearchResult.Matches.Length.Should().Be(21);
                 }

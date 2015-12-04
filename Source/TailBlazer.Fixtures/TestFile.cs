@@ -11,6 +11,7 @@ namespace TailBlazer.Fixtures
 
         public TestFile()
         {
+
             Name = Path.GetTempFileName();
             Info = new FileInfo(Name);
         }
@@ -28,6 +29,13 @@ namespace TailBlazer.Fixtures
         public void Delete()
         {
             File.Delete(Name);
+        }
+
+        public void Create()
+        {
+            Name = Path.GetTempFileName();
+            Info = new FileInfo(Name);
+            File.Create(Name);
         }
 
         public void Dispose()
