@@ -135,12 +135,10 @@ namespace TailBlazer.Fixtures
                     fileSearchResult.Matches.Length.Should().Be(19);
 
                     file.Append(new [] {"9","20"});
-                   // scheduler.AdvanceBySeconds(10);
                     pulse.Once();
                     fileSearchResult.Matches.Length.Should().Be(20);
 
                     file.Append(new[] { "9999" });
-                 //   scheduler.AdvanceByMilliSeconds(275);
                     pulse.Once();
                     fileSearchResult.Matches.Length.Should().Be(21);
                 }

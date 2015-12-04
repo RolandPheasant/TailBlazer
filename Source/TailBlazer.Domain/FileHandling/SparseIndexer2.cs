@@ -71,8 +71,7 @@ namespace TailBlazer.Domain.FileHandling
             var tailScanner= shared.Select(segments => segments.Tail).DistinctUntilChanged()
                 //.ObserveOn(scheduler)
                 .Scan((SparseIndex)null, (previous, current) =>
-                {
-                   
+               {
                     if (previous == null)
                     {
                         return Scan(current.Start, -1, 1);

@@ -7,11 +7,8 @@ namespace TailBlazer.Domain.FileHandling
     {
         public FileSegmentKey Key { get; }
         public FileSegment Segment { get; }
-
         public FileSegmentSearchStatus Status { get; }
-
         public long[] Lines => _matches.Data;
-
         private readonly ImmutableList<long> _matches;
         
 

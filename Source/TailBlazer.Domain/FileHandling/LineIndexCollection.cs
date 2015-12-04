@@ -59,7 +59,6 @@ namespace TailBlazer.Domain.FileHandling
                     var start = i == 0 ? 0 : Lines[i - 1];
                     var end = Lines[i] - 1;
                     return new LineIndex(i + 1, i, start, end);
-
                 });
         }
 

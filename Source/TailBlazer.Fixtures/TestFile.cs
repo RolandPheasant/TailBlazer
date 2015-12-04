@@ -33,8 +33,6 @@ namespace TailBlazer.Fixtures
 
         public void Create()
         {
-            Name = Path.GetTempFileName();
-            Info = new FileInfo(Name);
             File.Create(Name);
         }
 

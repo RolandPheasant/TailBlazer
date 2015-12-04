@@ -65,6 +65,7 @@
     <Compile Include="FileHandling\FileInfoEx.cs" />
     <Compile Include="FileHandling\FileSearch.cs" />
     <Compile Include="FileHandling\FileSearchResult.cs" />
+    <Compile Include="FileHandling\FileSearchResultEx.cs" />
     <Compile Include="FileHandling\FileSegmentSearchResult.cs" />
     <Compile Include="FileHandling\FileSegment.cs" />
     <Compile Include="FileHandling\FileSegmentChangedReason.cs" />

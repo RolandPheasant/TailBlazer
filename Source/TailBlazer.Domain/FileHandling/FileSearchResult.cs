@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class FileSearchResult
+    public class FileSearchResult//: ILineProvider
     {
         public static readonly FileSearchResult None = new FileSearchResult();
         public long[] Matches { get; }
