@@ -112,22 +112,30 @@ namespace TailBlazer.Domain.FileHandling
             return source.WithSegments().IndexSparsely();
         }
 
-        public static IObservable<FileSearchResult> Search(this IObservable<FileNotification> source,Func<string, bool> predicate)
+        public static IObservable<FileSearchResult> Search(this FileInfo source, Func<string, bool> predicate, IScheduler scheduler=null)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
-            return source.WithSegments().Search(predicate);
+            return source.WatchFile(scheduler:scheduler).WithSegments().Search(predicate);
         }
 
-        public static IObservable<FileSearchResult> Search(this IObservable<FileSegmentCollection> source, Func<string, bool> predicate)
+        public static IObservable<FileSearchResult> Search(this IObservable<FileNotification> source,Func<string, bool> predicate, IScheduler scheduler = null)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
+            return source.WithSegments().Search(predicate, scheduler);
+        }
+
+        public static IObservable<FileSearchResult> Search(this IObservable<FileSegmentCollection> source, Func<string, bool> predicate, IScheduler scheduler = null)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
             return Observable.Create<FileSearchResult>(observer =>
             {
-                var searcher = new FileSearch(source, predicate);
+                var searcher = new FileSearch(source, predicate, scheduler);
                 var publisher = searcher.Result.SubscribeSafe(observer);
                 return new CompositeDisposable(publisher, searcher);
             });

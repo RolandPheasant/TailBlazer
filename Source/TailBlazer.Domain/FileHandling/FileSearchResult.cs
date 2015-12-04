@@ -5,6 +5,8 @@ namespace TailBlazer.Domain.FileHandling
 {
     public class FileSearchResult
     {
+        public static readonly FileSearchResult None = new FileSearchResult();
+
         public long[] Matches { get; }
         public int TotalMatches => Matches.Length;
         public int SegmentsCompleted { get; }
@@ -20,6 +22,11 @@ namespace TailBlazer.Domain.FileHandling
             SegmentsCompleted = fileSegmentSearches.Count(s=>s.Status== FileSegmentSearchStatus.Complete);
             Matches = fileSegmentSearches.SelectMany(s => s.Lines).ToArray();
 
+        }
+
+        private FileSearchResult()
+        {
+            Matches = new long[0];
         }
 
 

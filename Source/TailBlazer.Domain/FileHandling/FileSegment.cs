@@ -9,7 +9,6 @@ namespace TailBlazer.Domain.FileHandling
         public long End { get;  }
         public FileSegmentType Type { get;  }
         public long Size => End - Start;
-
         public FileSegmentKey Key { get; }
 
         public FileSegment(int index, long start, long end, FileSegmentType type)

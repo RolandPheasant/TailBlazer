@@ -39,8 +39,6 @@ namespace TailBlazer.Domain.FileHandling
             segments[segments.Length-1] = new FileSegment(last, newLength);
             Segments = segments;
             Count = Segments.Length;
-
-
         }
     }
 }

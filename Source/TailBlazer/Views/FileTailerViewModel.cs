@@ -56,6 +56,15 @@ namespace TailBlazer.Views
                         .ObserveOn(schedulerProvider.Background)
                         .DistinctUntilChanged();
 
+            var search = filterRequest.Select(searchText =>
+            {
+                if (string.IsNullOrEmpty(searchText) || searchText.Length < 3)
+                    return Observable.Return(FileSearchResult.None);
+
+                return fileInfo.Search(s => s.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+
+            }).Switch();
+
             //tailer is the main object used to tail, scroll and filter in a file
             var tailer = fileTailerFactory.Create(fileInfo, filterRequest, scroller);
             

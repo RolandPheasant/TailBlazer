@@ -10,9 +10,9 @@ namespace TailBlazer.Domain.FileHandling
 
         public FileSegmentSearchStatus Status { get; }
 
-        public long[] Lines => _lines.Data;
+        public long[] Lines => _matches.Data;
 
-        private readonly ImmutableList<long> _lines;
+        private readonly ImmutableList<long> _matches;
         
 
         public FileSegmentSearch(FileSegment segment, FileSegmentSearchStatus status = FileSegmentSearchStatus.Pending)
@@ -20,7 +20,7 @@ namespace TailBlazer.Domain.FileHandling
             Key = segment.Key;
             Segment = segment;
             Status = status;
-            _lines = new ImmutableList<long>();
+            _matches = new ImmutableList<long>();
         }
 
         public FileSegmentSearch(FileSegment segment, FileSegmentSearchResult result)
@@ -28,7 +28,7 @@ namespace TailBlazer.Domain.FileHandling
             Key = segment.Key;
             Segment = segment;
             Status =  FileSegmentSearchStatus.Complete;
-            _lines = new ImmutableList<long>(result.Indicies);
+            _matches = new ImmutableList<long>(result.Indicies);
         }
 
         public FileSegmentSearch(FileSegmentSearch segmentSearch, FileSegmentSearchResult result)
@@ -37,10 +37,9 @@ namespace TailBlazer.Domain.FileHandling
             Key = segmentSearch.Key;
             Segment = new FileSegment(segmentSearch.Segment, result.End); 
             Status = FileSegmentSearchStatus.Complete;
-            _lines = segmentSearch._lines.Add(result.Indicies);
+            _matches = segmentSearch._matches.Add(result.Indicies);
         }
 
-        //  public 
 
         #region Equality
 
@@ -82,5 +81,9 @@ namespace TailBlazer.Domain.FileHandling
 
         #endregion
 
+        public override string ToString()
+        {
+            return $"{Segment} ->{Status}. Items: {Lines}";
+        }
     }
 }
