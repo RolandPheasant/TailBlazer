@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,7 +8,7 @@ namespace TailBlazer.Domain.FileHandling
     {
         public static readonly FileSearchResult None = new FileSearchResult();
         public long[] Matches { get; }
-        public int Total => Matches.Length;
+        public int Count => Matches.Length;
         public int SegmentsCompleted { get; }
         public int Segments { get; }
         public bool IsSearching { get; }
@@ -18,8 +19,10 @@ namespace TailBlazer.Domain.FileHandling
             IsSearching = fileSegmentSearches.Any(s => s.Status != FileSegmentSearchStatus.Complete);
 
             Segments = fileSegmentSearches.Length;
-            SegmentsCompleted = fileSegmentSearches.Count(s=>s.Status== FileSegmentSearchStatus.Complete);
+            SegmentsCompleted = fileSegmentSearches.Count(s => s.Status == FileSegmentSearchStatus.Complete);
             Matches = fileSegmentSearches.SelectMany(s => s.Lines).ToArray();
+
+            Console.WriteLine($"{SegmentsCompleted}/{Segments}. {Count}");
 
         }
 

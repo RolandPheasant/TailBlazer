@@ -17,6 +17,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ProgressBar.xaml" />
+           
             </ResourceDictionary.MergedDictionaries>
 
             <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InverredBooleanToVisibilityConverter"/>
@@ -49,62 +50,70 @@
 
         <Grid Margin="0 4 0 4" >
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto" MinWidth="175"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
+            
 
-            <StackPanel Orientation="Horizontal">
-                <Viewbox Width="24" Height="24" Margin="4 0 0 0">
+                <Viewbox
+                    Grid.Column="0" Grid.RowSpan="2"
+                    Width="24" Height="24" Margin="4 0 0 0">
                     <Canvas Width="24" Height="24">
+
+                        <!--<Path Data="M 25.34375 0.59375 L 21.4375 3.15625 L 16.8125 6.21875 L 18.375 3.3125 L 15.4375 4.90625 C 15.4375 4.90625 13.053934 6.2050341 10.34375 7.84375 C 7.633566 9.4824659 4.6356734 11.400968 3.09375 13 C 0.32055475 15.773195 0.32055475 20.226805 3.09375 23 C 5.8669452 25.773195 10.320555 25.773195 13.09375 23 C 14.636855 21.456895 16.397579 18.86773 17.8125 16.59375 C 19.227421 14.31977 20.28125 12.375 20.28125 12.375 L 21.5625 10.0625 L 19.0625 10.96875 L 18.6875 11.09375 L 22.84375 4.53125 L 25.34375 0.59375 z M 18.65625 7.40625 L 15.46875 12.46875 L 13.90625 14.90625 L 16.625 13.9375 L 17.15625 13.75 C 16.742642 14.459353 16.693315 14.567664 16.09375 15.53125 C 14.708671 17.75727 12.944395 20.336855 11.6875 21.59375 C 9.6606952 23.620555 6.5268048 23.620555 4.5 21.59375 C 2.4731952 19.566945 2.4731952 16.433055 4.5 14.40625 L 4.53125 14.40625 C 5.6893266 13.205282 8.710184 11.173784 11.375 9.5625 C 12.422652 8.929036 12.52043 8.9081853 13.34375 8.4375 L 13.125 8.8125 L 11.21875 12.34375 L 14.5625 10.125 L 18.65625 7.40625 z M 8 15 C 6.3 15 5 16.3 5 18 C 5 19.7 6.3 21 8 21 C 9.7 21 11 19.7 11 18 C 11 16.3 9.7 15 8 15 z"
+                              Fill="{Binding ElementName=SearchTextBox, Path=BorderBrush}" />-->
                         <Path Data="M3,2H21V2H21V4H20.92L15,9.92V22.91L9,16.91V9.91L3.09,4H3V2M11,16.08L13,18.08V9H13.09L18.09,4H5.92L10.92,9H11V16.08Z" 
                               Fill="{Binding ElementName=SearchTextBox, Path=BorderBrush}" />
                     </Canvas>
                 </Viewbox>
 
-                <TextBox x:Name="SearchTextBox" 
+                <TextBox Margin="6 0 0 0"
+                         Grid.Column="1" x:Name="SearchTextBox" 
                     wpf:TextFieldAssist.Hint="{Binding SearchHint.Value}"          
-                    Margin="4 0 0 0"
-                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                    Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     VerticalAlignment="Center"
-                    MinWidth="125"/>
+                    MinWidth="175"/>
 
-                <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"    
-                    Visibility="{Binding SearchIsInProgess.Value, Converter={StaticResource BooleanToVisibilityConverter}}"         
-                    Value="65"
-                    IsIndeterminate="True"
-                    Margin="6 2 0 2" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <Grid Grid.Column="2"  
+                      HorizontalAlignment="Left"
+               
+                      Margin="8 0 0 0">
 
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
 
-                <StackPanel  
-                    VerticalAlignment="Center"
-                    Margin="12 0 6 0"
-                     Orientation="Horizontal" 
-                     HorizontalAlignment="Left">
+                    </Grid.RowDefinitions>
 
-                    <TextBlock  Visibility="Collapsed"
-                    Margin="4 0 0 0"
-                   Text="{Binding FirstIndex,StringFormat='\first={0}'}"
-                    VerticalAlignment="Center"
-                    MinWidth="125"/>
+                    <StackPanel x:Name="SizeText"
+                        MinWidth="250"
+                        VerticalAlignment="Center" Orientation="Horizontal" HorizontalAlignment="Left">
+                        <TextBlock Text="{Binding FileSizeText.Value}" />
 
-                    <TextBlock   Visibility="Collapsed"
-                    Margin="4 0 0 0"
-                    Text="{Binding PageSize,StringFormat='\size={0}'}"
-                    VerticalAlignment="Center"
-                    MinWidth="125"/>
+                        <Border Margin="4 1 0 1" BorderThickness="1 0 0 0"
+                                Opacity=".35"
+                                BorderBrush="{Binding ElementName=TextBlock2,Path=Foreground}" />
 
-                    <TextBlock Text="{Binding FileSizeText.Value}" />
+                        <TextBlock  x:Name="TextBlock2" Margin="2 0 0 0" Text="{Binding LineCountText.Value}" />
+                    </StackPanel>
 
-                    <Border Margin="4 1 0 1" BorderThickness="1 0 0 0"
-                        Opacity=".6"
-                        BorderBrush="{Binding ElementName=TextBlock2,Path=Foreground}"
-                        />
-                    <TextBlock  x:Name="TextBlock2" Margin="2 0 0 0" Text="{Binding LineCountText.Value}" />
-                </StackPanel>
-            </StackPanel>
+                    <ProgressBar
+                        Width="{Binding ElementName=SizeText, Path=Width}"    
+                        Grid.Row="1"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Bottom"
+                        Visibility="{Binding Searching, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Value="{Binding SegmentsSearched}"
+                        Maximum="{Binding Segments}"
+                        Minimum="0"
+                       
+                        IsIndeterminate="False"/>
+                </Grid>
 
-            <CheckBox Grid.Column="1"
+            <CheckBox Grid.Column="3"
                       HorizontalAlignment="Right"
                       VerticalAlignment="Center"
                       IsChecked="{Binding AutoTail}"

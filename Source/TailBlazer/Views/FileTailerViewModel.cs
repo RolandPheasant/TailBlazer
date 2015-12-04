@@ -22,6 +22,13 @@ namespace TailBlazer.Views
         private bool _autoTail=true;
         private int _firstIndex;
         private int _pageSize;
+        private bool _searching
+            
+            ;
+
+        private int _segments;
+        private int _segmentsSearched
+            ;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
 
@@ -47,8 +54,7 @@ namespace TailBlazer.Views
 
             //An observable which acts as a scroll command
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
-            var scroller = _userScrollRequested
-                        .CombineLatest(autoChanged, (user, auto) =>
+            var scroller = _userScrollRequested.CombineLatest(autoChanged, (user, auto) =>
                         {
                             var mode = AutoTail ? ScrollingMode.Tail : ScrollingMode.User;
                             return  new ScrollRequest(mode, user.PageSize, user.FirstIndex);
@@ -63,18 +69,26 @@ namespace TailBlazer.Views
 
                 return fileInfo.Search(s => s.Contains(searchText, StringComparison.OrdinalIgnoreCase));
 
-            }).Switch();
+            }).Switch()
+            .Replay(1).RefCount();
+
+            var progressMonitor = search.Subscribe(result =>
+            {
+                Searching = result.IsSearching;
+                Segments = result.Segments;
+                SegmentsSearched = result.SegmentsCompleted;
+            });
 
             //tailer is the main object used to tail, scroll and filter in a file
-            var tailer = fileTailerFactory.Create(fileInfo, filterRequest, scroller);
+            var tailer = fileTailerFactory.Create(fileInfo, search, scroller);
             
             //User feedback for when tailer is loading
             IsLoading = tailer.IsLoading.ForBinding();
 
-            //User feedback lines count and filter matches
-            LineCountText = tailer.TotalLines.CombineLatest(tailer.MatchedLines,(total,matched)=> total == matched 
-                ? $"{total.ToString("#,###")} lines" 
-                : $"{matched.ToString("#,###0")} of {total.ToString("#,###")} lines").ForBinding();
+            ////User feedback lines count and filter matches
+            LineCountText = tailer.TotalLines.CombineLatest(tailer.MatchedLines, (total, matched) => total == matched
+                 ? $"{total.ToString("#,###")} lines"
+                 : $"{matched.ToString("#,###0")} of {total.ToString("#,###")} lines").ForBinding();
 
             //User feedback to show file size
             FileSizeText = tailer.FileSize
@@ -126,6 +140,7 @@ namespace TailBlazer.Views
                 SearchHint,
                 ShouldHightlightMatchingText,
                 SearchIsInProgess,
+                progressMonitor,
                 Disposable.Create(_userScrollRequested.OnCompleted));
         }
         
@@ -174,7 +189,26 @@ namespace TailBlazer.Views
             get { return _firstIndex; }
             set { SetAndRaise(ref _firstIndex, value); }
         }
-        
+
+
+        public bool Searching
+        {
+            get { return _searching; }
+            set { SetAndRaise(ref _searching, value); }
+        }
+
+        public int Segments
+        {
+            get { return _segments; }
+            set { SetAndRaise(ref _segments, value); }
+        }
+
+        public int SegmentsSearched
+        {
+            get { return _segmentsSearched; }
+            set { SetAndRaise(ref _segmentsSearched, value); }
+        }
+
         public void Dispose()
         {
             _cleanUp.Dispose();

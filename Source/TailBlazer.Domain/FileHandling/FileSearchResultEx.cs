@@ -17,20 +17,20 @@ namespace TailBlazer.Domain.FileHandling
 
             if (scroll.Mode == ScrollingMode.Tail)
             {
-                first = size > source.Total ? 0 : source.Total - size;
+                first = size > source.Count ? 0 : source.Count - size;
             }
             else
             {
-                if (scroll.FirstIndex + size >= source.Total)
-                    first = source.Total - size;
+                if (scroll.FirstIndex + size >= source.Count)
+                    first = source.Count - size;
             }
 
-            return Enumerable.Range(first, Math.Min(size, source.Total))
+            return Enumerable.Range(first, Math.Min(size, source.Count))
                 .Select(i =>
                 {
                     var start = i == 0 ? 0 : source.Matches[i - 1];
                     var end = source.Matches[i] - 1;
-                    return new LineIndex(i + 1, i, start, end);
+                    return new LineIndex(0, i, start, end);
                 });
         }
     }

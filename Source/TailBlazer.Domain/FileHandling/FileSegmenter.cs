@@ -58,24 +58,25 @@ namespace TailBlazer.Domain.FileHandling
 
         public IEnumerable<FileSegment> LoadSegments()
         {
-
-            var fileLength = _info.Length;
-            if (fileLength == 0)
-            {
-                yield return new FileSegment(0, 0, 0, FileSegmentType.Tail);
-                yield break;
-            }
-
-            if (fileLength < _initialTail)
-            {
-                yield return new FileSegment(0, 0, fileLength, FileSegmentType.Tail);
-                yield break;
-            }
             using (var stream = File.Open(_info.FullName, FileMode.Open, FileAccess.Read,FileShare.Delete | FileShare.ReadWrite))
             {
                 stream.Seek(0, SeekOrigin.Begin);
                 using (var reader = new StreamReaderExtended(stream, true))
                 {
+
+                    var fileLength = stream.Length;
+                    if (fileLength == 0)
+                    {
+                        yield return new FileSegment(0, 0, 0, FileSegmentType.Tail);
+                        yield break;
+                    }
+
+                    if (fileLength < _initialTail)
+                    {
+                        yield return new FileSegment(0, 0, fileLength, FileSegmentType.Tail);
+                        yield break;
+                    }
+
                     var headStartsAt = reader.FindNextEndOfLinePosition(fileLength - _initialTail);
                     long currentEnfOfPage = 0;
                     long previousEndOfPage = 0;

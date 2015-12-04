@@ -102,7 +102,6 @@
     <Compile Include="FileSegmentUsingExtensionFixture.cs" />
     <Compile Include="SparseIndexerFixture.cs" />
     <Compile Include="FileScanFixture.cs" />
-    <Compile Include="FileTailerFixture.cs" />
     <Compile Include="FileWatchFixture.cs" />
     <Compile Include="LogFixtures.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

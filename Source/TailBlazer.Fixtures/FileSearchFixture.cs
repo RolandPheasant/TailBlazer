@@ -28,7 +28,7 @@ namespace TailBlazer.Fixtures
                     fileSearchResult.Segments.Should().Be(1);
                     fileSearchResult.SegmentsCompleted.Should().Be(1);
                     fileSearchResult.IsSearching.Should().Be(false);
-                    fileSearchResult.Total.Should().Be(0);
+                    fileSearchResult.Count.Should().Be(0);
                 }
             }
         }
