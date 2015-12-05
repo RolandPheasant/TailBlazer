@@ -39,8 +39,7 @@
     <StartupObject>TailBlazer.Infrastucture.BootStrap</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>
-    </ApplicationIcon>
+    <ApplicationIcon>tailblazer.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Dragablz, Version=0.0.2.140, Culture=neutral, processorArchitecture=MSIL">
@@ -141,6 +140,7 @@
     <Compile Include="Views\ScrollChangedArgs.cs" />
     <Compile Include="Views\ScrollDirection.cs" />
     <Compile Include="Views\ScrollBoundsArgs.cs" />
+    <Compile Include="Views\TailBlazerIcon.cs" />
     <Compile Include="Views\VirtualScrollPanel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -216,6 +216,9 @@
       <Project>{332f8beb-1743-4b41-8953-a66a57f2503d}</Project>
       <Name>TailBlazer.Domain</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="tailblazer.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
