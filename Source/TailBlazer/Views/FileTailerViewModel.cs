@@ -22,13 +22,9 @@ namespace TailBlazer.Views
         private bool _autoTail=true;
         private int _firstIndex;
         private int _pageSize;
-        private bool _searching
-            
-            ;
-
+        private bool _searching;
         private int _segments;
-        private int _segmentsSearched
-            ;
+        private int _segmentsSearched;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
 

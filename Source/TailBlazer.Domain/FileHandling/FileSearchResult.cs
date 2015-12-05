@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 
 namespace TailBlazer.Domain.FileHandling
@@ -37,7 +36,6 @@ namespace TailBlazer.Domain.FileHandling
             Size = 0;
 
             Console.WriteLine($"{SegmentsCompleted}/{Segments}. {Count}");
-
         }
         
         public FileSearchResult(FileSearchResult previous, FileSegmentSearch current)
@@ -46,7 +44,6 @@ namespace TailBlazer.Domain.FileHandling
 
             _allSearches = previous._allSearches.Values.ToDictionary(fss => fss.Key);
             _allSearches[current.Key] = current;
-
             var all = _allSearches.Values.ToArray();
 
             IsSearching = all.Any(s => s.Segment.Type == FileSegmentType.Head && s.Status != FileSegmentSearchStatus.Complete);
@@ -57,18 +54,14 @@ namespace TailBlazer.Domain.FileHandling
 
             //For large sets this could be very inefficient
             Matches = all.SelectMany(s => s.Lines).ToArray();
-
+            
             Console.WriteLine($"{SegmentsCompleted}/{Segments}. {Count}");
-
         }
-
-
-
+        
         private FileSearchResult()
         {
             Matches = new long[0];
         }
-
 
         #region Equality
 
@@ -111,5 +104,9 @@ namespace TailBlazer.Domain.FileHandling
 
         #endregion
 
+        public override string ToString()
+        {
+            return this == None ? "<None>" : $"Count: {Count}, Segments: {Segments}, Size: {Size}";
+        }
     }
 }

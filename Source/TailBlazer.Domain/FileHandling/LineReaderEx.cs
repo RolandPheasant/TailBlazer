@@ -49,7 +49,7 @@ namespace TailBlazer.Domain.FileHandling
                 long position = source.AbsolutePosition();
 
                 if (predicate(line))
-                    yield return selector(previousPostion);
+                    yield return selector(position);
 
                 if (shouldBreak(line, position))
                     yield break;

@@ -1,75 +1,84 @@
-﻿using System;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace TailBlazer.Domain.Infrastructure
 {
-    /// <summary>
-    /// whipped straight from rx.net
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    internal class ImmutableList<T>
+    public class ImmutableList<T>
     {
         public static readonly ImmutableList<T> Empty = new ImmutableList<T>();
 
-        private readonly T[] _data;
+        private readonly List<T> _data;
+        public IReadOnlyCollection<T> Data => new ReadOnlyCollection<T>(_data);
 
         public ImmutableList()
         {
-            _data = new T[0];
+            _data = new List<T>();
         }
 
-        public ImmutableList(T[] data)
+        public ImmutableList(List<T> data)
         {
-            _data = data;
+            _data = new List<T>(data);
+        }
+        public ImmutableList(IReadOnlyList<T> data)
+        {
+            _data = new List<T>(data);
         }
 
-        public T[] Data => _data;
-
+        public ImmutableList(IReadOnlyCollection<T> data)
+        {
+            _data = new List<T>(data);
+        }
         public ImmutableList<T> Add(T value)
         {
-            var newData = new T[_data.Length + 1];
-
-            Array.Copy(_data, newData, _data.Length);
-            newData[_data.Length] = value;
-
+            var newData = new List<T>(_data) {value};
             return new ImmutableList<T>(newData);
+        }
+
+
+        public T this[int index]
+        {
+            get { return _data[index]; }
         }
 
 
         public ImmutableList<T> Add(T[] newItems)
         {
-
-            var result = new T[_data.Length + newItems.Length];
-            _data.CopyTo(result, 0);
-            newItems.CopyTo(result, _data.Length);
-
-            return new ImmutableList<T>(result);
+            var list = new List<T>(_data);
+            list.AddRange(newItems);
+            return new ImmutableList<T>(list);
         }
+
+        public ImmutableList<T> Add(IList<T> newItems)
+        {
+            var list = new List<T>(_data);
+            list.AddRange(newItems);
+            return new ImmutableList<T>(list);
+        }
+        public ImmutableList<T> Add(ImmutableList<T> newItems)
+        {
+            var list = new List<T>(_data);
+            list.AddRange(newItems.Data);
+            return new ImmutableList<T>(list);
+        }
+
 
         public ImmutableList<T> Remove(T value)
         {
-            var i = IndexOf(value);
+            var list = new List<T>(_data);
+            var i = list.IndexOf(value);
             if (i < 0)
                 return this;
 
-            var length = _data.Length;
-            if (length == 1)
-                return Empty;
 
-            var newData = new T[length - 1];
-
-            Array.Copy(_data, 0, newData, 0, i);
-            Array.Copy(_data, i + 1, newData, i, length - i - 1);
-
-            return new ImmutableList<T>(newData);
+            return new ImmutableList<T>(list);
         }
 
-        private int IndexOf(T value)
-        {
-            for (var i = 0; i < _data.Length; ++i)
-                if (Equals(_data[i], value))
-                    return i;
+        public int Count => _data.Count;
 
-            return -1;
+        public int IndexOf(T value)
+        {
+            return _data.IndexOf(value);
         }
     }
 }

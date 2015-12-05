@@ -61,8 +61,7 @@ namespace TailBlazer.Domain.FileHandling
             IsLoading = indexer.Take(1).Select(_ => false).StartWith(true);
 
             //count matching lines (all if no filter is specified)
-            MatchedLines = indexer
-                        .CombineLatest(filter, (i, f) => f == FileSearchResult.None ? i.Count : f.Count)
+            MatchedLines = indexer.CombineLatest(filter, (i, f) => f == FileSearchResult.None ? i.Count : f.Count)
                         .Synchronize(locker);
 
             //count total line
@@ -82,10 +81,10 @@ namespace TailBlazer.Domain.FileHandling
 
                     var currentPage = indices.ToArray();
                     var previous = lines.Items.Select(l => l.LineIndex).ToArray();
-                    var removed = previous.Except(currentPage, LineIndex.LineComparer).ToArray();
+                    var removed = previous.Except(currentPage).ToArray();
                     var removedLines = lines.Items.Where(l => removed.Contains(l.LineIndex)).ToArray();
 
-                    var added = currentPage.Except(previous, LineIndex.LineComparer).ToArray();
+                    var added = currentPage.Except(previous).ToArray();
                     //finally we can load the line from the file
                     var newLines = file.ReadLine(added, (lineIndex, text) =>
                     {

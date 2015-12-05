@@ -52,19 +52,29 @@ namespace TailBlazer.Domain.FileHandling
                     first = source.Count - size;
             }
 
+            first = Math.Max(0, first);
+            size = Math.Min(size, source.Count);
+
+
+          
+
+
 
 
             //need to look up line number
             return Enumerable.Range(first, Math.Min(size, source.Count))
                 .Select(i =>
                 {
-                    var start = source.Matches[i];
-                    var end = i== source.Count -1  ? source.Size :  source.Matches[i+1] ;
-                    //var start = i == 0 ? 0 : source.Matches[i - 1];
-                    //var end = source.Matches[i] - 1;
 
-                    var lineNumber = (int)collection.GetLineNumberFromPosition(start);
-                    return new LineIndex(lineNumber, i, start, end);
+               
+                    var endOfMatchingLine = source.Matches[i];
+
+                    return collection.GetLineNumberPosition(i,endOfMatchingLine);
+
+                    //var lineNumber = (int)collection.GetLineNumberFromPosition(endOfMatchingLine)-1;
+                    //var start = lineNumber == 0 ? 0 : collection.Matches[lineNumber - 1];
+
+                    //return new LineIndex(lineNumber, i, start, endOfMatchingLine);
                 });
         }
     }

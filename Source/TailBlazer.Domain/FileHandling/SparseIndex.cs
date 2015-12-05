@@ -1,5 +1,6 @@
 using System;
 using TailBlazer.Domain.Annotations;
+using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -7,10 +8,12 @@ namespace TailBlazer.Domain.FileHandling
     {
         public long Start { get; }
         public long End { get; }
-        public long[] Indicies { get; }
+        public ImmutableList<long> Indicies { get; }
+
+ 
         public int Compression { get; }
         public int LineCount { get; }
-        public int IndexCount => Indicies.Length;
+        public int IndexCount => Indicies.Count;
 
         public IndexType Type { get; }
 
@@ -22,7 +25,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             Start = start;
             End = end;
-            Indicies = indicies;
+            Indicies = new ImmutableList<long>(indicies);
             Compression = compression;
             LineCount = lineCount;
             Type = type;
@@ -33,7 +36,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             Start = start;
             End = end;
-            Indicies = new long[0];
+            Indicies = new ImmutableList<long>();
             Compression = compression;
             LineCount = lineCount;
             Type = type;
@@ -51,10 +54,7 @@ namespace TailBlazer.Domain.FileHandling
             Type = latest.Type;
 
             //combine latest arrays
-            var items = new long[previous.Indicies.Length + latest.Indicies.Length];
-            previous.Indicies.CopyTo(items, 0);
-            latest.Indicies.CopyTo(items, previous.Indicies.Length);
-            Indicies = items;
+            Indicies = previous.Indicies.Add(latest.Indicies);
         }
     }
 }

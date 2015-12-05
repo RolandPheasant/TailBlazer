@@ -20,7 +20,7 @@ namespace TailBlazer.Domain.FileHandling
     {
         private readonly IScheduler _scheduler;
         private readonly Func<string, bool> _predicate;
-        private readonly IDisposable _cleanUp ;
+        private readonly IDisposable _cleanUp;
 
         private FileInfo Info { get; set; }
         public IObservable<FileSearchResult> SearchResult { get;  }
@@ -76,7 +76,6 @@ namespace TailBlazer.Domain.FileHandling
                     }
                     else
                     {
-
                         var result = Search(previous.Segment.End, current.End);
                         return result == null ? previous : new FileSegmentSearch(previous, result);
                     }

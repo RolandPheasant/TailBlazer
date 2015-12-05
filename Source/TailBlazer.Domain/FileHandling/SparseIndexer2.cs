@@ -69,7 +69,6 @@ namespace TailBlazer.Domain.FileHandling
 
             //3. Scan the tail so results can be returned quickly
             var tailScanner= shared.Select(segments => segments.Tail).DistinctUntilChanged()
-                //.ObserveOn(scheduler)
                 .Scan((SparseIndex)null, (previous, current) =>
                {
                     if (previous == null)
@@ -106,13 +105,12 @@ namespace TailBlazer.Domain.FileHandling
                     _indicies.Add(estimate);
 
                     //keep it as an estimate for files over 250 meg
-                    if (tail.Start > sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing)
-                    {
-                        //todo: index first and last segment
-                    }
-                    else
-                    {
-                        scheduler.Schedule(() =>
+
+                    if (tail.Start > sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing) return;
+
+                    //todo: index first and last segment for large sized file
+
+                    scheduler.Schedule(() =>
                         {
                             var actual = Scan(0, tail.Start, compression);
                             _indicies.Edit(innerList =>
@@ -121,9 +119,6 @@ namespace TailBlazer.Domain.FileHandling
                                 innerList.Add(actual);
                             });
                         });
-                    }
-
-
                 });
 
 

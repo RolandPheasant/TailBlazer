@@ -102,6 +102,7 @@
     <Compile Include="Infrastructure\Extensions.cs" />
     <Compile Include="Infrastructure\ILogFactory.cs" />
     <Compile Include="Infrastructure\ILogger.cs" />
+    <Compile Include="Infrastructure\ImmutableArray.cs" />
     <Compile Include="Infrastructure\ImmutableList.cs" />
     <Compile Include="Infrastructure\IObjectFactory.cs" />
     <Compile Include="Infrastructure\IProperty.cs" />

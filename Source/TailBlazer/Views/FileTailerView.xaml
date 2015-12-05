@@ -203,49 +203,59 @@
 
         </ListBox>
 
-        <!--<Grid 
+            <Grid 
             Height="26"
             Background="{StaticResource PrimaryHueMidBrush}"
             Grid.Row="2"
             Margin = "-4 0 -4 -4">
-            --><!--Hack as the margin in the tab control means the botton panel has a margin (cannot be bother retemplating the tab control) --><!--
 
-            <Grid.Resources>
-                <Style TargetType="{x:Type TextBlock}">
-                    <Setter Property="Opacity" Value="0.8"/>
-                    <Setter Property="Margin" Value="5 4 0 4"/>
-                    <Setter Property="VerticalAlignment" Value="Center"/>
-                    <Setter Property="Foreground" Value="{StaticResource PrimaryHueMidForegroundBrush}"/>
-                </Style>
-            </Grid.Resources>
 
-            <StackPanel   Margin="0 0 6 0"
+                <Grid.Resources>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Setter Property="Opacity" Value="0.8"/>
+                        <Setter Property="Margin" Value="5 4 0 4"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="Foreground" Value="{StaticResource PrimaryHueMidForegroundBrush}"/>
+                    </Style>
+                </Grid.Resources>
+
+                <StackPanel   Margin="0 0 6 0"
                      Orientation="Horizontal" 
                      HorizontalAlignment="Right">
 
-                <TextBlock  Visibility="Collapsed"
+                    <TextBlock  
                     Margin="4 0 0 0"
                    Text="{Binding FirstIndex,StringFormat='\first={0}'}"
                     VerticalAlignment="Center"
                     MinWidth="125"/>
 
-                <TextBlock   Visibility="Collapsed"
+                    <TextBlock  
                     Margin="4 0 0 0"
                     Text="{Binding PageSize,StringFormat='\size={0}'}"
                     VerticalAlignment="Center"
                     MinWidth="125"/>
 
-                <TextBlock Text="{Binding FileSizeText}" />
+                    <!--<TextBlock        Margin="4 0 0 0" Text="{Binding FileSizeText}" />
+                    <TextBlock  
+                    Margin="4 0 0 0"
+                    Text="{Binding MatchedLineCount.Value,StringFormat='\matching lines={0}'}"
+                    VerticalAlignment="Center"/>-->
 
-                <Border Margin="4 4 0 4" BorderThickness="1 0 0 0"
+
+                    <!--<Border Margin="4 4 0 4" BorderThickness="1 0 0 0"
                         Opacity=".6"
                         BorderBrush="{Binding ElementName=TextBlock,Path=Foreground}"
                         />
-                <TextBlock  x:Name="TextBlock" Margin="2 0 0 0" Text="{Binding LineCountText}" />
-            </StackPanel>
+                    <TextBlock  x:Name="TextBlock" Margin="2 0 0 0" Text="{Binding LineCountText}" />-->
 
-        </Grid>-->
-    </Grid>
+                    <TextBlock Margin="4 4 0 4" Text="{Binding FileSizeText.Value}" />
+
+                </StackPanel>
+
+            </Grid>
+
+
+        </Grid>
 
     </Grid>
 </UserControl>

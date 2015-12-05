@@ -144,5 +144,33 @@ namespace TailBlazer.Fixtures
                 }
             }
         }
+
+        public void CanReadLinesBack()
+        {
+            var scheduler = new TestScheduler();
+            var pulse = new Subject<Unit>();
+
+            using (var file = new TestFile())
+            {
+                FileSearchResult fileSearchResult = null;
+                file.Append(Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
+
+                using (file.Info.WatchFile(pulse)
+                    .Search(str => str.Contains("9"), scheduler)
+                    .Subscribe(x => fileSearchResult = x))
+                {
+                    pulse.Once();
+                    fileSearchResult.Matches.Length.Should().Be(19);
+
+                    file.Append(new[] { "9", "20" });
+                    pulse.Once();
+                    fileSearchResult.Matches.Length.Should().Be(20);
+
+                    file.Append(new[] { "9999" });
+                    pulse.Once();
+                    fileSearchResult.Matches.Length.Should().Be(21);
+                }
+            }
+        }
     }
 }
