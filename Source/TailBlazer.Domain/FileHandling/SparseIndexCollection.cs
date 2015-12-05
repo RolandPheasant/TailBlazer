@@ -42,9 +42,6 @@ namespace TailBlazer.Domain.FileHandling
             }
         }
 
-
-
-
         public IEnumerable<LineIndex> GetIndicies(ScrollRequest scroll)
         {
             int first = scroll.FirstIndex;
@@ -73,7 +70,49 @@ namespace TailBlazer.Domain.FileHandling
 
         public long GetLineNumberFromPosition(long position)
         {
-            throw new NotImplementedException();
+            int firstLineInContainer = 0;
+            int lastLineInContainer = 0;
+
+            foreach (var sparseIndex in Indicies)
+            {
+                lastLineInContainer += sparseIndex.LineCount;
+                if (position >= sparseIndex.Start && position <= sparseIndex.End)
+                {
+                    //It could be that the user is scrolling into a part of the file
+                    //which is still being indexed [or will never be indexed]. 
+                    //In this case we need to estimate where to scroll to
+                    if (sparseIndex.LineCount != 0 && sparseIndex.Indicies.Count == 0)
+                    {
+                        //return estimate here!
+                        var lines = sparseIndex.LineCount;
+                        var bytes = sparseIndex.End - sparseIndex.Start;
+                        var bytesPerLine = bytes / lines;
+                        long lineNumber = (position / bytesPerLine);
+                        throw new IndexOutOfRangeException("Cannot find matching line");
+                        //  return new LineIndex(lineNumber, index,);
+
+                        //return estimate;
+                    }
+
+                    //var linenumber is the indexof the positon [could be shit perf because expensive indexOf]
+                    var aboluteIndex = sparseIndex.Indicies.IndexOf(position);
+
+
+                    if (aboluteIndex == -1)
+                    {
+                        var last = sparseIndex.Indicies.Data.Last();
+                        Console.WriteLine(last);
+                        Console.WriteLine(position);
+                    }
+
+                    return aboluteIndex;
+                   // var start = aboluteIndex == 0 ? 0 : sparseIndex.Indicies[aboluteIndex - 1];
+                  //  return new LineIndex(aboluteIndex, position + firstLineInContainer, start, position);
+
+                }
+                firstLineInContainer = firstLineInContainer + sparseIndex.LineCount;
+            }
+            throw new IndexOutOfRangeException("Cannot find matching line");
         }
 
         public LineIndex GetLineNumberPosition(int index,long endPosition)
@@ -105,8 +144,14 @@ namespace TailBlazer.Domain.FileHandling
                     //var linenumber is the indexof the positon [could be shit perf because expensive indexOf]
                     var aboluteIndex = sparseIndex.Indicies.IndexOf(endPosition);
 
-                    if (aboluteIndex==-1)
-                       Console.WriteLine();
+                    if (aboluteIndex == -1)
+                    {
+                        var last = sparseIndex.Indicies.Data.Last();
+                        Console.WriteLine(last);
+                        Console.WriteLine(endPosition);
+                    }
+
+                       
                     var start = aboluteIndex == 0 ? 0 : sparseIndex.Indicies[aboluteIndex - 1];
                     return new LineIndex(aboluteIndex, index + firstLineInContainer, start, endPosition);
 
