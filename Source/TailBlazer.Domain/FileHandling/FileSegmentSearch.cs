@@ -61,7 +61,7 @@ namespace TailBlazer.Domain.FileHandling
             unchecked
             {
                 var hashCode = Key.GetHashCode();
-                hashCode = (hashCode*397) ^ (Segment != null ? Segment.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (Segment?.GetHashCode() ?? 0);
                 hashCode = (hashCode*397) ^ (int) Status;
                 return hashCode;
             }
@@ -81,7 +81,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public override string ToString()
         {
-            return $"{Segment} ->{Status}. Items: {Lines}";
+            return $"{Segment} ->{Status}. Items: {Lines.Length}";
         }
     }
 }

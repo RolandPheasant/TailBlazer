@@ -98,6 +98,7 @@
     <Compile Include="FileHandling\SparseIndexCollection.cs" />
     <Compile Include="FileHandling\SparseIndexer2.cs" />
     <Compile Include="FileHandling\StreamReaderExtended.cs" />
+    <Compile Include="Infrastructure\Equality.cs" />
     <Compile Include="Infrastructure\Extensions.cs" />
     <Compile Include="Infrastructure\ILogFactory.cs" />
     <Compile Include="Infrastructure\ILogger.cs" />

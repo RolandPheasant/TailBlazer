@@ -41,16 +41,20 @@ namespace TailBlazer.Domain.FileHandling
         {
             if (source.EndOfStream) yield break;
 
+            long previousPostion = source.AbsolutePosition();
+
             string line;
             while ((line = source.ReadLine()) != null)
             {
-                var position = source.AbsolutePosition();
+                long position = source.AbsolutePosition();
 
                 if (predicate(line))
-                    yield return selector(position);
+                    yield return selector(previousPostion);
 
                 if (shouldBreak(line, position))
                     yield break;
+
+                previousPostion = position;
             }
         }
 

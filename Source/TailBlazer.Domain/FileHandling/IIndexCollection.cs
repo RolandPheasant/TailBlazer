@@ -11,10 +11,12 @@ namespace TailBlazer.Domain.FileHandling
         LinesChangedReason ChangedReason { get; }
         long TailStartsAt { get; }
 
+   
     }
 
     public interface ILineProvider
     {
+        long GetLineNumberFromPosition(long position);
         IEnumerable<LineIndex> GetIndicies(ScrollRequest scroll);
         IEnumerable<LineIndex> GetIndicies(ScrollRequest scroll, LineMatches matches);
     }

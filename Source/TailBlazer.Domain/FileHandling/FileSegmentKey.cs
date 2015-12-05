@@ -1,11 +1,18 @@
 using System;
+using System.Collections.Generic;
+using DynamicData.Binding;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public struct FileSegmentKey : IEquatable<FileSegmentKey>
+    public struct FileSegmentKey : IEquatable<FileSegmentKey>, IComparable<FileSegmentKey>
     {
         private readonly FileSegmentType _type;
         private readonly int _value;
+
+        private static readonly IComparer<FileSegmentKey> DefaultOrder = SortExpressionComparer<FileSegmentKey>
+                                                                        .Ascending(fsk => fsk._type == FileSegmentType.Head ? 1 : 2)
+                                                                        .ThenByAscending(fsk => fsk._value);
+
 
         public static readonly FileSegmentKey Tail =new FileSegmentKey(-1, FileSegmentType.Tail);
 
@@ -52,6 +59,11 @@ namespace TailBlazer.Domain.FileHandling
         }
 
         #endregion
+
+        public int CompareTo(FileSegmentKey other)
+        {
+            return DefaultOrder.Compare(this, other);
+        }
 
         public override string ToString()
         {

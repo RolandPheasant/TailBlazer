@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -41,7 +42,38 @@ namespace TailBlazer.Domain.FileHandling
             }
         }
 
-        public  IEnumerable<LineIndex> GetIndicies(ScrollRequest scroll)
+        public long GetLineNumberFromPosition(long position)
+        {
+            int firstLineInContainer = 0;
+            int lastLineInContainer = 0;
+
+            foreach (var sparseIndex in Indicies)
+            {
+                lastLineInContainer += sparseIndex.LineCount;
+                if (position>= sparseIndex.Start && position<= sparseIndex.End)
+                {
+                    //It could be that the user is scrolling into a part of the file
+                    //which is still being indexed [or will never be indexed]. 
+                    //In this case we need to estimate where to scroll to
+                    if (sparseIndex.LineCount != 0 && sparseIndex.Indicies.Length == 0)
+                    {
+                        //return estimate here!
+                        var lines = sparseIndex.LineCount;
+                        var bytes = sparseIndex.End - sparseIndex.Start;
+                        var bytesPerLine = bytes / lines;
+                        long estimate = (position/bytesPerLine);
+                        return estimate ;
+                    }
+
+                    //var linenumber is the indexof the positon [could be shit perf because expensive indexOf]
+                    return firstLineInContainer + sparseIndex.Indicies.ToList().IndexOf(position)+1;
+                }
+                firstLineInContainer = firstLineInContainer + sparseIndex.LineCount;
+            }
+            return -1;
+        }
+
+        public IEnumerable<LineIndex> GetIndicies(ScrollRequest scroll)
         {
             int first = scroll.FirstIndex;
             int size = scroll.PageSize;
@@ -110,7 +142,7 @@ namespace TailBlazer.Domain.FileHandling
                 if (index < lastLineInContainer)
                 {
                     //It could be that the user is scrolling into a part of the file
-                    //which is still being indexed. 
+                    //which is still being indexed [or will never be indexed]. 
                     //In this case we need to estimate where to scroll to
                     if (sparseIndex.LineCount != 0 && sparseIndex.Indicies.Length == 0)
                     {

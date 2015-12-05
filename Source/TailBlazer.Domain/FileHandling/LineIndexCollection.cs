@@ -38,6 +38,11 @@ namespace TailBlazer.Domain.FileHandling
             }
         }
 
+        public long GetLineNumberFromPosition(long position)
+        {
+            return -1;
+        }
+
         public IEnumerable<LineIndex> GetIndicies(ScrollRequest scroll)
         {
             int first = scroll.FirstIndex;

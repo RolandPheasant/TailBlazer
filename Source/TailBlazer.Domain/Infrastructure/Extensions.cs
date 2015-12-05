@@ -53,6 +53,10 @@ namespace System.Collections.Generic
     {
 
 
+        public static IEnumerable<T> YieldOne<T>(this T source)
+        {
+            yield return source;
+        }
 
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
         {

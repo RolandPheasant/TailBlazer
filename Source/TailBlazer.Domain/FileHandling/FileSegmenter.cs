@@ -60,12 +60,12 @@ namespace TailBlazer.Domain.FileHandling
         {
             using (var stream = File.Open(_info.FullName, FileMode.Open, FileAccess.Read,FileShare.Delete | FileShare.ReadWrite))
             {
+                var fileLength = stream.Length;
+
                 stream.Seek(0, SeekOrigin.Begin);
                 using (var reader = new StreamReaderExtended(stream, true))
                 {
-
-                    var fileLength = stream.Length;
-                    if (fileLength == 0)
+                    if (reader.EndOfStream ||  fileLength == 0)
                     {
                         yield return new FileSegment(0, 0, 0, FileSegmentType.Tail);
                         yield break;

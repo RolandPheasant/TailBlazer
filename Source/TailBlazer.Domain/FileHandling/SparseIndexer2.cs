@@ -106,17 +106,24 @@ namespace TailBlazer.Domain.FileHandling
                     _indicies.Add(estimate);
 
                     //keep it as an estimate for files over 250 meg
-                    if (tail.Start > sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing) return;
-
-                    scheduler.Schedule(() =>
+                    if (tail.Start > sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing)
                     {
-                        var actual = Scan(0, tail.Start, compression);
-                        _indicies.Edit(innerList =>
+                        //todo: index first and last segment
+                    }
+                    else
+                    {
+                        scheduler.Schedule(() =>
                         {
-                            innerList.Remove(estimate);
-                            innerList.Add(actual);
+                            var actual = Scan(0, tail.Start, compression);
+                            _indicies.Edit(innerList =>
+                            {
+                                innerList.Remove(estimate);
+                                innerList.Add(actual);
+                            });
                         });
-                    });
+                    }
+
+
                 });
 
 
