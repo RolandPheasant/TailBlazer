@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using FluentAssertions;
 using Microsoft.Reactive.Testing;
@@ -169,6 +171,36 @@ namespace TailBlazer.Fixtures
                     file.Append(new[] { "9999" });
                     pulse.Once();
                     fileSearchResult.Matches.Length.Should().Be(21);
+                }
+            }
+        }
+
+        [Fact]
+        public void CanReadLinesBackInLargeFile()
+        {
+            var scheduler = new TestScheduler();
+            var pulse = new Subject<Unit>();
+
+            using (var file = new TestFile())
+            {
+                IEnumerable<Line> lines = null;
+                file.Append(Enumerable.Range(1, 100000).Select(i => i.ToString()).ToArray());
+
+                using (file.Info.WatchFile(pulse)
+                    .Search(str => str.Contains("9"), scheduler)
+                    .Select(result => file.Info.ReadLinesByPosition(result.Matches).ToArray())
+                    .Subscribe(x => lines=x))
+                {
+                    pulse.Once();
+                   // fileSearchResult.Matches.Length.Should().Be(19);
+
+                    file.Append(new[] { "9", "20" });
+                    pulse.Once();
+                  //  fileSearchResult.Matches.Length.Should().Be(20);
+
+                    file.Append(new[] { "9999" });
+                    pulse.Once();
+                 //   fileSearchResult.Matches.Length.Should().Be(21);
                 }
             }
         }

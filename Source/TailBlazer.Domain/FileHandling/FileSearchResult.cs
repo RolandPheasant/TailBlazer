@@ -53,7 +53,7 @@ namespace TailBlazer.Domain.FileHandling
             Size = all.Last().Segment.End;
 
             //For large sets this could be very inefficient
-            Matches = all.SelectMany(s => s.Lines).ToArray();
+            Matches = all.SelectMany(s => s.Lines).OrderBy(l=>l).ToArray();
             
             Console.WriteLine($"{SegmentsCompleted}/{Segments}. {Count}");
         }

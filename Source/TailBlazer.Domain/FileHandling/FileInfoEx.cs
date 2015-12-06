@@ -195,6 +195,30 @@ namespace TailBlazer.Domain.FileHandling
             }
         }
 
+        public static IEnumerable<Line> ReadLinesByPosition(this FileInfo source, long[] positions, Func<int, bool> isEndOfTail = null)
+        {
+            using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            {
+                using (var reader = new StreamReaderExtended(stream, Encoding.Default, true))
+                {
+                    int count=0;
+                    string line;
+
+                    foreach (var position in positions)
+                    {
+                        if (reader.AbsolutePosition() != position)
+                        {
+                            reader.DiscardBufferedData();
+                            stream.Seek(position, SeekOrigin.Begin);
+
+                        }
+                        line = reader.ReadLine();
+                        yield return new Line((int)position, line,null);
+                    }
+                }
+            }
+        }
+
         public static long FindNextEndOfLinePosition(this FileInfo source, long initialPosition)
         {
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
