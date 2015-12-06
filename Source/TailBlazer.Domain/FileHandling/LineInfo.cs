@@ -4,6 +4,7 @@ using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
+ 
     public struct LineInfo : IEquatable<LineInfo>
     {
         public int Line { get; }
@@ -46,9 +47,8 @@ namespace TailBlazer.Domain.FileHandling
                                                 .AndOn<LineInfo, long>(li => li.Offset);
 
 
-        public static readonly IEqualityComparer<LineInfo> FlexComparer = Equality.CompareOn<LineInfo, long>(li => li.Type== LineIndexType.Absolute ? li.Start : li.Index);
-
-
+        public static readonly IEqualityComparer<LineInfo> FlexComparer = Equality.CompareOn<LineInfo, long>(li => li.Type== 
+        LineIndexType.Absolute ? li.Start : li.Line);
 
         public static readonly IEqualityComparer<LineInfo> IndexComparer = Equality.CompareOn<LineInfo, int>(li => li.Index);
 
@@ -85,6 +85,9 @@ namespace TailBlazer.Domain.FileHandling
 
         public bool Equals(LineInfo other)
         {
+            //if (Type== LineIndexType.Absolute)
+            //    return  Start == other.Start && Type == other.Type;
+
             return Line == other.Line && Index == other.Index && Start == other.Start && End == other.End && Offset == other.Offset && Type == other.Type;
         }
 

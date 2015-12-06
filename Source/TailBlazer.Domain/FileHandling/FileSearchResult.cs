@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -20,6 +21,9 @@ namespace TailBlazer.Domain.FileHandling
         private readonly IDictionary<FileSegmentKey, FileSegmentSearch> _allSearches;
 
         public FileSegmentSearch LastSearch { get; }
+
+        
+
         public long Size { get; }
 
         public FileSearchResult(FileSegmentSearch initial)
@@ -41,9 +45,22 @@ namespace TailBlazer.Domain.FileHandling
         
         public FileSearchResult(FileSearchResult previous, FileSegmentSearch current)
         {
+
             LastSearch = current;
 
             _allSearches = previous._allSearches.Values.ToDictionary(fss => fss.Key);
+
+            var lastTail = _allSearches.Lookup(FileSegmentKey.Tail);
+
+            if (lastTail.HasValue)
+            {
+                TailStartsAt = lastTail.Value.Segment.End;
+            }
+            else
+            {
+                 TailStartsAt = long.MaxValue;
+            }
+
             _allSearches[current.Key] = current;
             var all = _allSearches.Values.ToArray();
 
@@ -56,16 +73,16 @@ namespace TailBlazer.Domain.FileHandling
             Matches = all.SelectMany(s => s.Lines).OrderBy(l=>l).ToArray();
 
 
-            if (current.Segment.Type == FileSegmentType.Tail)
-            {
-                ChangedReason = LinesChangedReason.Tailed;
-                TailStartsAt = previous.LastSearch.Segment.End;
-            }
-            else
-            {
-                ChangedReason = LinesChangedReason.Paged;
-                TailStartsAt = previous.TailStartsAt;
-            }
+            //if (current.Segment.Type == FileSegmentType.Tail)
+            //{
+            //    ChangedReason = LinesChangedReason.Tailed;
+            //    TailStartsAt = current.TailStartsAt;
+            //}
+            //else
+            //{
+            //    ChangedReason = LinesChangedReason.Paged;
+            //    TailStartsAt = previous.TailStartsAt;
+            //}
 
             Console.WriteLine($"{SegmentsCompleted}/{Segments}.{Count}");
         }
@@ -103,7 +120,7 @@ namespace TailBlazer.Domain.FileHandling
                 if (i > Count - 1) continue;
 
                 var start = Matches[i];
-                yield return new LineInfo(0, i, start, (long)0, start >=LastSearch.TailStartsAt
+                yield return new LineInfo(0, i, start, (long)0, start >=TailStartsAt
                     && ChangedReason == LinesChangedReason.Tailed);
             }
 

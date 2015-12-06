@@ -42,8 +42,6 @@ namespace TailBlazer.Domain.FileHandling
 
                 TailStartsAt = previous.TailStartsAt;
             }
-
-
         }
 
         public IEnumerable<LineInfo> GetIndicies(ScrollRequest scroll)

@@ -123,6 +123,7 @@ namespace TailBlazer.Views
 
             //track first visible index
             var firstIndexMonitor = tailer.Lines.Connect()
+                .Buffer(TimeSpan.FromMilliseconds(250)).FlattenBufferResult()
                 .QueryWhenChanged(lines =>lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min())
                 .Subscribe(first=> FirstIndex= first);
            

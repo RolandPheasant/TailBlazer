@@ -11,6 +11,8 @@ using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
+  
+
     public class FileTailer: IDisposable
     {
         private readonly IDisposable _cleanUp;
@@ -40,7 +42,7 @@ namespace TailBlazer.Domain.FileHandling
             IsSearching = isBusy.AsObservable();
 
             var locker = new object();
-            scrollRequest = scrollRequest.Synchronize(locker); ;
+            scrollRequest = scrollRequest.Synchronize(locker); 
             
             var fileWatcher = file.WatchFile(scheduler: scheduler)
                             .DistinctUntilChanged()
@@ -48,43 +50,35 @@ namespace TailBlazer.Domain.FileHandling
                             .Replay(1).RefCount();
 
             var indexer = fileWatcher.Index().Replay(1).RefCount();
-
+            
             //compare latest lines and latest filter and only take the filtered results it is not empty
             var latestLines = indexer.Cast<ILineProvider>().Synchronize(locker);
             var latestFilter = filter.Cast<ILineProvider>().Synchronize(locker); 
             var latest = latestLines.CombineLatest(latestFilter, (l, f) => f.IsEmpty ? l : f);
-
-
-            var tailStartsAt = latestLines.Select(p => p.ChangedReason!= LinesChangedReason.Loaded ?  p.TailStartsAt : -1);
-
-            IsLoading = indexer.Take(1).Select(_ => false).StartWith(true);
-
-            //count matching lines (all if no filter is specified)
+            
             MatchedLines = latest.Select(provider => provider.Count);
             TotalLines = latestLines.Select(x => x.Count);
-
             FileSize = fileWatcher.Select(notification => notification.Size);
-            
-            var aggregator = latestLines.CombineLatest(latestFilter, (l, f) => f.IsEmpty ? l : f)
-                .CombineLatest(scrollRequest, (currentLines, scroll) => currentLines.GetIndicies(scroll).ToArray());
+            IsLoading = indexer.Take(1).Select(_ => false).StartWith(true);
 
-
-            var xx = tailStartsAt
-                .CombineLatest(aggregator, (tail, currentPage ) =>
+            var aggregator = latest.CombineLatest(scrollRequest, (currentLines, scroll) =>
                 {
-                    //calculated added and removed indicies
-                    var previous = lines.Items.Select(l => l.LineInfo).ToArray();
-                    var removed = previous.Except(currentPage, LineInfo.FlexComparer).ToArray();
-                    var added = currentPage.Except(previous, LineInfo.FlexComparer).ToArray();
+                    Console.WriteLine($"{scroll.Mode}, {scroll.FirstIndex}, {scroll.PageSize}");
 
+                    var currentPage = currentLines.GetIndicies(scroll).ToArray();
+
+                    var previous = lines.Items.Select(l => l.LineInfo).ToArray();
+                    var removed = previous.Except(currentPage,LineInfo.FlexComparer).ToArray();
+                    var added = currentPage.Except(previous, LineInfo.FlexComparer).ToArray();
                     //calculated added and removed lines
                     var removedLines = lines.Items.Where(l => removed.Contains(l.LineInfo)).ToArray();
-
+                    Console.WriteLine($"{added.Length} added");
                     Func<long, DateTime?> isTail = l =>
                     {
-                        var onTail =  l >= tail;
-                        Console.WriteLine($"Checking {l} os on tail = {tail}/ On tail ={onTail}");
-                        return l >= tail ? DateTime.Now : (DateTime?) null;
+                        var tail = currentLines.TailStartsAt;
+                        var onTail = tail != -1 && l >= tail;
+                      //  Console.WriteLine($"Checking {l} is on tail = {tail}/ On tail ={onTail}");
+                        return onTail ? DateTime.Now : (DateTime?)null;
                     };
 
                     //finally we can load the line from the file todo: Add encdoing back in
@@ -101,7 +95,8 @@ namespace TailBlazer.Domain.FileHandling
                         if (changes.NewLines.Any()) innerList.AddRange(changes.NewLines);
                     });
                 });
-            _cleanUp = new CompositeDisposable(Lines, lines, xx, Disposable.Create(() => isBusy.OnCompleted()));
+
+            _cleanUp = new CompositeDisposable(Lines, lines, aggregator, Disposable.Create(() => isBusy.OnCompleted()));
         }
 
 
