@@ -39,8 +39,7 @@ namespace TailBlazer.Domain.FileHandling
             _initialTail = initialTail;
             _segmentSize = segmentSize;
  
-
-            //TODO: Re-segment as file grows.
+            //TODO: Re-segment as file grows + account for rollover
             Segments = refresher
                 .StartWithUnit()
                 .Scan((FileSegmentCollection) null, (previous, current) =>

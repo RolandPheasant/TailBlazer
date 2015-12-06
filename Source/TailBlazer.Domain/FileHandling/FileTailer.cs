@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -11,7 +12,6 @@ using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
-  
 
     public class FileTailer: IDisposable
     {
@@ -63,7 +63,7 @@ namespace TailBlazer.Domain.FileHandling
 
             var aggregator = latest.CombineLatest(scrollRequest, (currentLines, scroll) =>
                 {
-                    Console.WriteLine($"{scroll.Mode}, {scroll.FirstIndex}, {scroll.PageSize}");
+                    Debug.WriteLine($"{scroll.Mode}, {scroll.FirstIndex}, {scroll.PageSize}");
 
                     var currentPage = currentLines.GetIndicies(scroll).ToArray();
 
@@ -72,7 +72,8 @@ namespace TailBlazer.Domain.FileHandling
                     var added = currentPage.Except(previous, LineInfo.LineIndexComparer).ToArray();
                     //calculated added and removed lines
                     var removedLines = lines.Items.Where(l => removed.Contains(l.LineInfo)).ToArray();
-                    Console.WriteLine($"{added.Length} added");
+
+                    Debug.WriteLine($"{added.Length} added");
                     Func<long, DateTime?> isTail = l =>
                     {
                         var tail = currentLines.TailStartsAt;

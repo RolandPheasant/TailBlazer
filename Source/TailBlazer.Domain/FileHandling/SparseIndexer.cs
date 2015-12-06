@@ -31,8 +31,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public Encoding Encoding { get; private set; }
         public FileInfo Info { get; private set; }
-        public int Compression { get; }
-        public int TailSize { get; }
+
         public IObservable<SparseIndexCollection> Result { get; }
 
         public SparseIndexer([NotNull] IObservable<FileSegmentCollection> fileSegments,
@@ -44,9 +43,9 @@ namespace TailBlazer.Domain.FileHandling
         {
             if (fileSegments == null) throw new ArgumentNullException(nameof(fileSegments));
 
+            //TODO: When File segment has got smaller => roll-over [do something about it]
+
             scheduler = scheduler ?? Scheduler.Default;
-            Compression = compression;
-            TailSize = tailSize;
 
             //1. create  a resulting index object from the collection of index fragments
             Result = _indicies

@@ -133,6 +133,7 @@ namespace TailBlazer.Domain.FileHandling
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
+
             return Observable.Create<FileSearchResult>(observer =>
             {
                 var searcher = new FileSearch(source, predicate, scheduler);
