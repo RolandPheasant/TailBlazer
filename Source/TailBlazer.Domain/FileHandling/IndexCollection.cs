@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class SparseIndexCollection: IIndexCollection
+    public class IndexCollection: IIndexCollection
     {
         public Encoding Encoding { get; }
         public int Count { get; }
@@ -15,10 +14,10 @@ namespace TailBlazer.Domain.FileHandling
 
         public LinesChangedReason ChangedReason { get; }
         public long TailStartsAt { get; }
-        private SparseIndex[] Indicies { get; }
+        private Index[] Indicies { get; }
 
-        public SparseIndexCollection(IReadOnlyCollection<SparseIndex> latest,
-                                    SparseIndexCollection previous,
+        public IndexCollection(IReadOnlyCollection<Index> latest,
+                                    IndexCollection previous,
                                     Encoding encoding)
         {
 

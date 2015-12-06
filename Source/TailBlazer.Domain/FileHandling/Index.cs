@@ -4,12 +4,11 @@ using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class SparseIndex : IEquatable<SparseIndex>
+    public class Index : IEquatable<Index>
     {
         public long Start { get; }
         public long End { get; }
         public ImmutableList<long> Indicies { get; }
-
         public int Compression { get; }
         public int LineCount { get; }
         public int IndexCount => Indicies.Count;
@@ -20,7 +19,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public DateTime TimeStamp { get; } = DateTime.Now;
 
-        public SparseIndex(long start, long end, long[] indicies, int compression, int lineCount, IndexType type)
+        public Index(long start, long end, long[] indicies, int compression, int lineCount, IndexType type)
         {
             Start = start;
             End = end;
@@ -31,7 +30,7 @@ namespace TailBlazer.Domain.FileHandling
         }
         
 
-        public SparseIndex(long start, long end,  int compression, int lineCount, IndexType type)
+        public Index(long start, long end,  int compression, int lineCount, IndexType type)
         {
             Start = start;
             End = end;
@@ -41,7 +40,7 @@ namespace TailBlazer.Domain.FileHandling
             Type = type;
         }
 
-        public SparseIndex([NotNull] SparseIndex latest, SparseIndex previous)
+        public Index([NotNull] Index latest, Index previous)
         {
             if (latest == null) throw new ArgumentNullException(nameof(latest));
             if (previous == null) throw new ArgumentNullException(nameof(previous));
@@ -59,7 +58,7 @@ namespace TailBlazer.Domain.FileHandling
         #region Equality
 
 
-        public bool Equals(SparseIndex other)
+        public bool Equals(Index other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -71,7 +70,7 @@ namespace TailBlazer.Domain.FileHandling
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((SparseIndex) obj);
+            return Equals((Index) obj);
         }
 
         public override int GetHashCode()
@@ -88,12 +87,12 @@ namespace TailBlazer.Domain.FileHandling
             }
         }
 
-        public static bool operator ==(SparseIndex left, SparseIndex right)
+        public static bool operator ==(Index left, Index right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(SparseIndex left, SparseIndex right)
+        public static bool operator !=(Index left, Index right)
         {
             return !Equals(left, right);
         }

@@ -41,7 +41,6 @@ namespace TailBlazer.Views
             
             var clearAdorner = Observable.FromEventPattern<DragEventHandler, DragEventArgs>(h => control.PreviewDragLeave += h, h => control.PreviewDragLeave -= h).ToUnit()
                 .Merge(Observable.FromEventPattern<DragEventHandler, DragEventArgs>(h => control.PreviewDrop += h, h => control.PreviewDrop -= h).ToUnit())
-                .Merge(Observable.FromEventPattern<DragEventHandler, DragEventArgs>(h => window.DragLeave += h, h => window.DragLeave -= h).ToUnit())
                 .Subscribe(e =>
                 {
                     if (adorner == null) return;

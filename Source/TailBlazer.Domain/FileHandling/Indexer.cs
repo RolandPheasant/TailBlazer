@@ -24,17 +24,17 @@ namespace TailBlazer.Domain.FileHandling
         An alternative solution to what I got now is to do a triple index (as per point 3).
         In doing so it would make the rx easier and get rid of the need for the observable list
   */
-    public class SparseIndexer : IDisposable
+    public class Indexer : IDisposable
     {
         private readonly IDisposable _cleanUp;
-        private readonly ISourceList<SparseIndex> _indicies = new SourceList<SparseIndex>();
+        private readonly ISourceList<Index> _indicies = new SourceList<Index>();
 
         public Encoding Encoding { get; private set; }
         public FileInfo Info { get; private set; }
 
-        public IObservable<SparseIndexCollection> Result { get; }
+        public IObservable<IndexCollection> Result { get; }
 
-        public SparseIndexer([NotNull] IObservable<FileSegmentCollection> fileSegments,
+        public Indexer([NotNull] IObservable<FileSegmentCollection> fileSegments,
             int compression = 10,
             int tailSize = 1000000,
             int sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing= 250000000,
@@ -50,9 +50,9 @@ namespace TailBlazer.Domain.FileHandling
             //1. create  a resulting index object from the collection of index fragments
             Result = _indicies
                 .Connect()
-                .Sort(SortExpressionComparer<SparseIndex>.Ascending(si => si.Start))
+                .Sort(SortExpressionComparer<Index>.Ascending(si => si.Start))
                 .ToCollection()
-                .Scan((SparseIndexCollection)null, (previous, notification) => new SparseIndexCollection(notification, previous, Encoding))
+                .Scan((IndexCollection)null, (previous, notification) => new IndexCollection(notification, previous, Encoding))
                 .Replay(1).RefCount();
 
             var shared = fileSegments.Replay(1).RefCount();
@@ -68,14 +68,14 @@ namespace TailBlazer.Domain.FileHandling
 
             //3. Scan the tail so results can be returned quickly
             var tailScanner= shared.Select(segments => segments.Tail).DistinctUntilChanged()
-                .Scan((SparseIndex)null, (previous, current) =>
+                .Scan((Index)null, (previous, current) =>
                {
                     if (previous == null)
                     {
                         return Scan(current.Start, -1, 1);
                     }
                     var latest=Scan(previous.End , -1, 1);
-                    return latest == null ? null : new SparseIndex(latest,previous);
+                    return latest == null ? null : new Index(latest,previous);
                 })
                 .Where(tail=>tail!=null)
                 .Replay(1).RefCount();
@@ -100,7 +100,7 @@ namespace TailBlazer.Domain.FileHandling
 
                     //Need iterate one at a time through the 
                     var estimateLines = EstimateNumberOfLines(tail, Info);
-                    var estimate = new SparseIndex(0, tail.Start, compression, estimateLines, IndexType.Page);
+                    var estimate = new Index(0, tail.Start, compression, estimateLines, IndexType.Page);
                     _indicies.Add(estimate);
 
                     //keep it as an estimate for files over 250 meg [for now]
@@ -123,7 +123,7 @@ namespace TailBlazer.Domain.FileHandling
             _cleanUp = new CompositeDisposable(infoSubscriber,_indicies, tailSubscriber, tailSubscriber, headSubscriber);
         }
 
-        private int EstimateNumberOfLines(SparseIndex tail, FileInfo info)
+        private int EstimateNumberOfLines(Index tail, FileInfo info)
         {
             //Calculate estimate line count
             var averageLineLength = tail.Size / tail.LineCount;
@@ -131,7 +131,7 @@ namespace TailBlazer.Domain.FileHandling
             return (int)estimatedLines;
         }
 
-        private SparseIndex Scan( long start, long end, int compression)
+        private Index Scan( long start, long end, int compression)
         {
             int count = 0;
             long lastPosition = 0;
@@ -151,7 +151,7 @@ namespace TailBlazer.Domain.FileHandling
 
                     }).ToArray();
                 }
-                return new SparseIndex(start, lastPosition, lines, compression, count, end == -1 ? IndexType.Tail : IndexType.Page);
+                return new Index(start, lastPosition, lines, compression, count, end == -1 ? IndexType.Tail : IndexType.Page);
             }
         }
 

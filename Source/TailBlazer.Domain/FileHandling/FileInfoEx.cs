@@ -97,9 +97,9 @@ namespace TailBlazer.Domain.FileHandling
         {
             return Observable.Defer(() =>
             {
-                return Observable.Create<SparseIndexCollection>(observer =>
+                return Observable.Create<IndexCollection>(observer =>
                 {
-                    var indexer = new SparseIndexer(source);
+                    var indexer = new Indexer(source);
                     var notifier = indexer.Result.SubscribeSafe(observer);
                     return new CompositeDisposable(indexer, notifier);
                 });
@@ -142,40 +142,6 @@ namespace TailBlazer.Domain.FileHandling
             });
         }
 
-        public static IObservable<LineMatches> Match(this IObservable<FileNotification> source, Func<string,bool> predicate, Action<bool> isSearching=null)
-        {
-            return source
-                .Where(n => n.NotificationType == FileNotificationType.CreatedOrOpened)
-                .Select(createdNotification =>
-                {
-                    return Observable.Create<LineMatches>(observer =>
-                    {
-                        var indexer = new LineMatcher((FileInfo) createdNotification, predicate);
-
-                        var notifier = source
-                            .Where(n => n.NotificationType == FileNotificationType.Changed)
-                            .StartWith(createdNotification)
-                            .Scan((LineMatches) null, (state, notification) =>
-                            {
-                                var shouldNotifyOfSearch = isSearching != null &&
-                                            notification.NotificationType == FileNotificationType.CreatedOrOpened;
-                                try
-                                {
-                                    if (shouldNotifyOfSearch) isSearching(true);
-                                    var lines = indexer.ScanToEnd().ToArray();
-                                    return new LineMatches(lines, state);
-                                }
-                                finally
-                                {
-                                    if (shouldNotifyOfSearch) isSearching(false);
-                                }
-                            })
-                            .SubscribeSafe(observer);
-
-                        return new CompositeDisposable(indexer, notifier);
-                    });
-                }).Switch();
-        }
 
         public static IEnumerable<Line> ReadLines(this FileInfo source, int[] lines, Func<int, bool> isEndOfTail = null)
         {
@@ -202,9 +168,6 @@ namespace TailBlazer.Domain.FileHandling
             {
                 using (var reader = new StreamReaderExtended(stream, Encoding.Default, true))
                 {
-                    int count=0;
-                    string line;
-
                     foreach (var position in positions)
                     {
                         if (reader.AbsolutePosition() != position)
@@ -213,26 +176,13 @@ namespace TailBlazer.Domain.FileHandling
                             stream.Seek(position, SeekOrigin.Begin);
 
                         }
-                        line = reader.ReadLine();
+                        var line = reader.ReadLine();
                         yield return new Line((int)position, line,null);
                     }
                 }
             }
         }
 
-        public static long FindNextEndOfLinePosition(this FileInfo source, long initialPosition)
-        {
-            using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
-            {
-                stream.Seek(initialPosition, SeekOrigin.Begin);
-                using (var reader = new StreamReaderExtended(stream, Encoding.Default, true))
-                {
-                    if (reader.EndOfStream) return -1;
-                    reader.ReadLine();
-                    return reader.AbsolutePosition();
-                }
-            }
-        }
 
         public static long FindNextEndOfLinePosition(this StreamReaderExtended source, long initialPosition,
             SeekOrigin origin= SeekOrigin.Begin)
