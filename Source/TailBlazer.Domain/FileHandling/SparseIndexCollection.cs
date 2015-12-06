@@ -40,6 +40,8 @@ namespace TailBlazer.Domain.FileHandling
 
                 TailStartsAt = previous.Count-1;
             }
+
+
         }
 
         public IEnumerable<LineIndex> GetIndicies(ScrollRequest scroll)
@@ -70,49 +72,11 @@ namespace TailBlazer.Domain.FileHandling
 
         public long GetLineNumberFromPosition(long position)
         {
-            int firstLineInContainer = 0;
-            int lastLineInContainer = 0;
-
-            foreach (var sparseIndex in Indicies)
-            {
-                lastLineInContainer += sparseIndex.LineCount;
-                if (position >= sparseIndex.Start && position <= sparseIndex.End)
-                {
-                    //It could be that the user is scrolling into a part of the file
-                    //which is still being indexed [or will never be indexed]. 
-                    //In this case we need to estimate where to scroll to
-                    if (sparseIndex.LineCount != 0 && sparseIndex.Indicies.Count == 0)
-                    {
-                        //return estimate here!
-                        var lines = sparseIndex.LineCount;
-                        var bytes = sparseIndex.End - sparseIndex.Start;
-                        var bytesPerLine = bytes / lines;
-                        long lineNumber = (position / bytesPerLine);
-                        throw new IndexOutOfRangeException("Cannot find matching line");
-                        //  return new LineIndex(lineNumber, index,);
-
-                        //return estimate;
-                    }
-
-                    //var linenumber is the indexof the positon [could be shit perf because expensive indexOf]
-                    var aboluteIndex = sparseIndex.Indicies.IndexOf(position);
-
-
-                    if (aboluteIndex == -1)
-                    {
-                        var last = sparseIndex.Indicies.Data.Last();
-                        Console.WriteLine(last);
-                        Console.WriteLine(position);
-                    }
-
-                    return aboluteIndex;
-                   // var start = aboluteIndex == 0 ? 0 : sparseIndex.Indicies[aboluteIndex - 1];
-                  //  return new LineIndex(aboluteIndex, position + firstLineInContainer, start, position);
-
-                }
-                firstLineInContainer = firstLineInContainer + sparseIndex.LineCount;
-            }
-            throw new IndexOutOfRangeException("Cannot find matching line");
+            //completely approximate [make this more accurate]
+            var totalSize = Indicies.Max(si => si.End);
+            var lines2 = Indicies.Sum(si => si.LineCount);
+            var bytesPerLine2 = totalSize / lines2;
+            return position / bytesPerLine2;
         }
 
         public LineIndex GetLineNumberPosition(int index,long endPosition)
@@ -141,9 +105,11 @@ namespace TailBlazer.Domain.FileHandling
                         //return estimate;
                     }
 
+
+
                     //var linenumber is the indexof the positon [could be shit perf because expensive indexOf]
                     var aboluteIndex = sparseIndex.Indicies.IndexOf(endPosition);
-
+                  //  var aboluteIndex = sparseIndex.Indicies.IndexOf(endPosition);
                     if (aboluteIndex == -1)
                     {
                         var last = sparseIndex.Indicies.Data.Last();
@@ -159,38 +125,6 @@ namespace TailBlazer.Domain.FileHandling
                 firstLineInContainer = firstLineInContainer + sparseIndex.LineCount;
             }
             throw new IndexOutOfRangeException("Cannot find matching line");
-        }
-
-        public IEnumerable<LineIndex> GetIndicies(ScrollRequest scroll, LineMatches matches)
-        {
-            //abstract clipping
-            int first = scroll.FirstIndex;
-            int size = scroll.PageSize;
-
-            if (scroll.Mode == ScrollingMode.Tail)
-            {
-                first = size > matches.Count ? 0 : matches.Count - size;
-            }
-            else
-            {
-                if (first + size >= matches.Count)
-                    first = matches.Count - size;
-            }
-
-            var allMatched = Enumerable.Range(Math.Max(first, 0), Math.Min(size, matches.Count));
-
-            int i = 0;
-            foreach (var item in allMatched)
-            {
-                if (item >= matches.Count) continue;
-                var line = matches.Lines[item];
-                
-                var relativeIndex = CalculateRelativeIndex(line);
-                if (relativeIndex == null) yield break;
-
-                yield return new LineIndex(line, i + first, relativeIndex.Start, relativeIndex.LinesOffset);
-                i++;
-            }
         }
 
         private RelativeIndex CalculateRelativeIndex(int index)

@@ -83,8 +83,8 @@ namespace TailBlazer.Domain.FileHandling
                     //calculated added and removed indeicies
                     var currentPage = indices.ToArray();
                     var previous = lines.Items.Select(l => l.LineIndex).ToArray();
-                    var removed = previous.Except(currentPage,LineIndex.IndexComparer).ToArray();
-                    var added = currentPage.Except(previous, LineIndex.IndexComparer).ToArray();
+                    var removed = previous.Except(currentPage,LineIndex.FlexComparer).ToArray();
+                    var added = currentPage.Except(previous, LineIndex.FlexComparer).ToArray();
 
                     //calculated added and removed lines
                     var removedLines = lines.Items.Where(l => removed.Contains(l.LineIndex)).ToArray();

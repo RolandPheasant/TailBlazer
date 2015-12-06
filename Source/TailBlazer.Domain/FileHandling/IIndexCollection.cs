@@ -20,6 +20,6 @@ namespace TailBlazer.Domain.FileHandling
         LineIndex GetLineNumberPosition(int index, long endPosition);
 
         IEnumerable<LineIndex> GetIndicies(ScrollRequest scroll);
-        IEnumerable<LineIndex> GetIndicies(ScrollRequest scroll, LineMatches matches);
+
     }
 }

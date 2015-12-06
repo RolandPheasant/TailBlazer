@@ -78,7 +78,7 @@ namespace TailBlazer.Domain.FileHandling
 
                     if (relative)
                     {
-                        int previousLine = -1;
+                        long previousLine = -1;
                         long previousStart = -1;
 
                         foreach (var index in indicies)
@@ -110,7 +110,7 @@ namespace TailBlazer.Domain.FileHandling
                     }
                     else
                     {
-                        int previousLine = -1;
+                        long previousLine = -1;
                         foreach (var index in indicies)
                         {
                             var currentLine = index.Line;

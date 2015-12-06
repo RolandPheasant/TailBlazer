@@ -6,7 +6,7 @@ namespace TailBlazer.Views
     public class LineProxy
     {
         public Line Line { get; }
-        public int Number => Line.Number;
+        public long Number => Line.Number;
         public string Text => Line.Text;
         public bool IsRecent { get; }
 

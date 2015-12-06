@@ -19,14 +19,6 @@ namespace TailBlazer.Domain.FileHandling
         }
 
 
-        public Line(int number, int index, string text, DateTime? timestamp)
-        {
-            Number = number;
-            Index = index;
-            Text = text;
-            Timestamp = timestamp;
-        }
-
         public Line(LineIndex lineIndex, string text, DateTime? timestamp)
         {
             LineIndex = lineIndex;
@@ -43,7 +35,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Number == other.Number && string.Equals(Text, other.Text);
+            return string.Equals(Text, other.Text) && LineIndex.Equals(other.LineIndex);
         }
 
         public override bool Equals(object obj)
@@ -58,7 +50,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             unchecked
             {
-                return (Number*397) ^ (Text?.GetHashCode() ?? 0);
+                return ((Text != null ? Text.GetHashCode() : 0)*397) ^ LineIndex.GetHashCode();
             }
         }
 

@@ -42,7 +42,15 @@ namespace TailBlazer.Domain.FileHandling
                                                 .AndOn<LineIndex, long>(li => li.Offset);
 
 
-        public static readonly IEqualityComparer<LineIndex> IndexComparer =Equality.CompareOn<LineIndex, int>(li => li.Index);
+        public static readonly IEqualityComparer<LineIndex> FlexComparer = Equality.CompareOn<LineIndex, long>(li =>
+        {
+            return li.Type== LineIndexType.Absolute ? li.Start : li.Index;
+        });
+
+
+
+        public static readonly IEqualityComparer<LineIndex> IndexComparer = Equality.CompareOn<LineIndex, int>(li => li.Index);
+
         private sealed class LineIndexEqualityComparer : IEqualityComparer<LineIndex>
         {
             public bool Equals(LineIndex x, LineIndex y)
@@ -76,7 +84,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public bool Equals(LineIndex other)
         {
-            return Line == other.Line && Index == other.Index && Start == other.Start && End == other.End && Offset == other.Offset;
+            return Line == other.Line && Index == other.Index && Start == other.Start && End == other.End && Offset == other.Offset && Type == other.Type;
         }
 
         public override bool Equals(object obj)
@@ -89,11 +97,12 @@ namespace TailBlazer.Domain.FileHandling
         {
             unchecked
             {
-                var hashCode = Line;
+                var hashCode = Line.GetHashCode();
                 hashCode = (hashCode*397) ^ Index;
                 hashCode = (hashCode*397) ^ Start.GetHashCode();
                 hashCode = (hashCode*397) ^ End.GetHashCode();
                 hashCode = (hashCode*397) ^ Offset;
+                hashCode = (hashCode*397) ^ (int) Type;
                 return hashCode;
             }
         }

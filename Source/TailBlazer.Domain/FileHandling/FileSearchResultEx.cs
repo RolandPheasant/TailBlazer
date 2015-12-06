@@ -61,14 +61,16 @@ namespace TailBlazer.Domain.FileHandling
                     //a matched line is different from an Index in that we do not know the end of the line
 
                     var start = source.Matches[i];
-                    var end = i == source.Count - 1 ? source.Size : source.Matches[i + 1];
-                    //var start = i == 0 ? 0 : source.Matches[i - 1];
-                    //var end = source.Matches[i] - 1;
 
+
+                    //we need to get the start and the end from theindex collection 
+
+                    var end = i == source.Count - 1 ? source.Size : source.Matches[i + 1];
 
                     //do we care about the line number? Should we add it to the index
-                    var lineNumber = (int) collection.GetLineNumberFromPosition(start);
-                    return new LineIndex(lineNumber, i, start, end);
+                    var approximateLineNumber =(int) collection.GetLineNumberFromPosition(start);
+
+                    return new LineIndex(approximateLineNumber, i, start, end);
                 });
         }
     }
