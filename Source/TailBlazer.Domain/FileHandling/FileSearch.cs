@@ -55,7 +55,9 @@ namespace TailBlazer.Domain.FileHandling
 
             //initialise a pending state for all segments
             var loader = segmentCache.Connect()
+                
                 .Transform(fs => new FileSegmentSearch(fs))
+                .WhereReasonsAre(ChangeReason.Add)
                 .PopulateInto(searchData);
 
             //scan end of file, then tail
@@ -83,7 +85,7 @@ namespace TailBlazer.Domain.FileHandling
             var headSubscriber = tailSearch.Take(1).WithContinuation(() =>
             {
                 var locker = new object();
-                return searchData.Connect(fss=>fss.Segment.Type == FileSegmentType.Head)
+                return searchData.Connect(fss=>fss.Segment.Type == FileSegmentType.Head )
                     .Do(head => Debug.WriteLine(head.First().Current))
                     .WhereReasonsAre(ChangeReason.Add)  
                     .SelectMany(changes=>changes.Select(c=>c.Current).OrderByDescending(c=>c.Segment.Index).ToArray())

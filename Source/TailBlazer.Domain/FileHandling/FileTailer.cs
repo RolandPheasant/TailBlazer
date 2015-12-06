@@ -68,8 +68,8 @@ namespace TailBlazer.Domain.FileHandling
                     var currentPage = currentLines.GetIndicies(scroll).ToArray();
 
                     var previous = lines.Items.Select(l => l.LineInfo).ToArray();
-                    var removed = previous.Except(currentPage,LineInfo.FlexComparer).ToArray();
-                    var added = currentPage.Except(previous, LineInfo.FlexComparer).ToArray();
+                    var removed = previous.Except(currentPage,LineInfo.LineIndexComparer).ToArray();
+                    var added = currentPage.Except(previous, LineInfo.LineIndexComparer).ToArray();
                     //calculated added and removed lines
                     var removedLines = lines.Items.Where(l => removed.Contains(l.LineInfo)).ToArray();
                     Console.WriteLine($"{added.Length} added");

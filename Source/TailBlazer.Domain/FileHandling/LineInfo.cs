@@ -48,7 +48,7 @@ namespace TailBlazer.Domain.FileHandling
 
 
         public static readonly IEqualityComparer<LineInfo> FlexComparer = Equality.CompareOn<LineInfo, long>(li => li.Type== 
-        LineIndexType.Absolute ? li.Start : li.Line);
+        LineIndexType.Absolute ? (long)li.Start : (long)li.Line);
 
         public static readonly IEqualityComparer<LineInfo> IndexComparer = Equality.CompareOn<LineInfo, int>(li => li.Index);
 
@@ -56,19 +56,37 @@ namespace TailBlazer.Domain.FileHandling
         {
             public bool Equals(LineInfo x, LineInfo y)
             {
-                return x.Index == y.Index && x.Start == y.Start && x.Offset == y.Offset && x.Type == y.Type;
+                if (x.Type == LineIndexType.Absolute)
+                {
+                    return x.Start == y.Start  && x.Type == y.Type;
+                }
+                //index or 
+                return  x.Index == y.Index   && x.Type == y.Type;
+
             }
 
             public int GetHashCode(LineInfo obj)
             {
+                if (obj.Type == LineIndexType.Absolute)
+                {
+                    unchecked
+                    {
+                        var hashCode = obj.Start.GetHashCode(); ;
+                        //hashCode = (hashCode * 397) ^ obj
+                        //hashCode = (hashCode * 397) ^ obj.Offset;
+                        hashCode = (hashCode * 397) ^ (int)obj.Type;
+                        return hashCode;
+                    }
+                }
                 unchecked
                 {
-                    var hashCode = obj.Index;
-                    hashCode = (hashCode*397) ^ obj.Start.GetHashCode();
-                    hashCode = (hashCode*397) ^ obj.Offset;
-                    hashCode = (hashCode*397) ^ (int) obj.Type;
+                    var hashCode = obj.Index.GetHashCode(); ;
+                    //hashCode = (hashCode * 397) ^ obj
+                    //hashCode = (hashCode * 397) ^ obj.Offset;
+                    hashCode = (hashCode * 397) ^ (int)obj.Type;
                     return hashCode;
                 }
+
             }
         }
 

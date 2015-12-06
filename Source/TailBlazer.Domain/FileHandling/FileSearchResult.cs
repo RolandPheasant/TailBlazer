@@ -72,18 +72,6 @@ namespace TailBlazer.Domain.FileHandling
             //For large sets this could be very inefficient
             Matches = all.SelectMany(s => s.Lines).OrderBy(l=>l).ToArray();
 
-
-            //if (current.Segment.Type == FileSegmentType.Tail)
-            //{
-            //    ChangedReason = LinesChangedReason.Tailed;
-            //    TailStartsAt = current.TailStartsAt;
-            //}
-            //else
-            //{
-            //    ChangedReason = LinesChangedReason.Paged;
-            //    TailStartsAt = previous.TailStartsAt;
-            //}
-
             Console.WriteLine($"{SegmentsCompleted}/{Segments}.{Count}");
         }
         
@@ -101,6 +89,8 @@ namespace TailBlazer.Domain.FileHandling
             int first = scroll.FirstIndex;
             int size = scroll.PageSize;
 
+            Console.WriteLine("{}");
+
             if (scroll.Mode == ScrollingMode.Tail)
             {
                 first = size > Count ? 0 : Count - size;
@@ -115,11 +105,15 @@ namespace TailBlazer.Domain.FileHandling
             size = Math.Min(size, Count);
             if (size == 0) yield break;
 
+            Console.WriteLine($"ACTUAL SCROLL={scroll.Mode}, {first}, {size}. Number of matches ={Matches.Length}");
+
             foreach (var i in Enumerable.Range(first, size))
             {
                 if (i > Count - 1) continue;
 
                 var start = Matches[i];
+
+                //Console.WriteLine(start);
                 yield return new LineInfo(0, i, start, (long)0, start >=TailStartsAt
                     && ChangedReason == LinesChangedReason.Tailed);
             }
