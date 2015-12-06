@@ -104,8 +104,7 @@ namespace TailBlazer.Domain.FileHandling
                     var estimate = new SparseIndex(0, tail.Start, compression, estimateLines, IndexType.Page);
                     _indicies.Add(estimate);
 
-                    //keep it as an estimate for files over 250 meg
-
+                    //keep it as an estimate for files over 250 meg [for now]
                     if (tail.Start > sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing) return;
 
                     //todo: index first and last segment for large sized file

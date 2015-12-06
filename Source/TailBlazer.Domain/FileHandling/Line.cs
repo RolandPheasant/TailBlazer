@@ -27,11 +27,11 @@ namespace TailBlazer.Domain.FileHandling
         }
 
 
-        public Line(LineInfo lineInfo, string text)
+        public Line(LineInfo lineInfo, string text, DateTime? timestamp)
         {
             LineInfo = lineInfo;
             Text = text;
-            Timestamp = lineInfo.EndOfTail ? DateTime.Now : (DateTime?)null;
+            Timestamp = timestamp;
 
             Number = LineInfo.Line;
             Index = LineInfo.Index;

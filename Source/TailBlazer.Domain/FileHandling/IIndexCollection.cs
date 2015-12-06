@@ -10,6 +10,8 @@ namespace TailBlazer.Domain.FileHandling
 
     public interface ILineProvider
     {
+        long TailStartsAt { get; }
+
         bool IsEmpty { get; }
 
         LinesChangedReason ChangedReason { get; }

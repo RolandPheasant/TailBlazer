@@ -54,7 +54,8 @@ namespace TailBlazer.Domain.FileHandling
             var latestFilter = filter.Cast<ILineProvider>().Synchronize(locker); 
             var latest = latestLines.CombineLatest(latestFilter, (l, f) => f.IsEmpty ? l : f);
 
-      //    var tailStartsAt = latestLines.Skip(1).Select(provider=> provider.)
+
+            var tailStartsAt = latestLines.Select(p => p.ChangedReason!= LinesChangedReason.Loaded ?  p.TailStartsAt : -1);
 
             IsLoading = indexer.Take(1).Select(_ => false).StartWith(true);
 
@@ -65,8 +66,11 @@ namespace TailBlazer.Domain.FileHandling
             FileSize = fileWatcher.Select(notification => notification.Size);
             
             var aggregator = latestLines.CombineLatest(latestFilter, (l, f) => f.IsEmpty ? l : f)
-                .CombineLatest(scrollRequest, (currentLines, scroll) => currentLines.GetIndicies(scroll).ToArray())
-                .Select(currentPage =>
+                .CombineLatest(scrollRequest, (currentLines, scroll) => currentLines.GetIndicies(scroll).ToArray());
+
+
+            var xx = tailStartsAt
+                .CombineLatest(aggregator, (tail, currentPage ) =>
                 {
                     //calculated added and removed indicies
                     var previous = lines.Items.Select(l => l.LineInfo).ToArray();
@@ -76,10 +80,18 @@ namespace TailBlazer.Domain.FileHandling
                     //calculated added and removed lines
                     var removedLines = lines.Items.Where(l => removed.Contains(l.LineInfo)).ToArray();
 
+                    Func<long, DateTime?> isTail = l =>
+                    {
+                        var onTail = tail!=-1 && l >= tail;
+                        Console.WriteLine($"Checking {l} os on tail = {tail}/ On tail ={onTail}");
+                        return l >= tail ? DateTime.Now : (DateTime?) null;
+                    };
+
                     //finally we can load the line from the file todo: Add encdoing back in
-                    var newLines = file.ReadLine(added, (lineIndex, text) => new Line(lineIndex, text), Encoding.UTF8).ToArray();
+                    var newLines = file.ReadLine(added, (lineIndex, text) => new Line(lineIndex, text, isTail(lineIndex.Start)), Encoding.UTF8).ToArray();
                     return new { NewLines = newLines, OldLines = removedLines };
-                }).Where(fn => fn.NewLines.Length + fn.OldLines.Length > 0)
+                })
+                .Where(fn => fn.NewLines.Length + fn.OldLines.Length > 0)
                 .Subscribe(changes =>
                 {
                     //update observable list
@@ -89,7 +101,7 @@ namespace TailBlazer.Domain.FileHandling
                         if (changes.NewLines.Any()) innerList.AddRange(changes.NewLines);
                     });
                 });
-            _cleanUp = new CompositeDisposable(Lines, lines, aggregator, Disposable.Create(() => isBusy.OnCompleted()));
+            _cleanUp = new CompositeDisposable(Lines, lines, xx, Disposable.Create(() => isBusy.OnCompleted()));
         }
 
 

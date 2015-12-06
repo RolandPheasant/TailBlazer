@@ -31,7 +31,7 @@ namespace TailBlazer.Domain.FileHandling
             if (previous == null)
             {
                 ChangedReason = LinesChangedReason.Loaded;
-                TailStartsAt = Count-1;
+                TailStartsAt = latest.Max(idx => idx.End);
             }
             else
             {
@@ -40,7 +40,7 @@ namespace TailBlazer.Domain.FileHandling
                                 ? LinesChangedReason.Tailed
                                 : LinesChangedReason.Paged;
 
-                TailStartsAt = previous.Count-1;
+                TailStartsAt = previous.TailStartsAt;
             }
 
 
@@ -70,63 +70,6 @@ namespace TailBlazer.Domain.FileHandling
                 yield return  new LineInfo(i + 1, i, relativeIndex.Start, offset);
                 offset++;
             }
-        }
-
-        public long GetLineNumberFromPosition(long position)
-        {
-            //completely approximate [make this more accurate]
-            var totalSize = Indicies.Max(si => si.End);
-            var lines2 = Indicies.Sum(si => si.LineCount);
-            var bytesPerLine2 = totalSize / lines2;
-            return position / bytesPerLine2;
-        }
-
-        public LineInfo GetLineNumberPosition(int index,long endPosition)
-        {
-            int firstLineInContainer = 0;
-            int lastLineInContainer = 0;
-
-            foreach (var sparseIndex in Indicies)
-            {
-                lastLineInContainer += sparseIndex.LineCount;
-                if (endPosition >= sparseIndex.Start && endPosition <= sparseIndex.End)
-                {
-                    //It could be that the user is scrolling into a part of the file
-                    //which is still being indexed [or will never be indexed]. 
-                    //In this case we need to estimate where to scroll to
-                    if (sparseIndex.LineCount != 0 && sparseIndex.Indicies.Count == 0)
-                    {
-                        //return estimate here!
-                        var lines = sparseIndex.LineCount;
-                        var bytes = sparseIndex.End - sparseIndex.Start;
-                        var bytesPerLine = bytes / lines;
-                        long lineNumber = (endPosition / bytesPerLine);
-                        throw new IndexOutOfRangeException("Cannot find matching line");
-                      //  return new LineIndex(lineNumber, index,);
-
-                        //return estimate;
-                    }
-
-
-
-                    //var linenumber is the indexof the positon [could be shit perf because expensive indexOf]
-                    var aboluteIndex = sparseIndex.Indicies.IndexOf(endPosition);
-                  //  var aboluteIndex = sparseIndex.Indicies.IndexOf(endPosition);
-                    if (aboluteIndex == -1)
-                    {
-                        var last = sparseIndex.Indicies.Data.Last();
-                        Console.WriteLine(last);
-                        Console.WriteLine(endPosition);
-                    }
-
-                       
-                    var start = aboluteIndex == 0 ? 0 : sparseIndex.Indicies[aboluteIndex - 1];
-                    return new LineInfo(aboluteIndex, index + firstLineInContainer, start, endPosition);
-
-                }
-                firstLineInContainer = firstLineInContainer + sparseIndex.LineCount;
-            }
-            throw new IndexOutOfRangeException("Cannot find matching line");
         }
 
         private RelativeIndex CalculateRelativeIndex(int index)
