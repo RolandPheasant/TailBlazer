@@ -49,13 +49,12 @@ namespace TailBlazer.Domain.FileHandling
             IsSearching = all.Any(s => s.Segment.Type == FileSegmentType.Head && s.Status != FileSegmentSearchStatus.Complete);
             Segments = all.Length;
             SegmentsCompleted = all.Count(s => s.Segment.Type == FileSegmentType.Head && s.Status == FileSegmentSearchStatus.Complete);
-
             Size = all.Last().Segment.End;
 
             //For large sets this could be very inefficient
             Matches = all.SelectMany(s => s.Lines).OrderBy(l=>l).ToArray();
             
-            Console.WriteLine($"{SegmentsCompleted}/{Segments}. {Count}");
+            Console.WriteLine($"{SegmentsCompleted}/{Segments}.{Count}");
         }
         
         private FileSearchResult()

@@ -101,7 +101,6 @@
     <Compile Include="FileSegmentFixture.cs" />
     <Compile Include="FileSegmentUsingExtensionFixture.cs" />
     <Compile Include="FileTailerFixture.cs" />
-    <Compile Include="SparseIndexerFixture.cs" />
     <Compile Include="FileScanFixture.cs" />
     <Compile Include="FileWatchFixture.cs" />
     <Compile Include="LogFixtures.cs" />

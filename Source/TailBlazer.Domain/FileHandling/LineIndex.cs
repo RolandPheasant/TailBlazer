@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -36,31 +37,42 @@ namespace TailBlazer.Domain.FileHandling
         #region Comparison
 
 
+        public static readonly IEqualityComparer<LineIndex> PositionComparer =
+                                        Equality.CompareOn<LineIndex, long>(li => li.Start)
+                                                .AndOn<LineIndex, long>(li => li.Offset);
 
-        #endregion
-        
-        #region Equality
 
-        private sealed class LineEqualityComparer : IEqualityComparer<LineIndex>
+        public static readonly IEqualityComparer<LineIndex> IndexComparer =Equality.CompareOn<LineIndex, int>(li => li.Index);
+        private sealed class LineIndexEqualityComparer : IEqualityComparer<LineIndex>
         {
             public bool Equals(LineIndex x, LineIndex y)
             {
-                return x.Line == y.Line;
+                return x.Index == y.Index && x.Start == y.Start && x.Offset == y.Offset && x.Type == y.Type;
             }
 
             public int GetHashCode(LineIndex obj)
             {
-                return obj.Line;
+                unchecked
+                {
+                    var hashCode = obj.Index;
+                    hashCode = (hashCode*397) ^ obj.Start.GetHashCode();
+                    hashCode = (hashCode*397) ^ obj.Offset;
+                    hashCode = (hashCode*397) ^ (int) obj.Type;
+                    return hashCode;
+                }
             }
         }
 
-        private static readonly IEqualityComparer<LineIndex> LineComparerInstance = new LineEqualityComparer();
+        private static readonly IEqualityComparer<LineIndex> LineIndexComparerInstance = new LineIndexEqualityComparer();
 
-        public static IEqualityComparer<LineIndex> LineComparer
+        public static IEqualityComparer<LineIndex> LineIndexComparer
         {
-            get { return LineComparerInstance; }
+            get { return LineIndexComparerInstance; }
         }
 
+        #endregion
+
+        #region Equality
 
         public bool Equals(LineIndex other)
         {

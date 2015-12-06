@@ -83,8 +83,6 @@
     <Compile Include="FileHandling\LineMatchChangedReason.cs" />
     <Compile Include="FileHandling\LineMatches.cs" />
     <Compile Include="FileHandling\LineMatcher.cs" />
-    <Compile Include="FileHandling\LineIndexCollection.cs" />
-    <Compile Include="FileHandling\LineIndexer.cs" />
     <Compile Include="FileHandling\FileNotification.cs" />
     <Compile Include="FileHandling\FileNotificationType.cs" />
     <Compile Include="FileHandling\FileTailer.cs" />
@@ -94,9 +92,8 @@
     <Compile Include="FileHandling\ScrollingMode.cs" />
     <Compile Include="FileHandling\ScrollRequest.cs" />
     <Compile Include="FileHandling\SparseIndex.cs" />
-    <Compile Include="FileHandling\SparseIndexer.cs" />
     <Compile Include="FileHandling\SparseIndexCollection.cs" />
-    <Compile Include="FileHandling\SparseIndexer2.cs" />
+    <Compile Include="FileHandling\SparseIndexer.cs" />
     <Compile Include="FileHandling\StreamReaderExtended.cs" />
     <Compile Include="Infrastructure\Equality.cs" />
     <Compile Include="Infrastructure\Extensions.cs" />

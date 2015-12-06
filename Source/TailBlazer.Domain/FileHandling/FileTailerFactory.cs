@@ -14,15 +14,6 @@ namespace TailBlazer.Domain.FileHandling
             _logFactory = logFactory;
         }
 
-        public FileTailer Create(FileInfo file,IObservable<string> textToMatch,IObservable<ScrollRequest> scrollRequest, IScheduler scheduler = null)
-        {
-            throw new NotImplementedException();
-            //return new FileTailer(file, textToMatch, 
-            //    scrollRequest,
-            //    _logFactory.Create<FileTailer>());
-        }
-
-
         public FileTailer Create(FileInfo file, IObservable<FileSearchResult> filter, IObservable<ScrollRequest> scrollRequest, IScheduler scheduler = null)
         {
             return new FileTailer(file, filter,

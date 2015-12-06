@@ -45,18 +45,12 @@ namespace TailBlazer.Domain.FileHandling
             //manually maintained search results and status
             var searchData= new SourceCache<FileSegmentSearch, FileSegmentKey>(s=>s.Key);
             
-
             SearchResult = searchData.Connect()
                 .Flatten()
                 .Select(change=>change.Current)
-                .Scan((FileSearchResult)null, (previous, current) =>
-                {
-                    if (previous==null)
-                    {
-                        return new FileSearchResult(current);
-                    }
-                    return new FileSearchResult(previous, current);
-                })
+                .Scan((FileSearchResult)null, (previous, current) => previous==null 
+                                ? new FileSearchResult(current) 
+                                : new FileSearchResult(previous, current))
                 .StartWith(FileSearchResult.None);
 
             //initialise a pending state for all segments

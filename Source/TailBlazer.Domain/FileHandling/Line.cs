@@ -4,13 +4,12 @@ namespace TailBlazer.Domain.FileHandling
 {
     public class Line : IEquatable<Line>
     {
-
         public int Number { get;  }
         public int Index { get; }
         public string Text { get;  }
         public DateTime? Timestamp { get;  }
 
-        public LineIndex LineIndex { get; set; }
+        public LineIndex LineIndex { get;  }
 
         public Line(int number, string text, DateTime? timestamp)
         {

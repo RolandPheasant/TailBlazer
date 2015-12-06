@@ -10,35 +10,6 @@ namespace TailBlazer.Fixtures
 {
     public class ReadLinesFixture
     {
-        //[Fact()]
-        public void FileWhereThereIsAProblemIndexing()
-        {
-            var file = Path.GetTempFileName();
-            var info = new FileInfo(@"U:\Downloads\InventairePerpetuel.txt");
-
-            var indexer = new LineIndexer(info);
-            var indexed = indexer.ReadToEnd().ToArray();
-            var indicies = new LineIndexCollection(indexed, indexer.Encoding);
-
-
-
-            //   var tail = indicies.GetTail(new ScrollRequest(1)).ToArray();
-            var tail = indicies.GetIndicies( new ScrollRequest(1)).ToArray();
-
-            Console.WriteLine(indicies.Lines.Last());
-            var convertedLines = info.ReadLine(tail, (li, str) =>
-            {
-                Console.WriteLine(li.Size);
-                Console.WriteLine(str.Length);
-                return str;
-            }, indicies.Encoding).ToArray();
-
-        }
-
-
-
-        //public class ArrayToLineEnum
-
 
 
         [Fact]

@@ -55,23 +55,21 @@ namespace TailBlazer.Domain.FileHandling
             first = Math.Max(0, first);
             size = Math.Min(size, source.Count);
 
-            //need to look up line number
-            return Enumerable.Range(first, Math.Min(size, source.Count))
+            return Enumerable.Range(first, size)
                 .Select(i =>
                 {
                     //a matched line is different from an Index in that we do not know the end of the line
-                  
-                    //do we care about the line number? Should we add it to the index
+
                     var start = source.Matches[i];
-                    //var end = i == source.Count - 1 ? source.Size : source.Matches[i + 1];
+                    var end = i == source.Count - 1 ? source.Size : source.Matches[i + 1];
                     //var start = i == 0 ? 0 : source.Matches[i - 1];
-                    return new LineIndex(i, i, start, (long)1000);
+                    //var end = source.Matches[i] - 1;
+
+
+                    //do we care about the line number? Should we add it to the index
+                    var lineNumber = (int) collection.GetLineNumberFromPosition(start);
+                    return new LineIndex(lineNumber, i, start, end);
                 });
         }
     }
-
-    //public IEnumerable<LineIndex> GetIndicies(ScrollRequest scroll, LineMatches matches)
-    //{
-    //    throw new System.NotImplementedException();
-    //}
 }

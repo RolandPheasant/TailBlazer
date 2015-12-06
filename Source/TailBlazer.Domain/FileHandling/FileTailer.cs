@@ -75,16 +75,20 @@ namespace TailBlazer.Domain.FileHandling
                     var indicies = result.Incidies;
                     var matched = result.FilterResult;
 
+                    //get indicies which should be displayed
                     var indices = result.FilterResult  == FileSearchResult.None
                                     ? indicies.GetIndicies(scroll)
                                     : matched.GetIndicies(scroll,indicies);
 
+                    //calculated added and removed indeicies
                     var currentPage = indices.ToArray();
                     var previous = lines.Items.Select(l => l.LineIndex).ToArray();
-                    var removed = previous.Except(currentPage).ToArray();
-                    var removedLines = lines.Items.Where(l => removed.Contains(l.LineIndex)).ToArray();
+                    var removed = previous.Except(currentPage,LineIndex.IndexComparer).ToArray();
+                    var added = currentPage.Except(previous, LineIndex.IndexComparer).ToArray();
 
-                    var added = currentPage.Except(previous).ToArray();
+                    //calculated added and removed lines
+                    var removedLines = lines.Items.Where(l => removed.Contains(l.LineIndex)).ToArray();
+                    
                     //finally we can load the line from the file
                     var newLines = file.ReadLine(added, (lineIndex, text) =>
                     {

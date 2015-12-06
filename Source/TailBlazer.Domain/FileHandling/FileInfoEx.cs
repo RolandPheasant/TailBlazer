@@ -77,7 +77,7 @@ namespace TailBlazer.Domain.FileHandling
         public static IObservable<FileSegmentCollection> WithSegments(this IObservable<FileNotification> source)
         {
             return source
-                 .Where(n => n.NotificationType == FileNotificationType.Created)
+                 .Where(n => n.NotificationType == FileNotificationType.CreatedOrOpened)
                  .Select(createdNotification =>
                  {
                      return Observable.Create<FileSegmentCollection>(observer =>
@@ -99,7 +99,7 @@ namespace TailBlazer.Domain.FileHandling
             {
                 return Observable.Create<SparseIndexCollection>(observer =>
                 {
-                    var indexer = new SparseIndexer2(source);
+                    var indexer = new SparseIndexer(source);
                     var notifier = indexer.Result.SubscribeSafe(observer);
                     return new CompositeDisposable(indexer, notifier);
                 });
@@ -144,7 +144,7 @@ namespace TailBlazer.Domain.FileHandling
         public static IObservable<LineMatches> Match(this IObservable<FileNotification> source, Func<string,bool> predicate, Action<bool> isSearching=null)
         {
             return source
-                .Where(n => n.NotificationType == FileNotificationType.Created)
+                .Where(n => n.NotificationType == FileNotificationType.CreatedOrOpened)
                 .Select(createdNotification =>
                 {
                     return Observable.Create<LineMatches>(observer =>
@@ -157,7 +157,7 @@ namespace TailBlazer.Domain.FileHandling
                             .Scan((LineMatches) null, (state, notification) =>
                             {
                                 var shouldNotifyOfSearch = isSearching != null &&
-                                            notification.NotificationType == FileNotificationType.Created;
+                                            notification.NotificationType == FileNotificationType.CreatedOrOpened;
                                 try
                                 {
                                     if (shouldNotifyOfSearch) isSearching(true);
