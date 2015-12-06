@@ -82,7 +82,7 @@ namespace TailBlazer.Domain.FileHandling
 
                     Func<long, DateTime?> isTail = l =>
                     {
-                        var onTail = tail!=-1 && l >= tail;
+                        var onTail =  l >= tail;
                         Console.WriteLine($"Checking {l} os on tail = {tail}/ On tail ={onTail}");
                         return l >= tail ? DateTime.Now : (DateTime?) null;
                     };
