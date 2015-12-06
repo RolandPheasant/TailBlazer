@@ -112,7 +112,7 @@ namespace TailBlazer.Views
             //load lines into observable collection
             var loader = tailer.Lines.Connect()
                 .Transform(line => new LineProxy(line))
-                .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy.Number))
+                .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy.Line.LineInfo.Start).ThenByAscending(proxy => proxy.Line.LineInfo.Offset))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)
                 .Subscribe(changes => logger.Info($"Rows changed. {changes.Adds} adds, {changes.Removes} removed"), 

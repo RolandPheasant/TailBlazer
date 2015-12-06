@@ -6,20 +6,17 @@ namespace TailBlazer.Domain.FileHandling
     public interface IIndexCollection: ILineProvider
     {
         Encoding Encoding { get; }
-        int Count { get; }
-        int Diff { get; }
-        LinesChangedReason ChangedReason { get; }
-        long TailStartsAt { get; }
-
-   
     }
 
     public interface ILineProvider
     {
-        long GetLineNumberFromPosition(long position);
-        LineIndex GetLineNumberPosition(int index, long endPosition);
+        bool IsEmpty { get; }
 
-        IEnumerable<LineIndex> GetIndicies(ScrollRequest scroll);
+        LinesChangedReason ChangedReason { get; }
+
+        int Count { get; }
+
+        IEnumerable<LineInfo> GetIndicies(ScrollRequest scroll);
 
     }
 }

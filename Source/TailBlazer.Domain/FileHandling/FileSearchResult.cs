@@ -4,8 +4,7 @@ using System.Linq;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class FileSearchResult//: ILineProvider
-        : IEquatable<FileSearchResult>
+    public class FileSearchResult: ILineProvider, IEquatable<FileSearchResult>
     {
         public static readonly FileSearchResult None = new FileSearchResult();
         public long[] Matches { get; }
@@ -14,12 +13,14 @@ namespace TailBlazer.Domain.FileHandling
         public int Segments { get; }
         public bool IsSearching { get; }
 
-       // private readonly FileSegmentSearch[] _allSearches;
+        public LinesChangedReason ChangedReason { get; }
+        public long TailStartsAt { get; }
+
+        // private readonly FileSegmentSearch[] _allSearches;
         private readonly IDictionary<FileSegmentKey, FileSegmentSearch> _allSearches;
 
         public FileSegmentSearch LastSearch { get; }
         public long Size { get; }
-        //  public object  =>_lastSearch
 
         public FileSearchResult(FileSegmentSearch initial)
         {
@@ -53,13 +54,59 @@ namespace TailBlazer.Domain.FileHandling
 
             //For large sets this could be very inefficient
             Matches = all.SelectMany(s => s.Lines).OrderBy(l=>l).ToArray();
-            
+
+
+            if (current.Segment.Type == FileSegmentType.Tail)
+            {
+                ChangedReason = LinesChangedReason.Tailed;
+                TailStartsAt = previous.LastSearch.Segment.End;
+            }
+            else
+            {
+                ChangedReason = LinesChangedReason.Paged;
+                TailStartsAt = previous.TailStartsAt;
+            }
+
             Console.WriteLine($"{SegmentsCompleted}/{Segments}.{Count}");
         }
         
         private FileSearchResult()
         {
             Matches = new long[0];
+        }
+
+        public bool IsEmpty => this == None;
+
+        public  IEnumerable<LineInfo> GetIndicies( ScrollRequest scroll)
+        {
+            if (scroll == null) throw new ArgumentNullException(nameof(scroll));
+
+            int first = scroll.FirstIndex;
+            int size = scroll.PageSize;
+
+            if (scroll.Mode == ScrollingMode.Tail)
+            {
+                first = size > Count ? 0 : Count - size;
+            }
+            else
+            {
+                if (scroll.FirstIndex + size >= Count)
+                    first = Count - size;
+            }
+
+            first = Math.Max(0, first);
+            size = Math.Min(size, Count);
+            if (size == 0) yield break;
+
+            foreach (var i in Enumerable.Range(first, size))
+            {
+                if (i > Count - 1) continue;
+
+                var start = Matches[i];
+                yield return new LineInfo(0, i, start, (long)0, start >=LastSearch.TailStartsAt
+                    && ChangedReason == LinesChangedReason.Tailed);
+            }
+
         }
 
         #region Equality

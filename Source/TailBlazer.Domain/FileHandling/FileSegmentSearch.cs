@@ -26,15 +26,20 @@ namespace TailBlazer.Domain.FileHandling
             Key = segment.Key;
             Segment = segment;
             Status =  FileSegmentSearchStatus.Complete;
+            TailStartsAt = segment.End;
             _matches = new ImmutableArray<long>(result.Indicies);
         }
+
+        public long TailStartsAt { get; set; }
 
         public FileSegmentSearch(FileSegmentSearch segmentSearch, FileSegmentSearchResult result)
         {
             //this can only be the tail as the tail will continue to grow
+            TailStartsAt = segmentSearch.Segment.End;
             Key = segmentSearch.Key;
             Segment = new FileSegment(segmentSearch.Segment, result.End); 
             Status = FileSegmentSearchStatus.Complete;
+  
             _matches = segmentSearch._matches.Add(result.Indicies);
         }
 

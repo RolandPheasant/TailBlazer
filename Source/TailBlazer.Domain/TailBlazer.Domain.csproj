@@ -86,7 +86,7 @@
     <Compile Include="FileHandling\FileNotification.cs" />
     <Compile Include="FileHandling\FileNotificationType.cs" />
     <Compile Include="FileHandling\FileTailer.cs" />
-    <Compile Include="FileHandling\LineIndex.cs" />
+    <Compile Include="FileHandling\LineInfo.cs" />
     <Compile Include="FileHandling\LineReaderEx.cs" />
     <Compile Include="FileHandling\LinesChangedReason.cs" />
     <Compile Include="FileHandling\ScrollingMode.cs" />

@@ -9,7 +9,15 @@ namespace TailBlazer.Domain.FileHandling
         public string Text { get;  }
         public DateTime? Timestamp { get;  }
 
-        public LineIndex LineIndex { get;  }
+        public LineInfo LineInfo { get;  }
+
+        public Line(int number, string text)
+        {
+            Number = number;
+            Text = text;
+            Timestamp =  (DateTime?)null;
+        }
+
 
         public Line(int number, string text, DateTime? timestamp)
         {
@@ -19,14 +27,14 @@ namespace TailBlazer.Domain.FileHandling
         }
 
 
-        public Line(LineIndex lineIndex, string text, DateTime? timestamp)
+        public Line(LineInfo lineInfo, string text)
         {
-            LineIndex = lineIndex;
+            LineInfo = lineInfo;
             Text = text;
-            Timestamp = timestamp;
+            Timestamp = lineInfo.EndOfTail ? DateTime.Now : (DateTime?)null;
 
-            Number = LineIndex.Line;
-            Index = LineIndex.Index;
+            Number = LineInfo.Line;
+            Index = LineInfo.Index;
         }
 
         #region Equality
@@ -35,7 +43,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(Text, other.Text) && LineIndex.Equals(other.LineIndex);
+            return string.Equals(Text, other.Text) && LineInfo.Equals(other.LineInfo);
         }
 
         public override bool Equals(object obj)
@@ -50,7 +58,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             unchecked
             {
-                return ((Text != null ? Text.GetHashCode() : 0)*397) ^ LineIndex.GetHashCode();
+                return ((Text != null ? Text.GetHashCode() : 0)*397) ^ LineInfo.GetHashCode();
             }
         }
 

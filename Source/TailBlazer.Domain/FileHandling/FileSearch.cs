@@ -60,7 +60,6 @@ namespace TailBlazer.Domain.FileHandling
 
             //scan end of file, then tail
             var tailSearch = segmentCache.WatchValue(FileSegmentKey.Tail)
-     
                 .Scan((FileSegmentSearch) null, (previous, current) =>
                 {
                     if (previous == null)

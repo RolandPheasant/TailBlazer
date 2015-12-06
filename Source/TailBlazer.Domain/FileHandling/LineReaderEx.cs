@@ -59,7 +59,7 @@ namespace TailBlazer.Domain.FileHandling
         }
 
 
-        public static IEnumerable<T> ReadLine<T>(this FileInfo source, IEnumerable<LineIndex> lines, Func<LineIndex, string, T> selector, Encoding encoding)
+        public static IEnumerable<T> ReadLine<T>(this FileInfo source, IEnumerable<LineInfo> lines, Func<LineInfo, string, T> selector, Encoding encoding)
         {
             encoding = encoding ?? source.GetEncoding();
 
@@ -110,20 +110,28 @@ namespace TailBlazer.Domain.FileHandling
                     }
                     else
                     {
-                        long previousLine = -1;
+                       // long previousLine = -1;
                         foreach (var index in indicies)
                         {
-                            var currentLine = index.Line;
-                            var isContinuous = currentLine == previousLine + 1;
-                            if (!isContinuous)
+                            var currentPosition = reader.AbsolutePosition();
+                            if (currentPosition != index.Start)
                             {
                                 reader.DiscardBufferedData();
                                 reader.BaseStream.Seek(index.Start, SeekOrigin.Begin);
                             }
-
                             var line = reader.ReadLine();
                             yield return selector(index, line);
-                            previousLine = currentLine;
+
+                            //var currentLine = index.Line;
+                            //var isContinuous = currentLine == previousLine + 1;
+                            //if (!isContinuous)
+                            //{
+                            //    reader.DiscardBufferedData();
+                            //    reader.BaseStream.Seek(index.Start, SeekOrigin.Begin);
+                            //}
+
+                         
+                            //previousLine = currentLine;
                         }
                     }
 

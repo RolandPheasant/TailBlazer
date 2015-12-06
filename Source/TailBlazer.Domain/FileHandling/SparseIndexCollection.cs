@@ -11,6 +11,8 @@ namespace TailBlazer.Domain.FileHandling
         public Encoding Encoding { get; }
         public int Count { get; }
         public int Diff { get; }
+        public bool IsEmpty => Count != 0; 
+
         public LinesChangedReason ChangedReason { get; }
         public long TailStartsAt { get; }
         private SparseIndex[] Indicies { get; }
@@ -44,7 +46,7 @@ namespace TailBlazer.Domain.FileHandling
 
         }
 
-        public IEnumerable<LineIndex> GetIndicies(ScrollRequest scroll)
+        public IEnumerable<LineInfo> GetIndicies(ScrollRequest scroll)
         {
             int first = scroll.FirstIndex;
             int size = scroll.PageSize;
@@ -65,7 +67,7 @@ namespace TailBlazer.Domain.FileHandling
             var offset = relativeIndex.LinesOffset;
             foreach (var i in Enumerable.Range(first, Math.Min(size, Count)))
             {
-                yield return  new LineIndex(i + 1, i, relativeIndex.Start, offset);
+                yield return  new LineInfo(i + 1, i, relativeIndex.Start, offset);
                 offset++;
             }
         }
@@ -79,7 +81,7 @@ namespace TailBlazer.Domain.FileHandling
             return position / bytesPerLine2;
         }
 
-        public LineIndex GetLineNumberPosition(int index,long endPosition)
+        public LineInfo GetLineNumberPosition(int index,long endPosition)
         {
             int firstLineInContainer = 0;
             int lastLineInContainer = 0;
@@ -119,7 +121,7 @@ namespace TailBlazer.Domain.FileHandling
 
                        
                     var start = aboluteIndex == 0 ? 0 : sparseIndex.Indicies[aboluteIndex - 1];
-                    return new LineIndex(aboluteIndex, index + firstLineInContainer, start, endPosition);
+                    return new LineInfo(aboluteIndex, index + firstLineInContainer, start, endPosition);
 
                 }
                 firstLineInContainer = firstLineInContainer + sparseIndex.LineCount;
