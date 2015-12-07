@@ -6,6 +6,8 @@ namespace TailBlazer.Domain.FileHandling
 {
     public class FileSegmentCollection : IEquatable<FileSegmentCollection>
     {
+        private long sizeDiff;
+
         public FileInfo Info { get;  }
         public FileSegment[] Segments { get;  }
         public long TailStartsAt { get;  }
@@ -14,7 +16,12 @@ namespace TailBlazer.Domain.FileHandling
         public FileSegment Tail => Segments[Count - 1];
         public long FileLength => Tail.End;
 
-        public FileSegmentCollection(FileInfo fileInfo, FileSegment[] segments)
+        public long FileSize { get; }
+
+
+        public long SizeDiff { get; }
+
+        public FileSegmentCollection(FileInfo fileInfo, FileSegment[] segments, long sizeDiff)
         {
             if (segments.Length == 0)
                 throw new ArgumentException("Argument is empty collection", nameof(segments));
@@ -23,11 +30,15 @@ namespace TailBlazer.Domain.FileHandling
             Segments = segments;
             TailStartsAt = segments.Max(fs => fs.End);
             Count = Segments.Length;
+            FileSize = TailStartsAt;
+            SizeDiff = sizeDiff;
             Reason = FileSegmentChangedReason.Loaded;
         }
 
         public FileSegmentCollection(long newLength, FileSegmentCollection previous)
         {
+            SizeDiff = newLength - previous.FileLength;
+
             //All this assumes it is the tail which has changed, but that may not be so
             Reason = FileSegmentChangedReason.Tailed;
             Info = previous.Info;
@@ -39,7 +50,12 @@ namespace TailBlazer.Domain.FileHandling
             segments[segments.Length-1] = new FileSegment(last, newLength);
             Segments = segments;
             Count = Segments.Length;
+            FileSize = newLength;
+
         }
+
+
+
 
         #region Equality
 

@@ -6,21 +6,21 @@ namespace TailBlazer.Domain.FileHandling
     {
         public int PageSize { get;  }
         public int FirstIndex { get;  }
-        public ScrollingMode Mode { get; }
+        public ScrollReason Mode { get; }
         
         public ScrollRequest(int pageSize)
         {
             PageSize = pageSize;
-            Mode = ScrollingMode.Tail;
+            Mode = ScrollReason.Tail;
         }
         public ScrollRequest(int pageSize, int firstIndex)
         {
             PageSize = pageSize;
             FirstIndex = firstIndex;
-            Mode = ScrollingMode.User;
+            Mode = ScrollReason.User;
         }
 
-        public ScrollRequest(ScrollingMode mode, int pageSize, int firstIndex)
+        public ScrollRequest(ScrollReason mode, int pageSize, int firstIndex)
         {
             PageSize = pageSize;
             FirstIndex = firstIndex;
@@ -34,7 +34,7 @@ namespace TailBlazer.Domain.FileHandling
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            if (Mode== ScrollingMode.Tail)
+            if (Mode== ScrollReason.Tail)
                 return PageSize == other.PageSize && Mode == other.Mode;
 
             return PageSize == other.PageSize && FirstIndex == other.FirstIndex && Mode == other.Mode;

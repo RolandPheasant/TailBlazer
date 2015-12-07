@@ -91,7 +91,7 @@ namespace TailBlazer.Domain.FileHandling
 
             Console.WriteLine("{}");
 
-            if (scroll.Mode == ScrollingMode.Tail)
+            if (scroll.Mode == ScrollReason.Tail)
             {
                 first = size > Count ? 0 : Count - size;
             }

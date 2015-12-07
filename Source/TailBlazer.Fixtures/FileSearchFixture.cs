@@ -18,7 +18,7 @@ namespace TailBlazer.Fixtures
         public void EmptyFile()
         {
             var pulse = new Subject<Unit>();
-
+            var scheduler = new TestScheduler();
             using (var file = new TestFile())
             {
                 FileSearchResult fileSearchResult = null;
@@ -27,6 +27,8 @@ namespace TailBlazer.Fixtures
                     .Search(str => str.Contains("9"))
                     .Subscribe(x => fileSearchResult = x))
                 {
+                  //  scheduler.AdvanceBy(250);
+                    pulse.Once();
                     fileSearchResult.Segments.Should().Be(1);
                     fileSearchResult.SegmentsCompleted.Should().Be(1);
                     fileSearchResult.IsSearching.Should().Be(false);

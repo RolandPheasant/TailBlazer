@@ -4,12 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
-using DynamicData;
 using DynamicData.Kernel;
-using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -54,94 +51,15 @@ namespace TailBlazer.Domain.FileHandling
 
         public static IObservable<FileNotification> WatchFile(this FileInfo file, IObservable<Unit> pulse)
         {
-            return Observable.Create<FileNotification>(observer =>
-            {
-                 Func<IObservable<FileNotification>> poller = () => pulse.StartWith(Unit.Default)
+            return pulse.StartWith(Unit.Default)
 
-                    .Scan((FileNotification)null, (state, _) => state == null
-                       ? new FileNotification(file)
-                       : new FileNotification(state))
-                    .DistinctUntilChanged();
-
-                /*
-                    In theory, poll merrily away except slow down when there is an error.
-                */
-                return poller()
-                    .Catch<FileNotification, Exception>(ex => Observable.Return(new FileNotification(file, ex))
-                        .Concat(poller().DelaySubscription(TimeSpan.FromSeconds(10))))
-                    .SubscribeSafe(observer);
-            });
+                .Scan((FileNotification) null, (state, _) => state == null
+                    ? new FileNotification(file)
+                    : new FileNotification(state))
+                .DistinctUntilChanged();
         }
 
-
-        public static IObservable<FileSegmentCollection> WithSegments(this IObservable<FileNotification> source)
-        {
-            return source
-                 .Where(n => n.NotificationType == FileNotificationType.CreatedOrOpened)
-                 .Select(createdNotification =>
-                 {
-                     return Observable.Create<FileSegmentCollection>(observer =>
-                     {
-                         var refresher = source
-                             .Where(n => n.NotificationType == FileNotificationType.Changed)
-                             .StartWith(createdNotification)
-                             .ToUnit();
-
-                         var indexer = new FileSegmenter((FileInfo)createdNotification, refresher);
-                         return indexer.Segments.SubscribeSafe(observer);
-                     });
-                 }).Switch();
-        }
-
-        public static IObservable<IIndexCollection> Index(this IObservable<FileSegmentCollection> source)
-        {
-            return Observable.Defer(() =>
-            {
-                return Observable.Create<IndexCollection>(observer =>
-                {
-                    var indexer = new Indexer(source);
-                    var notifier = indexer.Result.SubscribeSafe(observer);
-                    return new CompositeDisposable(indexer, notifier);
-                });
-            });
-
-        }
-
-        public static IObservable<IIndexCollection> Index(this IObservable<FileNotification> source)
-        {
-            return source.WithSegments().Index();
-        }
-
-        public static IObservable<FileSearchResult> Search(this FileInfo source, Func<string, bool> predicate, IScheduler scheduler=null)
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-
-            return source.WatchFile(scheduler:scheduler).WithSegments().Search(predicate,scheduler);
-        }
-
-        public static IObservable<FileSearchResult> Search(this IObservable<FileNotification> source,Func<string, bool> predicate, IScheduler scheduler = null)
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-
-            return source.WithSegments().Search(predicate, scheduler);
-        }
-
-        public static IObservable<FileSearchResult> Search(this IObservable<FileSegmentCollection> source, Func<string, bool> predicate, IScheduler scheduler = null)
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-
-
-            return Observable.Create<FileSearchResult>(observer =>
-            {
-                var searcher = new FileSearch(source, predicate, scheduler);
-                var publisher = searcher.SearchResult.SubscribeSafe(observer);
-                return new CompositeDisposable(publisher, searcher);
-            });
-        }
-
+        
 
         public static IEnumerable<Line> ReadLines(this FileInfo source, int[] lines, Func<int, bool> isEndOfTail = null)
         {
@@ -182,8 +100,7 @@ namespace TailBlazer.Domain.FileHandling
                 }
             }
         }
-
-
+        
         public static long FindNextEndOfLinePosition(this StreamReaderExtended source, long initialPosition,
             SeekOrigin origin= SeekOrigin.Begin)
         {

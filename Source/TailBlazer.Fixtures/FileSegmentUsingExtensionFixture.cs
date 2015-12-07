@@ -53,10 +53,10 @@ namespace TailBlazer.Fixtures
             var info = new FileInfo(file);
             var refresher = new Subject<Unit>();
 
-            var segmenter = new FileSegmenter(info, refresher, 1000);
+
             FileSegmentCollection result = null;
 
-            using (var indexer = info.WatchFile(refresher).WithSegments().Subscribe(segment => result = segment))
+            using (var indexer = info.WatchFile(refresher).WithSegments(1000).Subscribe(segment => result = segment))
             {
                 result.Should().NotBeNull();
 

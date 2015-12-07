@@ -8,55 +8,7 @@ namespace TailBlazer.Domain.FileHandling
 {
     public static class LineReaderEx
     {
-        public static IEnumerable<T> ScanLines<T>(this StreamReaderExtended source,
-                int compression,
-                Func<long, T> selector,
-                Func<string, long, bool> shouldBreak)
-        {
 
-            int i = 0;
-            if (source.EndOfStream) yield break;
-
-            string line;
-            while ((line=source.ReadLine()) != null)
-            {
-                i++;
-                var position = source.AbsolutePosition();
-
-                if (i == compression)
-                {
-                    yield return selector(position);
-                    i = 0;
-                };
-                
-                if (shouldBreak(line, position))
-                    yield break;
-            }
-        }
-
-        public static IEnumerable<T> SearchLines<T>(this StreamReaderExtended source,
-            Func<string, bool> predicate,
-            Func<long, T> selector,
-            Func<string, long, bool> shouldBreak)
-        {
-            if (source.EndOfStream) yield break;
-
-            long previousPostion = source.AbsolutePosition();
-
-            string line;
-            while ((line = source.ReadLine()) != null)
-            {
-                long position = source.AbsolutePosition();
-
-                if (predicate(line))
-                    yield return selector(previousPostion);
-
-                if (shouldBreak(line, position))
-                    yield break;
-
-                previousPostion = position;
-            }
-        }
 
 
         public static IEnumerable<T> ReadLine<T>(this FileInfo source, IEnumerable<LineInfo> lines, Func<LineInfo, string, T> selector, Encoding encoding)

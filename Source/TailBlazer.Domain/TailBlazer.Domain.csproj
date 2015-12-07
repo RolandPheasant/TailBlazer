@@ -64,8 +64,10 @@
   <ItemGroup>
     <Compile Include="FileHandling\FileInfoEx.cs" />
     <Compile Include="FileHandling\FileSearch.cs" />
+    <Compile Include="FileHandling\FileSearchEx.cs" />
     <Compile Include="FileHandling\FileSearchResult.cs" />
     <Compile Include="FileHandling\FileSearchResultEx.cs" />
+    <Compile Include="FileHandling\FileSegmentEx.cs" />
     <Compile Include="FileHandling\FileSegmentSearchResult.cs" />
     <Compile Include="FileHandling\FileSegment.cs" />
     <Compile Include="FileHandling\FileSegmentChangedReason.cs" />
@@ -78,6 +80,7 @@
     <Compile Include="FileHandling\FileTailerFactory.cs" />
     <Compile Include="FileHandling\IFileTailerFactory.cs" />
     <Compile Include="FileHandling\IIndexCollection.cs" />
+    <Compile Include="FileHandling\IndexEx.cs" />
     <Compile Include="FileHandling\IndexType.cs" />
     <Compile Include="FileHandling\LineIndexType.cs" />
     <Compile Include="FileHandling\FileNotification.cs" />
@@ -86,7 +89,7 @@
     <Compile Include="FileHandling\LineInfo.cs" />
     <Compile Include="FileHandling\LineReaderEx.cs" />
     <Compile Include="FileHandling\LinesChangedReason.cs" />
-    <Compile Include="FileHandling\ScrollingMode.cs" />
+    <Compile Include="FileHandling\ScrollReason.cs" />
     <Compile Include="FileHandling\ScrollRequest.cs" />
     <Compile Include="FileHandling\Index.cs" />
     <Compile Include="FileHandling\IndexCollection.cs" />

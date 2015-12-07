@@ -1,6 +1,6 @@
 ﻿namespace TailBlazer.Domain.FileHandling
 {
-    public enum ScrollingMode
+    public enum ScrollReason
     {
         /// <summary>
         /// Auto scroll to the tail.

@@ -48,7 +48,7 @@ namespace TailBlazer.Domain.FileHandling
             int first = scroll.FirstIndex;
             int size = scroll.PageSize;
 
-            if (scroll.Mode == ScrollingMode.Tail)
+            if (scroll.Mode == ScrollReason.Tail)
             {
                 first = size > Count ? 0 : Count - size;
             }

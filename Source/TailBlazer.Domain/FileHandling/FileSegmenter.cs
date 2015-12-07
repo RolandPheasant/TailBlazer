@@ -8,8 +8,6 @@ using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
-
-
     /*
         Dynamically split the file into manageable chunks.
 
@@ -23,34 +21,44 @@ namespace TailBlazer.Domain.FileHandling
 
     public sealed class FileSegmenter
     {
-        private readonly FileInfo _info;
+        private  FileInfo _info;
         private readonly int _initialTail;
         private readonly int _segmentSize;
 
         public IObservable<FileSegmentCollection> Segments { get; }
 
-        public FileSegmenter(FileInfo info,
-                                IObservable<Unit> refresher, 
+        public FileSegmenter(IObservable<FileNotification> notifications, 
                                 int initialTail= 100000, 
                                 int segmentSize=25000000)
         {
-            if (refresher == null) throw new ArgumentNullException(nameof(refresher));
-            _info = info;
+            if (notifications == null) throw new ArgumentNullException(nameof(notifications));
             _initialTail = initialTail;
             _segmentSize = segmentSize;
- 
+
+
+
+
             //TODO: Re-segment as file grows + account for rollover
-            Segments = refresher
-                .StartWithUnit()
+            Segments = notifications
+                //.notifications()
                 .Scan((FileSegmentCollection) null, (previous, current) =>
                 {
                     if (previous == null || previous.FileLength == 0)
                     {
-                        _info.Refresh();
+                        _info =(FileInfo) current;
+
                         var segments = LoadSegments().ToArray();
-                        return new FileSegmentCollection(info, segments);
+                        return new FileSegmentCollection(_info, segments, current.Size);
                     }
-                    var newLength = info.GetFileLength();
+                    var newLength = _info.Length;
+
+                    if (newLength < previous.FileLength)
+                    {
+                        var sizeDiff = newLength - previous.FileLength;
+                        var segments = LoadSegments().ToArray();
+                        return new FileSegmentCollection(_info, segments, sizeDiff);
+                    }
+
                     return new FileSegmentCollection(newLength, previous);
                 }).Replay(1).RefCount();
         }

@@ -52,7 +52,7 @@ namespace TailBlazer.Views
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
             var scroller = _userScrollRequested.CombineLatest(autoChanged, (user, auto) =>
                         {
-                            var mode = AutoTail ? ScrollingMode.Tail : ScrollingMode.User;
+                            var mode = AutoTail ? ScrollReason.Tail : ScrollReason.User;
                             return  new ScrollRequest(mode, user.PageSize, user.FirstIndex);
                         })
                         .ObserveOn(schedulerProvider.Background)
@@ -144,7 +144,7 @@ namespace TailBlazer.Views
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
         {
             if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));
-            var mode = AutoTail ? ScrollingMode.Tail : ScrollingMode.User;
+            var mode = AutoTail ? ScrollReason.Tail : ScrollReason.User;
 
             /*
                 I need to get rid of this subject as I prefer functional over imperative. 
