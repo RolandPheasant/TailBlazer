@@ -8,15 +8,7 @@ namespace TailBlazer.Domain.FileHandling
         public int Index { get; }
         public string Text { get;  }
         public DateTime? Timestamp { get;  }
-
         public LineInfo LineInfo { get;  }
-
-        public Line(int number, string text)
-        {
-            Number = number;
-            Text = text;
-            Timestamp =  (DateTime?)null;
-        }
 
 
         public Line(int number, string text, DateTime? timestamp)

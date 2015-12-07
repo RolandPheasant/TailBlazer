@@ -1,11 +1,34 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Text;
 using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.FileHandling
 {
+    public class TailInfo
+    {
+
+        public static readonly TailInfo None = new TailInfo();
+
+        public long TailStartsAt { get;  }
+        public DateTime LastTail { get;  }
+
+
+        public TailInfo(long tailStartsAt)
+        {
+            TailStartsAt = tailStartsAt;
+            LastTail = DateTime.Now;
+        }
+
+        private TailInfo()
+        {
+        }
+    }
+
+
     public class FileSearchResult: ILineProvider, IEquatable<FileSearchResult>
     {
         public static readonly FileSearchResult None = new FileSearchResult();
@@ -15,62 +38,80 @@ namespace TailBlazer.Domain.FileHandling
         public int Segments { get; }
         public bool IsSearching { get; }
 
-        public LinesChangedReason ChangedReason { get; }
-        public long TailStartsAt { get; }
+        private LinesChangedReason ChangedReason { get; }
 
         // private readonly FileSegmentSearch[] _allSearches;
         private readonly IDictionary<FileSegmentKey, FileSegmentSearch> _allSearches;
 
-        public FileSegmentSearch LastSearch { get; }
+        private FileSegmentSearch LastSearch { get; }
+        private FileInfo Info { get;  }
+        private Encoding Encoding { get;  }
+        private TailInfo TailInfo { get; }
 
-        
 
         public long Size { get; }
 
-        public FileSearchResult(FileSegmentSearch initial)
+        public FileSearchResult(FileSegmentSearch initial,
+            FileInfo info,
+            Encoding encoding)
         {
+            Info = info;
+            Encoding = encoding;
             LastSearch = initial;
-            _allSearches = new Dictionary<FileSegmentKey, FileSegmentSearch>();
-            _allSearches[initial.Key] = initial;
+            _allSearches = new Dictionary<FileSegmentKey, FileSegmentSearch>
+            {
+                [initial.Key] = initial
+            };
 
             IsSearching = initial.Status != FileSegmentSearchStatus.Complete;
             Segments = 1;
             SegmentsCompleted = IsSearching ? 0 : 1;
             Matches = initial.Lines.ToArray();
+            TailInfo = TailInfo.None;
 
             //check this
             Size = 0;
 
             Console.WriteLine($"{SegmentsCompleted}/{Segments}. {Count}");
         }
-        
-        public FileSearchResult(FileSearchResult previous, FileSegmentSearch current)
+
+        public FileSearchResult(FileSearchResult previous, 
+            FileSegmentSearch current,
+            FileInfo info,
+            Encoding encoding)
         {
 
             LastSearch = current;
+            Info = info;
+            Encoding = encoding;
 
             _allSearches = previous._allSearches.Values.ToDictionary(fss => fss.Key);
 
             var lastTail = _allSearches.Lookup(FileSegmentKey.Tail);
-
-            if (lastTail.HasValue)
+            if (current.Segment.Type == FileSegmentType.Tail)
             {
-                TailStartsAt = lastTail.Value.Segment.End;
-                //if (lastTail.Value.Lines.Length >= 1)
-                //{
-
-                //    TailStartsAt = lastTail.Value.Lines.Last();
-                //}
-                //else
-                //{
-                //    TailStartsAt = lastTail.Value.Segment.End;
-                //}
+                if (lastTail.HasValue)
+                {
+                    TailInfo = new TailInfo(lastTail.Value.Segment.End);
+                }
+                else
+                {
+                    TailInfo = new TailInfo(current.Segment.End);
+                }
 
             }
             else
             {
-                 TailStartsAt = long.MaxValue;
+                if (lastTail.HasValue)
+                {
+                    TailInfo = previous.TailInfo;
+                }
+                else
+                {
+                    TailInfo = TailInfo.None;
+                }
             }
+
 
             _allSearches[current.Key] = current;
             var all = _allSearches.Values.ToArray();
@@ -83,7 +124,7 @@ namespace TailBlazer.Domain.FileHandling
             //For large sets this could be very inefficient
             Matches = all.SelectMany(s => s.Lines).OrderBy(l=>l).ToArray();
 
-            Console.WriteLine($"{SegmentsCompleted}/{Segments}.{Count}");
+            //Console.WriteLine($"{SegmentsCompleted}/{Segments}.{Count}");
         }
         
         private FileSearchResult()
@@ -93,13 +134,51 @@ namespace TailBlazer.Domain.FileHandling
 
         public bool IsEmpty => this == None;
 
-        public  IEnumerable<LineInfo> GetIndicies( ScrollRequest scroll)
+        public IEnumerable<Line> ReadLines(ScrollRequest scroll)
         {
-            if (scroll == null) throw new ArgumentNullException(nameof(scroll));
+            var page = GetPage(scroll);
 
+            if (page.Size == 0) yield break;
+
+            using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read,FileShare.Delete | FileShare.ReadWrite))
+            {
+
+                using (var reader = new StreamReaderExtended(stream, Encoding, false))
+                {
+                    if (page.Size == 0) yield break;
+
+                    foreach (var i in Enumerable.Range(page.Start, page.Size))
+                    {
+                        if (i > Count - 1) continue;
+
+                        var start = Matches[i];
+                        var startPosition = reader.AbsolutePosition();
+
+                        if (startPosition != start)
+                        {
+                            reader.DiscardBufferedData();
+                            reader.BaseStream.Seek(start, SeekOrigin.Begin);
+                        }
+                        
+                        var line = reader.ReadLine();
+                        var endPosition = reader.AbsolutePosition();
+                        var info = new LineInfo(i + 1, i, startPosition, endPosition);
+                        
+                        var ontail = endPosition >= TailInfo.TailStartsAt && DateTime.Now.Subtract(TailInfo.LastTail).TotalSeconds<1
+                                    ? DateTime.Now 
+                                    : (DateTime?)null; 
+
+                        yield return new Line(info, line, ontail);
+                    }
+                }
+            }
+        }
+
+
+        private Page GetPage(ScrollRequest scroll)
+        {
             int first = scroll.FirstIndex;
             int size = scroll.PageSize;
-
 
             if (scroll.Mode == ScrollReason.Tail)
             {
@@ -113,20 +192,11 @@ namespace TailBlazer.Domain.FileHandling
 
             first = Math.Max(0, first);
             size = Math.Min(size, Count);
-            if (size == 0) yield break;
 
-            foreach (var i in Enumerable.Range(first, size))
-            {
-                if (i > Count - 1) continue;
-
-                var start = Matches[i];
-
-                //Console.WriteLine(start);
-                yield return new LineInfo(0, i, start, (long)0, start >=TailStartsAt
-                    && ChangedReason == LinesChangedReason.Tailed);
-            }
-
+            return new Page(first, size);
         }
+
+
 
         #region Equality
 

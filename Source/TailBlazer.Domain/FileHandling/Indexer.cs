@@ -48,17 +48,9 @@ namespace TailBlazer.Domain.FileHandling
 
             scheduler = scheduler ?? Scheduler.Default;
 
-            //1. create  a resulting index object from the collection of index fragments
-            Result = _indicies
-                .Connect()
-                .Sort(SortExpressionComparer<Index>.Ascending(si => si.Start))
-                .ToCollection()
-                .Scan((IndexCollection)null, (previous, notification) => new IndexCollection(notification, previous, Encoding))
-                .Replay(1).RefCount();
-
             var shared = fileSegments.Replay(1).RefCount();
-
-            //2. Get information from segment info
+           
+            //1. Get information from segment info
             var infoSubscriber = shared.Select(segments => segments.Info)
                 .Take(1)
                 .Subscribe(info =>
@@ -66,6 +58,18 @@ namespace TailBlazer.Domain.FileHandling
                     Info = info;
                     Encoding = encoding ?? info.GetEncoding();
                 });
+           
+            //2. create  a resulting index object from the collection of index fragments
+            Result = _indicies
+                .Connect()
+                .Sort(SortExpressionComparer<Index>.Ascending(si => si.Start))
+                .ToCollection()
+                .Scan((IndexCollection)null, (previous, notification) => new IndexCollection(notification, previous, Info, Encoding))
+                .Replay(1).RefCount();
+
+
+
+
 
             //3. Scan the tail so results can be returned quickly
             var tailScanner= shared.Select(segments => segments.Tail).DistinctUntilChanged()

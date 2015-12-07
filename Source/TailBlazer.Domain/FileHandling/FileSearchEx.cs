@@ -42,7 +42,7 @@ namespace TailBlazer.Domain.FileHandling
 
                     var searcher = Observable.Create<FileSearchResult>(observer =>
                     {
-                        var fileSearch = new FileSearch(shared, predicate, scheduler);
+                        var fileSearch = new FileSearch(shared, predicate, scheduler: scheduler);
                         var publisher = fileSearch.SearchResult.SubscribeSafe(observer);
                         return new CompositeDisposable(publisher, fileSearch);
                     });

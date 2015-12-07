@@ -79,7 +79,7 @@
     <Compile Include="FileHandling\FileSegmentType.cs" />
     <Compile Include="FileHandling\FileTailerFactory.cs" />
     <Compile Include="FileHandling\IFileTailerFactory.cs" />
-    <Compile Include="FileHandling\IIndexCollection.cs" />
+    <Compile Include="FileHandling\ILineProvider.cs" />
     <Compile Include="FileHandling\IndexEx.cs" />
     <Compile Include="FileHandling\IndexType.cs" />
     <Compile Include="FileHandling\LineIndexType.cs" />
@@ -89,6 +89,7 @@
     <Compile Include="FileHandling\LineInfo.cs" />
     <Compile Include="FileHandling\LineReaderEx.cs" />
     <Compile Include="FileHandling\LinesChangedReason.cs" />
+    <Compile Include="FileHandling\Page.cs" />
     <Compile Include="FileHandling\ScrollReason.cs" />
     <Compile Include="FileHandling\ScrollRequest.cs" />
     <Compile Include="FileHandling\Index.cs" />

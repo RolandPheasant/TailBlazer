@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -39,65 +37,6 @@ namespace TailBlazer.Domain.FileHandling
             EndOfTail = endOfTail;
         }
 
-        #region Comparison
-
-
-        public static readonly IEqualityComparer<LineInfo> PositionComparer =
-                                        Equality.CompareOn<LineInfo, long>(li => li.Start)
-                                                .AndOn<LineInfo, long>(li => li.Offset);
-
-
-        public static readonly IEqualityComparer<LineInfo> FlexComparer = Equality.CompareOn<LineInfo, long>(li => li.Type== 
-        LineIndexType.Absolute ? (long)li.Start : (long)li.Line);
-
-        public static readonly IEqualityComparer<LineInfo> IndexComparer = Equality.CompareOn<LineInfo, int>(li => li.Index);
-
-        private sealed class LineIndexEqualityComparer : IEqualityComparer<LineInfo>
-        {
-            public bool Equals(LineInfo x, LineInfo y)
-            {
-                if (x.Type == LineIndexType.Absolute)
-                {
-                    return x.Start == y.Start  && x.Type == y.Type;
-                }
-                //index or 
-                return  x.Index == y.Index   && x.Type == y.Type;
-
-            }
-
-            public int GetHashCode(LineInfo obj)
-            {
-                if (obj.Type == LineIndexType.Absolute)
-                {
-                    unchecked
-                    {
-                        var hashCode = obj.Start.GetHashCode(); ;
-                        //hashCode = (hashCode * 397) ^ obj
-                        //hashCode = (hashCode * 397) ^ obj.Offset;
-                        hashCode = (hashCode * 397) ^ (int)obj.Type;
-                        return hashCode;
-                    }
-                }
-                unchecked
-                {
-                    var hashCode = obj.Index.GetHashCode(); ;
-                    //hashCode = (hashCode * 397) ^ obj
-                    //hashCode = (hashCode * 397) ^ obj.Offset;
-                    hashCode = (hashCode * 397) ^ (int)obj.Type;
-                    return hashCode;
-                }
-
-            }
-        }
-
-        private static readonly IEqualityComparer<LineInfo> LineIndexComparerInstance = new LineIndexEqualityComparer();
-
-        public static IEqualityComparer<LineInfo> LineIndexComparer
-        {
-            get { return LineIndexComparerInstance; }
-        }
-
-        #endregion
 
         #region Equality
 

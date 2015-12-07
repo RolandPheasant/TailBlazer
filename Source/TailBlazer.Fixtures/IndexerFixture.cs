@@ -30,18 +30,18 @@ namespace TailBlazer.Fixtures
                     {
                         pulse.Once();
 
-                        var head = result.GetIndicies(new ScrollRequest(10, 0));
-                        var headText = file.Info.ReadLine(head, (index, text) => text, indexer.Encoding).ToArray();
+                        var head = result.ReadLines(new ScrollRequest(10, 0));
+                        var headText = head.Select(l => l.Text).ToArray();
                         var headExpected = Enumerable.Range(1, 10).Select(i => $"This is line number {i.ToString("00000000")}");
                         headText.ShouldAllBeEquivalentTo(headExpected);
 
-                        var tail = result.GetIndicies(new ScrollRequest(10));
-                        var tailText = file.Info.ReadLine(tail, (index, text) => text, indexer.Encoding).ToArray();
+                        var tail = result.ReadLines(new ScrollRequest(10));
+                        var tailText = tail.Select(l => l.Text).ToArray();
                         var tailExpected = Enumerable.Range(91, 10).Select(i => $"This is line number {i.ToString("00000000")}").ToArray();
                         tailText.ShouldAllBeEquivalentTo(tailExpected);
 
-                        var mid = result.GetIndicies(new ScrollRequest(10, 20));
-                        var midText = file.Info.ReadLine(mid, (index, text) => text, indexer.Encoding).ToArray();
+                        var mid = result.ReadLines(new ScrollRequest(10, 20));
+                        var midText = mid.Select(l => l.Text).ToArray();
                         var midExpected = Enumerable.Range(21, 10).Select(i => $"This is line number {i.ToString("00000000")}").ToArray();
                         midText.ShouldAllBeEquivalentTo(midExpected);
                     }
@@ -69,19 +69,18 @@ namespace TailBlazer.Fixtures
                         //start off the head scanner
                         scheduler.AdvanceBy(1);
 
-                        var head = result.GetIndicies(new ScrollRequest(10, 0));
-                        var headText = file.Info.ReadLine(head, (index, text) => text, indexer.Encoding).ToArray();
-                        var headExpected =
-                            Enumerable.Range(1, 10).Select(i => $"This is line number {i.ToString("00000000")}");
+                        var head = result.ReadLines(new ScrollRequest(10, 0));
+                        var headText =head.Select(l=>l.Text).ToArray();
+                        var headExpected =Enumerable.Range(1, 10).Select(i => $"This is line number {i.ToString("00000000")}");
                         headText.ShouldAllBeEquivalentTo(headExpected);
 
-                        var tail = result.GetIndicies(new ScrollRequest(10));
-                        var tailText = file.Info.ReadLine(tail, (index, text) => text, indexer.Encoding).ToArray();
+                        var tail = result.ReadLines(new ScrollRequest(10));
+                        var tailText = tail.Select(l => l.Text).ToArray();
                         var tailExpected =Enumerable.Range(9991, 10).Select(i => $"This is line number {i.ToString("00000000")}").ToArray();
                         tailText.ShouldAllBeEquivalentTo(tailExpected);
 
-                        var mid = result.GetIndicies(new ScrollRequest(10, 100));
-                        var midText = file.Info.ReadLine(mid, (index, text) => text, indexer.Encoding).ToArray();
+                        var mid = result.ReadLines(new ScrollRequest(10, 100));
+                        var midText = mid.Select(l => l.Text).ToArray();
                         var midExpected =Enumerable.Range(101, 10).Select(i => $"This is line number {i.ToString("00000000")}").ToArray();
                         midText.ShouldAllBeEquivalentTo(midExpected);
                     }

@@ -7,7 +7,7 @@ namespace TailBlazer.Domain.FileHandling
 {
     public static class IndexEx
     {
-        public static IObservable<IIndexCollection> Index(this IObservable<FileSegmentCollection> source)
+        public static IObservable<ILineProvider> Index(this IObservable<FileSegmentCollection> source)
         {
             var indexFactory = source
                 .Publish(shared =>
@@ -30,7 +30,7 @@ namespace TailBlazer.Domain.FileHandling
                 .Select(x => x.index);
 
         }
-        public static IObservable<IIndexCollection> Index(this IObservable<FileNotification> source)
+        public static IObservable<ILineProvider> Index(this IObservable<FileNotification> source)
         {
             return source.WithSegments().Index();
         }

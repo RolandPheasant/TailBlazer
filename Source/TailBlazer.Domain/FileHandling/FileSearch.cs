@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Text;
 using DynamicData;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.Infrastructure;
@@ -22,20 +23,30 @@ namespace TailBlazer.Domain.FileHandling
         private readonly Func<string, bool> _predicate;
         private readonly IDisposable _cleanUp;
 
-        private FileInfo Info { get; set; }
+        public Encoding Encoding { get; private set; }
+        public FileInfo Info { get; private set; }
+
         public IObservable<FileSearchResult> SearchResult { get;  }
 
-        public FileSearch([NotNull] IObservable<FileSegmentCollection> segments, [NotNull] Func<string, bool> predicate,IScheduler scheduler =null)
+        public FileSearch([NotNull] IObservable<FileSegmentCollection> fileSegments, [NotNull] Func<string, bool> predicate,
+             Encoding encoding = null,
+            IScheduler scheduler =null)
         {
-            if (segments == null) throw new ArgumentNullException(nameof(segments));
+            if (fileSegments == null) throw new ArgumentNullException(nameof(fileSegments));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
             _predicate = predicate;
             _scheduler = scheduler ?? Scheduler.Default;
 
-            var shared = segments.Publish();
-            var infoLoader = shared.FirstAsync().Subscribe(s => Info = s.Info);
+            var shared = fileSegments.Replay(1).RefCount();
 
+            var infoSubscriber = shared.Select(segments => segments.Info)
+                .Take(1)
+                .Subscribe(info =>
+                {
+                    Info = info;
+                    Encoding = encoding ?? info.GetEncoding();
+                });
             //Create a cache of segments which are to be searched
             var segmentCache = shared.Select(s => s.Segments)
                 .ToObservableChangeSet(s => s.Key)
@@ -49,8 +60,8 @@ namespace TailBlazer.Domain.FileHandling
                 .Flatten()
                 .Select(change=>change.Current)
                 .Scan((FileSearchResult)null, (previous, current) => previous==null 
-                                ? new FileSearchResult(current) 
-                                : new FileSearchResult(previous, current))
+                                ? new FileSearchResult(current, Info, Encoding) 
+                                : new FileSearchResult(previous, current, Info, Encoding))
                 .StartWith(FileSearchResult.None)
                 .Replay(1).RefCount();
 
@@ -101,13 +112,13 @@ namespace TailBlazer.Domain.FileHandling
             })
            .Subscribe(head => searchData.AddOrUpdate(head));
 
-            _cleanUp = new CompositeDisposable(shared.Connect(),
+            _cleanUp = new CompositeDisposable(
                 segmentCache, 
                 loader,
                 tailSubscriber,
                 headSubscriber,
                 tailSearch.Connect(),
-                infoLoader);
+                infoSubscriber);
         }
 
         private FileSegmentSearchResult Search(long start, long end)

@@ -21,7 +21,7 @@ namespace TailBlazer.Views
         public LineProxy(Line line)
         {
             Line = line;
-            IsRecent = line.Timestamp.HasValue && DateTime.Now.Subtract(line.Timestamp.Value).TotalSeconds < 2;
+            IsRecent = line.Timestamp.HasValue && DateTime.Now.Subtract(line.Timestamp.Value).TotalSeconds < 1;
         }
 
 

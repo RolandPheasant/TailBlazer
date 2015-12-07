@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -59,23 +58,54 @@ namespace TailBlazer.Domain.FileHandling
             // .DistinctUntilChanged();
         }
 
-        
 
-        public static IEnumerable<Line> ReadLines(this FileInfo source, int[] lines, Func<int, bool> isEndOfTail = null)
+        /// <summary>
+        /// Determines the encoding of a file
+        /// </summary>
+        /// <returns></returns>
+        public static Encoding GetEncoding(this FileInfo source)
+        {
+            using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            {
+                using (var reader = new StreamReaderExtended(stream, true))
+                {
+                    var something = reader.Peek();
+                    return reader.CurrentEncoding;
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Finds the delimiter by looking for the first line in the file and comparing chars
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <returns></returns>
+        public static int FindDelimiter(this FileInfo source)
         {
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
                 using (var reader = new StreamReaderExtended(stream, Encoding.Default, true))
                 {
-                    string line;
-                    int position = 0;
-                    while ((line = reader.ReadLine()) != null)
+                    if (reader.EndOfStream)
+                        return -1;
+                    do
                     {
-                        position++;
+                        var ch = (char)reader.Read();
 
-                        if (lines.Contains(position))
-                            yield return new Line(position,line, isEndOfTail==null ? null :(isEndOfTail(position)? DateTime.Now : (DateTime?)null));
-                    }
+                        // Note the following common line feed chars: 
+                        // \n - UNIX   \r\n - DOS   \r - Mac 
+                        switch (ch)
+                        {
+                            case '\r':
+                                var next = (char)reader.Peek();
+                                //with \n is WINDOWS delimiter. Otherwise mac
+                                return next == '\n' ? 2 : 1;
+                            case '\n':
+                                return 1;
+                        }
+                    } while (!reader.EndOfStream);
+                    return -1;
                 }
             }
         }

@@ -1,26 +1,32 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class IndexCollection: IIndexCollection
+    public class IndexCollection: ILineProvider
     {
-        public Encoding Encoding { get; }
+
         public int Count { get; }
         public int Diff { get; }
-        public bool IsEmpty => Count != 0; 
+        public bool IsEmpty => Count != 0;
 
-        public LinesChangedReason ChangedReason { get; }
-        public long TailStartsAt { get; }
+        private LinesChangedReason ChangedReason { get; }
+
         private Index[] Indicies { get; }
+
+        private FileInfo Info { get; }
+        private Encoding Encoding { get; }
+        private TailInfo TailInfo { get; }
 
         public IndexCollection(IReadOnlyCollection<Index> latest,
                                     IndexCollection previous,
+                                    FileInfo info,
                                     Encoding encoding)
         {
-
+            Info = info;
             Encoding = encoding;
             Count = latest.Select(idx => idx.LineCount).Sum();
             Indicies = latest.ToArray();
@@ -30,7 +36,7 @@ namespace TailBlazer.Domain.FileHandling
             if (previous == null)
             {
                 ChangedReason = LinesChangedReason.Loaded;
-                TailStartsAt = latest.Max(idx => idx.End);
+                TailInfo = new TailInfo(latest.Max(idx => idx.End));
             }
             else
             {
@@ -39,11 +45,71 @@ namespace TailBlazer.Domain.FileHandling
                                 ? LinesChangedReason.Tailed
                                 : LinesChangedReason.Paged;
 
-                TailStartsAt = previous.Indicies.Max(idx => idx.End); ;
+                //if (ChangedReason == LinesChangedReason.Tailed)
+                //{
+                //    TailInfo = previous.TailInfo;
+
+                //}
+                //else
+                //{
+                //    TailInfo = new TailInfo(latest.Max(idx => idx.End));
+                //}
+             TailInfo = new TailInfo(previous.Indicies.Max(idx => idx.End));
+                //TailStartsAt = ; ;
             }
         }
 
-        public IEnumerable<LineInfo> GetIndicies(ScrollRequest scroll)
+        /// <summary>
+        /// Reads the lines.
+        /// </summary>
+        /// <param name="scroll">The scroll.</param>
+        /// <returns></returns>
+        public IEnumerable<Line> ReadLines(ScrollRequest scroll)
+        {
+            var page = GetPage(scroll);
+
+            var relativeIndex = CalculateRelativeIndex(page.Start);
+            if (relativeIndex == null) yield break;
+
+            var offset = relativeIndex.LinesOffset;
+
+            using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            {
+
+                using (var reader = new StreamReaderExtended(stream, Encoding, false))
+                {
+                    //go to starting point
+                    stream.Seek(relativeIndex.Start, SeekOrigin.Begin);
+                    if (offset > 0)
+                    {
+                        //skip number of lines offset
+                        for (int i = 0; i < offset; i++)
+                            reader.ReadLine();
+                    }
+
+                    //if estimate move to the next start of line
+                    if (relativeIndex.IsEstimate && relativeIndex.Start != 0)
+                        reader.ReadLine();
+
+                    foreach (var i in Enumerable.Range(page.Start, page.Size))
+                    {
+                        var startPosition = reader.AbsolutePosition();
+                        var line = reader.ReadLine();
+                        var endPosition = reader.AbsolutePosition();
+                        var info = new LineInfo(i + 1, i, startPosition, endPosition);
+
+                        var ontail = startPosition >= TailInfo.TailStartsAt && DateTime.Now.Subtract(TailInfo.LastTail).TotalSeconds < 1
+                            ? DateTime.Now
+                            : (DateTime?)null;
+
+                        yield return new Line(info, line, ontail);
+                    }
+                }
+            }
+        }
+
+
+        private Page GetPage(ScrollRequest scroll)
         {
             int first = scroll.FirstIndex;
             int size = scroll.PageSize;
@@ -60,18 +126,10 @@ namespace TailBlazer.Domain.FileHandling
 
             first = Math.Max(0, first);
             size = Math.Min(size, Count);
-            if (size == 0) yield break;
 
-            var relativeIndex = CalculateRelativeIndex(first);
-            if (relativeIndex==null) yield break;
-
-            var offset = relativeIndex.LinesOffset;
-            foreach (var i in Enumerable.Range(first, size))
-            {
-                yield return  new LineInfo(i + 1, i, relativeIndex.Start, offset);
-                offset++;
-            }
+            return new Page(first, size);
         }
+
 
         private RelativeIndex CalculateRelativeIndex(int index)
         {
@@ -93,14 +151,16 @@ namespace TailBlazer.Domain.FileHandling
                         var bytes = sparseIndex.End - sparseIndex.Start;
                         var bytesPerLine = bytes/lines;
                         var estimate = index*bytesPerLine;
-                        return new RelativeIndex(index, estimate, 0);
+
+
+                        return new RelativeIndex(index, estimate, 0,true);
                     }
 
                     var relativePosition = (index - firstLineInContainer);
                     var relativeIndex = relativePosition / sparseIndex.Compression;
                     var offset = relativePosition % sparseIndex.Compression;
                     var start = relativeIndex == 0 ? 0 : sparseIndex.Indicies[relativeIndex - 1];
-                    return new RelativeIndex(index, start, offset);
+                    return new RelativeIndex(index, start, offset,false);
                 }
                 firstLineInContainer = firstLineInContainer + sparseIndex.LineCount;
             }
@@ -112,13 +172,15 @@ namespace TailBlazer.Domain.FileHandling
             public int Index { get; }
             public long Start { get; }
             public int LinesOffset { get; }
+            public bool IsEstimate { get; set; }
 
 
-            public RelativeIndex(int index, long start, int linesOffset)
+            public RelativeIndex(int index, long start, int linesOffset, bool isEstimate)
             {
                 Index = index;
                 Start = start;
                 LinesOffset = linesOffset;
+                IsEstimate = isEstimate;
             }
         }
     }
