@@ -140,14 +140,21 @@ namespace TailBlazer.Domain.FileHandling
                 long[] lines;
                 using (var reader = new StreamReaderExtended(stream, Encoding, false))
                 {
-                    stream.Seek(start, SeekOrigin.Begin);
+                    var currentPosition = reader.AbsolutePosition();
+                    if (currentPosition!= start)
+                        stream.Seek(start, SeekOrigin.Begin);
                     if (reader.EndOfStream) return null;
 
                     lines = reader.ScanLines(compression, i => i, (line, position) =>
                     {
-                        lastPosition = position;
-                        count++;
-                        return end != -1 && lastPosition >= end;
+                        var shouldBreak = end != -1 && lastPosition >= end;
+                        if (!shouldBreak)
+                        {
+                            //do not count the last line as this will take us one line over
+                            lastPosition = position;
+                            count++;
+                        }
+                        return shouldBreak;
 
                     }).ToArray();
                 }

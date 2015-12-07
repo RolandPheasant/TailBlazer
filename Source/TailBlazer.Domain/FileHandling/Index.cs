@@ -101,7 +101,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public override string ToString()
         {
-            return $"{Type} {Start}->{End}  x{Compression} Compression. Count: {LineCount}, IndexCount: {IndexCount}, @ {TimeStamp}";
+            return $"{Type} {Start}->{End}  x{Compression} Compression. Lines: {LineCount}, Indicies: {IndexCount}, @ {TimeStamp}";
         }
     }
 }

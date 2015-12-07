@@ -50,14 +50,16 @@ namespace TailBlazer.Domain.FileHandling
                 i++;
                 var position = source.AbsolutePosition();
 
+                if (shouldBreak(line, position))
+                    yield break;
+
                 if (i == compression)
                 {
                     yield return selector(position);
                     i = 0;
                 };
 
-                if (shouldBreak(line, position))
-                    yield break;
+
             }
         }
 
