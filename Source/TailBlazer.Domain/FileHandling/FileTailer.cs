@@ -63,7 +63,7 @@ namespace TailBlazer.Domain.FileHandling
 
             var aggregator = latest.CombineLatest(scrollRequest, (currentLines, scroll) =>
                 {
-                    Debug.WriteLine($"{scroll.Mode}, {scroll.FirstIndex}, {scroll.PageSize}");
+                 //   Debug.WriteLine($"{scroll.Mode}, {scroll.FirstIndex}, {scroll.PageSize}");
 
                     var currentPage = currentLines.GetIndicies(scroll).ToArray();
 
@@ -76,14 +76,14 @@ namespace TailBlazer.Domain.FileHandling
                     Debug.WriteLine($"{added.Length} added");
                     Func<long, DateTime?> isTail = l =>
                     {
+                        //account for time with tail (i.e. add time to ILineProvider.TailStartsAt )
                         var tail = currentLines.TailStartsAt;
                         var onTail = tail != -1 && l >= tail;
-                      //  Console.WriteLine($"Checking {l} is on tail = {tail}/ On tail ={onTail}");
                         return onTail ? DateTime.Now : (DateTime?)null;
                     };
 
                     //finally we can load the line from the file todo: Add encdoing back in
-                    var newLines = file.ReadLine(added, (lineIndex, text) => new Line(lineIndex, text, isTail(lineIndex.Start)), Encoding.UTF8).ToArray();
+                    var newLines = file.ReadLine(added, (lineIndex, text,position) => new Line(lineIndex, text, isTail(position)), Encoding.UTF8).ToArray();
                     return new { NewLines = newLines, OldLines = removedLines };
                 })
                 .Where(fn => fn.NewLines.Length + fn.OldLines.Length > 0)

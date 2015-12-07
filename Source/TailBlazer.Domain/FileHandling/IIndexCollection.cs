@@ -8,6 +8,8 @@ namespace TailBlazer.Domain.FileHandling
         Encoding Encoding { get; }
     }
 
+
+
     public interface ILineProvider
     {
         long TailStartsAt { get; }

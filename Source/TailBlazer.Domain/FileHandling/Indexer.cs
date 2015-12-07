@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -92,7 +93,7 @@ namespace TailBlazer.Domain.FileHandling
             });
 
 
-            //Scan the remainer -> TODO: Scan segments, or just forget about line numbers
+            //Scan the remainer of the file
             var headSubscriber = tailScanner.FirstAsync()
                 .Subscribe(tail =>
                 {
@@ -145,7 +146,7 @@ namespace TailBlazer.Domain.FileHandling
                         stream.Seek(start, SeekOrigin.Begin);
                     if (reader.EndOfStream) return null;
 
-                    lines = reader.ScanLines(compression, i => i, (line, position) =>
+                    lines = ScanLines(reader,compression, i => i, (line, position) =>
                     {
                         var shouldBreak = end != -1 && lastPosition >= end;
                         if (!shouldBreak)
@@ -158,7 +159,43 @@ namespace TailBlazer.Domain.FileHandling
 
                     }).ToArray();
                 }
+
+                if (end != -1 && lastPosition> end)
+                {
+                    count--;
+                    lastPosition = end;
+                    lines = lines.Take(lines.Length - 1).ToArray();
+                }
+
                 return new Index(start, lastPosition, lines, compression, count, end == -1 ? IndexType.Tail : IndexType.Page);
+            }
+        }
+
+        private  static IEnumerable<T> ScanLines<T>( StreamReaderExtended source,
+        int compression,
+        Func<long, T> selector,
+        Func<string, long, bool> shouldBreak)
+        {
+
+            int i = 0;
+            if (source.EndOfStream) yield break;
+
+            string line;
+            while ((line = source.ReadLine()) != null)
+            {
+                i++;
+                var position = source.AbsolutePosition();
+
+                if (shouldBreak(line, position))
+                    yield break;
+
+                if (i == compression)
+                {
+                    yield return selector(position);
+                    i = 0;
+                };
+
+
             }
         }
 

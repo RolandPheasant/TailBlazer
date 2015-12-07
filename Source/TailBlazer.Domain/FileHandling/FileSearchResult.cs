@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using DynamicData.Kernel;
 
@@ -55,6 +56,16 @@ namespace TailBlazer.Domain.FileHandling
             if (lastTail.HasValue)
             {
                 TailStartsAt = lastTail.Value.Segment.End;
+                //if (lastTail.Value.Lines.Length >= 1)
+                //{
+
+                //    TailStartsAt = lastTail.Value.Lines.Last();
+                //}
+                //else
+                //{
+                //    TailStartsAt = lastTail.Value.Segment.End;
+                //}
+
             }
             else
             {
@@ -89,7 +100,6 @@ namespace TailBlazer.Domain.FileHandling
             int first = scroll.FirstIndex;
             int size = scroll.PageSize;
 
-            Console.WriteLine("{}");
 
             if (scroll.Mode == ScrollReason.Tail)
             {
@@ -104,8 +114,6 @@ namespace TailBlazer.Domain.FileHandling
             first = Math.Max(0, first);
             size = Math.Min(size, Count);
             if (size == 0) yield break;
-
-            Console.WriteLine($"ACTUAL SCROLL={scroll.Mode}, {first}, {size}. Number of matches ={Matches.Length}");
 
             foreach (var i in Enumerable.Range(first, size))
             {

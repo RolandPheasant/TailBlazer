@@ -9,6 +9,77 @@ namespace TailBlazer.Domain.FileHandling
     public static class LineReaderEx
     {
 
+        public static IEnumerable<T> ReadLine<T>(this FileInfo source, IEnumerable<LineInfo> lines, Func<LineInfo, string,long, T> selector, Encoding encoding)
+        {
+            encoding = encoding ?? source.GetEncoding();
+
+            var indicies = lines.OrderBy(l => l.Index).ToArray();
+            if (indicies.Length == 0) yield break;
+
+            var first = indicies[0];
+            var relative = first.Type == LineIndexType.Relative;
+
+            using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+
+                using (var reader = new StreamReaderExtended(stream, encoding, false))
+                {
+
+                    if (relative)
+                    {
+                        long previousLine = -1;
+                        long previousStart = -1;
+
+                        foreach (var index in indicies)
+                        {
+                            var currentLine = index.Line;
+                            var currentStart = index.Start;
+
+                            var isContinuous = (currentLine == previousLine + 1 && currentStart == previousStart);
+                            if (!isContinuous)
+                            {
+                                reader.DiscardBufferedData();
+                                stream.Seek(index.Start, SeekOrigin.Begin);
+
+                                if (index.Offset > 0)
+                                {
+                                    //skip number of lines offset
+                                    for (int i = 0; i < index.Offset; i++)
+                                        reader.ReadLine();
+                                }
+                            }
+
+                            var line = reader.ReadLine();
+                            yield return selector(index, line, reader.AbsolutePosition());
+
+                            previousLine = currentLine;
+                            previousStart = currentStart;
+                        }
+
+                    }
+                    else
+                    {
+                        foreach (var index in indicies)
+                        {
+                            var currentPosition = reader.AbsolutePosition();
+                            if (currentPosition != index.Start)
+                            {
+                                reader.DiscardBufferedData();
+                                reader.BaseStream.Seek(index.Start, SeekOrigin.Begin);
+                            }
+                            long previousLine = reader.AbsolutePosition();
+                            var line = reader.ReadLine();
+                            
+                            yield return selector(index, line, previousLine);
+                       
+                        }
+                    }
+
+                }
+            }
+        }
+
 
 
         public static IEnumerable<T> ReadLine<T>(this FileInfo source, IEnumerable<LineInfo> lines, Func<LineInfo, string, T> selector, Encoding encoding)
@@ -73,17 +144,6 @@ namespace TailBlazer.Domain.FileHandling
                             }
                             var line = reader.ReadLine();
                             yield return selector(index, line);
-
-                            //var currentLine = index.Line;
-                            //var isContinuous = currentLine == previousLine + 1;
-                            //if (!isContinuous)
-                            //{
-                            //    reader.DiscardBufferedData();
-                            //    reader.BaseStream.Seek(index.Start, SeekOrigin.Begin);
-                            //}
-
-                         
-                            //previousLine = currentLine;
                         }
                     }
 

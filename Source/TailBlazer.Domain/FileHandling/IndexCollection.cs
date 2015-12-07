@@ -39,7 +39,7 @@ namespace TailBlazer.Domain.FileHandling
                                 ? LinesChangedReason.Tailed
                                 : LinesChangedReason.Paged;
 
-                TailStartsAt = previous.TailStartsAt;
+                TailStartsAt = previous.Indicies.Max(idx => idx.End); ;
             }
         }
 
@@ -57,12 +57,16 @@ namespace TailBlazer.Domain.FileHandling
                 if (scroll.FirstIndex + size >= Count)
                     first = Count - size;
             }
-            
+
+            first = Math.Max(0, first);
+            size = Math.Min(size, Count);
+            if (size == 0) yield break;
+
             var relativeIndex = CalculateRelativeIndex(first);
             if (relativeIndex==null) yield break;
 
             var offset = relativeIndex.LinesOffset;
-            foreach (var i in Enumerable.Range(first, Math.Min(size, Count)))
+            foreach (var i in Enumerable.Range(first, size))
             {
                 yield return  new LineInfo(i + 1, i, relativeIndex.Start, offset);
                 offset++;
@@ -108,6 +112,7 @@ namespace TailBlazer.Domain.FileHandling
             public int Index { get; }
             public long Start { get; }
             public int LinesOffset { get; }
+
 
             public RelativeIndex(int index, long start, int linesOffset)
             {

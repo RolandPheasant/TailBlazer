@@ -35,33 +35,7 @@ namespace TailBlazer.Domain.FileHandling
             return source.WithSegments().Index();
         }
 
-        public static IEnumerable<T> ScanLines<T>(this StreamReaderExtended source,
-        int compression,
-        Func<long, T> selector,
-        Func<string, long, bool> shouldBreak)
-        {
 
-            int i = 0;
-            if (source.EndOfStream) yield break;
-
-            string line;
-            while ((line = source.ReadLine()) != null)
-            {
-                i++;
-                var position = source.AbsolutePosition();
-
-                if (shouldBreak(line, position))
-                    yield break;
-
-                if (i == compression)
-                {
-                    yield return selector(position);
-                    i = 0;
-                };
-
-
-            }
-        }
 
     }
 }
