@@ -61,10 +61,7 @@ namespace TailBlazer.Domain.FileHandling
             FileSize = fileWatcher.Select(notification => notification.Size);
             IsLoading = indexer.Take(1).Select(_ => false).StartWith(true);
 
-            var aggregator = latest.CombineLatest(scrollRequest, (currentLines, scroll) =>
-            {
-                return currentLines.ReadLines(scroll).ToArray();
-            })
+            var aggregator = latest.CombineLatest(scrollRequest, (currentLines, scroll) => currentLines.ReadLines(scroll).ToArray())
             .Subscribe(currentPage =>
             {
                 var previous = lines.Items.ToArray();
@@ -78,47 +75,6 @@ namespace TailBlazer.Domain.FileHandling
                 });
 
             });
-
-            //var aggregator = latest.CombineLatest(scrollRequest, (currentLines, scroll) =>
-            //{
-            //    //TODO: Read entire page, the check which lines should be added and which shold be removed
-            //    //as part of that work, get the maximum inded [this is the head!]
-
-            //    //   Debug.WriteLine($"{scroll.Mode}, {scroll.FirstIndex}, {scroll.PageSize}");
-
-            //    var currentPage = currentLines.GetIndicies(scroll).ToArray();
-
-            //    var previous = lines.Items.Select(l => l.LineInfo).ToArray();
-            //    var removed = previous.Except(currentPage, LineInfo.LineIndexComparer).ToArray();
-            //    var added = currentPage.Except(previous, LineInfo.LineIndexComparer).ToArray();
-            //    //calculated added and removed lines
-            //    var removedLines = lines.Items.Where(l => removed.Contains(l.LineInfo)).ToArray();
-
-
-            //    Func<long, DateTime?> isTail = l =>
-            //    {
-            //        //account for time with tail (i.e. add time to ILineProvider.TailStartsAt )
-            //        var tail = currentLines.TailStartsAt;
-            //        var onTail = tail != -1 && l >= tail;
-            //        return onTail ? DateTime.Now : (DateTime?)null;
-            //    };
-
-            //    //Console.WriteLine();
-            //    //finally we can load the line from the file todo: Add encdoing back in
-            //    var newLines = file.ReadLine(added, (lineIndex, text, position) => new Line(lineIndex, text, isTail(position)), Encoding.UTF8).ToArray();
-
-            //    return new { NewLines = newLines, OldLines = removedLines };
-            //})
-            //.Where(fn => fn.NewLines.Length + fn.OldLines.Length > 0)
-            //.Subscribe(changes =>
-            //{
-            //    //update observable list
-            //    lines.Edit(innerList =>
-            //{
-            //    if (changes.OldLines.Any()) innerList.RemoveMany(changes.OldLines);
-            //    if (changes.NewLines.Any()) innerList.AddRange(changes.NewLines);
-            //});
-            //});
 
             _cleanUp = new CompositeDisposable(Lines, lines, aggregator, Disposable.Create(() => isBusy.OnCompleted()));
         }

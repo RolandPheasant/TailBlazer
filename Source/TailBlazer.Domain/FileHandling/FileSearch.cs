@@ -7,6 +7,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
 using DynamicData;
+using DynamicData.Aggregation;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.Infrastructure;
 
@@ -28,8 +29,10 @@ namespace TailBlazer.Domain.FileHandling
 
         public IObservable<FileSearchResult> SearchResult { get;  }
 
-        public FileSearch([NotNull] IObservable<FileSegmentCollection> fileSegments, [NotNull] Func<string, bool> predicate,
-             Encoding encoding = null,
+        public FileSearch([NotNull] IObservable<FileSegmentCollection> fileSegments, 
+            [NotNull] Func<string, bool> predicate,
+            int arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered = 50000,
+            Encoding encoding = null,
             IScheduler scheduler =null)
         {
             if (fileSegments == null) throw new ArgumentNullException(nameof(fileSegments));
@@ -96,6 +99,11 @@ namespace TailBlazer.Domain.FileHandling
             var headSubscriber = tailSearch.Take(1).WithContinuation(() =>
             {
                 var locker = new object();
+                var sumOfCounts = searchData
+                                .Connect(fss => fss.Segment.Type == FileSegmentType.Head)
+                                .Sum(fss => fss.Lines.Length)
+                                .StartWith(0);
+
                 return searchData.Connect(fss=>fss.Segment.Type == FileSegmentType.Head )
                     .Do(head => Debug.WriteLine(head.First().Current))
                     .WhereReasonsAre(ChangeReason.Add)  
@@ -103,12 +111,27 @@ namespace TailBlazer.Domain.FileHandling
                     .ObserveOn(_scheduler)
                     .Synchronize(locker)
                     .Do(head => searchData.AddOrUpdate(new FileSegmentSearch(head.Segment,FileSegmentSearchStatus.Searching) ))
-                    .Select(fss =>
-                    {
-                       // Debug.WriteLine($"Running Search For: {fss.Key}");
-                        var result = Search(fss.Segment.Start, fss.Segment.End);
-                        return new FileSegmentSearch(fss, result);
-                    });
+                   .Select(fileSegmentSearch =>
+                   {
+                       /*
+                            This hack imposes a limitation on the number of items returned as memory can be 
+                            absolutely hammered [I have senn 20MB memory when searching a 1 GB file - obviously not an option]
+                           TODO: A proper solution. 
+                           1. How about index to file?
+                           2. Allow auto pipe of large files
+                           3. Allow user to have some control here
+                       */
+
+                       var sum = searchData.Items.Sum(fss => fss.Lines.Length);
+
+                       if (sum >= arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered)
+                       {
+                           //
+                           return new FileSegmentSearch(fileSegmentSearch,  FileSegmentSearchStatus.Complete);
+                       }
+                       var result = Search(fileSegmentSearch.Segment.Start, fileSegmentSearch.Segment.End);
+                       return new FileSegmentSearch(fileSegmentSearch, result);
+                   });
             })
            .Subscribe(head => searchData.AddOrUpdate(head));
 
@@ -123,6 +146,8 @@ namespace TailBlazer.Domain.FileHandling
 
         private FileSegmentSearchResult Search(long start, long end)
         {
+
+
             long lastPosition = 0;
             using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {

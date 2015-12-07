@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,27 +7,6 @@ using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class TailInfo
-    {
-
-        public static readonly TailInfo None = new TailInfo();
-
-        public long TailStartsAt { get;  }
-        public DateTime LastTail { get;  }
-
-
-        public TailInfo(long tailStartsAt)
-        {
-            TailStartsAt = tailStartsAt;
-            LastTail = DateTime.Now;
-        }
-
-        private TailInfo()
-        {
-        }
-    }
-
-
     public class FileSearchResult: ILineProvider, IEquatable<FileSearchResult>
     {
         public static readonly FileSearchResult None = new FileSearchResult();
@@ -44,9 +22,7 @@ namespace TailBlazer.Domain.FileHandling
         private FileInfo Info { get;  }
         private Encoding Encoding { get;  }
         private TailInfo TailInfo { get; }
-
-
-        public long Size { get; }
+        private long Size { get; }
 
         public FileSearchResult(FileSegmentSearch initial,
             FileInfo info,
@@ -65,11 +41,7 @@ namespace TailBlazer.Domain.FileHandling
             SegmentsCompleted = IsSearching ? 0 : 1;
             Matches = initial.Lines.ToArray();
             TailInfo = TailInfo.None;
-
-            //check this
             Size = 0;
-
-            Console.WriteLine($"{SegmentsCompleted}/{Segments}. {Count}");
         }
 
         public FileSearchResult(FileSearchResult previous, 
@@ -87,28 +59,17 @@ namespace TailBlazer.Domain.FileHandling
             var lastTail = _allSearches.Lookup(FileSegmentKey.Tail);
             if (current.Segment.Type == FileSegmentType.Tail)
             {
-                if (lastTail.HasValue)
-                {
-                    TailInfo = new TailInfo(lastTail.Value.Segment.End);
-                }
-                else
-                {
-                    TailInfo = new TailInfo(current.Segment.End);
-                }
+                TailInfo = lastTail.HasValue 
+                            ? new TailInfo(lastTail.Value.Segment.End) 
+                            : new TailInfo(current.Segment.End);
             }
             else
             {
-                if (lastTail.HasValue)
-                {
-                    TailInfo = previous.TailInfo;
-                }
-                else
-                {
-                    TailInfo = TailInfo.None;
-                }
+                TailInfo = lastTail.HasValue 
+                            ? previous.TailInfo 
+                            : TailInfo.None;
             }
-
-
+            
             _allSearches[current.Key] = current;
             var all = _allSearches.Values.ToArray();
 
@@ -119,8 +80,6 @@ namespace TailBlazer.Domain.FileHandling
 
             //For large sets this could be very inefficient
             Matches = all.SelectMany(s => s.Lines).OrderBy(l=>l).ToArray();
-
-            //Console.WriteLine($"{SegmentsCompleted}/{Segments}.{Count}");
         }
         
         private FileSearchResult()

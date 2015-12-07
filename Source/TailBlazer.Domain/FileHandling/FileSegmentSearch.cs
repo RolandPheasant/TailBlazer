@@ -14,6 +14,7 @@ namespace TailBlazer.Domain.FileHandling
 
         private readonly ImmutableArray<long> _matches;
 
+
         public FileSegmentSearch(FileSegment segment, FileSegmentSearchStatus status = FileSegmentSearchStatus.Pending)
         {
             Key = segment.Key;
@@ -39,6 +40,14 @@ namespace TailBlazer.Domain.FileHandling
             Status = FileSegmentSearchStatus.Complete;
             _matches = segmentSearch._matches.Add(result.Indicies);
         }
+
+        public FileSegmentSearch(FileSegmentSearch segmentSearch, FileSegmentSearchStatus complete)
+        {
+            Key = segmentSearch.Key;
+            Segment = new FileSegment(segmentSearch.Segment, segmentSearch.Segment.End);
+            Status = complete;
+            _matches = new ImmutableArray<long>();
+         }
 
 
         #region Equality
