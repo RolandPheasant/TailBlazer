@@ -38,9 +38,6 @@ namespace TailBlazer.Domain.FileHandling
         public int Segments { get; }
         public bool IsSearching { get; }
 
-        private LinesChangedReason ChangedReason { get; }
-
-        // private readonly FileSegmentSearch[] _allSearches;
         private readonly IDictionary<FileSegmentKey, FileSegmentSearch> _allSearches;
 
         private FileSegmentSearch LastSearch { get; }
@@ -98,7 +95,6 @@ namespace TailBlazer.Domain.FileHandling
                 {
                     TailInfo = new TailInfo(current.Segment.End);
                 }
-
             }
             else
             {

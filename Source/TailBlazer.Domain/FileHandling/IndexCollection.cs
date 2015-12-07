@@ -45,17 +45,7 @@ namespace TailBlazer.Domain.FileHandling
                                 ? LinesChangedReason.Tailed
                                 : LinesChangedReason.Paged;
 
-                //if (ChangedReason == LinesChangedReason.Tailed)
-                //{
-                //    TailInfo = previous.TailInfo;
-
-                //}
-                //else
-                //{
-                //    TailInfo = new TailInfo(latest.Max(idx => idx.End));
-                //}
              TailInfo = new TailInfo(previous.Indicies.Max(idx => idx.End));
-                //TailStartsAt = ; ;
             }
         }
 

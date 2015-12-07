@@ -105,7 +105,7 @@ namespace TailBlazer.Domain.FileHandling
                     .Do(head => searchData.AddOrUpdate(new FileSegmentSearch(head.Segment,FileSegmentSearchStatus.Searching) ))
                     .Select(fss =>
                     {
-                        Debug.WriteLine($"Running Search For: {fss.Key}");
+                       // Debug.WriteLine($"Running Search For: {fss.Key}");
                         var result = Search(fss.Segment.Start, fss.Segment.End);
                         return new FileSegmentSearch(fss, result);
                     });
@@ -123,8 +123,6 @@ namespace TailBlazer.Domain.FileHandling
 
         private FileSegmentSearchResult Search(long start, long end)
         {
-     
-
             long lastPosition = 0;
             using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
