@@ -1,7 +1,6 @@
 using System;
-using System.IO;
 using System.Reactive.Linq;
-using TailBlazer.Domain.Infrastructure;
+
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -10,8 +9,7 @@ namespace TailBlazer.Domain.FileHandling
         public static IObservable<FileSegmentCollection> WithSegments(this IObservable<FileNotification> source,int initialTail= 100000)
         {
 
-            return source.Where(n => n.Exists 
-                            && (n.NotificationType == FileNotificationType.Changed || n.NotificationType == FileNotificationType.CreatedOrOpened))
+            return source.Where(n=>(n.NotificationType == FileNotificationType.Changed || n.NotificationType == FileNotificationType.CreatedOrOpened))
                 .Publish(shared =>
                 {
                      return Observable.Create<FileSegmentCollection>(observer =>
@@ -28,7 +26,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             return source
                 .TakeWhile(fsc=>fsc.SizeDiff>0)
-                .Publish(shared=> observableFactory(shared))
+                .Publish(observableFactory)
                 .Repeat();
         }
     }

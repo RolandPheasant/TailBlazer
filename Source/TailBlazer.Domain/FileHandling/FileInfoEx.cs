@@ -55,8 +55,8 @@ namespace TailBlazer.Domain.FileHandling
 
                 .Scan((FileNotification) null, (state, _) => state == null
                     ? new FileNotification(file)
-                    : new FileNotification(state))
-                .DistinctUntilChanged();
+                    : new FileNotification(state));
+            // .DistinctUntilChanged();
         }
 
         

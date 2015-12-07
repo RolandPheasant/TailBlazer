@@ -21,7 +21,7 @@ namespace TailBlazer.Domain.FileHandling
                         return new CompositeDisposable(indexer, notifier);
                     });
 
-                    return idx.Zip(diff, (index, sizeDiff) => new { index, sizeDiff });
+                    return idx.CombineLatest(diff, (index, sizeDiff) => new { index, sizeDiff });
                 });
 
             //this is the beast which allows the indexer to be recreated when a log file rolls

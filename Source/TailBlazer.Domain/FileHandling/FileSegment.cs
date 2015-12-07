@@ -31,21 +31,11 @@ namespace TailBlazer.Domain.FileHandling
 
         #region Equality
 
-        public static bool operator ==(FileSegment left, FileSegment right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(FileSegment left, FileSegment right)
-        {
-            return !Equals(left, right);
-        }
-
         public bool Equals(FileSegment other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Index == other.Index && Start == other.Start && End == other.End && Type == other.Type;
+            return Index == other.Index && Start == other.Start && End == other.End && Type == other.Type && Key.Equals(other.Key);
         }
 
         public override bool Equals(object obj)
@@ -64,8 +54,19 @@ namespace TailBlazer.Domain.FileHandling
                 hashCode = (hashCode*397) ^ Start.GetHashCode();
                 hashCode = (hashCode*397) ^ End.GetHashCode();
                 hashCode = (hashCode*397) ^ (int) Type;
+                hashCode = (hashCode*397) ^ Key.GetHashCode();
                 return hashCode;
             }
+        }
+
+        public static bool operator ==(FileSegment left, FileSegment right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(FileSegment left, FileSegment right)
+        {
+            return !Equals(left, right);
         }
 
         #endregion

@@ -23,14 +23,14 @@ namespace TailBlazer.Fixtures
             {
                 FileSearchResult fileSearchResult = null;
 
-                using (file.Info.WatchFile(pulse)
-                    .Search(str => str.Contains("9"))
+                using (file.Info
+                    .Search(str => str.Contains("9"), scheduler)
                     .Subscribe(x => fileSearchResult = x))
                 {
-                  //  scheduler.AdvanceBy(250);
+                    scheduler.AdvanceByMilliSeconds(250);
                     pulse.Once();
                     fileSearchResult.Segments.Should().Be(1);
-                    fileSearchResult.SegmentsCompleted.Should().Be(1);
+                    fileSearchResult.SegmentsCompleted.Should().Be(0);
                     fileSearchResult.IsSearching.Should().Be(false);
                     fileSearchResult.Count.Should().Be(0);
                 }
@@ -52,7 +52,7 @@ namespace TailBlazer.Fixtures
                     .Search(str => str.Contains("9"))
                     .Subscribe(x => fileSearchResult = x))
                 {
-                    fileSearchResult.Should().Be(FileSearchResult.None);
+                    fileSearchResult.Should().BeNull();
                 }
             }
         }
@@ -89,12 +89,15 @@ namespace TailBlazer.Fixtures
             using (var file = new TestFile())
             {
                 FileSearchResult fileSearchResult = null;
-                file.Append(Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
+
 
                 using (file.Info.WatchFile(pulse)
                     .Search(str => str.Contains("9"))
                     .Subscribe(x => fileSearchResult = x))
                 {
+                    file.Append(Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
+                    pulse.Once();
+                    pulse.Once();
                     fileSearchResult.Matches.Length.Should().NotBe(0);
                 }
             }

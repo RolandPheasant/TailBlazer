@@ -27,9 +27,6 @@ namespace TailBlazer.Domain.FileHandling
 
         public FileSearch([NotNull] IObservable<FileSegmentCollection> segments, [NotNull] Func<string, bool> predicate,IScheduler scheduler =null)
         {
-
-            //TODO: When File segment has got smaller => roll-over [do something about it]
-
             if (segments == null) throw new ArgumentNullException(nameof(segments));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
@@ -54,7 +51,8 @@ namespace TailBlazer.Domain.FileHandling
                 .Scan((FileSearchResult)null, (previous, current) => previous==null 
                                 ? new FileSearchResult(current) 
                                 : new FileSearchResult(previous, current))
-                .StartWith(FileSearchResult.None);
+                .StartWith(FileSearchResult.None)
+                .Replay(1).RefCount();
 
             //initialise a pending state for all segments
             var loader = segmentCache.Connect()

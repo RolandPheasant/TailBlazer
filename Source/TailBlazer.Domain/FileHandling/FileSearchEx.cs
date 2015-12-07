@@ -46,10 +46,10 @@ namespace TailBlazer.Domain.FileHandling
                         var publisher = fileSearch.SearchResult.SubscribeSafe(observer);
                         return new CompositeDisposable(publisher, fileSearch);
                     });
-                    return searcher.Zip(diff, (search, sizeDiff) => new { search, sizeDiff});
+                    return searcher.CombineLatest(diff, (search, sizeDiff) => new { search, sizeDiff});
                 });
 
-            //this is the beast which allows the search to be recreated when a log file rolls
+            //this is the magic which allows the search to be recreated when a log file rolls
             return searchFactory
                 .TakeWhile(x => x.sizeDiff >= 0).Repeat()
                 .Select(x => x.search);
