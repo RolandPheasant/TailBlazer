@@ -1,8 +1,8 @@
 # Where are all the features?
 
-Tail Blazer will in due course have all the usual features which can be expected of any file tailing utility plus much more.  For a full list of planned features see [issues](https://github.com/RolandPheasant/TailBlazer/issues) and if there are any features which you would expect Tail Blazer to have but are not already listed, feel free to raise a new issue.  However for now, the reason I have not pushed forward with implementing features is I have wanted to get the architecture right first and foremost as I want a rock solid foundation before the structures are built.  That point has now been reached so the features will start appearing in the near future.
+Tail Blazer will in due course have all the usual features which can be expected of any file tailing utility plus much more.  For a full list of planned features see [issues](https://github.com/RolandPheasant/TailBlazer/issues) and if there are any features which you would expect Tail Blazer to have but are not already listed, feel free to raise a new issue.  However for now, the reason I have not pushed forward with implementing features is I have wanted to get the architecture right first and foremost as I want a rock solid foundation before the structures are built. I am now happy with the architecture so the features will start appearing in the near future.
 
-I have gathered great feedback from many test users and I see a range of different usage scenarios which Tail Blazer now covers. These scenarios are listed below.
+So what has the re-architecting enabled? I have received great feedback from many test users and I there are range of different usage scenarios which Tail Blazer now covers. These scenarios are listed below and are all complete.
 
 ## Watch log files when I debug my code
 
@@ -23,7 +23,7 @@ Another system in the same company produces a 10 Megabyte file every minute then
 
 ![Very fast file](https://github.com/RolandPheasant/TailBlazer/blob/master/Images/VeryFastFile.gif)
 
-This image illustrates that even when a a file is changing rapidly the user interface is still very smooth.
+This image illustrates that even when a file is changing rapidly the user interface is still very smooth.
 
 ## Low memory usage
 
