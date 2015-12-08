@@ -33,9 +33,9 @@ For each of the files above the only lines in memory are those displayed on the 
 
 There have been many requests to allow Tail Blazer to act as the visualisation for external (non i/o file) data sources so I have raised an issue.  See [issue #51 plug-in data sources](https://github.com/RolandPheasant/TailBlazer/issues/51). Take a look and if you have any suggestons then add a comment there.
 
-## Further performance work and feedback
+## Try it out and feedback
 
 If you want to try it out, you can get the latest version from [releases](https://github.com/RolandPheasant/TailBlazer/releases). Extract the file and double click TailBlazer.exe
 
-I would appreciate some feed back on how you get on with Tail Blazer, whether good or bad!
+I would appreciate somefeed back on how you get on with Tail Blazer, whether good or bad!
 
