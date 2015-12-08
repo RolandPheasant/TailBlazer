@@ -7,7 +7,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
 using DynamicData;
-using DynamicData.Aggregation;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.Infrastructure;
 
@@ -22,10 +21,11 @@ namespace TailBlazer.Domain.FileHandling
     {
         private readonly IScheduler _scheduler;
         private readonly Func<string, bool> _predicate;
+        private readonly int _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered;
         private readonly IDisposable _cleanUp;
 
-        public Encoding Encoding { get; private set; }
-        public FileInfo Info { get; private set; }
+        private Encoding Encoding { get;  set; }
+        private FileInfo Info { get;  set; }
 
         public IObservable<FileSearchResult> SearchResult { get;  }
 
@@ -39,6 +39,7 @@ namespace TailBlazer.Domain.FileHandling
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
             _predicate = predicate;
+            _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered = arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered;
             _scheduler = scheduler ?? Scheduler.Default;
 
             var shared = fileSegments.Replay(1).RefCount();
@@ -63,8 +64,8 @@ namespace TailBlazer.Domain.FileHandling
                 .Flatten()
                 .Select(change=>change.Current)
                 .Scan((FileSearchResult)null, (previous, current) => previous==null 
-                                ? new FileSearchResult(current, Info, Encoding) 
-                                : new FileSearchResult(previous, current, Info, Encoding))
+                                ? new FileSearchResult(current, Info, Encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered) 
+                                : new FileSearchResult(previous, current, Info, Encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
                 .StartWith(FileSearchResult.None)
                 .Replay(1).RefCount();
 
@@ -99,10 +100,6 @@ namespace TailBlazer.Domain.FileHandling
             var headSubscriber = tailSearch.Take(1).WithContinuation(() =>
             {
                 var locker = new object();
-                var sumOfCounts = searchData
-                                .Connect(fss => fss.Segment.Type == FileSegmentType.Head)
-                                .Sum(fss => fss.Lines.Length)
-                                .StartWith(0);
 
                 return searchData.Connect(fss=>fss.Segment.Type == FileSegmentType.Head )
                     .Do(head => Debug.WriteLine(head.First().Current))
@@ -124,9 +121,8 @@ namespace TailBlazer.Domain.FileHandling
 
                        var sum = searchData.Items.Sum(fss => fss.Lines.Length);
 
-                       if (sum >= arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered)
+                       if (sum >= _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered)
                        {
-                           //
                            return new FileSegmentSearch(fileSegmentSearch,  FileSegmentSearchStatus.Complete);
                        }
                        var result = Search(fileSegmentSearch.Segment.Start, fileSegmentSearch.Segment.End);
@@ -146,8 +142,6 @@ namespace TailBlazer.Domain.FileHandling
 
         private FileSegmentSearchResult Search(long start, long end)
         {
-
-
             long lastPosition = 0;
             using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {

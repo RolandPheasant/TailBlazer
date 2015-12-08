@@ -65,7 +65,7 @@ namespace TailBlazer.Views
             var result = dialog.ShowDialog();
             if (result != true) return;
 
-            OpenFile( new FileInfo(dialog.FileName));
+            OpenFile(new FileInfo(dialog.FileName));
         }
 
         public void OpenFile(FileInfo file)

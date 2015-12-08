@@ -20,7 +20,7 @@ namespace TailBlazer.Domain.FileHandling
         public IObservable<int> MatchedLines { get; }
         public IObservable<long> FileSize { get; }
         public IObservableList<Line> Lines { get; }
-        public IObservable<bool> IsSearching { get;  }
+
         public IObservable<bool> IsLoading { get; }
         
         public FileTailer(FileInfo file,
@@ -37,9 +37,6 @@ namespace TailBlazer.Domain.FileHandling
 
             var lines = new SourceList<Line>();
             Lines = lines.AsObservableList();
-
-            var isBusy = new Subject<bool>();
-            IsSearching = isBusy.AsObservable();
 
             var locker = new object();
             scrollRequest = scrollRequest.Synchronize(locker); 
@@ -62,21 +59,20 @@ namespace TailBlazer.Domain.FileHandling
             IsLoading = indexer.Take(1).Select(_ => false).StartWith(true);
 
             var aggregator = latest.CombineLatest(scrollRequest, (currentLines, scroll) => currentLines.ReadLines(scroll).ToArray())
-            .Subscribe(currentPage =>
-            {
-                var previous = lines.Items.ToArray();
-                var added = currentPage.Except(previous).ToArray();
-                var removed = previous.Except(currentPage).ToArray();
-
-                lines.Edit(innerList =>
+                .Subscribe(currentPage =>
                 {
-                    if (removed.Any()) innerList.RemoveMany(removed);
-                    if (added.Any()) innerList.AddRange(added);
+                    var previous = lines.Items.ToArray();
+                    var added = currentPage.Except(previous).ToArray();
+                    var removed = previous.Except(currentPage).ToArray();
+
+                    lines.Edit(innerList =>
+                    {
+                        if (removed.Any()) innerList.RemoveMany(removed);
+                        if (added.Any()) innerList.AddRange(added);
+                    });
                 });
 
-            });
-
-            _cleanUp = new CompositeDisposable(Lines, lines, aggregator, Disposable.Create(() => isBusy.OnCompleted()));
+            _cleanUp = new CompositeDisposable(Lines, lines, aggregator);
         }
 
 

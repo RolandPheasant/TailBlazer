@@ -7,7 +7,7 @@ using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class FileSearchResult: ILineProvider, IEquatable<FileSearchResult>
+    public class FileSearchResult: ILineProvider, IEquatable<FileSearchResult>, IHasLimitationOfLines
     {
         public static readonly FileSearchResult None = new FileSearchResult();
         public long[] Matches { get; }
@@ -15,6 +15,8 @@ namespace TailBlazer.Domain.FileHandling
         public int SegmentsCompleted { get; }
         public int Segments { get; }
         public bool IsSearching { get; }
+        public bool HasReachedLimit { get; }
+        public int Maximum { get; }
 
         private readonly IDictionary<FileSegmentKey, FileSegmentSearch> _allSearches;
 
@@ -26,7 +28,8 @@ namespace TailBlazer.Domain.FileHandling
 
         public FileSearchResult(FileSegmentSearch initial,
             FileInfo info,
-            Encoding encoding)
+            Encoding encoding,
+            int limit)
         {
             Info = info;
             Encoding = encoding;
@@ -42,14 +45,17 @@ namespace TailBlazer.Domain.FileHandling
             Matches = initial.Lines.ToArray();
             TailInfo = TailInfo.None;
             Size = 0;
+            Maximum = limit;
+            HasReachedLimit = false;
         }
 
         public FileSearchResult(FileSearchResult previous, 
             FileSegmentSearch current,
             FileInfo info,
-            Encoding encoding)
+            Encoding encoding,
+            int limit)
         {
-
+            Maximum = limit;
             LastSearch = current;
             Info = info;
             Encoding = encoding;
@@ -80,11 +86,13 @@ namespace TailBlazer.Domain.FileHandling
 
             //For large sets this could be very inefficient
             Matches = all.SelectMany(s => s.Lines).OrderBy(l=>l).ToArray();
+            HasReachedLimit = Matches.Length >= limit;
         }
-        
+
         private FileSearchResult()
         {
             Matches = new long[0];
+            HasReachedLimit = false;
         }
 
         public bool IsEmpty => this == None;
@@ -198,5 +206,6 @@ namespace TailBlazer.Domain.FileHandling
         {
             return this == None ? "<None>" : $"Count: {Count}, Segments: {Segments}, Size: {Size}";
         }
+
     }
 }

@@ -68,16 +68,14 @@ namespace TailBlazer.Domain.FileHandling
                 .Replay(1).RefCount();
 
 
-
-
-
             //3. Scan the tail so results can be returned quickly
             var tailScanner= shared.Select(segments => segments.Tail).DistinctUntilChanged()
                 .Scan((Index)null, (previous, current) =>
                {
                     if (previous == null)
                     {
-                        return Scan(current.Start, -1, 1);
+                        var initial = Scan(current.Start, -1, 1);
+                        return initial ?? new Index(0, 0,0,0,IndexType.Tail);
                     }
                     var latest=Scan(previous.End , -1, 1);
                     return latest == null ? null : new Index(latest,previous);

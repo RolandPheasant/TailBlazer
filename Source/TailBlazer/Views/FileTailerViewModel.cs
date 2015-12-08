@@ -29,7 +29,6 @@ namespace TailBlazer.Views
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
 
         public IProperty<bool> ShouldHightlightMatchingText { get; }
-        public IProperty<bool> SearchIsInProgess { get; }
         public IProperty<string> LineCountText { get; }
         public IProperty<string> SearchHint { get; }
         public IProperty<int> MatchedLineCount { get; }
@@ -81,10 +80,24 @@ namespace TailBlazer.Views
             //User feedback for when tailer is loading
             IsLoading = tailer.IsLoading.ForBinding();
 
+            //////User feedback lines count and filter matches
+            //LineCountText = tailer.TotalLines.CombineLatest(tailer.MatchedLines, (total, matched) => total == matched
+            //     ? $"{total.ToString("#,###")} lines"
+            //     : $"{matched.ToString("#,###0")} of {total.ToString("#,###")} lines").ForBinding();
+
+
             ////User feedback lines count and filter matches
-            LineCountText = tailer.TotalLines.CombineLatest(tailer.MatchedLines, (total, matched) => total == matched
-                 ? $"{total.ToString("#,###")} lines"
-                 : $"{matched.ToString("#,###0")} of {total.ToString("#,###")} lines").ForBinding();
+            LineCountText = tailer.TotalLines.CombineLatest(search, (total, matched) =>
+            {
+                if (matched.IsEmpty) return $"{total.ToString("#,###")} lines";
+            
+                var limited = (IHasLimitationOfLines)matched ;
+                return limited.HasReachedLimit 
+                        ? $"{limited.Maximum.ToString("#,###0")}+ of {total.ToString("#,###")} lines" 
+                        : $"{matched.Count.ToString("#,###0")} of {total.ToString("#,###")} lines";
+            }).ForBinding();
+
+
 
             //User feedback to show file size
             FileSizeText = tailer.FileSize
@@ -100,9 +113,6 @@ namespace TailBlazer.Views
                                     return "Type to search";
                                 return text.Length < 3 ? "Enter at least 3 characters" : "Filter applied";
                             }).ForBinding();
-
-            //User feedback to show a search is under way
-            SearchIsInProgess = tailer.IsSearching.ForBinding();
 
             //Only highlight search text when at least 3 letters have been entered
             ShouldHightlightMatchingText = this.WhenValueChanged(vm => vm.SearchText)
@@ -136,7 +146,6 @@ namespace TailBlazer.Views
                 FileSizeText,
                 SearchHint,
                 ShouldHightlightMatchingText,
-                SearchIsInProgess,
                 progressMonitor,
                 Disposable.Create(_userScrollRequested.OnCompleted));
         }
@@ -186,8 +195,7 @@ namespace TailBlazer.Views
             get { return _firstIndex; }
             set { SetAndRaise(ref _firstIndex, value); }
         }
-
-
+        
         public bool Searching
         {
             get { return _searching; }

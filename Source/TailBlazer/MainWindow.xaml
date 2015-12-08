@@ -31,10 +31,12 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/controls.buttons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToggleButton.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/materialdesign.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InverredBooleanToVisibilityConverter"/>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
 
             <Canvas x:Key="appbar_github" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
                 <Path  Canvas.Left="3.27222" Canvas.Top="14.3263" 
@@ -93,13 +95,11 @@
 
         <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
             <materialDesign:DrawerHost.LeftDrawerContent>
-                
                 <TextBlock  Text="Under Development" Margin="12" FontSize="32"/>
             </materialDesign:DrawerHost.LeftDrawerContent>
                 
-            <Grid 
-            infrastucture:DependencyObjectHook.Receiver="{Binding DropMonitor}">
-            <!-- -->
+            <Grid infrastucture:DependencyObjectHook.Receiver="{Binding DropMonitor}">
+
             <dockablz:Layout >
                 <dragablz:TabablzControl x:Name="InitialTabablzControl"
                                     
@@ -113,7 +113,8 @@
                     <dragablz:TabablzControl.CustomHeaderItemTemplate>
                         <DataTemplate DataType="{x:Type infrastucture:ViewContainer}">
                             <TextBlock Margin="8 0 2 0" Text="{Binding Title}" />
-                        </DataTemplate>
+                                <!--<TextBox Margin="8 0 2 0" Text="{Binding Title}" />-->
+                            </DataTemplate>
                     </dragablz:TabablzControl.CustomHeaderItemTemplate>
                     <TabControl.ContentTemplate>
                         <DataTemplate DataType="{x:Type infrastucture:ViewContainer}">
