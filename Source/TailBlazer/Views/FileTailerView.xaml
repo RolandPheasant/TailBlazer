@@ -209,7 +209,7 @@
         </ListBox>
 
             <!--This is for debugging.Just change visibility for more info-->
-            <Grid  Visibility="Visible"
+            <Grid  Visibility="Collapsed"
             Height="26"
             Background="{StaticResource PrimaryHueMidBrush}"
             Grid.Row="2"
