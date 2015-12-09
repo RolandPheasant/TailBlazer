@@ -34,27 +34,19 @@
             </ResourceDictionary.MergedDictionaries>
 
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            
+            
+           <!--<DataTemplate DataType="{x:Type infrastucture:HeaderContent}">
+                <views:HeaderedContentView />
+            </DataTemplate>-->
 
             <DataTemplate DataType="{x:Type infrastucture:HeaderContent}">
-                <DockPanel Focusable="True">
-                    <materialDesign:PopupBox Focusable="True"  DockPanel.Dock="Right">
-                        <TextBox Text="I want to be able to edit the title but cannot open the popup boc"></TextBox>
-                        </materialDesign:PopupBox>
-                        <TextBlock 
-                                DockPanel.Dock="Left"
-                                Margin="8 0 2 0" Text="{Binding Title}" />
-                </DockPanel>
-
+                <TextBlock Margin="6 2 2 2" Text="{Binding Title}" />
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type infrastucture:ViewContainer}">
                 <ContentControl Margin="4" Content="{Binding Content}" />
             </DataTemplate>
-
-            <DataTemplate DataType="{x:Type dragablz:HeaderedItemViewModel}">
-                <ContentControl Content="{Binding Content}" Margin="4 4 4 4" FontSize="14" />
-            </DataTemplate>
-
 
             <Canvas x:Key="appbar_github" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
                 <Path  Canvas.Left="3.27222" Canvas.Top="14.3263" 
@@ -84,7 +76,7 @@
 
                 <Button Margin="6 0 0 0"
                     Command ="{Binding ShowInGitHubCommand}"
-                    ToolTip="Tail Blazer in GitHub">
+                    ToolTip="Tail Blazer on GitHub">
                     <Rectangle Width="22"
                            Height="22"
                            Fill="White">

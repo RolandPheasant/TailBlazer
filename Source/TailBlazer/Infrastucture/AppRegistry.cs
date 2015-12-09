@@ -18,11 +18,16 @@ namespace TailBlazer.Infrastucture
             log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(path));
             For<ILogger>().Use<Log4NetLogger>().Ctor<Type>("type").Is(x => x.RootType).AlwaysUnique();
 
-
+            For<ISelectionMonitor>().Use<SelectionMonitor>();
+            //For<IClipboardHandler>().Use<ClipboardHandler>();
 
             Scan(scanner =>
             {
                 scanner.ExcludeType<ILogger>();
+                scanner.ExcludeType<SelectionMonitor>();
+
+                
+              //  scanner.ExcludeType<ISelectionMonitor>();
                 scanner.LookForRegistries();
                 scanner.Convention<AppConventions>();
 

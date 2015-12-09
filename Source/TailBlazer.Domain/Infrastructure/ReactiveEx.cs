@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -137,6 +138,7 @@ namespace TailBlazer.Domain.Infrastructure
                 return observable.Subscribe(_ => { }, observer.OnError, onCompleted);
             });
         }
+
 
     }
 }

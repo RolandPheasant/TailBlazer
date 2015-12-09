@@ -125,7 +125,7 @@
                  ItemsSource="{Binding Lines}" 
                  FontFamily="Consolas"
                  SelectionMode="Extended"
-                 infrastucture:SelectorHelper.Binding="{Binding SelectionController}">
+                 infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}">
 
                 <ListBox.Template>
                 <ControlTemplate>
@@ -151,7 +151,12 @@
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
 
-            <ListBox.ItemTemplate>
+
+            <ListBox.InputBindings>
+                <KeyBinding Key="C" Modifiers="Control" Command="{Binding CopyToClipboardCommand}"/>
+            </ListBox.InputBindings>
+
+                        <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type local:LineProxy}">
                     <Grid >
                         <Grid.ColumnDefinitions>
@@ -159,9 +164,9 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <!--<TextBlock Text="{Binding Number, Mode=OneWay}" 
+                            <TextBlock Text="{Binding Index, Mode=OneWay}" 
                                    Opacity="0.55"
-                                   MinWidth="25"/>-->
+                                   MinWidth="25"/>
                         <infrastucture:SearchableTextControl Grid.Column="1" 
                                                              Margin="6 0 0 0"   
                                                             IsHighlight="{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"  
@@ -203,7 +208,8 @@
 
         </ListBox>
 
-            <Grid  Visibility="Collapsed"
+            <!--This is for debugging.Just change visibility for more info-->
+            <Grid  Visibility="Visible"
             Height="26"
             Background="{StaticResource PrimaryHueMidBrush}"
             Grid.Row="2"
@@ -222,12 +228,19 @@
                 <StackPanel   Margin="0 0 6 0"
                      Orientation="Horizontal" 
                      HorizontalAlignment="Right">
+                    
+                    <TextBlock  
+                        Margin="4 0 0 0"
+                        Text="{Binding SelectedItemsCount.Value,StringFormat='\xx{0} items selected'}"
+                        VerticalAlignment="Center"
+                        MinWidth="125"/>
+
 
                     <TextBlock  
-                    Margin="4 0 0 0"
-                   Text="{Binding FirstIndex,StringFormat='\first={0}'}"
-                    VerticalAlignment="Center"
-                    MinWidth="125"/>
+                        Margin="4 0 0 0"
+                       Text="{Binding FirstIndex,StringFormat='\first={0}'}"
+                        VerticalAlignment="Center"
+                        MinWidth="125"/>
 
                     <TextBlock  
                     Margin="4 0 0 0"

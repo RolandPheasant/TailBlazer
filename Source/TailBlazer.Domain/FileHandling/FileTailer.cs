@@ -20,9 +20,9 @@ namespace TailBlazer.Domain.FileHandling
         public IObservable<int> MatchedLines { get; }
         public IObservable<long> FileSize { get; }
         public IObservableList<Line> Lines { get; }
-
         public IObservable<bool> IsLoading { get; }
-        
+        public IObservable<ILineProvider> Latest { get; }
+
         public FileTailer(FileInfo file,
                 IObservable<FileSearchResult> filter,
                 IObservable<ScrollRequest> scrollRequest,
@@ -52,7 +52,9 @@ namespace TailBlazer.Domain.FileHandling
             var latestLines = indexer.Cast<ILineProvider>().Synchronize(locker);
             var latestFilter = filter.Cast<ILineProvider>().Synchronize(locker); 
             var latest = latestLines.CombineLatest(latestFilter, (l, f) => f.IsEmpty ? l : f);
-            
+
+
+            Latest = latest;
             MatchedLines = latest.Select(provider => provider.Count);
             TotalLines = latestLines.Select(x => x.Count);
             FileSize = fileWatcher.Select(notification => notification.Size);
@@ -74,6 +76,7 @@ namespace TailBlazer.Domain.FileHandling
 
             _cleanUp = new CompositeDisposable(Lines, lines, aggregator);
         }
+
 
 
         public void Dispose()

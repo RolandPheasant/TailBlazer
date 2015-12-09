@@ -5,24 +5,30 @@ namespace TailBlazer.Infrastucture
 {
     public class HeaderContent: AbstractNotifyPropertyChanged
     {
+        private  string _title;
+
         public HeaderContent(string title)
         {
-            Title = title;
+            _title = title;
         }
 
-        public string Title { get; }
+        public string Title
+        {
+            get { return _title; }
+            set { SetAndRaise(ref _title,value);}
+        }
     }
 
     public class ViewContainer
     {
+        public Guid Id { get; } = Guid.NewGuid();
+
+
         public ViewContainer(string title, object content)
         {
             Header = new HeaderContent(title);
             Content = content;
         }
-
-        public Guid Id { get; } = Guid.NewGuid();
-
 
         public object Header { get; }
 

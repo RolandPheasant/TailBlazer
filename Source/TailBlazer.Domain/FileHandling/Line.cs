@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing.Text;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -21,6 +22,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public Line(LineInfo lineInfo, string text, DateTime? timestamp)
         {
+
             LineInfo = lineInfo;
             Text = text;
             Timestamp = timestamp;
@@ -50,7 +52,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             unchecked
             {
-                return ((Text != null ? Text.GetHashCode() : 0)*397) ^ LineInfo.GetHashCode();
+                return ((Text?.GetHashCode() ?? 0)*397) ^ LineInfo.GetHashCode();
             }
         }
 

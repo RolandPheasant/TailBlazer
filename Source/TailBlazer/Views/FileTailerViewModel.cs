@@ -5,8 +5,10 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
+using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
@@ -29,6 +31,7 @@ namespace TailBlazer.Views
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
 
+        public IProperty<int> SelectedItemsCount { get; }
         public IProperty<bool> ShouldHightlightMatchingText { get; }
         public IProperty<string> LineCountText { get; }
         public IProperty<string> SearchHint { get; }
@@ -36,16 +39,33 @@ namespace TailBlazer.Views
         public IProperty<string> FileSizeText { get; }
         public IProperty<bool> IsLoading { get; }
 
-        public SelectionController<LineProxy> SelectionController { get; }= new SelectionController<LineProxy>();
+        public ICommand CopyToClipboardCommand { get; }
 
-        public FileTailerViewModel(ILogger logger,
-            ISchedulerProvider schedulerProvider, 
-            FileInfo fileInfo,
-            IFileTailerFactory fileTailerFactory)
+        public ISelectionMonitor SelectionMonitor { get; }
+
+        public FileTailerViewModel([NotNull] ILogger logger,
+            [NotNull] ISchedulerProvider schedulerProvider,
+            [NotNull]  FileInfo fileInfo,
+            [NotNull]  IFileTailerFactory fileTailerFactory, 
+            [NotNull] SelectionMonitor selectionMonitor, 
+            [NotNull] IClipboardHandler clipboardHandler)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
+            if (selectionMonitor == null) throw new ArgumentNullException(nameof(selectionMonitor));
+            if (clipboardHandler == null) throw new ArgumentNullException(nameof(clipboardHandler));
+
+            SelectionMonitor = selectionMonitor;
+            CopyToClipboardCommand = new Command(()=> clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
+
+
+            //monitor matching lines and start index,
+            //SelectedItemsCount = selectionMonitor
+            //                .Selected.Connect().Count().ForBinding();
+
+            SelectedItemsCount = selectionMonitor
+                .Selected.Connect().QueryWhenChanged(collection=> collection.Count).ForBinding();
 
             //An observable which acts as a filter command
             var filterRequest = this.WhenValueChanged(vm => vm.SearchText).Throttle(TimeSpan.FromMilliseconds(125));
@@ -134,7 +154,8 @@ namespace TailBlazer.Views
                 .Buffer(TimeSpan.FromMilliseconds(250)).FlattenBufferResult()
                 .QueryWhenChanged(lines =>lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min())
                 .Subscribe(first=> FirstIndex= first);
-           
+
+
             _cleanUp = new CompositeDisposable(tailer,
                 LineCountText, 
                 loader,
@@ -145,10 +166,15 @@ namespace TailBlazer.Views
                 SearchHint,
                 ShouldHightlightMatchingText,
                 progressMonitor,
-                SelectionController,
-                Disposable.Create(_userScrollRequested.OnCompleted));
+                SelectedItemsCount,
+                Disposable.Create(() =>
+                {
+                    _userScrollRequested.OnCompleted();
+                    (SelectionMonitor as IDisposable)?.Dispose();
+                }));
         }
-        
+
+
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
         {
             if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));

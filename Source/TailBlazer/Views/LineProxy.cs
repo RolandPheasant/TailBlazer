@@ -13,13 +13,16 @@ namespace TailBlazer.Views
             .ThenByAscending(p => p.Line.LineInfo.Offset);
 
         public Line Line { get; }
-        public long Number => Line.LineInfo.Start;
+        public long Number { get; }
 
+        public int Index { get; }
         public string Text => Line.Text;
         public bool IsRecent { get; }
 
         public LineProxy(Line line)
         {
+            Number = line.LineInfo.Start;
+            Index = line.LineInfo.Index;
             Line = line;
             IsRecent = line.Timestamp.HasValue && DateTime.Now.Subtract(line.Timestamp.Value).TotalSeconds < 1;
         }
@@ -42,7 +45,7 @@ namespace TailBlazer.Views
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(Line, other.Line);
+            return Number == other.Number && Equals(Line, other.Line);
         }
 
         public override bool Equals(object obj)
@@ -55,7 +58,10 @@ namespace TailBlazer.Views
 
         public override int GetHashCode()
         {
-            return (Line != null ? Line.GetHashCode() : 0);
+            unchecked
+            {
+                return (Number.GetHashCode()*397) ^ (Line != null ? Line.GetHashCode() : 0);
+            }
         }
 
         public static bool operator ==(LineProxy left, LineProxy right)

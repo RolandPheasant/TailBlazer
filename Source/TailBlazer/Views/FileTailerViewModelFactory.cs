@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
+using TailBlazer.Infrastucture;
 
 
 namespace TailBlazer.Views
@@ -28,7 +29,9 @@ namespace TailBlazer.Views
             return new FileTailerViewModel(_logFactory.Create<FileTailerViewModel>(),
                 _objectProvider.Get<ISchedulerProvider>(),
                 fileInfo,
-                _objectProvider.Get<IFileTailerFactory>());
+                _objectProvider.Get<IFileTailerFactory>(),
+                 _objectProvider.Get<SelectionMonitor>(),
+                  _objectProvider.Get<IClipboardHandler>());
         }
     }
 }

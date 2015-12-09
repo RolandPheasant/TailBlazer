@@ -17,7 +17,8 @@ namespace TailBlazer.Infrastucture
             // Register against all the interfaces implemented
             // by this concrete class
             type.GetInterfaces()
-                .Where(@interface => @interface.Name == $"I{type.Name}")
+                .Where(@interface => @interface.Name == $"I{type.Name}" )
+                
                 .ForEach(@interface => registry.For(@interface).Use(type).Singleton());
         }
     }

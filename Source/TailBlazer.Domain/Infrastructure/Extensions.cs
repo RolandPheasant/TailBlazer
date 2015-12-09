@@ -83,7 +83,10 @@ namespace System.Collections.Generic
         public static string ToDelimited<T>(this IEnumerable<T> source, string delimiter=",")
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            return string.Join(delimiter, source.WithDelimiter(delimiter));
+            var array = source.AsArray();
+            if (!array.Any())
+                return string.Empty;
+            return string.Join(string.Empty, array.WithDelimiter(delimiter));
 
         }
 
