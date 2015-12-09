@@ -124,7 +124,8 @@
             <ListBox Grid.Row="1" 
                  ItemsSource="{Binding Lines}" 
                  FontFamily="Consolas"
-                 SelectionMode="Extended">
+                 SelectionMode="Extended"
+                 infrastucture:SelectorHelper.Binding="{Binding SelectionController}">
 
                 <ListBox.Template>
                 <ControlTemplate>

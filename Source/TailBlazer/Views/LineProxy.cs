@@ -5,7 +5,7 @@ using TailBlazer.Domain.FileHandling;
 
 namespace TailBlazer.Views
 {
-    public class LineProxy: IComparable<LineProxy>, IComparable
+    public class LineProxy: IComparable<LineProxy>, IComparable, IEquatable<LineProxy>
     {
 
         public static readonly IComparer<LineProxy> DefaultSort = SortExpressionComparer<LineProxy>
@@ -34,6 +34,45 @@ namespace TailBlazer.Views
         public int CompareTo(object obj)
         {
             return CompareTo((LineProxy) obj);
+        }
+
+        #region Equality
+
+        public bool Equals(LineProxy other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Equals(Line, other.Line);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((LineProxy) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return (Line != null ? Line.GetHashCode() : 0);
+        }
+
+        public static bool operator ==(LineProxy left, LineProxy right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(LineProxy left, LineProxy right)
+        {
+            return !Equals(left, right);
+        }
+
+        #endregion
+
+        public override string ToString()
+        {
+            return $"Line: {Line}";
         }
     }
 }

@@ -42,8 +42,8 @@
     <ApplicationIcon>tailblazer.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dragablz, Version=0.0.2.140, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dragablz.0.0.2.140\lib\net45\Dragablz.dll</HintPath>
+    <Reference Include="Dragablz, Version=0.0.2.143, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dragablz.0.0.2.143\lib\net45\Dragablz.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="DynamicData, Version=4.3.1.1090, Culture=neutral, processorArchitecture=MSIL">
@@ -124,6 +124,7 @@
     </ApplicationDefinition>
     <Compile Include="Infrastucture\ConsoleLogger.cs" />
     <Compile Include="Infrastucture\LogFactory.cs" />
+    <Compile Include="Infrastucture\SelectionController.cs" />
     <Compile Include="Views\FileDropContainer.cs" />
     <Compile Include="Views\FileDropMonitor.cs" />
     <Compile Include="Views\FileIcon.cs" />

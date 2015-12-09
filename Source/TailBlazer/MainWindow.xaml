@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TailBlazer"
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:dockablz="clr-namespace:Dragablz.Dockablz;assembly=Dragablz"
         xmlns:dragablz="clr-namespace:Dragablz;assembly=Dragablz"
@@ -31,11 +30,30 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/controls.buttons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToggleButton.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/materialdesign.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/MaterialDesign.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InverredBooleanToVisibilityConverter"/>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
+            <DataTemplate DataType="{x:Type infrastucture:HeaderContent}">
+                <DockPanel Focusable="True">
+                    <materialDesign:PopupBox Focusable="True"  DockPanel.Dock="Right">
+                        <TextBox Text="I want to be able to edit the title but cannot open the popup boc"></TextBox>
+                        </materialDesign:PopupBox>
+                        <TextBlock 
+                                DockPanel.Dock="Left"
+                                Margin="8 0 2 0" Text="{Binding Title}" />
+                </DockPanel>
+
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type infrastucture:ViewContainer}">
+                <ContentControl Margin="4" Content="{Binding Content}" />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type dragablz:HeaderedItemViewModel}">
+                <ContentControl Content="{Binding Content}" Margin="4 4 4 4" FontSize="14" />
+            </DataTemplate>
 
 
             <Canvas x:Key="appbar_github" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
@@ -90,9 +108,6 @@
     </controls:MetroWindow.LeftWindowCommands>
 
     <AdornerDecorator>
-
-
-
         <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
             <materialDesign:DrawerHost.LeftDrawerContent>
                 <TextBlock  Text="Under Development" Margin="12" FontSize="32"/>
@@ -101,53 +116,27 @@
             <Grid infrastucture:DependencyObjectHook.Receiver="{Binding DropMonitor}">
 
             <dockablz:Layout >
-                <dragablz:TabablzControl x:Name="InitialTabablzControl"
-                                    
-                 ShowDefaultCloseButton="True"
-                ClosingItemCallback="{Binding ClosingTabItemHandler}"
-                SelectedItem="{Binding Selected,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                ItemsSource="{Binding  Views}" >
-                    <dragablz:TabablzControl.InterTabController>
-                        <dragablz:InterTabController InterTabClient="{Binding InterTabClient}"  />
-                    </dragablz:TabablzControl.InterTabController>
-                    <dragablz:TabablzControl.CustomHeaderItemTemplate>
-                        <DataTemplate DataType="{x:Type infrastucture:ViewContainer}">
-                            <TextBlock Margin="8 0 2 0" Text="{Binding Title}" />
-                                <!--<TextBox Margin="8 0 2 0" Text="{Binding Title}" />-->
-                            </DataTemplate>
-                    </dragablz:TabablzControl.CustomHeaderItemTemplate>
-                    <TabControl.ContentTemplate>
-                        <DataTemplate DataType="{x:Type infrastucture:ViewContainer}">
-                            <ContentControl Margin="4" Content="{Binding Content}" />
-                        </DataTemplate>
-                    </TabControl.ContentTemplate>
-                </dragablz:TabablzControl>
+                    <dragablz:TabablzControl x:Name="InitialTabablzControl"
+                    HeaderMemberPath="Header"             
+                    ShowDefaultCloseButton="True"
+                    ClosingItemCallback="{Binding ClosingTabItemHandler}"
+                    SelectedItem="{Binding Selected,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding  Views}" >
+                        <dragablz:TabablzControl.InterTabController>
+                            <dragablz:InterTabController InterTabClient="{Binding InterTabClient}"  />
+                        </dragablz:TabablzControl.InterTabController>
+                    </dragablz:TabablzControl>
             </dockablz:Layout>
 
             <StackPanel 
-           Visibility="{Binding IsEmpty,Converter={StaticResource BooleanToVisibilityConverter}}"
+                Visibility="{Binding IsEmpty,Converter={StaticResource BooleanToVisibilityConverter}}"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
-            Orientation="Vertical">
+                Orientation="Vertical">
 
-                <TextBlock
-                FontSize="26"
-                HorizontalAlignment="Center"
-                Margin="0 0 0 4"
-                Text="Drag files here"/>
-
-                <views:FileIcon
-                BorderThickness="0"
-                Width="50" 
-                Height="50" 
-
-                Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-
-                <TextBlock 
-                    FontSize="26"
-                    Margin="0 4 0 0"
-                    Text="to open"
-                    HorizontalAlignment="Center"/>
+                <TextBlock FontSize="26" HorizontalAlignment="Center" Margin="0 0 0 4" Text="Drag files here"/>
+                <views:FileIcon BorderThickness="0" Width="50" Height="50" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                <TextBlock FontSize="26" Margin="0 4 0 0" Text="to open" HorizontalAlignment="Center"/>
 
             </StackPanel>
         </Grid>

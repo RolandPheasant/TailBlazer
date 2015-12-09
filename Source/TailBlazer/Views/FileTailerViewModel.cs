@@ -9,6 +9,7 @@ using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
+using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Views
 {
@@ -34,6 +35,8 @@ namespace TailBlazer.Views
         public IProperty<int> MatchedLineCount { get; }
         public IProperty<string> FileSizeText { get; }
         public IProperty<bool> IsLoading { get; }
+
+        public SelectionController<LineProxy> SelectionController { get; }= new SelectionController<LineProxy>();
 
         public FileTailerViewModel(ILogger logger,
             ISchedulerProvider schedulerProvider, 
@@ -79,11 +82,6 @@ namespace TailBlazer.Views
             
             //User feedback for when tailer is loading
             IsLoading = tailer.IsLoading.ForBinding();
-
-            //////User feedback lines count and filter matches
-            //LineCountText = tailer.TotalLines.CombineLatest(tailer.MatchedLines, (total, matched) => total == matched
-            //     ? $"{total.ToString("#,###")} lines"
-            //     : $"{matched.ToString("#,###0")} of {total.ToString("#,###")} lines").ForBinding();
 
 
             ////User feedback lines count and filter matches
@@ -147,6 +145,7 @@ namespace TailBlazer.Views
                 SearchHint,
                 ShouldHightlightMatchingText,
                 progressMonitor,
+                SelectionController,
                 Disposable.Create(_userScrollRequested.OnCompleted));
         }
         
