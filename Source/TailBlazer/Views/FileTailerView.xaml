@@ -17,7 +17,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ProgressBar.xaml" />
+                <ResourceDictionary Source="../Themes/Generic.xaml"></ResourceDictionary>
 
             </ResourceDictionary.MergedDictionaries>
 
@@ -110,9 +110,12 @@
             Visibility="{Binding IsLoading.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
             UniformCornerRadius="14" Padding="4"
                       VerticalAlignment="Center" HorizontalAlignment="Center" Margin="12 12 12 12">
-            <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" 
-                         Value="50"
-                         IsIndeterminate="True" />
+            <ProgressBar
+                Style="{StaticResource TailBlazerCircularProgressBar}" 
+                MinWidth="50"
+                MinHeight="50"
+                Value="50"
+                IsIndeterminate="True"/>
         </wpf:Card>
 
 
