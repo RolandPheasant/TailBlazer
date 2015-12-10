@@ -82,6 +82,7 @@
     <Compile Include="FileHandling\ILineProvider.cs" />
     <Compile Include="FileHandling\IndexEx.cs" />
     <Compile Include="FileHandling\IndexType.cs" />
+    <Compile Include="FileHandling\ITailCollection.cs" />
     <Compile Include="FileHandling\LineIndexType.cs" />
     <Compile Include="FileHandling\FileNotification.cs" />
     <Compile Include="FileHandling\FileNotificationType.cs" />
@@ -96,6 +97,8 @@
     <Compile Include="FileHandling\IndexCollection.cs" />
     <Compile Include="FileHandling\Indexer.cs" />
     <Compile Include="FileHandling\StreamReaderExtended.cs" />
+    <Compile Include="FileHandling\TailCollection.cs" />
+    <Compile Include="FileHandling\Tailer.cs" />
     <Compile Include="FileHandling\TailInfo.cs" />
     <Compile Include="Infrastructure\DynamicDataEx.cs" />
     <Compile Include="Infrastructure\EnumerableEx.cs" />

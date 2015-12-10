@@ -148,6 +148,7 @@
     <Compile Include="Views\ScrollChangedArgs.cs" />
     <Compile Include="Views\ScrollDirection.cs" />
     <Compile Include="Views\ScrollBoundsArgs.cs" />
+    <Compile Include="Views\SearchViewModel.cs" />
     <Compile Include="Views\SettingsIcon.cs" />
     <Compile Include="Views\TailBlazerIcon.cs" />
     <Compile Include="Views\SearchCollection.cs" />

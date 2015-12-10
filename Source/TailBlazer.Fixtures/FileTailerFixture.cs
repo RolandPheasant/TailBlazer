@@ -17,28 +17,28 @@ namespace TailBlazer.Fixtures
     public class FileTailerFixture
     {
 
-        [Fact]
-        public void AutoTail()
-        {
-            var scheduler  = new TestScheduler();
-            var textMatch = Observable.Return(FileSearchResult.None);
-            var autoTailer = Observable.Return(new ScrollRequest(10));
+      //  [Fact]
+        //public void AutoTail()
+        //{
+        //    var scheduler  = new TestScheduler();
+        //    var textMatch = Observable.Return(FileSearchResult.None);
+        //    var autoTailer = Observable.Return(new ScrollRequest(10));
 
-            using (var file = new TestFile())
-            {
-                file.Append( Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
+        //    using (var file = new TestFile())
+        //    {
+        //        file.Append( Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
 
-                using (var tailer = new FileTailer(file.Info, textMatch, autoTailer, new NullLogger(), scheduler))
-                {
-                    scheduler.AdvanceByMilliSeconds(250);
-                    tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(Enumerable.Range(91, 10));
-                    file.Append( Enumerable.Range(101, 10).Select(i => i.ToString()));
+        //        using (var tailer = new FileTailer(file.Info, textMatch, autoTailer, new NullLogger(), scheduler))
+        //        {
+        //            scheduler.AdvanceByMilliSeconds(250);
+        //            tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(Enumerable.Range(91, 10));
+        //            file.Append( Enumerable.Range(101, 10).Select(i => i.ToString()));
 
-                    scheduler.AdvanceByMilliSeconds(250);
-                    tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(Enumerable.Range(101, 10));
-                }
-            }
-        }
+        //            scheduler.AdvanceByMilliSeconds(250);
+        //            tailer.Lines.Items.Select(l => l.Number).ShouldAllBeEquivalentTo(Enumerable.Range(101, 10));
+        //        }
+        //    }
+        //}
 
         //[Fact]
         //public void WillNotApplyFilterWhenTextIsLessThan3Character()

@@ -110,12 +110,9 @@
             Visibility="{Binding IsLoading.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
             UniformCornerRadius="14" Padding="4"
                       VerticalAlignment="Center" HorizontalAlignment="Center" Margin="12 12 12 12">
-            <ProgressBar
-         
-                Style="{StaticResource MaterialDesignCircularProgressBar}" 
+            <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" 
                          Value="50"
-                         IsIndeterminate="True"                         
-                      />
+                         IsIndeterminate="True" />
         </wpf:Card>
 
 
@@ -132,7 +129,9 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto" MinWidth="175"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
@@ -157,53 +156,57 @@
                     </TextBox.InputBindings>
                 </TextBox>
 
-                <WrapPanel   
-                    Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter},ConverterParameter={StaticResource Zero}}"
-                    VerticalAlignment="Center"
-                    Margin="8 4 4 4" Grid.Column="2" 
-              
-                           Orientation="Horizontal">
 
-                    <ListBox Margin="4 0 0 0"
+                <TextBlock  Margin="4 0 0 0" Grid.Column="2" 
+                           VerticalAlignment="Center"
+                           Text="Select From:"></TextBlock>
+
+                <ListBox Margin="4 0 0 0" Grid.Column="3" 
                     SelectedItem="{Binding SearchCollection.Selected}"
                     ItemsSource="{Binding SearchCollection.Items}">
 
-                        <ListBox.ItemTemplate>
-                            <DataTemplate DataType="{x:Type local:SearchViewModel}">
-                                <Grid x:Name="Selection">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition  Width="Auto"/>
-                                        <ColumnDefinition  Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
+                    <ListBox.Template>
+                        <ControlTemplate>
+                            <ScrollViewer x:Name="ScrollViewer" 
+                                        VerticalScrollBarVisibility="Auto"
+                                        HorizontalScrollBarVisibility="Auto"
+                                        CanContentScroll="True"
+                                        Padding="{TemplateBinding Padding}"
+                                        Background="{TemplateBinding Background}" 
+                                        BorderBrush="Transparent" BorderThickness="0" 
+                                        IsTabStop="False">
+                                <ItemsPresenter/>
+                            </ScrollViewer>
+                        </ControlTemplate>
+                    </ListBox.Template>
 
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type local:SearchViewModel}">
+                            <Grid x:Name="Selection">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition  Width="Auto"/>
+                                    <ColumnDefinition  Width="Auto"/>
+                                </Grid.ColumnDefinitions>
 
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
 
-                                    <TextBlock>
+                                <TextBlock Margin="4 0 0 0">
                                             <Run 
+                                                
                                                 FontSize="12"
                                                 FontWeight="Bold"
                                                 Text="{Binding Text, Mode=OneWay}"/>
                                            
-                                            <Run Text="("/>
-                                            
-                                            <Run 
-                                                Text="{Binding  Count, StringFormat='{}{0:#,###0}'}"/>
+                
+                                            <Run Text="{Binding  Count, StringFormat='{}{0:#,###0}'}"/>
                                               <Run Text=")"/>
 
-                                    </TextBlock>
-
-                                    <!--<TextBlock  FontWeight="Bold"
-                                                    FontSize="12"
-                                                    Text="{Binding Text, Mode=OneWay}"/>
-                                        <TextBlock Margin="4 2 0 0" Grid.Row="0" Grid.Column="1" 
-                                                   
-                                                   Text="{Binding  Count, StringFormat='{}{0:#,###0}'}"/>-->
-                                    <ProgressBar  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                </TextBlock>
+                                <ProgressBar  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                                             
                                             Margin="0 4 0 0"            
                                             Width="{Binding ElementName=Selection, Path=Width}"    
@@ -215,61 +218,41 @@
                                             Minimum="0"
                                             IsIndeterminate="False"/>
 
-                                    <Button Grid.Row="0" Grid.RowSpan="2" Grid.Column="2"
+                                <Button Grid.Row="0" Grid.RowSpan="2" Grid.Column="2"
                                                 Margin="4 0 0 4"
                                             VerticalAlignment="Center"
                                                 Command="{Binding RemoveCommand}"
                                                 Style="{StaticResource CloseButtonStyle}"/>
-                                </Grid>
-                            </DataTemplate>
+                            </Grid>
+                        </DataTemplate>
 
-                        </ListBox.ItemTemplate>
+                    </ListBox.ItemTemplate>
 
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
 
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
-                                <Style.Setters>
-                                    <Setter Property="Padding" Value="4 0 4 0"/>
-                                    <Setter Property="Height" Value="36"/>
-                                </Style.Setters>
-
-                                <!--<Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsRecent}" Value="True">
-                                        <DataTrigger.EnterActions>
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Background).(SolidColorBrush.Color)" 
-                                                                               FromBrush="{StaticResource SecondaryAccentBrush}" 
-                                                                               Duration="0:0:5"/>
-                                                    <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Foreground).(SolidColorBrush.Color)" 
-                                                                               ToBrush="{StaticResource SecondaryAccentForegroundBrush}" 
-                                                                               Duration="0:0:5"/>
-                                                </Storyboard>
-                                            </BeginStoryboard>
-
-                                        </DataTrigger.EnterActions>
-                                    </DataTrigger>
-                                </Style.Triggers>-->
-                            </Style>
-                        </ListBox.ItemContainerStyle>
-                    </ListBox>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
+                            <Style.Setters>
+                                <Setter Property="Padding" Value="4 0 4 0"/>
+                                <Setter Property="Height" Value="36"/>
+                            </Style.Setters>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
 
 
-                    <Button ToolTip="Search options"
+                <Button Grid.Column="4" HorizontalAlignment="Left"
+                    ToolTip="Search options"
                                 Height="14" Width="14"
-                                VerticalAlignment="Top"
+                                VerticalAlignment="Center"
                                 Margin="2 2 0 2"  
                                 Style="{StaticResource SettingsButtonStyle}"/>
-
-                </WrapPanel>
-
                 <CheckBox
-                    Grid.Column="3" HorizontalAlignment="Right"
+                    Grid.Column="5" HorizontalAlignment="Right"
                       VerticalAlignment="Center"
                       IsChecked="{Binding AutoTail}"
                       Margin="0 0 6 0"
@@ -281,9 +264,7 @@
                  ItemsSource="{Binding Lines}" 
                  FontFamily="Consolas"
                  SelectionMode="Extended"
-                 infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}"
-            
-              >
+                 infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}" >
 
                 <ListBox.Template>
                     <ControlTemplate>
@@ -414,9 +395,7 @@
                     <TextBlock  
                         Margin="4 0 0 0"
                         Text="{Binding  MatchedLineCount.Value,StringFormat='\items={0}'}"
-                        VerticalAlignment="Center"
-                       />
-
+                        VerticalAlignment="Center"/>
 
 
                     <TextBlock  

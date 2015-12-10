@@ -63,9 +63,7 @@ namespace TailBlazer.Views
 
             SelectionMonitor = selectionMonitor;
             CopyToClipboardCommand = new Command(()=> clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
-            
             SelectedItemsCount = selectionMonitor.Selected.Connect().QueryWhenChanged(collection=> collection.Count).ForBinding();
-
             SearchCollection = new SearchCollection(tailCollection, schedulerProvider);
 
             //An observable which acts as a scroll command
@@ -94,7 +92,6 @@ namespace TailBlazer.Views
             //User feedback for when tailer is loading
             IsLoading = tailer.IsLoading.ForBinding();
             
-
             //User feedback to show file size
             FileSizeText = tailer.FileSize
                 .Select(size => size.FormatWithAbbreviation())
@@ -111,9 +108,8 @@ namespace TailBlazer.Views
 
             var selectedText = SearchCollection.SelectedText;
 
-
-            HightlightText = selectedText.ForBinding();
             //Only highlight search text when at least 3 letters have been entered
+            HightlightText = selectedText.ForBinding();
             ShouldHightlightMatchingText = selectedText
                 .Select(searchText => !string.IsNullOrEmpty(searchText) && searchText.Length >= 3)
                 .ForBinding();
@@ -161,9 +157,6 @@ namespace TailBlazer.Views
                 }));
         }
 
-
-
-
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
         {
             if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));
@@ -210,7 +203,6 @@ namespace TailBlazer.Views
             set { SetAndRaise(ref _firstIndex, value); }
         }
         
-
         public void Dispose()
         {
             _cleanUp.Dispose();

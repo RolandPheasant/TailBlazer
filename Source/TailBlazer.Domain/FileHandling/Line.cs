@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing.Text;
 
 namespace TailBlazer.Domain.FileHandling
@@ -11,10 +12,12 @@ namespace TailBlazer.Domain.FileHandling
         public DateTime? Timestamp { get;  }
         public LineInfo LineInfo { get;  }
 
+        private long Start { get; }
 
         public Line(int number, string text, DateTime? timestamp)
         {
             Number = number;
+            Start = number;
             Text = text;
             Timestamp = timestamp;
         }
@@ -28,8 +31,31 @@ namespace TailBlazer.Domain.FileHandling
             Timestamp = timestamp;
 
             Number = LineInfo.Line;
+            Start = LineInfo.Start;
             Index = LineInfo.Index;
         }
+
+        private sealed class TextStartEqualityComparer : IEqualityComparer<Line>
+        {
+            public bool Equals(Line x, Line y)
+            {
+                if (ReferenceEquals(x, y)) return true;
+                if (ReferenceEquals(x, null)) return false;
+                if (ReferenceEquals(y, null)) return false;
+                if (x.GetType() != y.GetType()) return false;
+                return string.Equals(x.Text, y.Text) && x.Start == y.Start;
+            }
+
+            public int GetHashCode(Line obj)
+            {
+                unchecked
+                {
+                    return ((obj.Text?.GetHashCode() ?? 0)*397) ^ obj.Start.GetHashCode();
+                }
+            }
+        }
+
+        public static IEqualityComparer<Line> TextStartComparer { get; } = new TextStartEqualityComparer();
 
         #region Equality
 
