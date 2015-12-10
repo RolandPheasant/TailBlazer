@@ -38,11 +38,8 @@ namespace TailBlazer.Views
         public IProperty<bool> IsLoading { get; }
         public IProperty<string> HightlightText { get; }
         public ICommand CopyToClipboardCommand { get; }
-
         public ICommand KeepSearchCommand { get; }
-
         public ISelectionMonitor SelectionMonitor { get; }
-
         public SearchCollection SearchCollection { get; }
 
 

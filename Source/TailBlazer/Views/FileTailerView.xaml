@@ -157,10 +157,12 @@
                 </TextBox>
 
 
-                <TextBlock     Margin="4 0 0 0" Grid.Column="2" 
-                    Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
-                    VerticalAlignment="Center"
-                    Text="Select Filter:"></TextBlock>
+                <TextBlock     Margin="4 0 0 0" 
+                               Opacity="0.55"
+                               Grid.Column="2" 
+                            Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
+                            VerticalAlignment="Center"
+                            Text="Select Filter:"></TextBlock>
 
                 <ListBox      Margin="4 0 0 0" Grid.Column="3"
                     Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
@@ -195,7 +197,7 @@
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-
+                                
                                 <TextBlock Margin="4 0 0 0">
                                             <Run FontSize="12"
                                                 FontWeight="Bold"
@@ -207,7 +209,6 @@
                                 </TextBlock>
                                 
                                 <ProgressBar  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                                            
                                             Margin="0 4 0 0"            
                                             Width="{Binding ElementName=Selection, Path=Width}"    
                                             Orientation="Horizontal"
@@ -218,13 +219,14 @@
                                             Minimum="0"
                                             IsIndeterminate="False"/>
 
+                                
                                 <Button Visibility="{Binding IsDefault, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
-                                    Grid.Row="0" Grid.RowSpan="2" Grid.Column="2"
-                                          
+                                        Grid.Row="0"  Grid.Column="2"
+                                        ToolTip="{Binding Text, StringFormat='Removed {0}'}"
                                         Margin="4 0 0 4"
-                                            VerticalAlignment="Center"
-                                                Command="{Binding RemoveCommand}"
-                                                Style="{StaticResource CloseButtonStyle}"/>
+                                        VerticalAlignment="Center"
+                                        Command="{Binding RemoveCommand}"
+                                        Style="{StaticResource CloseButtonStyle}"/>
                             </Grid>
                         </DataTemplate>
 
@@ -247,12 +249,16 @@
                 </ListBox>
 
 
-                <Button Grid.Column="4" HorizontalAlignment="Left"
+                <!--<wpf:PopupBox Grid.Column="4" StaysOpen="True" StaysOpenOnEdit="True">
+                    <TextBox   Text="XXX"></TextBox>
+                </wpf:PopupBox>-->
+
+                <!--<Button Grid.Column="4" HorizontalAlignment="Left"
                     ToolTip="Search options"
                                 Height="14" Width="14"
                                 VerticalAlignment="Center"
                                 Margin="2 2 0 2"  
-                                Style="{StaticResource SettingsButtonStyle}"/>
+                                Style="{StaticResource SettingsButtonStyle}"/>-->
                 <CheckBox
                     Grid.Column="5" HorizontalAlignment="Right"
                       VerticalAlignment="Center"
@@ -371,7 +377,6 @@
                        Visibility="Visible"
             Height="26"
             Background="{StaticResource PrimaryHueMidBrush}"
-       
             Margin = "-4 0 -4 -4">
 
 
@@ -383,32 +388,39 @@
                         <Setter Property="Foreground" Value="{StaticResource PrimaryHueMidForegroundBrush}"/>
                     </Style>
                 </Grid.Resources>
+                
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-                <StackPanel   Margin="0 0 6 0"
+                <TextBlock Text="DEBUGGING INFO:"/>
+
+                <StackPanel Grid.Column="1" Margin="0 0 6 0"
                      Orientation="Horizontal" 
                      HorizontalAlignment="Right">
 
                     <TextBlock  
                         Margin="4 0 0 0"
-                        Text="{Binding SelectedItemsCount.Value,StringFormat='\xx{0} items selected'}"
+                        Text="{Binding SelectedItemsCount.Value,StringFormat='\Selected Items={0} '}"
                         VerticalAlignment="Center"
                         MinWidth="125"/>
 
                     <TextBlock  
                         Margin="4 0 0 0"
-                        Text="{Binding  MatchedLineCount.Value,StringFormat='\items={0}'}"
+                        Text="{Binding  MatchedLineCount.Value,StringFormat='\Count={0}'}"
                         VerticalAlignment="Center"/>
 
 
                     <TextBlock  
                         Margin="4 0 0 0"
-                       Text="{Binding FirstIndex,StringFormat='\first={0}'}"
+                       Text="{Binding FirstIndex,StringFormat='\First Index={0}'}"
                         VerticalAlignment="Center"
                         MinWidth="125"/>
 
                     <TextBlock  
                         Margin="4 0 0 0"
-                        Text="{Binding PageSize,StringFormat='\size={0}'}"
+                        Text="{Binding PageSize,StringFormat='\Page Size={0}'}"
                         VerticalAlignment="Center"
                         MinWidth="125"/>
 

@@ -17,11 +17,9 @@ namespace TailBlazer.Views
         private int _segments;
         private int _segmentsSearched;
 
-
-
         public ICommand  RemoveCommand { get; }
 
-        public string Text => _tail.SearchText;
+        public string Text => _tail.SearchText.ToUpper();
 
         public bool IsDefault => _tail.IsDefault;
 
