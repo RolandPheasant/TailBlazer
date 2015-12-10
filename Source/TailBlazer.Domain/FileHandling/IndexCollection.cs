@@ -8,7 +8,6 @@ namespace TailBlazer.Domain.FileHandling
 {
     public class IndexCollection: ILineProvider
     {
-
         public int Count { get; }
         public int Diff { get; }
         public bool IsEmpty => Count != 0;

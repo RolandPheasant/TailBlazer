@@ -15,6 +15,8 @@ using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Views
 {
+
+
     public class FileTailerViewModel: AbstractNotifyPropertyChanged, IDisposable, IScrollReceiver
     {
         private readonly IDisposable _cleanUp;
@@ -41,31 +43,35 @@ namespace TailBlazer.Views
 
         public ICommand CopyToClipboardCommand { get; }
 
+        public ICommand KeepSearchCommand { get; }
+
         public ISelectionMonitor SelectionMonitor { get; }
+
+        public SearchCollection SearchCollection { get; }
+
 
         public FileTailerViewModel([NotNull] ILogger logger,
             [NotNull] ISchedulerProvider schedulerProvider,
-            [NotNull]  FileInfo fileInfo,
-            [NotNull]  IFileTailerFactory fileTailerFactory, 
+            [NotNull] FileInfo fileInfo,
+            [NotNull] IFileTailerFactory fileTailerFactory, 
             [NotNull] ISelectionMonitor selectionMonitor, 
-            [NotNull] IClipboardHandler clipboardHandler)
+            [NotNull] IClipboardHandler clipboardHandler, 
+            [NotNull] ITailCollection tailCollection)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
             if (selectionMonitor == null) throw new ArgumentNullException(nameof(selectionMonitor));
             if (clipboardHandler == null) throw new ArgumentNullException(nameof(clipboardHandler));
+            if (tailCollection == null) throw new ArgumentNullException(nameof(tailCollection));
 
             SelectionMonitor = selectionMonitor;
             CopyToClipboardCommand = new Command(()=> clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
-
-
-            //monitor matching lines and start index,
-            //SelectedItemsCount = selectionMonitor
-            //                .Selected.Connect().Count().ForBinding();
-
+            
             SelectedItemsCount = selectionMonitor
                 .Selected.Connect().QueryWhenChanged(collection=> collection.Count).ForBinding();
+
+            SearchCollection = new SearchCollection(tailCollection, schedulerProvider);
 
             //An observable which acts as a filter command
             var filterRequest = this.WhenValueChanged(vm => vm.SearchText).Throttle(TimeSpan.FromMilliseconds(125));
@@ -80,15 +86,20 @@ namespace TailBlazer.Views
                         .ObserveOn(schedulerProvider.Background)
                         .DistinctUntilChanged();
 
-            var search = filterRequest.Select(searchText =>
-            {
-                if (string.IsNullOrEmpty(searchText) || searchText.Length < 3)
-                    return Observable.Return(FileSearchResult.None);
 
-                return fileInfo.Search(s => s.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+            var latest = fileInfo.Search(s => s.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
 
-            }).Switch()
+            var search = filterRequest.Select(searchText => !searchText.IsLongerThanOrEqualTo(3)
+                                                                ? Observable.Return(FileSearchResult.None)
+                                                                : latest).Switch()
             .Replay(1).RefCount();
+
+
+            //tailer is the main object used to tail, scroll and filter in a file
+            var tailer = fileTailerFactory.Create(fileInfo, search, scroller);
+
+            //command to add the current search to the tail collection
+            KeepSearchCommand = new Command(()=> tailCollection.Add(SearchText, latest),()=> SearchText.IsLongerThanOrEqualTo(3));
 
             var progressMonitor = search.Subscribe(result =>
             {
@@ -97,14 +108,14 @@ namespace TailBlazer.Views
                 SegmentsSearched = result.SegmentsCompleted;
             });
 
-            //tailer is the main object used to tail, scroll and filter in a file
-            var tailer = fileTailerFactory.Create(fileInfo, search, scroller);
+
+            tailCollection.Add("<No Filter>", tailer.All);
+
             
             //User feedback for when tailer is loading
             IsLoading = tailer.IsLoading.ForBinding();
-
-
-            ////User feedback lines count and filter matches
+            
+            //User feedback lines count and filter matches
             LineCountText = tailer.TotalLines.CombineLatest(search, (total, matched) =>
             {
                 if (matched.IsEmpty) return $"{total.ToString("#,###")} lines";
@@ -114,9 +125,7 @@ namespace TailBlazer.Views
                         ? $"{limited.Maximum.ToString("#,###0")}+ of {total.ToString("#,###")} lines" 
                         : $"{matched.Count.ToString("#,###0")} of {total.ToString("#,###")} lines";
             }).ForBinding();
-
-
-
+            
             //User feedback to show file size
             FileSizeText = tailer.FileSize
                 .Select(size => size.FormatWithAbbreviation())
@@ -127,9 +136,8 @@ namespace TailBlazer.Views
             SearchHint = this.WhenValueChanged(vm => vm.SearchText)
                             .Select(text =>
                             {
-                                if (string.IsNullOrEmpty(text))
-                                    return "Type to search";
-                                return text.Length < 3 ? "Enter at least 3 characters" : "Filter applied";
+                                if (string.IsNullOrEmpty(text)) return "Type to search";
+                                return text.Length < 3 ? "Enter at least 3 characters" : "Hit enter to search";
                             }).ForBinding();
 
             //Only highlight search text when at least 3 letters have been entered
@@ -167,6 +175,7 @@ namespace TailBlazer.Views
                 ShouldHightlightMatchingText,
                 progressMonitor,
                 SelectedItemsCount,
+                tailCollection,
                 Disposable.Create(() =>
                 {
                     _userScrollRequested.OnCompleted();

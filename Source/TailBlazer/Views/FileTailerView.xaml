@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:TailBlazer.Views"
              xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
-            x:Name="Control"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             x:Name="Control"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:FileTailerViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="400" d:DesignWidth="400">
@@ -22,6 +23,46 @@
 
             <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InverredBooleanToVisibilityConverter"/>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <infrastucture:NotEqualsToVisibilityConverter x:Key="NotEqualsToVisibilityConverter"/>
+            <system:Int32 x:Key="Zero">0</system:Int32>
+
+
+            <Style TargetType="{x:Type Button}" x:Key="SettingsButtonStyle" BasedOn="{StaticResource MaterialDesignMenuCommandButtonStyle}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Grid>
+                                <Ellipse Width="{TemplateBinding Width}"
+                                 Height="{TemplateBinding Height}"
+                                 Fill="{TemplateBinding Background}"/>
+                                <local:SettingsIcon  Width="12" Height="12"/>
+                                <!--<Path x:Name="Path"
+                              Data="M0.5,71 L70,0.5 M0.5,1 L70,70.5" 
+                              Width="6" Height="6"
+                              Stretch="Uniform"
+                              Stroke="{TemplateBinding Foreground}"
+                              StrokeThickness="1.5"
+                              StrokeStartLineCap="Square" 
+                              StrokeEndLineCap="Square"
+                              SnapsToDevicePixels="True" />-->
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
+                <Setter Property="Width" Value="22" />
+                <Setter Property="Height" Value="22" />
+                <Setter Property="Margin" Value="4 0 2 0" />
+                <Setter Property="Opacity" Value=".75" />
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="true">
+                        <Setter Property="Background" Value="{DynamicResource PrimaryHueLightBrush}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource PrimaryHueLightForegroundBrush}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
 
         </ResourceDictionary>
     </Control.Resources>
@@ -43,6 +84,7 @@
         <Grid    Visibility="{Binding IsLoading.Value, Converter={StaticResource InverredBooleanToVisibilityConverter}}"
 >
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
@@ -75,7 +117,11 @@
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     VerticalAlignment="Center"
-                    MinWidth="175"/>
+                    MinWidth="175">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding KeepSearchCommand}"/>
+                    </TextBox.InputBindings>
+                </TextBox>
 
                 <Grid Grid.Column="2"  
                       HorizontalAlignment="Left"
@@ -121,15 +167,56 @@
                       >Follow tail</CheckBox>
         </Grid>
 
-            <ListBox Grid.Row="1" 
+            <StackPanel Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter},ConverterParameter={StaticResource Zero}}"
+                Margin="8 4 4 4"
+                Grid.Row="1"  
+                Orientation="Horizontal">
+
+                <TextBlock Text="Select to switch:" VerticalAlignment="Center"/>
+                
+                <ListBox Margin="4 0 0 0"
+                    SelectedItem="{Binding SearchCollection.Selected}"
+                    ItemsSource="{Binding SearchCollection.Items}">
+                    
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type local:SearchViewModel}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition  Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="{Binding Text, Mode=OneWay}"/>
+                                <TextBlock Margin="4 0 0 0" Grid.Column="1" Text="{Binding  Count, StringFormat='{}{0:#,###0}'}"/>
+                            </Grid>
+                        </DataTemplate>
+
+                    </ListBox.ItemTemplate>
+
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListBox>
+
+
+                <Button 
+                    ToolTip="Search options"
+                    Margin="6 2 0 2"  Style="{StaticResource SettingsButtonStyle}"/>
+
+                
+            </StackPanel>
+            
+            <ListBox Grid.Row="2" 
                  ItemsSource="{Binding Lines}" 
                  FontFamily="Consolas"
                  SelectionMode="Extended"
                  infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}">
 
                 <ListBox.Template>
-                <ControlTemplate>
-                    <ScrollViewer x:Name="ScrollViewer" 
+                    <ControlTemplate>
+                        <ScrollViewer x:Name="ScrollViewer" 
                                         VerticalScrollBarVisibility="Auto"
                                         HorizontalScrollBarVisibility="Auto"
                                         CanContentScroll="True"
@@ -137,26 +224,26 @@
                                         Background="{TemplateBinding Background}" 
                                         BorderBrush="Transparent" BorderThickness="0" 
                                         IsTabStop="False">
-                        <ItemsPresenter/>
-                    </ScrollViewer>
-                </ControlTemplate>
-            </ListBox.Template>
+                            <ItemsPresenter/>
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </ListBox.Template>
 
-            <ListBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <local:VirtualScrollPanel ItemHeight="22"
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <local:VirtualScrollPanel ItemHeight="22"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
                                                 TotalItems="{Binding MatchedLineCount.Value}"/>
-                </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
 
 
-            <ListBox.InputBindings>
-                <KeyBinding Key="C" Modifiers="Control" Command="{Binding CopyToClipboardCommand}"/>
-            </ListBox.InputBindings>
+                <ListBox.InputBindings>
+                    <KeyBinding Key="C" Modifiers="Control" Command="{Binding CopyToClipboardCommand}"/>
+                </ListBox.InputBindings>
 
-            <ListBox.ContextMenu>
+                <ListBox.ContextMenu>
                     <ContextMenu>
 
                         <MenuItem Header="_Copy" 
@@ -170,7 +257,7 @@
                                     </Canvas>
                                 </Viewbox>
                             </MenuItem.Icon>
-    
+
 
                         </MenuItem>
                     </ContextMenu>
@@ -182,17 +269,17 @@
                 </ListBox.ContextMenu>
 
                 <ListBox.ItemTemplate>
-                    
-      
-                <DataTemplate DataType="{x:Type local:LineProxy}">
-                    <Grid >
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="{Binding Index, Mode=OneWay}" Visibility="Collapsed" Opacity="0.55" MinWidth="25"/>
-                        <infrastucture:SearchableTextControl Grid.Column="1" 
+
+                    <DataTemplate DataType="{x:Type local:LineProxy}">
+                        <Grid >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="{Binding Index, Mode=OneWay}" Visibility="Collapsed" Opacity="0.55" MinWidth="25"/>
+                            <infrastucture:SearchableTextControl Grid.Column="1" 
                                                              Margin="6 0 0 0"   
                                                             IsHighlight="{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"  
                                                             IsMatchCase="False"
@@ -200,45 +287,45 @@
                                                             HighlightBackground="{StaticResource SecondaryAccentBrush}"
                                                             HighlightForeground="{StaticResource SecondaryAccentForegroundBrush}"
                                                             Text="{Binding Text}"/>
-                    </Grid>
-                </DataTemplate>
+                        </Grid>
+                    </DataTemplate>
                 </ListBox.ItemTemplate>
 
 
                 <ListBox.ItemContainerStyle>
-                <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
-                    <Style.Setters>
-                        <Setter Property="Padding" Value="0"/>
-                        <Setter Property="Height" Value="22"/>
-                    </Style.Setters>
-                    
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsRecent}" Value="True">
-                            <DataTrigger.EnterActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Background).(SolidColorBrush.Color)" 
+                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
+                        <Style.Setters>
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Height" Value="22"/>
+                        </Style.Setters>
+
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsRecent}" Value="True">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Background).(SolidColorBrush.Color)" 
                                                                                FromBrush="{StaticResource SecondaryAccentBrush}" 
                                                                                Duration="0:0:5"/>
-                                        <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Foreground).(SolidColorBrush.Color)" 
+                                            <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Foreground).(SolidColorBrush.Color)" 
                                                                                ToBrush="{StaticResource SecondaryAccentForegroundBrush}" 
                                                                                Duration="0:0:5"/>
-                                    </Storyboard>
-                                </BeginStoryboard>
+                                        </Storyboard>
+                                    </BeginStoryboard>
 
-                            </DataTrigger.EnterActions>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </ListBox.ItemContainerStyle>
+                                </DataTrigger.EnterActions>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.ItemContainerStyle>
 
-        </ListBox>
-
+            </ListBox>
             <!--This is for debugging.Just change visibility for more info-->
-            <Grid  Visibility="Collapsed"
+            <Grid      Grid.Row="3"
+                       Visibility="Collapsed"
             Height="26"
             Background="{StaticResource PrimaryHueMidBrush}"
-            Grid.Row="2"
+       
             Margin = "-4 0 -4 -4">
 
 
@@ -254,7 +341,7 @@
                 <StackPanel   Margin="0 0 6 0"
                      Orientation="Horizontal" 
                      HorizontalAlignment="Right">
-                    
+
                     <TextBlock  
                         Margin="4 0 0 0"
                         Text="{Binding SelectedItemsCount.Value,StringFormat='\xx{0} items selected'}"
@@ -269,19 +356,16 @@
                         MinWidth="125"/>
 
                     <TextBlock  
-                    Margin="4 0 0 0"
-                    Text="{Binding PageSize,StringFormat='\size={0}'}"
-                    VerticalAlignment="Center"
-                    MinWidth="125"/>
+                        Margin="4 0 0 0"
+                        Text="{Binding PageSize,StringFormat='\size={0}'}"
+                        VerticalAlignment="Center"
+                        MinWidth="125"/>
 
 
                     <TextBlock Margin="4 4 0 4" Text="{Binding FileSizeText.Value}" />
 
                 </StackPanel>
-
             </Grid>
-
-
         </Grid>
 
     </Grid>

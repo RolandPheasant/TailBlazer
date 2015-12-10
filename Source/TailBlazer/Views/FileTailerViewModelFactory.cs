@@ -26,12 +26,14 @@ namespace TailBlazer.Views
         public FileTailerViewModel Create(FileInfo fileInfo)
         {
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
+
             return new FileTailerViewModel(_logFactory.Create<FileTailerViewModel>(),
                 _objectProvider.Get<ISchedulerProvider>(),
                 fileInfo,
                 _objectProvider.Get<IFileTailerFactory>(),
-                 _objectProvider.Get<SelectionMonitor>(),
-                  _objectProvider.Get<IClipboardHandler>());
+                _objectProvider.Get<SelectionMonitor>(),
+                _objectProvider.Get<IClipboardHandler>(),
+                _objectProvider.Get<ITailCollection>());
         }
     }
 }

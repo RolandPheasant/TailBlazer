@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using StructureMap.Configuration.DSL;
+using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
 using ILogger = TailBlazer.Domain.Infrastructure.ILogger;
 
@@ -19,14 +20,18 @@ namespace TailBlazer.Infrastucture
             For<ILogger>().Use<Log4NetLogger>().Ctor<Type>("type").Is(x => x.RootType).AlwaysUnique();
 
             For<IAttachedListBox>().Use<SelectionMonitor>();
-            //For<IClipboardHandler>().Use<ClipboardHandler>();
+            For<ITailCollection>().Use<TailCollection>();
 
             Scan(scanner =>
             {
                 scanner.ExcludeType<ILogger>();
-                scanner.ExcludeType<SelectionMonitor>();
 
+                //to do, need a auto-exclude these AppConventions
+                scanner.ExcludeType<SelectionMonitor>();
+                scanner.ExcludeType<TailCollection>();
                 
+
+
               //  scanner.ExcludeType<ISelectionMonitor>();
                 scanner.LookForRegistries();
                 scanner.Convention<AppConventions>();
