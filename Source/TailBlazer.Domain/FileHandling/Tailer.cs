@@ -7,14 +7,15 @@ namespace TailBlazer.Domain.FileHandling
     {
         public string SearchText { get;  }
         public IObservable<ILineProvider> Latest { get;  }
+        public bool IsDefault { get;  }
 
-
-        public Tailer([NotNull] string searchText, [NotNull] IObservable<ILineProvider> latest)
+        public Tailer([NotNull] string searchText, [NotNull] IObservable<ILineProvider> latest, bool isDefault)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
             if (latest == null) throw new ArgumentNullException(nameof(latest));
             SearchText = searchText;
             Latest = latest;
+            IsDefault = isDefault;
         }
         
         #region Equality

@@ -21,11 +21,11 @@ namespace TailBlazer.Domain.FileHandling
             _cleanUp = new CompositeDisposable(_searches, Tails);
         }
 
-        public void Add([NotNull] string searchText, [NotNull] IObservable<ILineProvider> latest)
+        public void Add([NotNull] string searchText, [NotNull] IObservable<ILineProvider> latest, bool isDefault = false)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
             if (latest == null) throw new ArgumentNullException(nameof(latest));
-            _searches.AddOrUpdate(new Tailer(searchText, latest));
+            _searches.AddOrUpdate(new Tailer(searchText, latest, isDefault));
         }
 
         public void Remove(string searchText)

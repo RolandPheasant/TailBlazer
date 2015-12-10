@@ -21,7 +21,7 @@
 
             </ResourceDictionary.MergedDictionaries>
 
-            <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InverredBooleanToVisibilityConverter"/>
+            <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"/>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <infrastucture:NotEqualsToVisibilityConverter x:Key="NotEqualsToVisibilityConverter"/>
             <system:Int32 x:Key="Zero">0</system:Int32>
@@ -116,7 +116,7 @@
         </wpf:Card>
 
 
-        <Grid    Visibility="{Binding IsLoading.Value, Converter={StaticResource InverredBooleanToVisibilityConverter}}" Margin="0"
+        <Grid    Visibility="{Binding IsLoading.Value, Converter={StaticResource InvertedBooleanToVisibilityConverter}}" Margin="0"
 >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -128,7 +128,7 @@
             <Grid Margin="0 4 0 4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto" MinWidth="175"/>
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
@@ -157,11 +157,13 @@
                 </TextBox>
 
 
-                <TextBlock  Margin="4 0 0 0" Grid.Column="2" 
-                           VerticalAlignment="Center"
-                           Text="Select From:"></TextBlock>
+                <TextBlock     Margin="4 0 0 0" Grid.Column="2" 
+                    Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
+                    VerticalAlignment="Center"
+                    Text="Select Filter:"></TextBlock>
 
-                <ListBox Margin="4 0 0 0" Grid.Column="3" 
+                <ListBox      Margin="4 0 0 0" Grid.Column="3"
+                    Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
                     SelectedItem="{Binding SearchCollection.Selected}"
                     ItemsSource="{Binding SearchCollection.Items}">
 
@@ -195,17 +197,15 @@
                                 </Grid.RowDefinitions>
 
                                 <TextBlock Margin="4 0 0 0">
-                                            <Run 
-                                                
-                                                FontSize="12"
+                                            <Run FontSize="12"
                                                 FontWeight="Bold"
+                                                BaselineAlignment="Bottom"
                                                 Text="{Binding Text, Mode=OneWay}"/>
-                                           
-                
-                                            <Run Text="{Binding  Count, StringFormat='{}{0:#,###0}'}"/>
-                                              <Run Text=")"/>
-
+                                    
+                                            <Run BaselineAlignment="Bottom"
+                                                Text="{Binding  Count, StringFormat='{}{0:#,###0}'}"/>
                                 </TextBlock>
+                                
                                 <ProgressBar  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                                             
                                             Margin="0 4 0 0"            
@@ -218,8 +218,10 @@
                                             Minimum="0"
                                             IsIndeterminate="False"/>
 
-                                <Button Grid.Row="0" Grid.RowSpan="2" Grid.Column="2"
-                                                Margin="4 0 0 4"
+                                <Button Visibility="{Binding IsDefault, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
+                                    Grid.Row="0" Grid.RowSpan="2" Grid.Column="2"
+                                          
+                                        Margin="4 0 0 4"
                                             VerticalAlignment="Center"
                                                 Command="{Binding RemoveCommand}"
                                                 Style="{StaticResource CloseButtonStyle}"/>

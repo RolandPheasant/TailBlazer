@@ -132,11 +132,11 @@ namespace TailBlazer.Views
                 .QueryWhenChanged(lines =>lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min())
                 .Subscribe(first=> FirstIndex= first);
 
+            //add a search for all
             tailCollection.Add("<All>", fileInfo.WatchFile()
                                                     .DistinctUntilChanged()
                                                     .TakeWhile(notification => notification.Exists).Repeat()
-                                                    .Index()
-                              );
+                                                    .Index(),true);
 
             _cleanUp = new CompositeDisposable(tailer,
                 loader,

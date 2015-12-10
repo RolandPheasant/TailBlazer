@@ -17,9 +17,13 @@ namespace TailBlazer.Views
         private int _segments;
         private int _segmentsSearched;
 
+
+
         public ICommand  RemoveCommand { get; }
 
         public string Text => _tail.SearchText;
+
+        public bool IsDefault => _tail.IsDefault;
 
         public IObservable<ILineProvider> Latest => _tail.Latest;
 

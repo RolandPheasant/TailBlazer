@@ -7,7 +7,7 @@ namespace TailBlazer.Domain.FileHandling
     {
         IObservableCache<Tailer, string> Tails { get; }
 
-        void Add(string searchText, IObservable<ILineProvider> latest);
+        void Add(string searchText, IObservable<ILineProvider> latest, bool isDefault=false);
         void Remove(string searchText);
     }
 }
