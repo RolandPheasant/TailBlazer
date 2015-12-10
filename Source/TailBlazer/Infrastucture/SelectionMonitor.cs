@@ -17,9 +17,9 @@ namespace TailBlazer.Infrastucture
     /// Tail Blazer is fast because it uses true data virtualisation. However this causes a huge headache
     /// when trying to copy and paste items which are selected but no longer visible to the clip-board
     /// 
-    /// This drawn out and unsophisticated cope attempts to deal with that. 
+    /// This drawn out and unsophisticated code attempts to deal with that. 
     /// 
-    /// BTW: I hear you shout this should be an abstraction but frankly I cannot be bothered when (as this is such a specialisation).
+    /// BTW: I hear you shout this should be an abstraction but frankly I cannot be bothered (as this is such a specialisation).
     /// </summary>
     public class SelectionMonitor : IDisposable, ISelectionMonitor 
     {
@@ -67,7 +67,7 @@ namespace TailBlazer.Infrastucture
                 .ToObservableChangeSet()
                 .Publish();
 
-            //Re-select and selected items which are scrolled back into view
+            //Re-select any selected items which are scrolled back into view
             var itemsAdded = dataSource.WhereReasonsAre(ListChangeReason.Add,ListChangeReason.AddRange)
                 .Subscribe(changes =>
                 {
@@ -81,7 +81,7 @@ namespace TailBlazer.Infrastucture
                     }
                 });
 
-            //monitor items which have moved off screen [store these for off screnn multi-select]
+            //monitor items which have moved off screen [store these for off screen multi-select]
             var itemsRemoved = dataSource.WhereReasonsAre(ListChangeReason.Remove, ListChangeReason.RemoveRange,ListChangeReason.Clear)
                 .Subscribe(changes =>
                 {
