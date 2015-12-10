@@ -115,26 +115,30 @@ namespace TailBlazer.Domain.FileHandling
         }
     }
 
-    public class FileTailer: IDisposable
+    public class FileTailer : IDisposable
     {
         private readonly IDisposable _cleanUp;
-        public IObservable<int> TotalLines { get;  }
-        public IObservable<int> MatchedLines { get; }
+        public IObservable<int> TotalLines { get; }
+        //public IObservable<int> MatchedLines { get; }
         public IObservable<long> FileSize { get; }
         public IObservableList<Line> Lines { get; }
+
         public IObservable<bool> IsLoading { get; }
         public IObservable<ILineProvider> Latest { get; }
 
-        public IObservable<ILineProvider> All { get; }
+       // public IObservable<ILineProvider> All { get; }
+
+
+
 
         public FileTailer(FileInfo file,
-                IObservable<FileSearchResult> filter,
+                IObservable<ILineProvider> latest,
                 IObservable<ScrollRequest> scrollRequest,
                 ILogger logger,
                 IScheduler scheduler = null)
         {
             if (file == null) throw new ArgumentNullException(nameof(file));
-            if (filter == null) throw new ArgumentNullException(nameof(filter));
+            if (latest == null) throw new ArgumentNullException(nameof(latest));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
 
             logger.Info($"Constructing file tailer for {file.FullName}");
@@ -143,23 +147,23 @@ namespace TailBlazer.Domain.FileHandling
             Lines = lines.AsObservableList();
 
             var locker = new object();
-            scrollRequest = scrollRequest.Synchronize(locker); 
-            
+            scrollRequest = scrollRequest.Synchronize(locker);
+
             var fileWatcher = file.WatchFile(scheduler: scheduler)
                             .DistinctUntilChanged()
                             .TakeWhile(notification => notification.Exists).Repeat()
                             .Replay(1).RefCount();
 
             var indexer = fileWatcher.Index().Replay(1).RefCount();
-            
-            //compare latest lines and latest filter and only take the filtered results it is not empty
-            var latestLines = indexer.Cast<ILineProvider>().Synchronize(locker);
-            var latestFilter = filter.Cast<ILineProvider>().Synchronize(locker); 
-            var latest = latestLines.CombineLatest(latestFilter, (l, f) => f.IsEmpty ? l : f);
 
-            All = latestLines;
+            //compare latest lines and latest filter and only take the filtered results it is not empty
+            var latestLines = indexer.Synchronize(locker);
+          //  var latestFilter = filter.Cast<ILineProvider>().Synchronize(locker);
+          //  var latest = latestLines.CombineLatest(latestFilter, (l, f) => f.IsEmpty ? l : f);
+
+            //All = latestLines;
             Latest = latest;
-            MatchedLines = latest.Select(provider => provider.Count);
+            //MatchedLines = latest.Select(provider => provider.Count);
             TotalLines = latestLines.Select(x => x.Count);
             FileSize = fileWatcher.Select(notification => notification.Size);
             IsLoading = indexer.Take(1).Select(_ => false).StartWith(true);
@@ -188,4 +192,81 @@ namespace TailBlazer.Domain.FileHandling
             _cleanUp.Dispose();
         }
     }
+
+    //public class FileTailer: IDisposable
+    //{
+    //    private readonly IDisposable _cleanUp;
+    //    public IObservable<int> TotalLines { get;  }
+    //    public IObservable<int> MatchedLines { get; }
+    //    public IObservable<long> FileSize { get; }
+    //    public IObservableList<Line> Lines { get; }
+    //    public IObservable<bool> IsLoading { get; }
+    //    public IObservable<ILineProvider> Latest { get; }
+
+    //    public IObservable<ILineProvider> All { get; }
+
+
+
+
+    //    public FileTailer(FileInfo file,
+    //            IObservable<ILineProvider> filter,
+    //            IObservable<ScrollRequest> scrollRequest,
+    //            ILogger logger,
+    //            IScheduler scheduler = null)
+    //    {
+    //        if (file == null) throw new ArgumentNullException(nameof(file));
+    //        if (filter == null) throw new ArgumentNullException(nameof(filter));
+    //        if (logger == null) throw new ArgumentNullException(nameof(logger));
+
+    //        logger.Info($"Constructing file tailer for {file.FullName}");
+
+    //        var lines = new SourceList<Line>();
+    //        Lines = lines.AsObservableList();
+
+    //        var locker = new object();
+    //        scrollRequest = scrollRequest.Synchronize(locker); 
+
+    //        var fileWatcher = file.WatchFile(scheduler: scheduler)
+    //                        .DistinctUntilChanged()
+    //                        .TakeWhile(notification => notification.Exists).Repeat()
+    //                        .Replay(1).RefCount();
+
+    //        var indexer = fileWatcher.Index().Replay(1).RefCount();
+
+    //        //compare latest lines and latest filter and only take the filtered results it is not empty
+    //        var latestLines = indexer.Cast<ILineProvider>().Synchronize(locker);
+    //        var latestFilter = filter.Cast<ILineProvider>().Synchronize(locker); 
+    //        var latest = latestLines.CombineLatest(latestFilter, (l, f) => f.IsEmpty ? l : f);
+
+    //        All = latestLines;
+    //        Latest = latest;
+    //        MatchedLines = latest.Select(provider => provider.Count);
+    //        TotalLines = latestLines.Select(x => x.Count);
+    //        FileSize = fileWatcher.Select(notification => notification.Size);
+    //        IsLoading = indexer.Take(1).Select(_ => false).StartWith(true);
+
+    //        var aggregator = latest.CombineLatest(scrollRequest, (currentLines, scroll) => currentLines.ReadLines(scroll).ToArray())
+    //            .Subscribe(currentPage =>
+    //            {
+    //                var previous = lines.Items.ToArray();
+    //                var added = currentPage.Except(previous).ToArray();
+    //                var removed = previous.Except(currentPage).ToArray();
+
+    //                lines.Edit(innerList =>
+    //                {
+    //                    if (removed.Any()) innerList.RemoveMany(removed);
+    //                    if (added.Any()) innerList.AddRange(added);
+    //                });
+    //            });
+
+    //        _cleanUp = new CompositeDisposable(Lines, lines, aggregator);
+    //    }
+
+
+
+    //    public void Dispose()
+    //    {
+    //        _cleanUp.Dispose();
+    //    }
+    //}
 }

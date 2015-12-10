@@ -27,20 +27,16 @@ namespace TailBlazer.Views
         private bool _autoTail=true;
         private int _firstIndex;
         private int _pageSize;
-        private bool _searching;
-        private int _segments;
-        private int _segmentsSearched;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
 
         public IProperty<int> SelectedItemsCount { get; }
         public IProperty<bool> ShouldHightlightMatchingText { get; }
-        public IProperty<string> LineCountText { get; }
         public IProperty<string> SearchHint { get; }
         public IProperty<int> MatchedLineCount { get; }
         public IProperty<string> FileSizeText { get; }
         public IProperty<bool> IsLoading { get; }
-
+        public IProperty<string> HightlightText { get; }
         public ICommand CopyToClipboardCommand { get; }
 
         public ICommand KeepSearchCommand { get; }
@@ -68,13 +64,9 @@ namespace TailBlazer.Views
             SelectionMonitor = selectionMonitor;
             CopyToClipboardCommand = new Command(()=> clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
             
-            SelectedItemsCount = selectionMonitor
-                .Selected.Connect().QueryWhenChanged(collection=> collection.Count).ForBinding();
+            SelectedItemsCount = selectionMonitor.Selected.Connect().QueryWhenChanged(collection=> collection.Count).ForBinding();
 
             SearchCollection = new SearchCollection(tailCollection, schedulerProvider);
-
-            //An observable which acts as a filter command
-            var filterRequest = this.WhenValueChanged(vm => vm.SearchText).Throttle(TimeSpan.FromMilliseconds(125));
 
             //An observable which acts as a scroll command
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
@@ -86,46 +78,23 @@ namespace TailBlazer.Views
                         .ObserveOn(schedulerProvider.Background)
                         .DistinctUntilChanged();
 
-
-            var latest = fileInfo.Search(s => s.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
-
-            var search = filterRequest.Select(searchText => !searchText.IsLongerThanOrEqualTo(3)
-                                                                ? Observable.Return(FileSearchResult.None)
-                                                                : latest).Switch()
-            .Replay(1).RefCount();
-
-
             //tailer is the main object used to tail, scroll and filter in a file
-            var tailer = fileTailerFactory.Create(fileInfo, search, scroller);
+            var tailer = fileTailerFactory.Create(fileInfo, SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
 
             //command to add the current search to the tail collection
-            KeepSearchCommand = new Command(()=> tailCollection.Add(SearchText, latest),()=> SearchText.IsLongerThanOrEqualTo(3));
-
-            var progressMonitor = search.Subscribe(result =>
+            KeepSearchCommand = new Command(() =>
             {
-                Searching = result.IsSearching;
-                Segments = result.Segments;
-                SegmentsSearched = result.SegmentsCompleted;
-            });
+                var text = SearchText;
+                var latest = fileInfo.Search(s => s.Contains(text, StringComparison.OrdinalIgnoreCase));
+                tailCollection.Add(text, latest);
+                SearchText = string.Empty;
+            },()=> SearchText.IsLongerThanOrEqualTo(3));
 
 
-            tailCollection.Add("<No Filter>", tailer.All);
-
-            
             //User feedback for when tailer is loading
             IsLoading = tailer.IsLoading.ForBinding();
             
-            //User feedback lines count and filter matches
-            LineCountText = tailer.TotalLines.CombineLatest(search, (total, matched) =>
-            {
-                if (matched.IsEmpty) return $"{total.ToString("#,###")} lines";
-            
-                var limited = (IHasLimitationOfLines)matched ;
-                return limited.HasReachedLimit 
-                        ? $"{limited.Maximum.ToString("#,###0")}+ of {total.ToString("#,###")} lines" 
-                        : $"{matched.Count.ToString("#,###0")} of {total.ToString("#,###")} lines";
-            }).ForBinding();
-            
+
             //User feedback to show file size
             FileSizeText = tailer.FileSize
                 .Select(size => size.FormatWithAbbreviation())
@@ -140,8 +109,12 @@ namespace TailBlazer.Views
                                 return text.Length < 3 ? "Enter at least 3 characters" : "Hit enter to search";
                             }).ForBinding();
 
+            var selectedText = SearchCollection.SelectedText;
+
+
+            HightlightText = selectedText.ForBinding();
             //Only highlight search text when at least 3 letters have been entered
-            ShouldHightlightMatchingText = this.WhenValueChanged(vm => vm.SearchText)
+            ShouldHightlightMatchingText = selectedText
                 .Select(searchText => !string.IsNullOrEmpty(searchText) && searchText.Length >= 3)
                 .ForBinding();
 
@@ -155,7 +128,7 @@ namespace TailBlazer.Views
                             ex => logger.Error(ex, "There is a problem with bind data"));
             
             //monitor matching lines and start index,
-            MatchedLineCount = tailer.MatchedLines.ForBinding();
+            MatchedLineCount = SearchCollection.Latest.Select(latest=>latest.Count).ForBinding();
 
             //track first visible index
             var firstIndexMonitor = tailer.Lines.Connect()
@@ -163,9 +136,13 @@ namespace TailBlazer.Views
                 .QueryWhenChanged(lines =>lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min())
                 .Subscribe(first=> FirstIndex= first);
 
+            tailCollection.Add("<All>", fileInfo.WatchFile()
+                                                    .DistinctUntilChanged()
+                                                    .TakeWhile(notification => notification.Exists).Repeat()
+                                                    .Index()
+                              );
 
             _cleanUp = new CompositeDisposable(tailer,
-                LineCountText, 
                 loader,
                 firstIndexMonitor,
                 IsLoading,
@@ -173,7 +150,8 @@ namespace TailBlazer.Views
                 FileSizeText,
                 SearchHint,
                 ShouldHightlightMatchingText,
-                progressMonitor,
+
+
                 SelectedItemsCount,
                 tailCollection,
                 Disposable.Create(() =>
@@ -182,6 +160,8 @@ namespace TailBlazer.Views
                     (SelectionMonitor as IDisposable)?.Dispose();
                 }));
         }
+
+
 
 
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
@@ -230,23 +210,6 @@ namespace TailBlazer.Views
             set { SetAndRaise(ref _firstIndex, value); }
         }
         
-        public bool Searching
-        {
-            get { return _searching; }
-            set { SetAndRaise(ref _searching, value); }
-        }
-
-        public int Segments
-        {
-            get { return _segments; }
-            set { SetAndRaise(ref _segments, value); }
-        }
-
-        public int SegmentsSearched
-        {
-            get { return _segmentsSearched; }
-            set { SetAndRaise(ref _segmentsSearched, value); }
-        }
 
         public void Dispose()
         {
