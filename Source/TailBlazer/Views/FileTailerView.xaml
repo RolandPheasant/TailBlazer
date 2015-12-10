@@ -156,7 +156,34 @@
                 <KeyBinding Key="C" Modifiers="Control" Command="{Binding CopyToClipboardCommand}"/>
             </ListBox.InputBindings>
 
-                        <ListBox.ItemTemplate>
+            <ListBox.ContextMenu>
+                    <ContextMenu>
+
+                        <MenuItem Header="_Copy" 
+                                  Command="{Binding CopyToClipboardCommand}">
+
+                            <MenuItem.Icon>
+                                <Viewbox >
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" 
+                                              Fill="Black" />
+                                    </Canvas>
+                                </Viewbox>
+                            </MenuItem.Icon>
+    
+
+                        </MenuItem>
+                    </ContextMenu>
+                    <!--<Viewbox Width="48" Height="48">
+                        <Canvas Width="24" Height="24">
+                            <Path Data="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" Fill="Black" />
+                        </Canvas>
+                    </Viewbox>-->
+                </ListBox.ContextMenu>
+
+                <ListBox.ItemTemplate>
+                    
+      
                 <DataTemplate DataType="{x:Type local:LineProxy}">
                     <Grid >
                         <Grid.ColumnDefinitions>
@@ -164,9 +191,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                            <TextBlock Text="{Binding Index, Mode=OneWay}" 
-                                   Opacity="0.55"
-                                   MinWidth="25"/>
+                        <TextBlock Text="{Binding Index, Mode=OneWay}" Visibility="Collapsed" Opacity="0.55" MinWidth="25"/>
                         <infrastucture:SearchableTextControl Grid.Column="1" 
                                                              Margin="6 0 0 0"   
                                                             IsHighlight="{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"  
@@ -177,9 +202,10 @@
                                                             Text="{Binding Text}"/>
                     </Grid>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
+                </ListBox.ItemTemplate>
 
-            <ListBox.ItemContainerStyle>
+
+                <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
                     <Style.Setters>
                         <Setter Property="Padding" Value="0"/>

@@ -21,7 +21,7 @@ namespace TailBlazer.Infrastucture
     /// 
     /// BTW: I hear you shout this should be an abstraction but frankly I cannot be bothered (as this is such a specialisation).
     /// </summary>
-    public class SelectionMonitor : IDisposable, ISelectionMonitor 
+    public class SelectionMonitor : IDisposable, ISelectionMonitor, IAttachedListBox 
     {
         public IObservableList<LineProxy> Selected { get; }
 
@@ -59,7 +59,7 @@ namespace TailBlazer.Infrastucture
             return _selected.Items.OrderBy(proxy=> proxy.Index).Select(proxy => proxy.Line.Text);
         } 
         
-        void ISelectionMonitor.Receive(ListBox selector)
+        void IAttachedListBox.Receive(ListBox selector)
         {
             _selector = selector;
 

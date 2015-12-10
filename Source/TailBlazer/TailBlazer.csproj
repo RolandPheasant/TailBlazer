@@ -125,7 +125,7 @@
     <Compile Include="Infrastucture\ClipboardHandler.cs" />
     <Compile Include="Infrastucture\ConsoleLogger.cs" />
     <Compile Include="Infrastucture\IClipboardHandler.cs" />
-    <Compile Include="Infrastucture\ISelectionMonitor.cs" />
+    <Compile Include="Infrastucture\IAttachedListBox.cs" />
     <Compile Include="Infrastucture\ListBoxHelper.cs" />
     <Compile Include="Infrastucture\LogFactory.cs" />
     <Compile Include="Infrastucture\SelectionMonitor.cs" />

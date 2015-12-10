@@ -47,7 +47,7 @@ namespace TailBlazer.Views
             [NotNull] ISchedulerProvider schedulerProvider,
             [NotNull]  FileInfo fileInfo,
             [NotNull]  IFileTailerFactory fileTailerFactory, 
-            [NotNull] SelectionMonitor selectionMonitor, 
+            [NotNull] ISelectionMonitor selectionMonitor, 
             [NotNull] IClipboardHandler clipboardHandler)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
