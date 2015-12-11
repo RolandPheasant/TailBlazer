@@ -15,8 +15,6 @@ using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Views
 {
-
-
     public class FileTailerViewModel: AbstractNotifyPropertyChanged, IDisposable, IScrollReceiver
     {
         private readonly IDisposable _cleanUp;
@@ -49,19 +47,19 @@ namespace TailBlazer.Views
             [NotNull] IFileTailerFactory fileTailerFactory, 
             [NotNull] ISelectionMonitor selectionMonitor, 
             [NotNull] IClipboardHandler clipboardHandler, 
-            [NotNull] ITailCollection tailCollection)
+            [NotNull] ISearchInfoCollection searchInfoCollection)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
             if (selectionMonitor == null) throw new ArgumentNullException(nameof(selectionMonitor));
             if (clipboardHandler == null) throw new ArgumentNullException(nameof(clipboardHandler));
-            if (tailCollection == null) throw new ArgumentNullException(nameof(tailCollection));
+            if (searchInfoCollection == null) throw new ArgumentNullException(nameof(searchInfoCollection));
 
             SelectionMonitor = selectionMonitor;
             CopyToClipboardCommand = new Command(()=> clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
             SelectedItemsCount = selectionMonitor.Selected.Connect().QueryWhenChanged(collection=> collection.Count).ForBinding();
-            SearchCollection = new SearchCollection(tailCollection, schedulerProvider);
+            SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
 
             //An observable which acts as a scroll command
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
@@ -81,16 +79,18 @@ namespace TailBlazer.Views
             {
                 var text = SearchText;
                 var latest = fileInfo.Search(s => s.Contains(text, StringComparison.OrdinalIgnoreCase));
-                tailCollection.Add(text, latest);
+                searchInfoCollection.Add(text, latest);
                 SearchText = string.Empty;
             },()=> SearchText.IsLongerThanOrEqualTo(3));
 
 
             //User feedback for when tailer is loading
-            IsLoading = tailer.IsLoading.ForBinding();
-            
+            IsLoading = Observable.Timer(TimeSpan.FromSeconds(3)).Select(_ => true).Concat(Observable.Return(false)).ForBinding();  //tailer.IsLoading.ForBinding();
+
+            var fileWatcher = new FileWatcher(fileInfo);
+
             //User feedback to show file size
-            FileSizeText = tailer.FileSize
+            FileSizeText = fileWatcher.Latest.Select(fn=>fn.Size)
                 .Select(size => size.FormatWithAbbreviation())
                 .DistinctUntilChanged()
                 .ForBinding();
@@ -130,7 +130,7 @@ namespace TailBlazer.Views
                 .Subscribe(first=> FirstIndex= first);
 
             //add a search for all
-            tailCollection.Add("<All>", fileInfo.WatchFile()
+            searchInfoCollection.Add("<All>", fileInfo.WatchFile()
                                                     .DistinctUntilChanged()
                                                     .TakeWhile(notification => notification.Exists).Repeat()
                                                     .Index(),true);
@@ -146,7 +146,7 @@ namespace TailBlazer.Views
 
 
                 SelectedItemsCount,
-                tailCollection,
+                searchInfoCollection,
                 Disposable.Create(() =>
                 {
                     _userScrollRequested.OnCompleted();

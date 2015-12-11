@@ -3,9 +3,9 @@ using DynamicData;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public interface ITailCollection : IDisposable
+    public interface ISearchInfoCollection : IDisposable
     {
-        IObservableCache<Tailer, string> Tails { get; }
+        IObservableCache<SearchInfo, CaseInsensitiveString> Searches { get; }
 
         void Add(string searchText, IObservable<ILineProvider> latest, bool isDefault=false);
         void Remove(string searchText);

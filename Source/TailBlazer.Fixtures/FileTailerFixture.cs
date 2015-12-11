@@ -84,7 +84,7 @@ namespace TailBlazer.Fixtures
                 file.Append(Enumerable.Range(1, 100).Select(i => i%2 == 1 ? $"{i} is an odd number" : $"{i} is an even number").ToArray());
                 var search = file.Info.Search(predicate,  scheduler);
 
-                using (var tailer = new FileTailer(file.Info, search, autoTailer, new NullLogger(), scheduler))
+                using (var tailer = new LineScroller(file.Info, search, autoTailer, new NullLogger(), scheduler))
                 {
 
                     //lines which contain "1"

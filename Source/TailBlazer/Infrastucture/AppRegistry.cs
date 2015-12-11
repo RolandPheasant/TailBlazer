@@ -19,8 +19,8 @@ namespace TailBlazer.Infrastucture
             log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(path));
             For<ILogger>().Use<Log4NetLogger>().Ctor<Type>("type").Is(x => x.RootType).AlwaysUnique();
 
-            For<IAttachedListBox>().Use<SelectionMonitor>();
-            For<ITailCollection>().Use<TailCollection>();
+            For<ISelectionMonitor>().Use<SelectionMonitor>();
+            For<ISearchInfoCollection>().Use<SearchInfoCollection>();
 
             Scan(scanner =>
             {
@@ -28,7 +28,7 @@ namespace TailBlazer.Infrastucture
 
                 //to do, need a auto-exclude these AppConventions
                 scanner.ExcludeType<SelectionMonitor>();
-                scanner.ExcludeType<TailCollection>();
+                scanner.ExcludeType<SearchInfoCollection>();
                 
 
 

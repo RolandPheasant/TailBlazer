@@ -14,11 +14,11 @@ namespace TailBlazer.Domain.FileHandling
             _logFactory = logFactory;
         }
 
-        public FileTailer Create(FileInfo file, IObservable<ILineProvider> filter, IObservable<ScrollRequest> scrollRequest, IScheduler scheduler = null)
+        public LineScroller Create(FileInfo file, IObservable<ILineProvider> filter, IObservable<ScrollRequest> scrollRequest, IScheduler scheduler = null)
         {
-            return new FileTailer(file, filter,
+            return new LineScroller(file, filter,
                 scrollRequest,
-                _logFactory.Create<FileTailer>());
+                _logFactory.Create<LineScroller>());
         }
     }
 }

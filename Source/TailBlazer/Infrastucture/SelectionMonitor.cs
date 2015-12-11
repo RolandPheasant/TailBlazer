@@ -20,7 +20,7 @@ namespace TailBlazer.Infrastucture
     /// 
     /// This drawn out and unsophisticated code attempts to deal with that. 
     /// 
-    /// BTW: I hear you shout this should be an abstraction but frankly I cannot be bothered (as this is such a specialisation).
+    /// BTW: I hear you shout this code should be an abstraction but frankly I cannot be bothered (as this is such a specialisation).
     /// </summary>
     public class SelectionMonitor : IDisposable, ISelectionMonitor, IAttachedListBox 
     {

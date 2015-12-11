@@ -21,38 +21,33 @@ namespace TailBlazer.Views
         public IObservable<string> SelectedText { get; }
         public IObservable<ILineProvider> Latest { get; }
 
-        public SearchCollection(ITailCollection tailCollection, ISchedulerProvider schedulerProvider)
+        public SearchCollection(ISearchInfoCollection searchInfoCollection, ISchedulerProvider schedulerProvider)
         {
-            var viewModels = tailCollection
-                .Tails.Connect()
+            var viewModels = searchInfoCollection.Searches.Connect()
                 .Transform(tail => new SearchViewModel(tail, vm =>
                 {
-                    tailCollection.Remove(vm.Text);
+                    searchInfoCollection.Remove(vm.Text);
                 }))
                 .DisposeMany()
                 .AsObservableCache();
+            
+            var shared = viewModels.Connect().Publish();
 
-
-
-            var binderLoader = viewModels.Connect()
+            var binderLoader = shared
                 .Sort(SortExpressionComparer<SearchViewModel>.Ascending(tvm => tvm.Text))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _items)
                 .Subscribe();
             
-            var autoSelector = viewModels.Connect()
-                .WhereReasonsAre(ChangeReason.Add)
+            var autoSelector = shared.WhereReasonsAre(ChangeReason.Add)
                 .Flatten()
                 .Select(change => change.Current)
                 .Subscribe(latest => Selected = latest);
-
-
-            var removed = viewModels.Connect()
-                .WhereReasonsAre(ChangeReason.Remove)
+            
+            var removed = shared.WhereReasonsAre(ChangeReason.Remove)
                 .Subscribe(_ => Selected = viewModels.Items.First());
 
-            var counter = viewModels.Connect()
-                .ToCollection()
+            var counter = shared.ToCollection()
                 .Subscribe(count => Count = count.Count);
 
            SelectedText = this.WhenValueChanged(sc => sc.Selected)
@@ -63,10 +58,8 @@ namespace TailBlazer.Views
                 .Where(x=>x!=null)
                 .Select(svm => svm.Latest).Switch().Replay(1).RefCount();
 
-            _cleanUp = new CompositeDisposable(viewModels, binderLoader, counter, removed, autoSelector);
+            _cleanUp = new CompositeDisposable(viewModels, binderLoader, counter, removed, autoSelector, shared.Connect());
         }
-
-
 
         public SearchViewModel Selected
         {

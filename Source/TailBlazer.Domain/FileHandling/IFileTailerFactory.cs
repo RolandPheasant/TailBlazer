@@ -6,6 +6,6 @@ namespace TailBlazer.Domain.FileHandling
 {
     public interface IFileTailerFactory
     {
-        FileTailer Create(FileInfo file, IObservable<ILineProvider> filter, IObservable<ScrollRequest> scrollRequest, IScheduler scheduler = null);
+        LineScroller Create(FileInfo file, IObservable<ILineProvider> filter, IObservable<ScrollRequest> scrollRequest, IScheduler scheduler = null);
     }
 }

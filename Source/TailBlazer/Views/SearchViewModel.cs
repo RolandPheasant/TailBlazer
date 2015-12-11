@@ -10,7 +10,7 @@ namespace TailBlazer.Views
 {
     public class SearchViewModel : AbstractNotifyPropertyChanged, IDisposable
     {
-        private readonly Tailer _tail;
+        private readonly SearchInfo _tail;
         private readonly IDisposable _cleanUp;
         private int _count;
         private bool _searching;
@@ -25,7 +25,7 @@ namespace TailBlazer.Views
 
         public IObservable<ILineProvider> Latest => _tail.Latest;
 
-        public SearchViewModel(Tailer tail, Action<SearchViewModel> removeAction)
+        public SearchViewModel(SearchInfo tail, Action<SearchViewModel> removeAction)
         {
             _tail = tail;
             RemoveCommand = new Command(()=> removeAction(this));

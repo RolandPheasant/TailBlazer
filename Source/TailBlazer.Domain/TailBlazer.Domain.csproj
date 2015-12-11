@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CaseInsensitiveString.cs" />
     <Compile Include="FileHandling\FileInfoEx.cs" />
     <Compile Include="FileHandling\FileSearch.cs" />
     <Compile Include="FileHandling\FileSearchEx.cs" />
@@ -78,15 +79,18 @@
     <Compile Include="FileHandling\FileSegmentSearchStatus.cs" />
     <Compile Include="FileHandling\FileSegmentType.cs" />
     <Compile Include="FileHandling\FileTailerFactory.cs" />
+    <Compile Include="FileHandling\FileWatcher.cs" />
     <Compile Include="FileHandling\IFileTailerFactory.cs" />
+    <Compile Include="FileHandling\IFileWatcher.cs" />
     <Compile Include="FileHandling\ILineProvider.cs" />
+    <Compile Include="FileHandling\ILineScroller.cs" />
     <Compile Include="FileHandling\IndexEx.cs" />
     <Compile Include="FileHandling\IndexType.cs" />
-    <Compile Include="FileHandling\ITailCollection.cs" />
+    <Compile Include="FileHandling\ISearchInfoCollection.cs" />
     <Compile Include="FileHandling\LineIndexType.cs" />
     <Compile Include="FileHandling\FileNotification.cs" />
     <Compile Include="FileHandling\FileNotificationType.cs" />
-    <Compile Include="FileHandling\FileTailer.cs" />
+    <Compile Include="FileHandling\LineScroller.cs" />
     <Compile Include="FileHandling\LineInfo.cs" />
     <Compile Include="FileHandling\LineReaderEx.cs" />
     <Compile Include="FileHandling\LinesChangedReason.cs" />
@@ -97,8 +101,8 @@
     <Compile Include="FileHandling\IndexCollection.cs" />
     <Compile Include="FileHandling\Indexer.cs" />
     <Compile Include="FileHandling\StreamReaderExtended.cs" />
-    <Compile Include="FileHandling\TailCollection.cs" />
-    <Compile Include="FileHandling\Tailer.cs" />
+    <Compile Include="FileHandling\SearchInfoCollection.cs" />
+    <Compile Include="FileHandling\SearchInfo.cs" />
     <Compile Include="FileHandling\TailInfo.cs" />
     <Compile Include="Infrastructure\DynamicDataEx.cs" />
     <Compile Include="Infrastructure\EnumerableEx.cs" />

@@ -3,13 +3,13 @@ using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public sealed class Tailer : IEquatable<Tailer>
+    public sealed class SearchInfo : IEquatable<SearchInfo>
     {
         public string SearchText { get;  }
         public IObservable<ILineProvider> Latest { get;  }
         public bool IsDefault { get;  }
 
-        public Tailer([NotNull] string searchText, [NotNull] IObservable<ILineProvider> latest, bool isDefault)
+        public SearchInfo([NotNull] string searchText, [NotNull] IObservable<ILineProvider> latest, bool isDefault)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
             if (latest == null) throw new ArgumentNullException(nameof(latest));
@@ -20,7 +20,7 @@ namespace TailBlazer.Domain.FileHandling
         
         #region Equality
 
-        public bool Equals(Tailer other)
+        public bool Equals(SearchInfo other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -32,7 +32,7 @@ namespace TailBlazer.Domain.FileHandling
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Tailer)obj);
+            return Equals((SearchInfo)obj);
         }
 
         public override int GetHashCode()
@@ -40,12 +40,12 @@ namespace TailBlazer.Domain.FileHandling
             return SearchText?.GetHashCode() ?? 0;
         }
 
-        public static bool operator ==(Tailer left, Tailer right)
+        public static bool operator ==(SearchInfo left, SearchInfo right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(Tailer left, Tailer right)
+        public static bool operator !=(SearchInfo left, SearchInfo right)
         {
             return !Equals(left, right);
         }

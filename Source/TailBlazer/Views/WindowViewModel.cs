@@ -75,9 +75,10 @@ namespace TailBlazer.Views
             scheduler.Background.Schedule(() =>
             {
                 //Handle errors
-
-                //2. resolve TailViewModel
-                var factory = _objectProvider.Get<FileTailerViewModelFactory>();
+                try
+                {
+                    //2. resolve TailViewModel
+                    var factory = _objectProvider.Get<FileTailerViewModelFactory>();
                 var viewModel = factory.Create(file);
 
                 //3. Display it
@@ -85,9 +86,18 @@ namespace TailBlazer.Views
                 //do the work on the ui thread
                 scheduler.MainThread.Schedule(() =>
                 {
-                    Views.Add(newItem);
-                    Selected = newItem;
+     
+                        Views.Add(newItem);
+                        Selected = newItem;
+
+
                 });
+                }
+                catch (Exception ex)
+                {
+                    //TODO: Create a failed to load view
+                    throw ex;
+                }
             });
         }
 
