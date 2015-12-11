@@ -147,7 +147,17 @@ namespace TailBlazer.Domain.FileHandling
 
         private Page GetPage(ScrollRequest scroll)
         {
-            int first = scroll.FirstIndex;
+            int first;
+            if (scroll.SpecifiedByPosition)
+            {
+                //get line number fro
+                first = IndexOf(scroll.FirstIndex);
+            }
+            else
+            {
+                first = scroll.FirstIndex;
+            }
+          
             int size = scroll.PageSize;
 
             if (scroll.Mode == ScrollReason.Tail)
@@ -166,7 +176,14 @@ namespace TailBlazer.Domain.FileHandling
             return new Page(first, size);
         }
 
+        private int IndexOf(long value)
+        {
+            for (var i = 0; i < Matches.Length; ++i)
+                if (Equals(Matches[i], value))
+                    return i;
 
+            return -1;
+        }
 
         #region Equality
 

@@ -62,6 +62,7 @@ namespace TailBlazer.Views
 
             _cleanUp = new CompositeDisposable(viewModels, binderLoader, counter, removed, autoSelector, shared.Connect());
         }
+        
 
         public SearchViewModel Selected
         {

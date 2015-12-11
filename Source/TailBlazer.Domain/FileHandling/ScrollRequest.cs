@@ -6,6 +6,8 @@ namespace TailBlazer.Domain.FileHandling
     {
         public int PageSize { get;  }
         public int FirstIndex { get;  }
+        public bool SpecifiedByPosition { get;  }
+
         public ScrollReason Mode { get; }
         
         public ScrollRequest(int pageSize)
@@ -13,10 +15,11 @@ namespace TailBlazer.Domain.FileHandling
             PageSize = pageSize;
             Mode = ScrollReason.Tail;
         }
-        public ScrollRequest(int pageSize, int firstIndex)
+        public ScrollRequest(int pageSize, int firstIndex, bool specifiedByPosition=false)
         {
             PageSize = pageSize;
             FirstIndex = firstIndex;
+            SpecifiedByPosition = specifiedByPosition;
             Mode = ScrollReason.User;
         }
 
@@ -25,6 +28,7 @@ namespace TailBlazer.Domain.FileHandling
             PageSize = pageSize;
             FirstIndex = firstIndex;
             Mode = mode;
+            SpecifiedByPosition = false;
         }
 
         #region Equality

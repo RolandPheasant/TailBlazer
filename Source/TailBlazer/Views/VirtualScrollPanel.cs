@@ -126,7 +126,13 @@ namespace TailBlazer.Views
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            if (_itemsControl == null) return availableSize;
+            if (_itemsControl == null)
+            {
+
+                return new Size(double.IsInfinity(availableSize.Width) ? 0: availableSize.Width,
+                    double.IsInfinity(availableSize.Height)  ? 0 : availableSize.Height);
+            }
+
             
             _isInMeasure = true;
             _childLayouts.Clear();

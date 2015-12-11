@@ -24,9 +24,9 @@ namespace TailBlazer.Views
         private bool _autoTail=true;
         private int _firstIndex;
         private int _pageSize;
+        private LineProxy _selectedLine;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
-
         public IProperty<int> SelectedItemsCount { get; }
         public IProperty<bool> ShouldHightlightMatchingText { get; }
         public IProperty<string> SearchHint { get; }
@@ -40,6 +40,8 @@ namespace TailBlazer.Views
         public ISelectionMonitor SelectionMonitor { get; }
         public SearchCollection SearchCollection { get; }
 
+
+        public InlineViewer InlineViewer { get; }
 
         public FileTailerViewModel([NotNull] ILogger logger,
             [NotNull] ISchedulerProvider schedulerProvider,
@@ -56,12 +58,11 @@ namespace TailBlazer.Views
             if (searchInfoCollection == null) throw new ArgumentNullException(nameof(searchInfoCollection));
 
             SelectionMonitor = selectionMonitor;
+
             CopyToClipboardCommand = new Command(()=> clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
             SelectedItemsCount = selectionMonitor.Selected.Connect().QueryWhenChanged(collection=> collection.Count).ForBinding();
             SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
-
-
-
+            
             //An observable which acts as a scroll command
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
             var scroller = _userScrollRequested.CombineLatest(autoChanged, (user, auto) =>
@@ -74,12 +75,15 @@ namespace TailBlazer.Views
 
             //LOAD SEARCHES
             //tailer is the main object used to tail, scroll and filter in a file
-            var tailer = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);  //fileTailerFactory.Create(fileInfo, SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
-            
+            var lineScroller = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);  //fileTailerFactory.Create(fileInfo, SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
+
             //Add a complete file display [No search info here]
             var indexed = fileWatcher.Latest.Index().Replay(1).RefCount();
             IsLoading = indexed.Take(1).Select(_ => false).StartWith(true).ForBinding();
             searchInfoCollection.Add("<All>", indexed, SearchType.All);
+
+ 
+            InlineViewer = new InlineViewer(indexed,schedulerProvider, this.WhenValueChanged(vm=>vm.SelectedItem));
 
             Func<string, IObservable<ILineProvider>> factory = text =>
             {
@@ -119,7 +123,7 @@ namespace TailBlazer.Views
                 .ForBinding();
 
             //load lines into observable collection
-            var loader = tailer.Lines.Connect()
+            var loader = lineScroller.Lines.Connect()
                 .Transform(line => new LineProxy(line))
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
                 .ObserveOn(schedulerProvider.MainThread)
@@ -133,12 +137,12 @@ namespace TailBlazer.Views
             LatestCount = SearchCollection.Latest.Select(latest => latest.Count).ForBinding();
 
             //track first visible index
-            var firstIndexMonitor = tailer.Lines.Connect()
+            var firstIndexMonitor = lineScroller.Lines.Connect()
                 .Buffer(TimeSpan.FromMilliseconds(250)).FlattenBufferResult()
                 .QueryWhenChanged(lines =>lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min())
                 .Subscribe(first=> FirstIndex= first);
 
-            _cleanUp = new CompositeDisposable(tailer,
+            _cleanUp = new CompositeDisposable(lineScroller,
                 loader,
                 firstIndexMonitor,
                 IsLoading,
@@ -157,6 +161,11 @@ namespace TailBlazer.Views
                 }));
         }
 
+        public LineProxy SelectedItem
+        {
+            get { return _selectedLine; }
+            set { SetAndRaise(ref _selectedLine, value);}
+        }
 
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
         {
@@ -176,9 +185,8 @@ namespace TailBlazer.Views
         void IScrollReceiver.ScrollChanged(ScrollChangedArgs scrollChangedArgs)
         {
             if (scrollChangedArgs.Direction == ScrollDirection.Up)
-            {
                 AutoTail = false;
-            }
+
         }
         public string SearchText
         {

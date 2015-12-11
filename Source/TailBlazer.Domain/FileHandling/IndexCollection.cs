@@ -30,7 +30,7 @@ namespace TailBlazer.Domain.FileHandling
             Count = latest.Select(idx => idx.LineCount).Sum();
             Indicies = latest.ToArray();
             Diff = Count - (previous?.Count ?? 0);
-
+            
             //need to check whether
             if (previous == null)
             {
@@ -64,7 +64,6 @@ namespace TailBlazer.Domain.FileHandling
 
             using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
-
                 using (var reader = new StreamReaderExtended(stream, Encoding, false))
                 {
                     //go to starting point
@@ -103,14 +102,25 @@ namespace TailBlazer.Domain.FileHandling
             int first = scroll.FirstIndex;
             int size = scroll.PageSize;
 
+
             if (scroll.Mode == ScrollReason.Tail)
             {
                 first = size > Count ? 0 : Count - size;
             }
             else
             {
-                if (scroll.FirstIndex + size >= Count)
-                    first = Count - size;
+
+                if (scroll.SpecifiedByPosition)
+                {
+                    //get line number fro
+                    first = this.IndexOf(scroll.FirstIndex);
+                }
+                else
+                {
+                    if (scroll.FirstIndex + size >= Count)
+                        first = Count - size;
+                }
+
             }
 
             first = Math.Max(0, first);
@@ -118,7 +128,17 @@ namespace TailBlazer.Domain.FileHandling
 
             return new Page(first, size);
         }
+        private int IndexOf(long value)
+        {
+            for (var i = 0; i < this.Indicies.Length; ++i)
+            {
+                if (Equals(Indicies[i], value))
+                    return i;
 
+            }
+
+            return -1;
+        }
 
         private RelativeIndex CalculateRelativeIndex(int index)
         {
@@ -161,7 +181,7 @@ namespace TailBlazer.Domain.FileHandling
             public int Index { get; }
             public long Start { get; }
             public int LinesOffset { get; }
-            public bool IsEstimate { get; set; }
+            public bool IsEstimate { get;  }
 
 
             public RelativeIndex(int index, long start, int linesOffset, bool isEstimate)
