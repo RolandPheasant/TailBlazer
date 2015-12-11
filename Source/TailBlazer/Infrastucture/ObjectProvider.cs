@@ -26,14 +26,14 @@ namespace TailBlazer.Infrastucture
             return _container.GetInstance<T>(args);
         }
 
-
-        //public T Get<T>(IEnumerable<ExplictArg> explictArg)
-        //{
-
-
-        //    args.SetArg(explictArg.Key, explictArg.Arg);
-        //    return _container.GetInstance<T>(new ExplicitArguments(););
-        //}
-
+        public T Get<T>(IEnumerable<ExplictArg> explictArgs)
+        {
+            var args = new ExplicitArguments();
+            foreach (var explictArg in explictArgs)
+            {
+                args.SetArg(explictArg.Key, explictArg.Arg);
+            }
+            return _container.GetInstance<T>(args);
+        }
     }
 }

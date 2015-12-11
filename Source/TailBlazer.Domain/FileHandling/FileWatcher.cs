@@ -10,15 +10,25 @@ namespace TailBlazer.Domain.FileHandling
 
     public class FileWatcher : IFileWatcher
     {
+
         public IObservable<FileNotification> Latest { get; }
 
-        public FileWatcher([NotNull] FileInfo file, IScheduler scheduler=null)
+        private FileInfo FileInfo { get;  }
+
+        public string FullName => FileInfo.FullName;
+
+        public string Name => FileInfo.Name;
+        
+        public string Folder => FileInfo.DirectoryName;
+
+        public FileWatcher([NotNull] FileInfo fileInfo, IScheduler scheduler=null)
         {
-            if (file == null) throw new ArgumentNullException(nameof(file));
-            Latest = file.WatchFile(scheduler: scheduler ?? Scheduler.Default)
+            FileInfo = fileInfo;
+            if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
+            Latest = fileInfo.WatchFile(scheduler: scheduler ?? Scheduler.Default)
                 .DistinctUntilChanged()
                 .TakeWhile(notification => notification.Exists).Repeat()
-                .Replay(1).RefCount();
+                ;//.Replay(1).RefCount();
         }
     }
 }

@@ -7,6 +7,7 @@
              xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:converters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf"
              x:Name="Control"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:FileTailerViewModel, IsDesignTimeCreatable=False}"
@@ -101,25 +102,100 @@
                 </Style.Triggers>
             </Style>
 
+            <Style x:Key="RaisedCircularProgressBar" TargetType="{x:Type ProgressBar}">
+                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+                <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="wpf:ShadowAssist.ShadowDepth" Value="Depth2" />
+                <Setter Property="Padding" Value="1"/>
+                <Setter Property="Width" Value="40" />
+                <Setter Property="Height" Value="40" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ProgressBar}">
+                            <Grid>
+                                <Ellipse Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="{TemplateBinding BorderThickness}" 
+                                 Effect="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(wpf:ShadowAssist.ShadowDepth), Converter={x:Static converters:ShadowConverter.Instance}}"
+                                 x:Name="border" />
+                                <ProgressBar
+                                        Visibility="{Binding IsLoading.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                        Style="{StaticResource TailBlazerCircularProgressBar}" 
+                                       Width="{TemplateBinding Width}"
+                                       Height="{TemplateBinding Height}"
+                                        Value="{TemplateBinding Value}"
+                                        IsIndeterminate="True"/>
+                                <Ellipse x:Name="GeometryEllipse" Fill="Transparent" IsHitTestVisible="False" Focusable="False" />
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter Property="Opacity" Value="0.23"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="border" Property="wpf:ShadowAssist.Darken" Value="True" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
 
         </ResourceDictionary>
     </Control.Resources>
 
     <Grid>
-        <wpf:Card 
-            Visibility="{Binding IsLoading.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
-            UniformCornerRadius="14" Padding="4"
-                      VerticalAlignment="Center" HorizontalAlignment="Center" Margin="12 12 12 12">
+        <!--<wpf:Card 
+            Width="75"
+             Height="75"
+          
+            UniformCornerRadius="4" Padding="4"
+
+            >
             <ProgressBar
+
                 Style="{StaticResource TailBlazerCircularProgressBar}" 
                 MinWidth="50"
                 MinHeight="50"
                 Value="50"
                 IsIndeterminate="True"/>
-        </wpf:Card>
+        </wpf:Card>-->
 
+        <!--<Grid>
+            <Ellipse Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="{TemplateBinding BorderThickness}" 
+                                 Effect=wpf:ShadowAssist.ShadowDepth
+                     , Converter={x:Static converters:ShadowConverter.Instance}}"
+                                 x:Name="border" />
+        </Grid>-->
+        
+        <!--<wpf:Card  
+            UniformCornerRadius="4"
+            Padding="4"
+            wpf:ShadowAssist.ShadowDepth="Depth5"
+            VerticalAlignment="Center" 
+            HorizontalAlignment="Center">
+            <ProgressBar
+                Visibility="{Binding IsLoading.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
+                Style="{StaticResource TailBlazerCircularProgressBar}" 
+                MinWidth="75"
+                MinHeight="75"
+                Value="50"
+                IsIndeterminate="True"/>
+        </wpf:Card>-->
+        <ProgressBar
+                Visibility="{Binding IsLoading.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
+                Style="{StaticResource TailBlazerCircularProgressBar}" 
+                MinWidth="75"
+                MinHeight="75"
+                Value="50"
+                IsIndeterminate="True"/>
 
-        <Grid    Visibility="{Binding IsLoading.Value, Converter={StaticResource InvertedBooleanToVisibilityConverter}}" Margin="0"
+        <Grid    
+            Visibility="{Binding IsLoading.Value, Converter={StaticResource InvertedBooleanToVisibilityConverter}}" Margin="0"
 >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -43,15 +42,14 @@ namespace TailBlazer.Views
 
         public FileTailerViewModel([NotNull] ILogger logger,
             [NotNull] ISchedulerProvider schedulerProvider,
-            [NotNull] FileInfo fileInfo,
-            [NotNull] IFileTailerFactory fileTailerFactory, 
+            [NotNull] IFileWatcher fileWatcher,
             [NotNull] ISelectionMonitor selectionMonitor, 
             [NotNull] IClipboardHandler clipboardHandler, 
             [NotNull] ISearchInfoCollection searchInfoCollection)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
-            if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
+            if (fileWatcher == null) throw new ArgumentNullException(nameof(fileWatcher));
             if (selectionMonitor == null) throw new ArgumentNullException(nameof(selectionMonitor));
             if (clipboardHandler == null) throw new ArgumentNullException(nameof(clipboardHandler));
             if (searchInfoCollection == null) throw new ArgumentNullException(nameof(searchInfoCollection));
@@ -71,24 +69,43 @@ namespace TailBlazer.Views
                         .ObserveOn(schedulerProvider.Background)
                         .DistinctUntilChanged();
 
+            //LOAD SEARCHES
             //tailer is the main object used to tail, scroll and filter in a file
-            var tailer = fileTailerFactory.Create(fileInfo, SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
+            var tailer =   new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);  //fileTailerFactory.Create(fileInfo, SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
+
+
+            //Add a complete file display [No search info here]
+            var indexed = fileWatcher.Latest.Index().Replay(1).RefCount();
+            IsLoading = indexed.Take(1).Select(_ => false).StartWith(true).ForBinding();
+            searchInfoCollection.Add("<All>", indexed, true);
+
+            Func<string, IObservable<ILineProvider>> factory = text =>
+            {
+                return fileWatcher.Latest
+                    .Search(s => s.Contains(text, StringComparison.OrdinalIgnoreCase))
+                    .Replay(1).RefCount();
+            };
+         
+
+            var current = this.WhenValueChanged(vm => vm.SearchText)
+                                .Select(searchText => !searchText.IsLongerThanOrEqualTo(3) 
+                                                        ? indexed 
+                                                        : factory(searchText))
+                                .Switch();
+            searchInfoCollection.Add("<Current>", current, true);
 
             //command to add the current search to the tail collection
             KeepSearchCommand = new Command(() =>
             {
                 var text = SearchText;
-                var latest = fileInfo.Search(s => s.Contains(text, StringComparison.OrdinalIgnoreCase));
-                searchInfoCollection.Add(text, latest);
+                searchInfoCollection.Add(text, factory(text));
                 SearchText = string.Empty;
             },()=> SearchText.IsLongerThanOrEqualTo(3));
 
 
-            //User feedback for when tailer is loading
-            IsLoading = Observable.Timer(TimeSpan.FromSeconds(3)).Select(_ => true).Concat(Observable.Return(false)).ForBinding();  //tailer.IsLoading.ForBinding();
 
-            var fileWatcher = new FileWatcher(fileInfo);
 
+            
             //User feedback to show file size
             FileSizeText = fileWatcher.Latest.Select(fn=>fn.Size)
                 .Select(size => size.FormatWithAbbreviation())
@@ -129,12 +146,6 @@ namespace TailBlazer.Views
                 .QueryWhenChanged(lines =>lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min())
                 .Subscribe(first=> FirstIndex= first);
 
-            //add a search for all
-            searchInfoCollection.Add("<All>", fileInfo.WatchFile()
-                                                    .DistinctUntilChanged()
-                                                    .TakeWhile(notification => notification.Exists).Repeat()
-                                                    .Index(),true);
-
             _cleanUp = new CompositeDisposable(tailer,
                 loader,
                 firstIndexMonitor,
@@ -143,9 +154,8 @@ namespace TailBlazer.Views
                 FileSizeText,
                 SearchHint,
                 ShouldHightlightMatchingText,
-
-
                 SelectedItemsCount,
+                SearchCollection,
                 searchInfoCollection,
                 Disposable.Create(() =>
                 {

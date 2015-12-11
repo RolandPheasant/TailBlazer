@@ -21,7 +21,8 @@ namespace TailBlazer.Infrastucture
 
             For<ISelectionMonitor>().Use<SelectionMonitor>();
             For<ISearchInfoCollection>().Use<SearchInfoCollection>();
-
+            
+           For<IFileWatcher>().Use<FileWatcher>();
             Scan(scanner =>
             {
                 scanner.ExcludeType<ILogger>();
@@ -29,10 +30,9 @@ namespace TailBlazer.Infrastucture
                 //to do, need a auto-exclude these AppConventions
                 scanner.ExcludeType<SelectionMonitor>();
                 scanner.ExcludeType<SearchInfoCollection>();
-                
+                scanner.ExcludeType<FileWatcher>();
 
-
-              //  scanner.ExcludeType<ISelectionMonitor>();
+                //  scanner.ExcludeType<ISelectionMonitor>();
                 scanner.LookForRegistries();
                 scanner.Convention<AppConventions>();
 
