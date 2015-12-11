@@ -7,7 +7,7 @@
              xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
-             xmlns:converters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf"
+             xmlns:fileHandling="clr-namespace:TailBlazer.Domain.FileHandling;assembly=TailBlazer.Domain"
              x:Name="Control"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:FileTailerViewModel, IsDesignTimeCreatable=False}"
@@ -38,25 +38,16 @@
                                  Height="{TemplateBinding Height}"
                                  Fill="{TemplateBinding Background}"/>
                                 <local:SettingsIcon  Width="12" Height="12"/>
-                                <!--<Path x:Name="Path"
-                              Data="M0.5,71 L70,0.5 M0.5,1 L70,70.5" 
-                              Width="6" Height="6"
-                              Stretch="Uniform"
-                              Stroke="{TemplateBinding Foreground}"
-                              StrokeThickness="1.5"
-                              StrokeStartLineCap="Square" 
-                              StrokeEndLineCap="Square"
-                              SnapsToDevicePixels="True" />-->
                             </Grid>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
-                <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
+                <Setter Property="Background" Value="{DynamicResource PrimaryHueMidForegroundBrush }" />
                 <Setter Property="Width" Value="22" />
                 <Setter Property="Height" Value="22" />
                 <Setter Property="Margin" Value="4 0 2 0" />
                 <Setter Property="Opacity" Value=".75" />
-                <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush }" />
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="true">
                         <Setter Property="Background" Value="{DynamicResource PrimaryHueLightBrush}"/>
@@ -64,8 +55,6 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
-
-
             <Style TargetType="{x:Type Button}" x:Key="CloseButtonStyle" BasedOn="{StaticResource MaterialDesignMenuCommandButtonStyle}">
                 <Setter Property="Template">
                     <Setter.Value>
@@ -101,91 +90,10 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
-
-            <Style x:Key="RaisedCircularProgressBar" TargetType="{x:Type ProgressBar}">
-                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
-                <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
-                <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="Cursor" Value="Hand"/>
-                <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                <Setter Property="wpf:ShadowAssist.ShadowDepth" Value="Depth2" />
-                <Setter Property="Padding" Value="1"/>
-                <Setter Property="Width" Value="40" />
-                <Setter Property="Height" Value="40" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type ProgressBar}">
-                            <Grid>
-                                <Ellipse Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="{TemplateBinding BorderThickness}" 
-                                 Effect="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(wpf:ShadowAssist.ShadowDepth), Converter={x:Static converters:ShadowConverter.Instance}}"
-                                 x:Name="border" />
-                                <ProgressBar
-                                        Visibility="{Binding IsLoading.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                        Style="{StaticResource TailBlazerCircularProgressBar}" 
-                                       Width="{TemplateBinding Width}"
-                                       Height="{TemplateBinding Height}"
-                                        Value="{TemplateBinding Value}"
-                                        IsIndeterminate="True"/>
-                                <Ellipse x:Name="GeometryEllipse" Fill="Transparent" IsHitTestVisible="False" Focusable="False" />
-                            </Grid>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsEnabled" Value="false">
-                                    <Setter Property="Opacity" Value="0.23"/>
-                                </Trigger>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="border" Property="wpf:ShadowAssist.Darken" Value="True" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
-
         </ResourceDictionary>
     </Control.Resources>
 
     <Grid>
-        <!--<wpf:Card 
-            Width="75"
-             Height="75"
-          
-            UniformCornerRadius="4" Padding="4"
-
-            >
-            <ProgressBar
-
-                Style="{StaticResource TailBlazerCircularProgressBar}" 
-                MinWidth="50"
-                MinHeight="50"
-                Value="50"
-                IsIndeterminate="True"/>
-        </wpf:Card>-->
-
-        <!--<Grid>
-            <Ellipse Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="{TemplateBinding BorderThickness}" 
-                                 Effect=wpf:ShadowAssist.ShadowDepth
-                     , Converter={x:Static converters:ShadowConverter.Instance}}"
-                                 x:Name="border" />
-        </Grid>-->
-        
-        <!--<wpf:Card  
-            UniformCornerRadius="4"
-            Padding="4"
-            wpf:ShadowAssist.ShadowDepth="Depth5"
-            VerticalAlignment="Center" 
-            HorizontalAlignment="Center">
-            <ProgressBar
-                Visibility="{Binding IsLoading.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
-                Style="{StaticResource TailBlazerCircularProgressBar}" 
-                MinWidth="75"
-                MinHeight="75"
-                Value="50"
-                IsIndeterminate="True"/>
-        </wpf:Card>-->
         <ProgressBar
                 Visibility="{Binding IsLoading.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
                 Style="{StaticResource TailBlazerCircularProgressBar}" 
@@ -194,9 +102,9 @@
                 Value="50"
                 IsIndeterminate="True"/>
 
-        <Grid    
-            Visibility="{Binding IsLoading.Value, Converter={StaticResource InvertedBooleanToVisibilityConverter}}" Margin="0"
->
+        <Grid  
+            Visibility="{Binding IsLoading.Value, Converter={StaticResource InvertedBooleanToVisibilityConverter}}" 
+            Margin="-4 0 -4 0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
       
@@ -216,9 +124,6 @@
 
                 <Viewbox Width="24" Height="24" Margin="4 0 0 0">
                     <Canvas Width="24" Height="24">
-
-                        <!--<Path Data="M 25.34375 0.59375 L 21.4375 3.15625 L 16.8125 6.21875 L 18.375 3.3125 L 15.4375 4.90625 C 15.4375 4.90625 13.053934 6.2050341 10.34375 7.84375 C 7.633566 9.4824659 4.6356734 11.400968 3.09375 13 C 0.32055475 15.773195 0.32055475 20.226805 3.09375 23 C 5.8669452 25.773195 10.320555 25.773195 13.09375 23 C 14.636855 21.456895 16.397579 18.86773 17.8125 16.59375 C 19.227421 14.31977 20.28125 12.375 20.28125 12.375 L 21.5625 10.0625 L 19.0625 10.96875 L 18.6875 11.09375 L 22.84375 4.53125 L 25.34375 0.59375 z M 18.65625 7.40625 L 15.46875 12.46875 L 13.90625 14.90625 L 16.625 13.9375 L 17.15625 13.75 C 16.742642 14.459353 16.693315 14.567664 16.09375 15.53125 C 14.708671 17.75727 12.944395 20.336855 11.6875 21.59375 C 9.6606952 23.620555 6.5268048 23.620555 4.5 21.59375 C 2.4731952 19.566945 2.4731952 16.433055 4.5 14.40625 L 4.53125 14.40625 C 5.6893266 13.205282 8.710184 11.173784 11.375 9.5625 C 12.422652 8.929036 12.52043 8.9081853 13.34375 8.4375 L 13.125 8.8125 L 11.21875 12.34375 L 14.5625 10.125 L 18.65625 7.40625 z M 8 15 C 6.3 15 5 16.3 5 18 C 5 19.7 6.3 21 8 21 C 9.7 21 11 19.7 11 18 C 11 16.3 9.7 15 8 15 z"
-                                  Fill="{Binding ElementName=SearchTextBox, Path=BorderBrush}" />-->
                         <Path Data="M3,2H21V2H21V4H20.92L15,9.92V22.91L9,16.91V9.91L3.09,4H3V2M11,16.08L13,18.08V9H13.09L18.09,4H5.92L10.92,9H11V16.08Z" 
                                   Fill="{Binding ElementName=SearchTextBox, Path=BorderBrush}" />
                     </Canvas>
@@ -238,7 +143,9 @@
 
                 <TextBlock     Margin="4 0 0 0" 
                                Opacity="0.55"
-                               Grid.Column="2" 
+                               Width="35"
+                               TextAlignment="Right"
+                               Grid.Column="2" TextWrapping="Wrap"
                             Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
                             VerticalAlignment="Center"
                             Text="Select Filter:"></TextBlock>
@@ -265,7 +172,7 @@
 
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type local:SearchViewModel}">
-                            <Grid x:Name="Selection">
+                            <Grid x:Name="Selection" VerticalAlignment="Center">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition  Width="Auto"/>
@@ -283,8 +190,7 @@
                                                 BaselineAlignment="Bottom"
                                                 Text="{Binding Text, Mode=OneWay}"/>
                                     
-                                            <Run BaselineAlignment="Bottom"
-                                                Text="{Binding  Count, StringFormat='{}{0:#,###0}'}"/>
+                                            <Run BaselineAlignment="Bottom" Text="{Binding  CountText}"/>
                                 </TextBlock>
                                 
                                 <ProgressBar  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
@@ -298,10 +204,10 @@
                                             Minimum="0"
                                             IsIndeterminate="False"/>
 
-                                
-                                <Button Visibility="{Binding IsDefault, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
+
+                                <Button Visibility="{Binding SearchType, Converter={StaticResource EqualityToVisibilityConverter},ConverterParameter={x:Static fileHandling:SearchType.User}}"
                                         Grid.Row="0"  Grid.Column="2"
-                                        ToolTip="{Binding Text, StringFormat='Removed {0}'}"
+                                        ToolTip="{Binding RemoveTooltip}"
                                         Margin="4 0 0 4"
                                         VerticalAlignment="Center"
                                         Command="{Binding RemoveCommand}"
@@ -328,21 +234,17 @@
                 </ListBox>
 
 
-                <!--<wpf:PopupBox Grid.Column="4" StaysOpen="True" StaysOpenOnEdit="True">
-                    <TextBox   Text="XXX"></TextBox>
-                </wpf:PopupBox>-->
-
-                <!--<Button Grid.Column="4" HorizontalAlignment="Left"
+                <Button Grid.Column="4" HorizontalAlignment="Left"
                     ToolTip="Search options"
                                 Height="14" Width="14"
                                 VerticalAlignment="Center"
                                 Margin="2 2 0 2"  
-                                Style="{StaticResource SettingsButtonStyle}"/>-->
+                                Style="{StaticResource SettingsButtonStyle}"/>
                 <CheckBox
                     Grid.Column="5" HorizontalAlignment="Right"
                       VerticalAlignment="Center"
                       IsChecked="{Binding AutoTail}"
-                      Margin="0 0 6 0"
+                      Margin="4 0 4 0"
                       >Follow tail</CheckBox>
             </Grid>
 
@@ -373,7 +275,7 @@
                         <local:VirtualScrollPanel ItemHeight="22"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
-                                                TotalItems="{Binding MatchedLineCount.Value}"/>
+                                                TotalItems="{Binding Count.Value}"/>
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
 
@@ -384,8 +286,7 @@
 
                 <ListBox.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="_Copy" 
-                                  Command="{Binding CopyToClipboardCommand}">
+                        <MenuItem Header="_Copy" Command="{Binding CopyToClipboardCommand}">
 
                             <MenuItem.Icon>
                                 <Viewbox >
@@ -451,61 +352,62 @@
                 </ListBox.ItemContainerStyle>
 
             </ListBox>
-            <!--This is for debugging.Just change visibility for more info-->
-            <Grid      Grid.Row="2"
-                       Visibility="Visible"
-            Height="26"
-            Background="{StaticResource PrimaryHueMidBrush}"
-            Margin = "-4 0 -4 -4">
+            
+            <Grid    Grid.Row="2"
+              Margin = "0 0 -4 0"       
+            Background="{StaticResource PrimaryHueMidBrush}">
 
 
                 <Grid.Resources>
                     <Style TargetType="{x:Type TextBlock}">
                         <Setter Property="Opacity" Value="0.8"/>
-                        <Setter Property="Margin" Value="5 4 0 4"/>
                         <Setter Property="VerticalAlignment" Value="Center"/>
                         <Setter Property="Foreground" Value="{StaticResource PrimaryHueMidForegroundBrush}"/>
                     </Style>
                 </Grid.Resources>
-                
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-
-                <TextBlock Text="DEBUGGING INFO:"/>
-
-                <StackPanel Grid.Column="1" Margin="0 0 6 0"
+                <StackPanel Grid.Column="1" Margin="4 2 6 2"
                      Orientation="Horizontal" 
-                     HorizontalAlignment="Right">
+                     Visibility="Visible"       
+                     HorizontalAlignment="Left">
+
+                    <TextBlock Text="DEBUGGING INFO:"/>
 
                     <TextBlock  
                         Margin="4 0 0 0"
                         Text="{Binding SelectedItemsCount.Value,StringFormat='\Selected Items={0} '}"
-                        VerticalAlignment="Center"
-                        MinWidth="125"/>
-
-                    <TextBlock  
-                        Margin="4 0 0 0"
-                        Text="{Binding  MatchedLineCount.Value,StringFormat='\Count={0}'}"
                         VerticalAlignment="Center"/>
+
 
 
                     <TextBlock  
                         Margin="4 0 0 0"
                        Text="{Binding FirstIndex,StringFormat='\First Index={0}'}"
-                        VerticalAlignment="Center"
-                        MinWidth="125"/>
+                        VerticalAlignment="Center"/>
 
                     <TextBlock  
                         Margin="4 0 0 0"
                         Text="{Binding PageSize,StringFormat='\Page Size={0}'}"
-                        VerticalAlignment="Center"
-                        MinWidth="125"/>
+                        VerticalAlignment="Center"/>
+
+                </StackPanel>
+                
+                <StackPanel 
+                    Margin="4 2 4 2"
+                    Grid.Column="1"
+                            HorizontalAlignment="Right"
+                            Orientation="Horizontal">
+                    <TextBlock  
+                        Margin="4 0 0 0"
+                        Text="{Binding  Count.Value,StringFormat='Total lines: {0}'}"
+                        VerticalAlignment="Center"/>
 
 
-                    <TextBlock Margin="4 4 0 4" Text="{Binding FileSizeText.Value}" />
-
+                    <TextBlock Margin="4 0 0 0" Text="{Binding FileSizeText.Value}" />
                 </StackPanel>
             </Grid>
         </Grid>

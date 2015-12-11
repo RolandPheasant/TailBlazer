@@ -7,7 +7,14 @@ using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class FileSearchResult: ILineProvider, IEquatable<FileSearchResult>, IHasLimitationOfLines
+    public interface IProgressInfo
+    {
+        int SegmentsCompleted { get; }
+        int Segments { get; }
+        bool IsSearching { get; }
+    }
+
+    public class FileSearchResult: ILineProvider, IEquatable<FileSearchResult>, IHasLimitationOfLines, IProgressInfo
     {
         public static readonly FileSearchResult None = new FileSearchResult();
         public long[] Matches { get; }

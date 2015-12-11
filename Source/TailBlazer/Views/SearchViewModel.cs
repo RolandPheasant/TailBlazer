@@ -16,12 +16,17 @@ namespace TailBlazer.Views
         private bool _searching;
         private int _segments;
         private int _segmentsSearched;
+        private string _countText;
 
         public ICommand  RemoveCommand { get; }
 
         public string Text => _tail.SearchText.ToUpper();
 
-        public bool IsDefault => _tail.IsDefault;
+        public string RemoveTooltip => $"Get rid of {Text}?";
+
+        public bool IsUserDefined => _tail.SearchType == SearchType.User ;
+
+        public SearchType SearchType => _tail.SearchType ;
 
         public IObservable<ILineProvider> Latest => _tail.Latest;
 
@@ -33,14 +38,26 @@ namespace TailBlazer.Views
                 .Select(lp => lp.Count)
                 .Subscribe(count => Count = count);
 
-            var progressMonitor = _tail.Latest.OfType<FileSearchResult>().Subscribe(result =>
+            var counterTextFormatter = _tail.Latest
+                .Select(lp =>
+                {
+                    var limited = lp as IHasLimitationOfLines;
+                    if (limited == null) return $"{lp.Count.ToString("#,###0")}";
+                    return limited.HasReachedLimit 
+                                ? $"{limited.Maximum.ToString("#,###0")}+" 
+                                : $"{lp.Count.ToString("#,###0")}";
+                })
+                 .Subscribe(countText => CountText = countText); ;
+
+
+            var progressMonitor = _tail.Latest.OfType<IProgressInfo>().Subscribe(result =>
             {
                 Searching = result.IsSearching;
                 Segments = result.Segments;
                 SegmentsSearched = result.SegmentsCompleted;
             });
 
-            _cleanUp = new CompositeDisposable(progressMonitor, counter);
+            _cleanUp = new CompositeDisposable(progressMonitor, counter, counterTextFormatter);
         }
 
 
@@ -48,6 +65,12 @@ namespace TailBlazer.Views
         {
             get { return _count; }
             set { SetAndRaise(ref _count, value); }
+        }
+
+        public string CountText
+        {
+            get { return _countText; }
+            set { SetAndRaise(ref _countText, value); }
         }
 
         public bool Searching

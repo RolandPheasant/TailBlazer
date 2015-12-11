@@ -30,7 +30,7 @@ namespace TailBlazer.Views
         public IProperty<int> SelectedItemsCount { get; }
         public IProperty<bool> ShouldHightlightMatchingText { get; }
         public IProperty<string> SearchHint { get; }
-        public IProperty<int> MatchedLineCount { get; }
+        public IProperty<int> Count { get; }
         public IProperty<string> FileSizeText { get; }
         public IProperty<bool> IsLoading { get; }
         public IProperty<string> HightlightText { get; }
@@ -59,6 +59,8 @@ namespace TailBlazer.Views
             SelectedItemsCount = selectionMonitor.Selected.Connect().QueryWhenChanged(collection=> collection.Count).ForBinding();
             SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
 
+
+
             //An observable which acts as a scroll command
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
             var scroller = _userScrollRequested.CombineLatest(autoChanged, (user, auto) =>
@@ -71,13 +73,14 @@ namespace TailBlazer.Views
 
             //LOAD SEARCHES
             //tailer is the main object used to tail, scroll and filter in a file
-            var tailer =   new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);  //fileTailerFactory.Create(fileInfo, SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
+            var tailer = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);  //fileTailerFactory.Create(fileInfo, SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
+
 
 
             //Add a complete file display [No search info here]
             var indexed = fileWatcher.Latest.Index().Replay(1).RefCount();
             IsLoading = indexed.Take(1).Select(_ => false).StartWith(true).ForBinding();
-            searchInfoCollection.Add("<All>", indexed, true);
+            searchInfoCollection.Add("<All>", indexed, SearchType.All);
 
             Func<string, IObservable<ILineProvider>> factory = text =>
             {
@@ -87,12 +90,15 @@ namespace TailBlazer.Views
             };
          
 
-            var current = this.WhenValueChanged(vm => vm.SearchText)
-                                .Select(searchText => !searchText.IsLongerThanOrEqualTo(3) 
-                                                        ? indexed 
-                                                        : factory(searchText))
-                                .Switch();
-            searchInfoCollection.Add("<Current>", current, true);
+           // //current is screen-only [not selectable]
+           // var current = this.WhenValueChanged(vm => vm.SearchText)
+           //                     .Select(searchText => !searchText.IsLongerThanOrEqualTo(3) 
+           //                                             ? indexed 
+           //                                             : factory(searchText))
+           //                     .Switch();
+           //searchInfoCollection.Add("<Current>", current, SearchType.Current);
+
+
 
             //command to add the current search to the tail collection
             KeepSearchCommand = new Command(() =>
@@ -102,9 +108,7 @@ namespace TailBlazer.Views
                 SearchText = string.Empty;
             },()=> SearchText.IsLongerThanOrEqualTo(3));
 
-
-
-
+            
             
             //User feedback to show file size
             FileSizeText = fileWatcher.Latest.Select(fn=>fn.Size)
@@ -138,7 +142,7 @@ namespace TailBlazer.Views
                             ex => logger.Error(ex, "There is a problem with bind data"));
             
             //monitor matching lines and start index,
-            MatchedLineCount = SearchCollection.Latest.Select(latest=>latest.Count).ForBinding();
+            Count = indexed.Select(latest=>latest.Count).ForBinding();
 
             //track first visible index
             var firstIndexMonitor = tailer.Lines.Connect()
@@ -150,7 +154,7 @@ namespace TailBlazer.Views
                 loader,
                 firstIndexMonitor,
                 IsLoading,
-                MatchedLineCount,
+                Count,
                 FileSizeText,
                 SearchHint,
                 ShouldHightlightMatchingText,
