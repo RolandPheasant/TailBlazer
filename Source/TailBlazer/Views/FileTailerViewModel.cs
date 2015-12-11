@@ -31,6 +31,7 @@ namespace TailBlazer.Views
         public IProperty<bool> ShouldHightlightMatchingText { get; }
         public IProperty<string> SearchHint { get; }
         public IProperty<int> Count { get; }
+        public IProperty<int> LatestCount { get; }
         public IProperty<string> FileSizeText { get; }
         public IProperty<bool> IsLoading { get; }
         public IProperty<string> HightlightText { get; }
@@ -74,9 +75,7 @@ namespace TailBlazer.Views
             //LOAD SEARCHES
             //tailer is the main object used to tail, scroll and filter in a file
             var tailer = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);  //fileTailerFactory.Create(fileInfo, SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
-
-
-
+            
             //Add a complete file display [No search info here]
             var indexed = fileWatcher.Latest.Index().Replay(1).RefCount();
             IsLoading = indexed.Take(1).Select(_ => false).StartWith(true).ForBinding();
@@ -89,17 +88,6 @@ namespace TailBlazer.Views
                     .Replay(1).RefCount();
             };
          
-
-           // //current is screen-only [not selectable]
-           // var current = this.WhenValueChanged(vm => vm.SearchText)
-           //                     .Select(searchText => !searchText.IsLongerThanOrEqualTo(3) 
-           //                                             ? indexed 
-           //                                             : factory(searchText))
-           //                     .Switch();
-           //searchInfoCollection.Add("<Current>", current, SearchType.Current);
-
-
-
             //command to add the current search to the tail collection
             KeepSearchCommand = new Command(() =>
             {
@@ -108,8 +96,6 @@ namespace TailBlazer.Views
                 SearchText = string.Empty;
             },()=> SearchText.IsLongerThanOrEqualTo(3));
 
-            
-            
             //User feedback to show file size
             FileSizeText = fileWatcher.Latest.Select(fn=>fn.Size)
                 .Select(size => size.FormatWithAbbreviation())
@@ -144,6 +130,8 @@ namespace TailBlazer.Views
             //monitor matching lines and start index,
             Count = indexed.Select(latest=>latest.Count).ForBinding();
 
+            LatestCount = SearchCollection.Latest.Select(latest => latest.Count).ForBinding();
+
             //track first visible index
             var firstIndexMonitor = tailer.Lines.Connect()
                 .Buffer(TimeSpan.FromMilliseconds(250)).FlattenBufferResult()
@@ -155,6 +143,7 @@ namespace TailBlazer.Views
                 firstIndexMonitor,
                 IsLoading,
                 Count,
+                LatestCount,
                 FileSizeText,
                 SearchHint,
                 ShouldHightlightMatchingText,
@@ -167,6 +156,7 @@ namespace TailBlazer.Views
                     (SelectionMonitor as IDisposable)?.Dispose();
                 }));
         }
+
 
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
         {

@@ -90,6 +90,61 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
+
+
+            <Style x:Key="filterListBoxStyle" TargetType="{x:Type ListBox}">
+
+                <Setter Property="BorderBrush" Value="{StaticResource MaterialDesignTextBoxBorder}"/>
+              
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate  TargetType="{x:Type ListBox}">
+
+                            <Border x:Name="border"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+          
+                        CornerRadius="8" 
+                         BorderThickness="4 0 0 0" >
+                                
+                                <ScrollViewer x:Name="ScrollViewer" 
+                                              Margin="4 0 0 0"
+            		                            VerticalScrollBarVisibility="Auto"
+            		                            HorizontalScrollBarVisibility="Auto"
+            		                            CanContentScroll="True"
+            		                            Padding="{TemplateBinding Padding}"
+            		                            Background="{TemplateBinding Background}" 
+            		                            BorderBrush="Transparent" BorderThickness="0" 
+            		                            IsTabStop="False">
+                                <ItemsPresenter/>
+                            </ScrollViewer>
+                                
+                        </Border>
+                        <ControlTemplate.Triggers>
+
+
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Opacity" TargetName="border" Value="0.56"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="true">
+                                <Setter  Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                            </Trigger>
+                                <Trigger Property="IsFocused" Value="true">
+                                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueDarkBrush}"/>
+                                </Trigger>
+
+                            </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+
+
+                
+            </Style>
+
         </ResourceDictionary>
     </Control.Resources>
 
@@ -107,7 +162,7 @@
             Margin="-4 0 -4 0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-      
+
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -141,59 +196,49 @@
                 </TextBox>
 
 
-                <TextBlock     Margin="4 0 0 0" 
-                               Opacity="0.55"
-                               Width="35"
-                               TextAlignment="Right"
-                               Grid.Column="2" TextWrapping="Wrap"
+
+
+                <TextBlock     Margin="4 0 0 0" Grid.Column="2"
+                               Opacity="0.56"
+
+                               Width="43"
+                               TextAlignment="Center"
+                              TextWrapping="Wrap"
                             Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
                             VerticalAlignment="Center"
-                            Text="Select Filter:"></TextBlock>
+                            Text="Switch Results"></TextBlock>
 
-                <ListBox      Margin="4 0 0 0" Grid.Column="3"
-                    Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
+
+                <ListBox Grid.Column="3" Margin="4 2 0 2" 
+                      Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
                     SelectedItem="{Binding SearchCollection.Selected}"
-                    ItemsSource="{Binding SearchCollection.Items}">
+                    ItemsSource="{Binding SearchCollection.Items}" 
+                     Style="{DynamicResource filterListBoxStyle}">
 
-                    <ListBox.Template>
-                        <ControlTemplate>
-                            <ScrollViewer x:Name="ScrollViewer" 
-                                        VerticalScrollBarVisibility="Auto"
-                                        HorizontalScrollBarVisibility="Auto"
-                                        CanContentScroll="True"
-                                        Padding="{TemplateBinding Padding}"
-                                        Background="{TemplateBinding Background}" 
-                                        BorderBrush="Transparent" BorderThickness="0" 
-                                        IsTabStop="False">
-                                <ItemsPresenter/>
-                            </ScrollViewer>
-                        </ControlTemplate>
-                    </ListBox.Template>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type local:SearchViewModel}">
+                                <Grid x:Name="Selection" VerticalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition  Width="Auto"/>
+                                        <ColumnDefinition  Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type local:SearchViewModel}">
-                            <Grid x:Name="Selection" VerticalAlignment="Center">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition  Width="Auto"/>
-                                    <ColumnDefinition  Width="Auto"/>
-                                </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
 
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                
-                                <TextBlock Margin="4 0 0 0">
+                                    <TextBlock Margin="4 0 0 0">
                                             <Run FontSize="12"
                                                 FontWeight="Bold"
                                                 BaselineAlignment="Bottom"
                                                 Text="{Binding Text, Mode=OneWay}"/>
                                     
                                             <Run BaselineAlignment="Bottom" Text="{Binding  CountText}"/>
-                                </TextBlock>
-                                
-                                <ProgressBar  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                    </TextBlock>
+
+                                    <ProgressBar  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                                             Margin="0 4 0 0"            
                                             Width="{Binding ElementName=Selection, Path=Width}"    
                                             Orientation="Horizontal"
@@ -205,41 +250,45 @@
                                             IsIndeterminate="False"/>
 
 
-                                <Button Visibility="{Binding SearchType, Converter={StaticResource EqualityToVisibilityConverter},ConverterParameter={x:Static fileHandling:SearchType.User}}"
+                                    <Button Visibility="{Binding SearchType, Converter={StaticResource EqualityToVisibilityConverter},ConverterParameter={x:Static fileHandling:SearchType.User}}"
                                         Grid.Row="0"  Grid.Column="2"
                                         ToolTip="{Binding RemoveTooltip}"
                                         Margin="4 0 0 4"
                                         VerticalAlignment="Center"
                                         Command="{Binding RemoveCommand}"
                                         Style="{StaticResource CloseButtonStyle}"/>
-                            </Grid>
-                        </DataTemplate>
+                                </Grid>
+                            </DataTemplate>
 
-                    </ListBox.ItemTemplate>
+                        </ListBox.ItemTemplate>
 
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel Orientation="Horizontal"/>
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
 
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
-                            <Style.Setters>
-                                <Setter Property="Padding" Value="4 0 4 0"/>
-                                <Setter Property="Height" Value="36"/>
-                            </Style.Setters>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                </ListBox>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
+                                <Style.Setters>
+                                    <Setter Property="Padding" Value="4 0 4 0"/>
+                                    <Setter Property="Height" Value="36"/>
+                                </Style.Setters>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
 
 
-                <Button Grid.Column="4" HorizontalAlignment="Left"
-                    ToolTip="Search options"
-                                Height="14" Width="14"
-                                VerticalAlignment="Center"
-                                Margin="2 2 0 2"  
-                                Style="{StaticResource SettingsButtonStyle}"/>
+                <!--</Border>-->
+
+                <Button Grid.Column="4" 
+                        Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
+                        HorizontalAlignment="Left"
+                        ToolTip="Search options"
+                        Height="14" Width="14"
+                        VerticalAlignment="Center"
+                        Margin="2 2 0 2"  
+                        Style="{StaticResource SettingsButtonStyle}"/>
                 <CheckBox
                     Grid.Column="5" HorizontalAlignment="Right"
                       VerticalAlignment="Center"
@@ -275,7 +324,7 @@
                         <local:VirtualScrollPanel ItemHeight="22"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
-                                                TotalItems="{Binding Count.Value}"/>
+                                                TotalItems="{Binding LatestCount.Value}"/>
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
 
@@ -287,12 +336,11 @@
                 <ListBox.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="_Copy" Command="{Binding CopyToClipboardCommand}">
-
                             <MenuItem.Icon>
-                                <Viewbox >
+                                <Viewbox Width="16" Height="16">
                                     <Canvas Width="24" Height="24">
                                         <Path Data="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" 
-                                              Fill="Black" />
+                                              Fill="{DynamicResource MaterialDesignBody}" />
                                     </Canvas>
                                 </Viewbox>
                             </MenuItem.Icon>
@@ -352,9 +400,9 @@
                 </ListBox.ItemContainerStyle>
 
             </ListBox>
-            
+
             <Grid    Grid.Row="2"
-              Margin = "0 0 -4 0"       
+              Margin = "0 0 0 -4"       
             Background="{StaticResource PrimaryHueMidBrush}">
 
 
@@ -395,7 +443,7 @@
                         VerticalAlignment="Center"/>
 
                 </StackPanel>
-                
+
                 <StackPanel 
                     Margin="4 2 4 2"
                     Grid.Column="1"
