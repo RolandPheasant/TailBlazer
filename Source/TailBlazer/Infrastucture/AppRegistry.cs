@@ -17,7 +17,7 @@ namespace TailBlazer.Infrastucture
                 throw new FileNotFoundException("The log4net.config file was not found" + path);
 
             log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(path));
-            For<ILogger>().Use<Log4NetLogger>().Ctor<Type>("type").Is(x => x.RootType).AlwaysUnique();
+            For<ILogger>().Use<Log4NetLogger>().Ctor<Type>("type").Is(x => x.ParentType).AlwaysUnique();
 
             For<ISelectionMonitor>().Use<SelectionMonitor>();
             For<ISearchInfoCollection>().Use<SearchInfoCollection>();

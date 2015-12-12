@@ -7,6 +7,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Navigation;
 using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.Infrastructure;
@@ -14,6 +15,12 @@ using TailBlazer.Views;
 
 namespace TailBlazer.Infrastucture
 {
+    public enum MouseKeyState
+    {
+        Down,
+        Up
+    }
+
     /// <summary>
     /// Tail Blazer is fast because it uses true data virtualisation. However this causes a huge headache
     /// when trying to copy and paste items which are selected but no longer visible to the clip-board
@@ -29,6 +36,8 @@ namespace TailBlazer.Infrastucture
         private readonly ILogger _logger;
         private readonly ISourceList<LineProxy> _selected = new SourceList<LineProxy>();
         private readonly ISourceList<LineProxy> _recentlyRemovedFromVisibleRange = new SourceList<LineProxy>();
+
+
         private readonly IDisposable _cleanUp;
         private readonly SerialDisposable _controlSubscriber = new SerialDisposable();
         
@@ -41,11 +50,19 @@ namespace TailBlazer.Infrastucture
             _logger = logger;
             Selected = _selected.AsObservableList();
 
+            var selectionLogger = _selected.Connect()
+                .ToCollection()
+                .Subscribe(collection =>
+                {
+                    logger.Debug($"{collection.Count} selected: {collection.Select(l=>l.Text).ToDelimited(Environment.NewLine)} ");
+                });
+
             _cleanUp = new CompositeDisposable(
                 _selected, 
                 _recentlyRemovedFromVisibleRange,
                 _controlSubscriber,
                 Selected,
+                selectionLogger,
                 //keep recent items only up to a certain number
                 _recentlyRemovedFromVisibleRange.LimitSizeTo(100).Subscribe());
         }
@@ -90,10 +107,9 @@ namespace TailBlazer.Infrastucture
                     //edit ensures items are added in 1 batch
                     _recentlyRemovedFromVisibleRange.Edit(innerList =>
                     {
-                        foreach (var item in oldItems)
+                        foreach (var item in oldItems.Where(item => !innerList.Contains(item)))
                         {
-                            if (!innerList.Contains(item))
-                                innerList.Add(item);
+                            innerList.Add(item);
                         }
                     });
 
@@ -101,30 +117,66 @@ namespace TailBlazer.Infrastucture
 
             //clear selection when the mouse is clicked and no other key is pressed
             var mouseDown = Observable.FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(
-                h => selector.PreviewMouseLeftButtonDown += h,
-                h => selector.PreviewMouseLeftButtonDown -= h)
-                .Select(evt => evt.EventArgs)
-                .Subscribe(mouseArgs =>
-                {
-                    var isKeyDown = (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)
-                     || Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightCtrl));
+                                    h => selector.PreviewMouseLeftButtonDown += h,
+                                    h => selector.PreviewMouseLeftButtonDown -= h)
+                                    .Select(evt => evt.EventArgs)
+                                    .Subscribe(mouseArgs =>
+                                    {
+                                        var isKeyDown = (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)
+                                         || Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightCtrl));
 
-                    if (!isKeyDown) _selected.Clear();
-                });
+                                        if (!isKeyDown) _selected.Clear();
 
-            var selectionChanged = Observable
+                                    });
+
+            var mouseUpHandler = Observable.FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(
+                        h => selector.PreviewMouseLeftButtonUp += h,
+                        h => selector.PreviewMouseLeftButtonUp -= h)
+                        .Select(x => MouseKeyState.Up);
+
+
+            var selectedChanged = Observable
                 .FromEventPattern<SelectionChangedEventHandler, SelectionChangedEventArgs>(
                     h => selector.SelectionChanged += h,
                     h => selector.SelectionChanged -= h)
-                .Select(evt => evt.EventArgs)
-                .Subscribe(OnSelectedItemsChanged);
+                .Select(evt => evt.EventArgs);
 
-            _controlSubscriber.Disposable =new CompositeDisposable(mouseDown, selectionChanged, itemsAdded, itemsRemoved, dataSource.Connect());
+
+            //Handle selecting multiple rows with the mouse [TODO: Scroll up when the]
+            var mouseDragSelector2 =  selectedChanged
+                    .Scan(new ImmutableList<LineProxy>(), (state, latest) =>
+                    {
+                        return state.Add(latest.AddedItems.OfType<LineProxy>().ToList());
+                    }).Select(list => list.Data.Distinct().ToArray())
+                    .TakeUntil(mouseUpHandler)
+                    .Repeat()
+                    .Where(selection=>selection.Length>0)
+                    .Subscribe(selection =>
+                    {
+
+                        var first = selection.OrderBy(proxy => proxy.Number).First();
+                        var last = selection.OrderBy(proxy => proxy.Number).Last();
+
+                        var fromCurrentPage = _selector.Items.OfType<LineProxy>()
+                            .Where(lp => lp.Number >= first.Number && lp.Number <= last.Number)
+                            .ToArray();
+
+                        foreach (var item in fromCurrentPage)
+                            _selector.SelectedItems.Add(item);
+      
+                        _logger.Debug($"{selection.Length} selected. Page={fromCurrentPage.Length}" );
+                    });
+
+
+            var selectionChanged = selectedChanged.Subscribe(OnSelectedItemsChanged);
+
+            _controlSubscriber.Disposable =new CompositeDisposable(mouseDown, mouseDragSelector2, selectionChanged, itemsAdded, itemsRemoved, dataSource.Connect());
         }
 
 
         private void OnSelectedItemsChanged(SelectionChangedEventArgs args)
         {
+
             //Logic - by default when items scroll out of view they are no longer selected.
             //this is because the panel is virtualised and and automatically unselected due
             //to the control thinking that the item is not longer part of the overall collection
@@ -133,25 +185,28 @@ namespace TailBlazer.Infrastucture
             {
                 _isSelecting = true;
 
-                _selected.Edit(list =>
+                _selected.Edit(innerList =>
                 {
                     var toAdd = args.AddedItems.OfType<LineProxy>().ToList();
 
                     //may need to track if last selected is off the page:
                     var isShiftKeyDown = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
 
-                    // var toRemove = args.RemovedItems.OfType<LineProxy>().ToList();
                     //get the last item at then end of the list
+
                     if (!isShiftKeyDown)
                     {
+                        //if mouse down, we need to prevent items being cleated
+
                         //add items to list
                         foreach (var lineProxy in toAdd)
                         {
-                            if (list.Contains(lineProxy)) continue;
+                            if (innerList.Contains(lineProxy)) continue;
                             _lastSelected = lineProxy;
-                            list.Add(lineProxy);
+                            innerList.Add(lineProxy);
                         }
                     }
+                    
                     else
                     {
                         //if shift down we need to override selected and manually select our selves
@@ -165,8 +220,8 @@ namespace TailBlazer.Infrastucture
                         var lastInONcurrentPage = currentPage.Contains(_lastSelected);
                         if (lastInONcurrentPage && allOnCurrentPage.Length == allSelectedItems.Length)
                         {
-                            list.Clear();
-                            list.AddRange(allSelectedItems);
+                            innerList.Clear();
+                            innerList.AddRange(allSelectedItems);
                             return;
                         }
 
@@ -199,16 +254,16 @@ namespace TailBlazer.Infrastucture
                         _recentlyRemovedFromVisibleRange.Clear();
 
                         //maintain our record
-                        list.Clear();
-                        list.AddRange(fromCurrentPage);
+                        innerList.Clear();
+                        innerList.AddRange(fromCurrentPage);
                         foreach (var previous in fromPrevious)
                         {
-                            if (!list.Contains(previous))
-                                list.Add(previous);
+                            if (!innerList.Contains(previous))
+                                innerList.Add(previous);
                         }
 
                         //finally reload the actual selection:
-                        foreach (var item in list)
+                        foreach (var item in innerList)
                         {
                             _selector.SelectedItems.Add(item);
                         }
