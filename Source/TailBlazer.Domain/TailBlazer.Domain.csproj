@@ -64,7 +64,7 @@
   <ItemGroup>
     <Compile Include="CaseInsensitiveString.cs" />
     <Compile Include="FileHandling\FileInfoEx.cs" />
-    <Compile Include="FileHandling\FileSearch.cs" />
+    <Compile Include="FileHandling\FileSearcher.cs" />
     <Compile Include="FileHandling\FileSearchEx.cs" />
     <Compile Include="FileHandling\FileSearchResult.cs" />
     <Compile Include="FileHandling\FileSearchResultEx.cs" />

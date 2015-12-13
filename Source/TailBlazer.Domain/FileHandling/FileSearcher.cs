@@ -17,7 +17,7 @@ namespace TailBlazer.Domain.FileHandling
     /// 
     /// See https://github.com/RolandPheasant/TailBlazer/issues/42
     /// </summary>
-    public class FileSearch: IDisposable
+    public class FileSearcher: IDisposable
     {
         private readonly IScheduler _scheduler;
         private readonly Func<string, bool> _predicate;
@@ -29,7 +29,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public IObservable<FileSearchResult> SearchResult { get;  }
 
-        public FileSearch([NotNull] IObservable<FileSegmentCollection> fileSegments, 
+        public FileSearcher([NotNull] IObservable<FileSegmentCollection> fileSegments, 
             [NotNull] Func<string, bool> predicate,
             int arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered = 50000,
             Encoding encoding = null,

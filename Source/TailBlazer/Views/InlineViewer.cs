@@ -39,12 +39,16 @@ namespace TailBlazer.Views
             SelectionMonitor = selectionMonitor;
             CopyToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
 
+            bool isSettingScrollPosition = false;
+
             var lineProvider = args.LineProvider;
             var selectedChanged = args.SelectedChanged;
+            var pageSize = this.WhenValueChanged(vm=>vm.PageSize);
             var scrollSelected = selectedChanged.Where(proxy => proxy != null)
-                    .CombineLatest(lineProvider, (proxy, lp) => new ScrollRequest(10, (int) proxy.Number, true));
+                    .CombineLatest(lineProvider, pageSize,(proxy, lp,pge) => new ScrollRequest(pge, (int) proxy.Start, true));
 
             var scrollUser = _userScrollRequested
+                .Where(x=>!isSettingScrollPosition)
                 .Select(request => new ScrollRequest(ScrollReason.User, request.PageSize, request.FirstIndex));
             
             var scroller= scrollSelected.Merge(scrollUser)
@@ -61,17 +65,31 @@ namespace TailBlazer.Views
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)
                 .Subscribe();
-            
-            //track first visible index [required to set scroll extent]
+
+            //TODO: Set scroller first index
+
+            // track first visible index[required to set scroll extent]
             var firstIndexMonitor = lineScroller.Lines.Connect()
                 .Buffer(TimeSpan.FromMilliseconds(250)).FlattenBufferResult()
                 .QueryWhenChanged(lines => lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min())
-                .Subscribe(first => FirstIndex = first);
+                .ObserveOn(schedulerProvider.MainThread)
+                .Subscribe(first =>
+                {
+                    try
+                    {
+                        isSettingScrollPosition = true;
+                        FirstIndex = first;
+                    }
+                    finally
+                    {
+                        isSettingScrollPosition = false;
+                    }
+                });
 
             _cleanUp = new CompositeDisposable(lineScroller,
                         loader,
                         Count,
-                        firstIndexMonitor,
+                       // firstIndexMonitor,
                         Disposable.Create(() =>
                         {
                             _userScrollRequested.OnCompleted();

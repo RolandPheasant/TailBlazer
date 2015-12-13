@@ -131,7 +131,9 @@ namespace TailBlazer.Domain.FileHandling
                             reader.DiscardBufferedData();
                             reader.BaseStream.Seek(start, SeekOrigin.Begin);
                         }
-                        
+
+                         startPosition = reader.AbsolutePosition();
+
                         var line = reader.ReadLine();
                         var endPosition = reader.AbsolutePosition();
                         var info = new LineInfo(i + 1, i, startPosition, endPosition);

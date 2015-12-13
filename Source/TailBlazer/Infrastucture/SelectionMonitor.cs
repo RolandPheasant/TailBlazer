@@ -154,11 +154,11 @@ namespace TailBlazer.Infrastucture
                     .Subscribe(selection =>
                     {
 
-                        var first = selection.OrderBy(proxy => proxy.Number).First();
-                        var last = selection.OrderBy(proxy => proxy.Number).Last();
+                        var first = selection.OrderBy(proxy => proxy.Start).First();
+                        var last = selection.OrderBy(proxy => proxy.Start).Last();
 
                         var fromCurrentPage = _selector.Items.OfType<LineProxy>()
-                            .Where(lp => lp.Number >= first.Number && lp.Number <= last.Number)
+                            .Where(lp => lp.Start >= first.Start && lp.Start <= last.Start)
                             .ToArray();
 
                         foreach (var item in fromCurrentPage)

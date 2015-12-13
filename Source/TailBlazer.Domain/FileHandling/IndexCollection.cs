@@ -58,14 +58,19 @@ namespace TailBlazer.Domain.FileHandling
             if (scroll.SpecifiedByPosition)
             {
                 foreach (var line in ReadLinesByPosition(scroll))
-                {
                     yield return line;
-                }
-
-                yield break;
+            }
+            else
+            {
+                foreach (var line in ReadLinesByIndex(scroll))
+                    yield return line;
             }
 
 
+        }
+
+        private IEnumerable<Line> ReadLinesByIndex(ScrollRequest scroll)
+        {
 
             var page = GetPage(scroll);
 
@@ -108,7 +113,6 @@ namespace TailBlazer.Domain.FileHandling
             }
         }
 
-
         private IEnumerable<Line> ReadLinesByPosition(ScrollRequest scroll)
         {
 
@@ -123,22 +127,29 @@ namespace TailBlazer.Domain.FileHandling
                 using (var reader = new StreamReaderExtended(stream, Encoding, false))
                 {
 
-                    var startPosition = scroll.FirstIndex;
+                    var startPosition = (long)scroll.FirstIndex;
                     var first = (int)CalculateIndexByPositon(startPosition);
-                    reader.BaseStream.Seek(scroll.FirstIndex, SeekOrigin.Begin);
-                    string line;
-                    while ((line = reader.ReadLine()) != null && taken < scroll.PageSize)
+                    reader.BaseStream.Seek(startPosition, SeekOrigin.Begin);
+
+                    do
                     {
 
+                        var line = reader.ReadLine();
+                        if (line==null) yield break;
+
                         var endPosition = reader.AbsolutePosition();
+
                         var info = new LineInfo(first + taken + 1, first + taken, startPosition, endPosition);
                         var ontail = endPosition >= TailInfo.TailStartsAt && DateTime.Now.Subtract(TailInfo.LastTail).TotalSeconds < 1
                             ? DateTime.Now
-                            : (DateTime?) null;
+                            : (DateTime?)null;
 
                         yield return new Line(info, line, ontail);
+
+                        startPosition = endPosition;
                         taken++;
-                    }
+
+                    } while (taken < scroll.PageSize);
                 }
             }
         }

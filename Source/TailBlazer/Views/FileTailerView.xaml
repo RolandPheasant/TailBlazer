@@ -377,7 +377,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock Text="{Binding Index, Mode=OneWay}" Visibility="Collapsed" Opacity="0.55" MinWidth="25"/>
+                            <TextBlock Text="{Binding Start, Mode=OneWay}" Visibility="Visible" Opacity="0.55" MinWidth="25"/>
                             <infrastucture:SearchableTextControl Grid.Column="1" 
                                                              Margin="6 0 0 0"   
                                                             IsHighlight="{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"  
