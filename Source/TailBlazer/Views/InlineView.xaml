@@ -59,7 +59,7 @@
                     <local:VirtualScrollPanel ItemHeight="22"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
-                                                TotalItems="{Binding LatestCount.Value}"/>
+                                                TotalItems="{Binding Count.Value}"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
 

@@ -55,6 +55,18 @@ namespace TailBlazer.Domain.FileHandling
         /// <returns></returns>
         public IEnumerable<Line> ReadLines(ScrollRequest scroll)
         {
+            if (scroll.SpecifiedByPosition)
+            {
+                foreach (var line in ReadLinesByPosition(scroll))
+                {
+                    yield return line;
+                }
+
+                yield break;
+            }
+
+
+
             var page = GetPage(scroll);
 
             var relativeIndex = CalculateRelativeIndex(page.Start);
@@ -96,6 +108,40 @@ namespace TailBlazer.Domain.FileHandling
             }
         }
 
+
+        private IEnumerable<Line> ReadLinesByPosition(ScrollRequest scroll)
+        {
+
+            //TODO: Calculate initial index of first item.
+
+   
+            //scroll from specified position
+
+            using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read,FileShare.Delete | FileShare.ReadWrite))
+            {
+                int taken = 0;
+                using (var reader = new StreamReaderExtended(stream, Encoding, false))
+                {
+
+                    var startPosition = scroll.FirstIndex;
+                    //var firstINdex = CalculateIndexByPositon(startPosition);
+                    reader.BaseStream.Seek(scroll.FirstIndex, SeekOrigin.Begin);
+                    string line;
+                    while ((line = reader.ReadLine()) != null && taken < scroll.PageSize)
+                    {
+
+                        var endPosition = reader.AbsolutePosition();
+                        var info = new LineInfo(taken + 1, taken, startPosition, endPosition);
+                        var ontail = endPosition >= TailInfo.TailStartsAt && DateTime.Now.Subtract(TailInfo.LastTail).TotalSeconds < 1
+                            ? DateTime.Now
+                            : (DateTime?) null;
+
+                        yield return new Line(info, line, ontail);
+                        taken++;
+                    }
+                }
+            }
+        }
 
         private Page GetPage(ScrollRequest scroll)
         {
@@ -139,7 +185,43 @@ namespace TailBlazer.Domain.FileHandling
 
             return -1;
         }
+        private long CalculateIndexByPositon(long position)
+        {
+            long firstLineInContainer = 0;
+            long lastLineInContainer = 0;
 
+            foreach (var sparseIndex in Indicies)
+            {
+                lastLineInContainer += sparseIndex.End;
+                if (position < lastLineInContainer)
+                {
+                    //It could be that the user is scrolling into a part of the file
+                    //which is still being indexed [or will never be indexed]. 
+                    //In this case we need to estimate where to scroll to
+                    if (sparseIndex.LineCount != 0 && sparseIndex.Indicies.Count == 0)
+                    {
+                        return -1;
+                        //return estimate here!
+                        //var lines = sparseIndex.LineCount;
+                        //var bytes = sparseIndex.End - sparseIndex.Start;
+                        //var bytesPerLine = bytes / lines;
+                        //var estimate = index * bytesPerLine;
+
+
+                        //return new RelativeIndex(index, estimate, 0, true);
+                    }
+               
+                    var relativeIndex = (int)(position / sparseIndex.Compression);
+                    var offset = position % sparseIndex.Compression;
+
+                    var actualIndex = sparseIndex.Indicies.IndexOf(position);
+
+                    return actualIndex + offset;
+                }
+                firstLineInContainer = firstLineInContainer + sparseIndex.LineCount;
+            }
+            return -1;
+        }
         private RelativeIndex CalculateRelativeIndex(int index)
         {
             int firstLineInContainer = 0;

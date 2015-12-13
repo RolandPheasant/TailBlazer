@@ -25,6 +25,7 @@ namespace TailBlazer.Views
         private int _firstIndex;
         private int _pageSize;
         private LineProxy _selectedLine;
+        private bool _showInline;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         public IProperty<int> SelectedItemsCount { get; }
@@ -40,8 +41,8 @@ namespace TailBlazer.Views
         public ISelectionMonitor SelectionMonitor { get; }
         public SearchCollection SearchCollection { get; }
 
-
         public InlineViewer InlineViewer { get; }
+        public IProperty<bool> InlineViewerVisible { get; }
 
         public FileTailerViewModel([NotNull] ILogger logger,
             [NotNull] ISchedulerProvider schedulerProvider,
@@ -73,7 +74,6 @@ namespace TailBlazer.Views
                         .ObserveOn(schedulerProvider.Background)
                         .DistinctUntilChanged();
 
-            //LOAD SEARCHES
             //tailer is the main object used to tail, scroll and filter in a file
             var lineScroller = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);  //fileTailerFactory.Create(fileInfo, SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
 
@@ -82,8 +82,9 @@ namespace TailBlazer.Views
             IsLoading = indexed.Take(1).Select(_ => false).StartWith(true).ForBinding();
             searchInfoCollection.Add("<All>", indexed, SearchType.All);
 
- 
-            InlineViewer = new InlineViewer(indexed,schedulerProvider, this.WhenValueChanged(vm=>vm.SelectedItem));
+            InlineViewer = new InlineViewer(indexed, schedulerProvider, 
+                this.WhenValueChanged(vm => vm.SelectedItem),
+                indexed.Select(idx=>idx.Count));
 
             Func<string, IObservable<ILineProvider>> factory = text =>
             {
@@ -142,6 +143,10 @@ namespace TailBlazer.Views
                 .QueryWhenChanged(lines =>lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min())
                 .Subscribe(first=> FirstIndex= first);
 
+
+            InlineViewerVisible= SearchCollection.WhenValueChanged(sc => sc.Selected)
+                .CombineLatest(this.WhenValueChanged(vm => vm.ShowInline), (selected, showInline) => selected.IsUserDefined && showInline).ForBinding();
+
             _cleanUp = new CompositeDisposable(lineScroller,
                 loader,
                 firstIndexMonitor,
@@ -152,6 +157,8 @@ namespace TailBlazer.Views
                 SearchHint,
                 ShouldHightlightMatchingText,
                 SelectedItemsCount,
+                InlineViewer,
+                InlineViewerVisible,
                 SearchCollection,
                 searchInfoCollection,
                 Disposable.Create(() =>
@@ -160,6 +167,8 @@ namespace TailBlazer.Views
                     (SelectionMonitor as IDisposable)?.Dispose();
                 }));
         }
+
+
 
         public LineProxy SelectedItem
         {
@@ -211,7 +220,14 @@ namespace TailBlazer.Views
             get { return _firstIndex; }
             set { SetAndRaise(ref _firstIndex, value); }
         }
-        
+
+        public bool ShowInline
+        {
+            get { return _showInline; }
+            set { SetAndRaise(ref _showInline, value); }
+        }
+
+
         public void Dispose()
         {
             _cleanUp.Dispose();

@@ -165,6 +165,7 @@
 
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
 
             <Grid Margin="0 4 0 4">
@@ -289,17 +290,33 @@
                         VerticalAlignment="Center"
                         Margin="2 2 0 2"  
                         Style="{StaticResource SettingsButtonStyle}"/>
-                <CheckBox
-                    Grid.Column="5" HorizontalAlignment="Right"
-                      VerticalAlignment="Center"
-                      IsChecked="{Binding AutoTail}"
-                      Margin="4 0 4 0"
-                      >Follow tail</CheckBox>
+
+                <StackPanel    Grid.Column="5" Margin="4 0 4 0" Orientation="Vertical">
+
+                    <CheckBox 
+                    HorizontalAlignment="Left"
+                          VerticalAlignment="Center"
+                          IsChecked="{Binding AutoTail}"
+                          Margin="4 0 4 0"
+                          >Follow tail</CheckBox>
+
+                    <CheckBox 
+                        HorizontalAlignment="Left"
+                          VerticalAlignment="Center"
+                          IsChecked="{Binding ShowInline}"
+                          Margin="4 0 4 0"
+                          >Show in-line</CheckBox>
+
+
+                </StackPanel>
+
+
             </Grid>
 
 
             <ListBox   Grid.Row="1"
                  ItemsSource="{Binding Lines}" 
+                SelectedItem="{Binding SelectedItem}"
                  FontFamily="Consolas"
                  SelectionMode="Extended"
                  infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}" >
@@ -401,7 +418,7 @@
 
             </ListBox>
 
-            <Grid    Grid.Row="2"
+            <Grid    Grid.Row="3"
               Margin = "0 0 0 -4"       
             Background="{StaticResource PrimaryHueMidBrush}">
 
@@ -458,6 +475,11 @@
                     <TextBlock Margin="4 0 0 0" Text="{Binding FileSizeText.Value}" />
                 </StackPanel>
             </Grid>
+
+            <local:InlineView 
+                Visibility="{Binding Path=DataContext.InlineViewerVisible.Value, ElementName=Control,Converter={StaticResource BooleanToVisibilityConverter}}"
+                DataContext="{Binding InlineViewer}"
+                Grid.Row="2" Height="200"/>
         </Grid>
 
     </Grid>

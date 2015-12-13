@@ -7,7 +7,6 @@ using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
-using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Views
 {
@@ -15,7 +14,6 @@ namespace TailBlazer.Views
     {
         private readonly IDisposable _cleanUp;
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
-        private readonly ILineScroller _lineScroller;
         private readonly ISubject<ScrollRequest> _userScrollRequested = new ReplaySubject<ScrollRequest>(1);
 
         private int _firstIndex;
@@ -24,44 +22,42 @@ namespace TailBlazer.Views
 
         public InlineViewer(IObservable<ILineProvider> lineProvider, 
             ISchedulerProvider schedulerProvider, 
-            IObservable<LineProxy> whenValueChanged)
+            IObservable<LineProxy> selectedChanged,
+            IObservable<int> countChanged)
         {
+            
+            var scrollSelected = selectedChanged.Where(proxy => proxy != null)
+                    .CombineLatest(lineProvider, (proxy, lp) => new ScrollRequest(10, (int) proxy.Number, true));
 
-            var scroller = whenValueChanged.Where(proxy => proxy != null)
-                    .ObserveOn(schedulerProvider.Background)
-                .CombineLatest(lineProvider, (proxy, lp) =>
-                {
-                    return new ScrollRequest(this.PageSize, (int) proxy.Number, true);
-                });
-
-
-            _lineScroller = new LineScroller(lineProvider, scroller);
+            var scrollUser = _userScrollRequested
+                .Select(request => new ScrollRequest(ScrollReason.User, request.PageSize, request.FirstIndex));
 
 
-            var pageChanged = this.WhenValueChanged(vm => vm.PageSize);
-            var firstChanged = this.WhenValueChanged(vm => vm.PageSize);
-
-            //var scroller = pageChanged.CombineLatest(firstChanged, (page, index) => new ScrollRequest(ScrollReason.User, page, index))
-            //.ObserveOn(schedulerProvider.Background)
-            //.DistinctUntilChanged();
-
-
+            var scroller= scrollSelected.Merge(scrollUser)
+                .ObserveOn(schedulerProvider.Background)
+                .DistinctUntilChanged();
+            
+            var lineScroller = new LineScroller(lineProvider, scroller);
+            Count = countChanged.ForBinding();
+            
             //load lines into observable collection
-            var loader = _lineScroller.Lines.Connect()
+            var loader = lineScroller.Lines.Connect()
                 .Transform(line => new LineProxy(line))
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)
                 .Subscribe();
 
-            _cleanUp = new CompositeDisposable(_lineScroller,
+            _cleanUp = new CompositeDisposable(lineScroller,
                         loader,
+                        Count,
                         Disposable.Create(() =>
                         {
                             _userScrollRequested.OnCompleted();
                         }));
         }
 
+        public IProperty<int> Count { get;  }
 
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
         {

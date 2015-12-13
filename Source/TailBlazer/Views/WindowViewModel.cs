@@ -19,6 +19,7 @@ namespace TailBlazer.Views
 {
     public class WindowViewModel: AbstractNotifyPropertyChanged, IDisposable
     {
+        private readonly ILogger _logger;
         private readonly IObjectProvider _objectProvider;
         private readonly IDisposable _cleanUp;
         private ViewContainer _selected;
@@ -32,8 +33,9 @@ namespace TailBlazer.Views
 
         public FileDropMonitor DropMonitor { get; } = new FileDropMonitor();
 
-        public WindowViewModel(IObjectProvider objectProvider, IWindowFactory windowFactory)
+        public WindowViewModel(IObjectProvider objectProvider, IWindowFactory windowFactory, ILogger logger)
         {
+            _logger = logger;
             _objectProvider = objectProvider;
             InterTabClient = new InterTabClient(windowFactory);
             OpenFileCommand =  new Command(OpenFile);
@@ -77,26 +79,28 @@ namespace TailBlazer.Views
                 //Handle errors
                 try
                 {
+                    _logger.Info($"Attempting to open '{file.FullName}'");
                     //2. resolve TailViewModel
                     var factory = _objectProvider.Get<FileTailerViewModelFactory>();
-                var viewModel = factory.Create(file);
+                    var viewModel = factory.Create(file);
 
-                //3. Display it
-                var newItem = new ViewContainer(file.Name, viewModel);
-                //do the work on the ui thread
-                scheduler.MainThread.Schedule(() =>
-                {
-     
+                    //3. Display it
+                    var newItem = new ViewContainer(file.Name, viewModel);
+                    //do the work on the ui thread
+                    scheduler.MainThread.Schedule(() =>
+                    {
+
                         Views.Add(newItem);
+                        _logger.Info($"Opened '{file.FullName}'");
                         Selected = newItem;
 
-
-                });
+                    });
                 }
                 catch (Exception ex)
                 {
                     //TODO: Create a failed to load view
-                    throw ex;
+                    _logger.Error(ex, $"There was a problem opening '{file.FullName}'");
+
                 }
             });
         }
