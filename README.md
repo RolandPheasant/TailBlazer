@@ -23,12 +23,13 @@ That's better. A tail program which is pleasing to my eyes!
  - Side by side monitoring of files
  - Auto tail or scroll mode
  - Filter lines to match text
- - Toogle betwwen search results
+ - Apply multiple searches and toogle between search results
+ - View search result in original position in file
+ - Copy to clipboard
 
 ## Future feature list
 
  - Filter lines on regex
- - Find in file
  - Conditionally highlight text
  - Store recent files and folders
  - Automatic creation of columns
