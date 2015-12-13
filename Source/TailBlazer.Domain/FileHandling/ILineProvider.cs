@@ -19,4 +19,16 @@ namespace TailBlazer.Domain.FileHandling
 
         IEnumerable<Line> ReadLines(ScrollRequest scroll);
     }
+
+    public class EmptyLineProvider: ILineProvider
+    {
+        public bool IsEmpty { get; } = true;
+        public int Count { get; } = 0;
+
+
+        public IEnumerable<Line> ReadLines(ScrollRequest scroll)
+        {
+            yield break;
+        }
+    }
 }

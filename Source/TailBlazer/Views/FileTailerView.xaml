@@ -452,7 +452,7 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="1" Margin="4 2 6 2"
                      Orientation="Horizontal" 
-                     Visibility="Visible"       
+                     Visibility="Collapsed"       
                      HorizontalAlignment="Left">
 
                     <TextBlock Text="DEBUGGING INFO:"/>

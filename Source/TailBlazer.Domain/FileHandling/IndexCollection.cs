@@ -124,14 +124,14 @@ namespace TailBlazer.Domain.FileHandling
                 {
 
                     var startPosition = scroll.FirstIndex;
-                    var first = CalculateIndexByPositon(startPosition);
+                    var first = (int)CalculateIndexByPositon(startPosition);
                     reader.BaseStream.Seek(scroll.FirstIndex, SeekOrigin.Begin);
                     string line;
                     while ((line = reader.ReadLine()) != null && taken < scroll.PageSize)
                     {
 
                         var endPosition = reader.AbsolutePosition();
-                        var info = new LineInfo(taken + 1, taken, startPosition, endPosition);
+                        var info = new LineInfo(first + taken + 1, first + taken, startPosition, endPosition);
                         var ontail = endPosition >= TailInfo.TailStartsAt && DateTime.Now.Subtract(TailInfo.LastTail).TotalSeconds < 1
                             ? DateTime.Now
                             : (DateTime?) null;
@@ -156,16 +156,8 @@ namespace TailBlazer.Domain.FileHandling
             else
             {
 
-                if (scroll.SpecifiedByPosition)
-                {
-                    //get line number fro
-                    first = this.IndexOf(scroll.FirstIndex);
-                }
-                else
-                {
                     if (scroll.FirstIndex + size >= Count)
                         first = Count - size;
-                }
 
             }
 
@@ -174,17 +166,7 @@ namespace TailBlazer.Domain.FileHandling
 
             return new Page(first, size);
         }
-        private int IndexOf(long value)
-        {
-            for (var i = 0; i < this.Indicies.Length; ++i)
-            {
-                if (Equals(Indicies[i], value))
-                    return i;
 
-            }
-
-            return -1;
-        }
         private long CalculateIndexByPositon(long position)
         {
             long firstLineInContainer = 0;
@@ -195,28 +177,49 @@ namespace TailBlazer.Domain.FileHandling
                 lastLineInContainer += sparseIndex.End;
                 if (position < lastLineInContainer)
                 {
-                    //It could be that the user is scrolling into a part of the file
-                    //which is still being indexed [or will never be indexed]. 
-                    //In this case we need to estimate where to scroll to
                     if (sparseIndex.LineCount != 0 && sparseIndex.Indicies.Count == 0)
                     {
-                        return -1;
-                        //return estimate here!
-                        //var lines = sparseIndex.LineCount;
-                        //var bytes = sparseIndex.End - sparseIndex.Start;
-                        //var bytesPerLine = bytes / lines;
-                        //var estimate = index * bytesPerLine;
+                        var lines = sparseIndex.LineCount;
+                        var bytes = sparseIndex.End - sparseIndex.Start;
+                        var bytesPerLine = bytes / lines;
 
-
-                        //return new RelativeIndex(index, estimate, 0, true);
+                        return position / bytesPerLine;
                     }
-               
-                    var relativeIndex = (int)(position / sparseIndex.Compression);
-                    var offset = position % sparseIndex.Compression;
 
-                    var actualIndex = sparseIndex.Indicies.IndexOf(position);
 
-                    return actualIndex + offset;
+                    if (sparseIndex.Compression == 1)
+                    {
+                       return firstLineInContainer + sparseIndex.Indicies.IndexOf(position);
+                    }
+             
+                    //find nearest, then work out offset
+                    var nearest = sparseIndex.Indicies.Data
+                        .Select((value,index)=>new {value,index})
+                        .OrderByDescending(x=>x.value)
+                        .FirstOrDefault(i => i.value <= position);
+
+                    if (nearest != null)
+                    {
+                        //index depends of how far in container
+                        var relativeIndex = nearest.index * sparseIndex.Compression;
+
+                        //remaining size
+                        var size = (sparseIndex.End - sparseIndex.Start);
+                        var offset =   (position - nearest.value);
+                        var estimateOffset = (offset/size) * sparseIndex.Compression;
+                        return firstLineInContainer + relativeIndex + estimateOffset;
+                    }
+                    else
+                    {
+                        //index depends of how far in container
+                        var relativeIndex = 0;
+
+                        //remaining size
+                        var size = (sparseIndex.End - sparseIndex.Start);
+                        var offset = position;
+                        var estimateOffset = (offset / size) * sparseIndex.Compression;
+                        return firstLineInContainer +  relativeIndex + estimateOffset;
+                    }
                 }
                 firstLineInContainer = firstLineInContainer + sparseIndex.LineCount;
             }

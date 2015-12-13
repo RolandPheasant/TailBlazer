@@ -5,6 +5,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Input;
+using System.Windows.Navigation;
 using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.Annotations;
@@ -83,11 +84,13 @@ namespace TailBlazer.Views
             var lineScroller = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);  //fileTailerFactory.Create(fileInfo, SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
 
             //Add a complete file display [No search info here]
-            var indexed = fileWatcher.Latest.Index().Replay(1).RefCount();
+            var indexed = fileWatcher.Latest.Index()
+                .Replay(1).RefCount();
+
             IsLoading = indexed.Take(1).Select(_ => false).StartWith(true).ForBinding();
             searchInfoCollection.Add("<All>", indexed, SearchType.All);
 
-            InlineViewer = inlineViewerFactory.Create(indexed, this.WhenValueChanged(vm => vm.SelectedItem));
+
         
             //command to add the current search to the tail collection
             KeepSearchCommand = new Command(() =>
@@ -142,16 +145,22 @@ namespace TailBlazer.Views
                 .Buffer(TimeSpan.FromMilliseconds(250)).FlattenBufferResult()
                 .QueryWhenChanged(lines =>lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min())
                 .Subscribe(first=> FirstIndex= first);
+     
 
+            //Create objects required for inline viewing
             var isUserDefinedChanged = SearchCollection.WhenValueChanged(sc => sc.Selected)
                 .Select(selected => selected.IsUserDefined)
                 .DistinctUntilChanged();
+            
+            var inlineViewerVisible = isUserDefinedChanged.CombineLatest(this.WhenValueChanged(vm => vm.ShowInline),
+                                                            (userDefined, showInline) => userDefined && showInline);
 
             CanViewInline = isUserDefinedChanged.ForBinding();
+            InlineViewerVisible = inlineViewerVisible.ForBinding();
 
-            InlineViewerVisible = isUserDefinedChanged
-                .CombineLatest(this.WhenValueChanged(vm=>vm.ShowInline), (userDefined, showInline) => userDefined && showInline)
-                .ForBinding();
+            //return an empty line provider unless user is viewing inline - this saves needless trips to the file
+            var inline = indexed.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : new EmptyLineProvider());
+            InlineViewer = inlineViewerFactory.Create(inline, this.WhenValueChanged(vm => vm.SelectedItem));
 
             _cleanUp = new CompositeDisposable(lineScroller,
                 loader,

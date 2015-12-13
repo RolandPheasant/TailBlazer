@@ -78,9 +78,7 @@
     <Compile Include="FileHandling\FileSegmentSearch.cs" />
     <Compile Include="FileHandling\FileSegmentSearchStatus.cs" />
     <Compile Include="FileHandling\FileSegmentType.cs" />
-    <Compile Include="FileHandling\FileTailerFactory.cs" />
     <Compile Include="FileHandling\FileWatcher.cs" />
-    <Compile Include="FileHandling\IFileTailerFactory.cs" />
     <Compile Include="FileHandling\IFileWatcher.cs" />
     <Compile Include="FileHandling\ILineProvider.cs" />
     <Compile Include="FileHandling\ILineScroller.cs" />
