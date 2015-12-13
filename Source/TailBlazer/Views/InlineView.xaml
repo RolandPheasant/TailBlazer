@@ -94,7 +94,10 @@
                         </Grid.ColumnDefinitions>
                         <!--IsHighlight="{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"  
                                                             SearchText="{Binding ElementName=Control,Path=DataContext.HightlightText.Value}"-->
-                        <TextBlock Text="{Binding Start, Mode=OneWay}" Visibility="Visible" Opacity="0.55" MinWidth="25"/>
+                        <TextBlock Text="{Binding Start, Mode=OneWay}" 
+                                   Visibility="Hidden" 
+                                   Opacity="0.55" 
+                                   MinWidth="25"/>
                         <infrastucture:SearchableTextControl Grid.Column="1" 
                                                              Margin="6 0 0 0"   
                                                             IsHighlight="{Binding Path=DataContext.ShouldHightlightMatchingText.Value,RelativeSource={RelativeSource AncestorType={x:Type local:FileTailerView}}}"

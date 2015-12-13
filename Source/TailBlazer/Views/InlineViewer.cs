@@ -66,8 +66,6 @@ namespace TailBlazer.Views
                 .Bind(out _data)
                 .Subscribe();
 
-            //TODO: Set scroller first index
-
             // track first visible index[required to set scroll extent]
             var firstIndexMonitor = lineScroller.Lines.Connect()
                 .Buffer(TimeSpan.FromMilliseconds(250)).FlattenBufferResult()
@@ -89,14 +87,13 @@ namespace TailBlazer.Views
             _cleanUp = new CompositeDisposable(lineScroller,
                         loader,
                         Count,
-                       // firstIndexMonitor,
+                        firstIndexMonitor,
                         Disposable.Create(() =>
                         {
                             _userScrollRequested.OnCompleted();
                         }));
         }
-
-
+        
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
         {
             if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));
