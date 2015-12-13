@@ -95,7 +95,7 @@
                         <!--IsHighlight="{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"  
                                                             SearchText="{Binding ElementName=Control,Path=DataContext.HightlightText.Value}"-->
                         <TextBlock Text="{Binding Start, Mode=OneWay}" 
-                                   Visibility="Hidden" 
+                                   Visibility="Collapsed" 
                                    Opacity="0.55" 
                                    MinWidth="25"/>
                         <infrastucture:SearchableTextControl Grid.Column="1" 
