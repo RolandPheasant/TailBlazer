@@ -217,7 +217,10 @@ namespace TailBlazer.Views
             UpdateScrollInfo(availableSize, _extentInfo, widestWidth);
 
             _isInMeasure = false;
-            return availableSize;
+
+            return new Size(double.IsInfinity(availableSize.Width) ? 0 : availableSize.Width,
+    double.IsInfinity(availableSize.Height) ? 0 : availableSize.Height);
+            //return availableSize;
         }
 
         private void EnsureScrollOffsetIsWithinConstrains(ExtentInfo extentInfo)

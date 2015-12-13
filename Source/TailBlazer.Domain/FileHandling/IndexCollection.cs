@@ -124,7 +124,7 @@ namespace TailBlazer.Domain.FileHandling
                 {
 
                     var startPosition = scroll.FirstIndex;
-                    //var firstINdex = CalculateIndexByPositon(startPosition);
+                    var first = CalculateIndexByPositon(startPosition);
                     reader.BaseStream.Seek(scroll.FirstIndex, SeekOrigin.Begin);
                     string line;
                     while ((line = reader.ReadLine()) != null && taken < scroll.PageSize)

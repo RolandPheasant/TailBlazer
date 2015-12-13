@@ -3,10 +3,13 @@ using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Windows.Input;
 using DynamicData;
+using DynamicData.Annotations;
 using DynamicData.Binding;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
+using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Views
 {
@@ -20,12 +23,20 @@ namespace TailBlazer.Views
         private int _pageSize;
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
 
-        public InlineViewer(IObservable<ILineProvider> lineProvider, 
+        public ICommand CopyToClipboardCommand { get; }
+
+        public ISelectionMonitor SelectionMonitor { get; }
+        public InlineViewer(InlineViewerArgs args,
+           [NotNull] IClipboardHandler clipboardHandler,
             ISchedulerProvider schedulerProvider, 
-            IObservable<LineProxy> selectedChanged,
-            IObservable<int> countChanged)
+            ISelectionMonitor selectionMonitor)
         {
-            
+            SelectionMonitor = selectionMonitor;
+            CopyToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
+
+            var lineProvider = args.LineProvider;
+            var selectedChanged = args.SelectedChanged;
+
             var scrollSelected = selectedChanged.Where(proxy => proxy != null)
                     .CombineLatest(lineProvider, (proxy, lp) => new ScrollRequest(10, (int) proxy.Number, true));
 
@@ -38,7 +49,7 @@ namespace TailBlazer.Views
                 .DistinctUntilChanged();
             
             var lineScroller = new LineScroller(lineProvider, scroller);
-            Count = countChanged.ForBinding();
+            Count = lineProvider.Select(lp=>lp.Count).ForBinding();
             
             //load lines into observable collection
             var loader = lineScroller.Lines.Connect()

@@ -33,7 +33,7 @@
 
     <Grid>
 
-        <ListBox   Grid.Row="1"
+        <ListBox  
                  ItemsSource="{Binding Lines}" 
                  FontFamily="Consolas"
                  SelectionMode="Extended"

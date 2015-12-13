@@ -143,10 +143,13 @@
     <Compile Include="Views\HeaderedContentView.xaml.cs">
       <DependentUpon>HeaderedContentView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\IInlineViewerFactory.cs" />
     <Compile Include="Views\InlineView.xaml.cs">
       <DependentUpon>InlineView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\InlineViewer.cs" />
+    <Compile Include="Views\InlineViewerArgs.cs" />
+    <Compile Include="Views\InlineViewerFactory.cs" />
     <Compile Include="Views\IScrollReceiver.cs" />
     <Compile Include="Views\LineProxy.cs" />
     <Compile Include="Views\ScrollChangedArgs.cs" />

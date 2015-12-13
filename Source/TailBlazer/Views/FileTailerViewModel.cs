@@ -38,18 +38,22 @@ namespace TailBlazer.Views
         public IProperty<string> HightlightText { get; }
         public ICommand CopyToClipboardCommand { get; }
         public ICommand KeepSearchCommand { get; }
+
+
         public ISelectionMonitor SelectionMonitor { get; }
         public SearchCollection SearchCollection { get; }
 
         public InlineViewer InlineViewer { get; }
         public IProperty<bool> InlineViewerVisible { get; }
+        public IProperty<bool> CanViewInline { get; }
 
         public FileTailerViewModel([NotNull] ILogger logger,
             [NotNull] ISchedulerProvider schedulerProvider,
             [NotNull] IFileWatcher fileWatcher,
             [NotNull] ISelectionMonitor selectionMonitor, 
             [NotNull] IClipboardHandler clipboardHandler, 
-            [NotNull] ISearchInfoCollection searchInfoCollection)
+            [NotNull] ISearchInfoCollection searchInfoCollection, 
+            [NotNull] IInlineViewerFactory inlineViewerFactory)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
@@ -57,6 +61,7 @@ namespace TailBlazer.Views
             if (selectionMonitor == null) throw new ArgumentNullException(nameof(selectionMonitor));
             if (clipboardHandler == null) throw new ArgumentNullException(nameof(clipboardHandler));
             if (searchInfoCollection == null) throw new ArgumentNullException(nameof(searchInfoCollection));
+            if (inlineViewerFactory == null) throw new ArgumentNullException(nameof(inlineViewerFactory));
 
             SelectionMonitor = selectionMonitor;
 
@@ -82,22 +87,17 @@ namespace TailBlazer.Views
             IsLoading = indexed.Take(1).Select(_ => false).StartWith(true).ForBinding();
             searchInfoCollection.Add("<All>", indexed, SearchType.All);
 
-            InlineViewer = new InlineViewer(indexed, schedulerProvider, 
-                this.WhenValueChanged(vm => vm.SelectedItem),
-                indexed.Select(idx=>idx.Count));
-
-            Func<string, IObservable<ILineProvider>> factory = text =>
-            {
-                return fileWatcher.Latest
-                    .Search(s => s.Contains(text, StringComparison.OrdinalIgnoreCase))
-                    .Replay(1).RefCount();
-            };
-         
+            InlineViewer = inlineViewerFactory.Create(indexed, this.WhenValueChanged(vm => vm.SelectedItem));
+        
             //command to add the current search to the tail collection
             KeepSearchCommand = new Command(() =>
             {
                 var text = SearchText;
-                searchInfoCollection.Add(text, factory(text));
+                var latest =   fileWatcher.Latest
+                    .Search(s => s.Contains(text, StringComparison.OrdinalIgnoreCase))
+                    .Replay(1).RefCount();
+
+                searchInfoCollection.Add(text, latest);
                 SearchText = string.Empty;
             },()=> SearchText.IsLongerThanOrEqualTo(3));
 
@@ -143,9 +143,15 @@ namespace TailBlazer.Views
                 .QueryWhenChanged(lines =>lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min())
                 .Subscribe(first=> FirstIndex= first);
 
+            var isUserDefinedChanged = SearchCollection.WhenValueChanged(sc => sc.Selected)
+                .Select(selected => selected.IsUserDefined)
+                .DistinctUntilChanged();
 
-            InlineViewerVisible= SearchCollection.WhenValueChanged(sc => sc.Selected)
-                .CombineLatest(this.WhenValueChanged(vm => vm.ShowInline), (selected, showInline) => selected.IsUserDefined && showInline).ForBinding();
+            CanViewInline = isUserDefinedChanged.ForBinding();
+
+            InlineViewerVisible = isUserDefinedChanged
+                .CombineLatest(this.WhenValueChanged(vm=>vm.ShowInline), (userDefined, showInline) => userDefined && showInline)
+                .ForBinding();
 
             _cleanUp = new CompositeDisposable(lineScroller,
                 loader,
@@ -157,6 +163,7 @@ namespace TailBlazer.Views
                 SearchHint,
                 ShouldHightlightMatchingText,
                 SelectedItemsCount,
+                CanViewInline,
                 InlineViewer,
                 InlineViewerVisible,
                 SearchCollection,

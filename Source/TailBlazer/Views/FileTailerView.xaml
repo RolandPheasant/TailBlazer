@@ -162,8 +162,8 @@
             Margin="-4 0 -4 0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
@@ -197,8 +197,6 @@
                 </TextBox>
 
 
-
-
                 <TextBlock     Margin="4 0 0 0" Grid.Column="2"
                                Opacity="0.56"
 
@@ -211,7 +209,9 @@
 
 
                 <ListBox Grid.Column="3" Margin="4 2 0 2" 
-                      Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
+                      
+                         VerticalAlignment="Stretch"
+                         Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
                     SelectedItem="{Binding SearchCollection.Selected}"
                     ItemsSource="{Binding SearchCollection.Items}" 
                      Style="{DynamicResource filterListBoxStyle}">
@@ -291,16 +291,18 @@
                         Margin="2 2 0 2"  
                         Style="{StaticResource SettingsButtonStyle}"/>
 
-                <StackPanel    Grid.Column="5" Margin="4 0 4 0" Orientation="Vertical">
+                <StackPanel    
+                    VerticalAlignment="Center"
+                    Grid.Column="5" Margin="4 0 4 0" Orientation="Vertical">
 
-                    <CheckBox 
-                    HorizontalAlignment="Left"
+                    <CheckBox Visibility="{Binding }"
+                        HorizontalAlignment="Left"
                           VerticalAlignment="Center"
                           IsChecked="{Binding AutoTail}"
                           Margin="4 0 4 0"
                           >Follow tail</CheckBox>
 
-                    <CheckBox 
+                    <CheckBox Visibility="{Binding CanViewInline.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
                         HorizontalAlignment="Left"
                           VerticalAlignment="Center"
                           IsChecked="{Binding ShowInline}"
@@ -418,7 +420,20 @@
 
             </ListBox>
 
-            <Grid    Grid.Row="3"
+            <GridSplitter Grid.Row="2"
+                          Height="5" 
+                          ResizeDirection="Rows"
+                          Visibility="{Binding Path=DataContext.InlineViewerVisible.Value, ElementName=Control,Converter={StaticResource BooleanToVisibilityConverter}}"
+                          Background="{StaticResource PrimaryHueMidBrush}"
+                          BorderThickness="1" HorizontalAlignment="Stretch"/>
+
+            <local:InlineView 
+                VerticalAlignment="Stretch"
+                Visibility="{Binding Path=DataContext.InlineViewerVisible.Value, ElementName=Control,Converter={StaticResource BooleanToVisibilityConverter}}"
+                DataContext="{Binding InlineViewer}"
+                Grid.Row="3" />
+
+            <Grid    Grid.Row="4"
               Margin = "0 0 0 -4"       
             Background="{StaticResource PrimaryHueMidBrush}">
 
@@ -475,11 +490,6 @@
                     <TextBlock Margin="4 0 0 0" Text="{Binding FileSizeText.Value}" />
                 </StackPanel>
             </Grid>
-
-            <local:InlineView 
-                Visibility="{Binding Path=DataContext.InlineViewerVisible.Value, ElementName=Control,Converter={StaticResource BooleanToVisibilityConverter}}"
-                DataContext="{Binding InlineViewer}"
-                Grid.Row="2" Height="200"/>
         </Grid>
 
     </Grid>
