@@ -25,9 +25,26 @@ namespace TailBlazer.Infrastucture
 
         public string GetDistinctPath(string path)
         {
-            var result = GetDistinctPath(Root, new Stack<string>(path.Split(DirectorySeparators)));
+            return CombinePath(GetDistinctPath(Root, path: new Stack<string>(path.Split(DirectorySeparators))));
+        }
 
-            return string.Join(Path.DirectorySeparatorChar.ToString(), result);
+        private static string CombinePath(Stack<string> path)
+        {
+            var parts = new List<string>(capacity: 3);
+
+            parts.Add(path.First());
+
+            if (path.Count > 1)
+            {
+                if (path.Count > 2)
+                {
+                    parts.Add("..");
+                }
+
+                parts.Add(path.Last());
+            }
+
+            return string.Join(Path.DirectorySeparatorChar.ToString(), parts);
         }
 
         private static Stack<string> GetDistinctPath(Node node, Stack<string> path)
@@ -37,14 +54,14 @@ namespace TailBlazer.Infrastucture
 
         private static Stack<string> GetDistinctPath(Node node, Stack<string> path, Stack<string> result)
         {
-            if (!path.Any())
-            {
-                return result;
-            }
-
             if (result == null)
             {
                 result = new Stack<string>();
+            }
+
+            if (path.Count == 0)
+            {
+                return result;
             }
 
             var part = path.Pop();
@@ -67,7 +84,7 @@ namespace TailBlazer.Infrastucture
 
         private static void Insert(Node node, Stack<string> path)
         {
-            if (!path.Any())
+            if (path.Count == 0)
             {
                 return;
             }
