@@ -122,6 +122,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Infrastucture\CheckedToLengthConverter.cs" />
     <Compile Include="Infrastucture\ClipboardHandler.cs" />
     <Compile Include="Infrastucture\ConsoleLogger.cs" />
     <Compile Include="Infrastucture\IClipboardHandler.cs" />

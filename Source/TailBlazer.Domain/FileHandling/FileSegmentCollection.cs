@@ -53,10 +53,7 @@ namespace TailBlazer.Domain.FileHandling
             FileSize = newLength;
 
         }
-
-
-
-
+        
         #region Equality
 
         public bool Equals(FileSegmentCollection other)
@@ -97,7 +94,5 @@ namespace TailBlazer.Domain.FileHandling
         }
 
         #endregion
-
-
     }
 }

@@ -22,6 +22,9 @@
 
             </ResourceDictionary.MergedDictionaries>
 
+            <infrastucture:CheckedToLengthConverter TrueValue="*" FalseValue="*" x:Key="c1" />
+            <infrastucture:CheckedToLengthConverter TrueValue="175" FalseValue="0" x:Key="c2" />
+
             <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"/>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <infrastucture:NotEqualsToVisibilityConverter x:Key="NotEqualsToVisibilityConverter"/>
@@ -162,9 +165,9 @@
             Margin="-4 0 -4 0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="{Binding  Path=InlineViewerVisible.Value, Mode=TwoWay, Converter={StaticResource c1}}"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="{Binding  Path=InlineViewerVisible.Value, Mode=TwoWay, Converter={StaticResource c2}}"/>
                 <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
 
@@ -315,8 +318,9 @@
 
             </Grid>
 
-
-            <ListBox   Grid.Row="1"
+            <ListBox   
+                VerticalAlignment="Stretch"
+                Grid.Row="1"
                  ItemsSource="{Binding Lines}" 
                 SelectedItem="{Binding SelectedItem}"
                  FontFamily="Consolas"
@@ -368,8 +372,6 @@
                 </ListBox.ContextMenu>
 
                 <ListBox.ItemTemplate>
-
-
                     <DataTemplate DataType="{x:Type local:LineProxy}">
                         <Grid >
                             <Grid.ColumnDefinitions>
@@ -440,7 +442,6 @@
               Margin = "0 0 0 -4"       
             Background="{StaticResource PrimaryHueMidBrush}">
 
-
                 <Grid.Resources>
                     <Style TargetType="{x:Type TextBlock}">
                         <Setter Property="Opacity" Value="0.8"/>
@@ -451,9 +452,13 @@
 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="1" Margin="4 2 6 2"
+
+                <!--</>-->
+
+                    <StackPanel Grid.Column="1" Margin="4 2 6 2"
                      Orientation="Horizontal" 
                      Visibility="Collapsed"       
                      HorizontalAlignment="Left">
@@ -464,8 +469,6 @@
                         Margin="4 0 0 0"
                         Text="{Binding SelectedItemsCount.Value,StringFormat='\Selected Items={0} '}"
                         VerticalAlignment="Center"/>
-
-
 
                     <TextBlock  
                         Margin="4 0 0 0"
@@ -481,12 +484,12 @@
 
                 <StackPanel 
                     Margin="4 2 4 2"
-                    Grid.Column="1"
+                    Grid.Column="2"
                             HorizontalAlignment="Right"
                             Orientation="Horizontal">
                     <TextBlock  
                         Margin="4 0 0 0"
-                        Text="{Binding  Count.Value,StringFormat='Total lines: {0}'}"
+                        Text="{Binding  CountText.Value}"
                         VerticalAlignment="Center"/>
 
 

@@ -21,9 +21,7 @@ namespace TailBlazer.Views
         public IObservable<string> SelectedText { get; }
         public IObservable<ILineProvider> Latest { get; }
 
-        public SearchCollection(ISearchInfoCollection searchInfoCollection, 
-            
-            ISchedulerProvider schedulerProvider)
+        public SearchCollection(ISearchInfoCollection searchInfoCollection, ISchedulerProvider schedulerProvider)
         {
             var viewModels = searchInfoCollection.Searches.Connect()
                 .Transform(tail => new SearchViewModel(tail, vm =>

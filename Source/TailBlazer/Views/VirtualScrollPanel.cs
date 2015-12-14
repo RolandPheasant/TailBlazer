@@ -239,7 +239,16 @@ namespace TailBlazer.Views
                     var generatorPosition = _itemsGenerator.GeneratorPositionFromIndex(virtualItemIndex);
                     if (generatorPosition.Index >= 0)
                     {
-                        _itemsGenerator.Recycle(generatorPosition, 1);
+                        try
+                        {
+                            _itemsGenerator.Recycle(generatorPosition, 1);
+                        }
+                        catch (ArgumentException)
+                        {
+                            //I have seen the following exception which appears to be a non-issue
+                            // GeneratorPosition '0,10' passed to Remove does not have Offset equal to 0.
+                        }
+
                     }
                 }
                 SetVirtualItemIndex(child, -1);

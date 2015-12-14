@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Navigation;
 using DynamicData;
@@ -33,13 +34,13 @@ namespace TailBlazer.Views
         public IProperty<bool> ShouldHightlightMatchingText { get; }
         public IProperty<string> SearchHint { get; }
         public IProperty<int> Count { get; }
+        public IProperty<string> CountText { get; }
         public IProperty<int> LatestCount { get; }
         public IProperty<string> FileSizeText { get; }
         public IProperty<bool> IsLoading { get; }
         public IProperty<string> HightlightText { get; }
         public ICommand CopyToClipboardCommand { get; }
         public ICommand KeepSearchCommand { get; }
-
 
         public ISelectionMonitor SelectionMonitor { get; }
         public SearchCollection SearchCollection { get; }
@@ -65,18 +66,19 @@ namespace TailBlazer.Views
             if (inlineViewerFactory == null) throw new ArgumentNullException(nameof(inlineViewerFactory));
 
             SelectionMonitor = selectionMonitor;
-
             CopyToClipboardCommand = new Command(()=> clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
             SelectedItemsCount = selectionMonitor.Selected.Connect().QueryWhenChanged(collection=> collection.Count).ForBinding();
             SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
             
             //An observable which acts as a scroll command
+            bool isSettingScrollPosition=false;
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
             var scroller = _userScrollRequested.CombineLatest(autoChanged, (user, auto) =>
                         {
                             var mode = AutoTail ? ScrollReason.Tail : ScrollReason.User;
                             return  new ScrollRequest(mode, user.PageSize, user.FirstIndex);
                         })
+                        .Where(x=> !isSettingScrollPosition)
                         .ObserveOn(schedulerProvider.Background)
                         .DistinctUntilChanged();
 
@@ -89,9 +91,7 @@ namespace TailBlazer.Views
 
             IsLoading = indexed.Take(1).Select(_ => false).StartWith(true).ForBinding();
             searchInfoCollection.Add("<All>", indexed, SearchType.All);
-
-
-        
+            
             //command to add the current search to the tail collection
             KeepSearchCommand = new Command(() =>
             {
@@ -137,23 +137,36 @@ namespace TailBlazer.Views
             
             //monitor matching lines and start index,
             Count = indexed.Select(latest=>latest.Count).ForBinding();
-
+            CountText = indexed.Select(latest => $"{latest.Count.ToString("##,###")} lines").ForBinding();
             LatestCount = SearchCollection.Latest.Select(latest => latest.Count).ForBinding();
 
             //track first visible index
             var firstIndexMonitor = lineScroller.Lines.Connect()
                 .Buffer(TimeSpan.FromMilliseconds(250)).FlattenBufferResult()
                 .QueryWhenChanged(lines =>lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min())
-                .Subscribe(first=> FirstIndex= first);
-     
+                .ObserveOn(schedulerProvider.MainThread)
+                .Subscribe(first =>
+                {
+                    try
+                    {
+                        isSettingScrollPosition = true;
+                        FirstIndex = first;
+                    }
+                    finally
+                    {
+                        isSettingScrollPosition = false;
+                    }
+                });
 
             //Create objects required for inline viewing
             var isUserDefinedChanged = SearchCollection.WhenValueChanged(sc => sc.Selected)
                 .Select(selected => selected.IsUserDefined)
                 .DistinctUntilChanged();
-            
+
+
             var inlineViewerVisible = isUserDefinedChanged.CombineLatest(this.WhenValueChanged(vm => vm.ShowInline),
                                                             (userDefined, showInline) => userDefined && showInline);
+
 
             CanViewInline = isUserDefinedChanged.ForBinding();
             InlineViewerVisible = inlineViewerVisible.ForBinding();
@@ -242,7 +255,6 @@ namespace TailBlazer.Views
             get { return _showInline; }
             set { SetAndRaise(ref _showInline, value); }
         }
-
 
         public void Dispose()
         {
