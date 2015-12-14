@@ -4,9 +4,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Windows;
 using System.Windows.Input;
-using System.Windows.Navigation;
 using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.Annotations;
@@ -71,14 +69,12 @@ namespace TailBlazer.Views
             SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
             
             //An observable which acts as a scroll command
-            bool isSettingScrollPosition=false;
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
             var scroller = _userScrollRequested.CombineLatest(autoChanged, (user, auto) =>
                         {
                             var mode = AutoTail ? ScrollReason.Tail : ScrollReason.User;
                             return  new ScrollRequest(mode, user.PageSize, user.FirstIndex);
                         })
-                        .Where(x=> !isSettingScrollPosition)
                         .ObserveOn(schedulerProvider.Background)
                         .DistinctUntilChanged();
 
@@ -145,18 +141,7 @@ namespace TailBlazer.Views
                 .Buffer(TimeSpan.FromMilliseconds(250)).FlattenBufferResult()
                 .QueryWhenChanged(lines =>lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min())
                 .ObserveOn(schedulerProvider.MainThread)
-                .Subscribe(first =>
-                {
-                    try
-                    {
-                        isSettingScrollPosition = true;
-                        FirstIndex = first;
-                    }
-                    finally
-                    {
-                        isSettingScrollPosition = false;
-                    }
-                });
+                .Subscribe(first => FirstIndex = first);
 
             //Create objects required for inline viewing
             var isUserDefinedChanged = SearchCollection.WhenValueChanged(sc => sc.Selected)

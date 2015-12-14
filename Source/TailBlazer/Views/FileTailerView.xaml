@@ -489,11 +489,11 @@
                             Orientation="Horizontal">
                     <TextBlock  
                         Margin="4 0 0 0"
-                        Text="{Binding  CountText.Value}"
+                        Text="{Binding  CountText.Value, StringFormat='\{0}.'}"
                         VerticalAlignment="Center"/>
 
 
-                    <TextBlock Margin="4 0 0 0" Text="{Binding FileSizeText.Value}" />
+                    <TextBlock Margin="6 0 0 0" Text="{Binding FileSizeText.Value}" />
                 </StackPanel>
             </Grid>
         </Grid>
