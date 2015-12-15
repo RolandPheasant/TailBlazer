@@ -135,6 +135,7 @@
     <Compile Include="Infrastucture\SelectionMonitor.cs" />
     <Compile Include="Views\FileDropContainer.cs" />
     <Compile Include="Views\FileDropMonitor.cs" />
+    <Compile Include="Views\FileHeaderNamingJob.cs" />
     <Compile Include="Views\FileIcon.cs" />
     <Compile Include="Infrastucture\SchedulerProvider.cs" />
     <Compile Include="Infrastucture\SearchableTextControl.cs" />
