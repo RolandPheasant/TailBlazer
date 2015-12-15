@@ -5,7 +5,7 @@ using static System.IO.Path;
 
 namespace TailBlazer.Fixtures
 {
-    public class DistinctPathTrieFixture
+    public class FileLabellerFixture
     {
         [Fact]
         public void ReturnsCorrectDistinctPath()
