@@ -5,7 +5,7 @@ using static System.IO.Path;
 
 namespace TailBlazer.Fixtures
 {
-    public class FileLabellerFixture
+    public class FileNamerFixture
     {
         [Fact]
         public void ReturnsCorrectDistinctPath()
@@ -32,9 +32,9 @@ namespace TailBlazer.Fixtures
                 Combine("obj", "..", "logger.log")
             };
 
-            var trie = new FileLabeller(paths);
+            var trie = new FileNamer(paths);
 
-            var result = paths.Select(path => trie.GetLabel(path)).ToArray();
+            var result = paths.Select(path => trie.GetName(path)).ToArray();
 
             Assert.Equal(expected, result);
         }

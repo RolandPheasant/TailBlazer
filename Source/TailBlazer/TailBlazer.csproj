@@ -131,7 +131,7 @@
     <Compile Include="Infrastucture\IAttachedListBox.cs" />
     <Compile Include="Infrastucture\ListBoxHelper.cs" />
     <Compile Include="Infrastucture\LogFactory.cs" />
-    <Compile Include="Infrastucture\FileLabeller.cs" />
+    <Compile Include="Infrastucture\FileNamer.cs" />
     <Compile Include="Infrastucture\SelectionMonitor.cs" />
     <Compile Include="Views\FileDropContainer.cs" />
     <Compile Include="Views\FileDropMonitor.cs" />

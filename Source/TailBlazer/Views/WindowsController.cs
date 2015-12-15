@@ -25,11 +25,11 @@ namespace TailBlazer.Views
             var added = filePages.Connect()
                 .Subscribe(_ =>
                 {
-                    var tree = new FileLabeller(filePages.Items.Select(f=>f.FullName));
+                    var tree = new FileNamer(filePages.Items.Select(f=>f.FullName));
                     filePages.Items.Select(page => new
                     {
                         Item = page,
-                        Label = tree.GetLabel(page.FullName)
+                        Label = tree.GetName(page.FullName)
                     })
                     .ForEach(x=> x.Item.DisplayName = x.Label);
                 });
