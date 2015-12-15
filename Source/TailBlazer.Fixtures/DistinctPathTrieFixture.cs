@@ -32,9 +32,9 @@ namespace TailBlazer.Fixtures
                 Combine("obj", "..", "logger.log")
             };
 
-            var trie = new DistinctPathTrie(paths);
+            var trie = new FileLabeller(paths);
 
-            var result = paths.Select(path => trie.GetDistinctPath(path)).ToArray();
+            var result = paths.Select(path => trie.GetLabel(path)).ToArray();
 
             Assert.Equal(expected, result);
         }

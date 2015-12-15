@@ -19,8 +19,10 @@ namespace TailBlazer.Infrastucture
             // by this concrete class
             type.GetInterfaces()
                 .Where(@interface => @interface.Name == $"I{type.Name}" )
-                
                 .ForEach(@interface => registry.For(@interface).Use(type).Singleton());
+
+            if (type.Name.EndsWith("Job"))
+                registry.For(type).Singleton();
         }
     }
 }

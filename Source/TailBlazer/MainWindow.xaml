@@ -33,17 +33,13 @@
                 <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/MaterialDesign.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-            
-            
-           <!--<DataTemplate DataType="{x:Type infrastucture:HeaderContent}">
-                <views:HeaderedContentView />
-            </DataTemplate>-->
-
-            <DataTemplate DataType="{x:Type infrastucture:HeaderContent}">
-                <TextBlock Margin="6 2 2 2" Text="{Binding Title}" />
+            <DataTemplate DataType="{x:Type infrastucture:FileHeader}">
+                <TextBlock Margin="6 2 2 2" 
+                           ToolTipService.ShowOnDisabled="True"
+                           ToolTip="{Binding FullName}"
+                           Text="{Binding  DisplayName}" />
+          
             </DataTemplate>
-
             <DataTemplate DataType="{x:Type infrastucture:ViewContainer}">
                 <ContentControl Margin="4" Content="{Binding Content}" />
             </DataTemplate>

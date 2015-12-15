@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace TailBlazer.Infrastucture
 {
-    public class DistinctPathTrie
+    public class FileLabeller
     {
         private static readonly char[] DirectorySeparators =
         {
@@ -13,7 +13,7 @@ namespace TailBlazer.Infrastucture
             Path.AltDirectorySeparatorChar
         };
 
-        public DistinctPathTrie(IEnumerable<string> paths)
+        public FileLabeller(IEnumerable<string> paths)
         {
             foreach (var path in paths)
             {
@@ -23,9 +23,9 @@ namespace TailBlazer.Infrastucture
 
         private Node Root { get; } = new Node(string.Empty);
 
-        public string GetDistinctPath(string path)
+        public string GetLabel(string path)
         {
-            return CombinePath(GetDistinctPath(Root, path: new Stack<string>(path.Split(DirectorySeparators))));
+            return CombinePath(GetLabel(Root, path: new Stack<string>(path.Split(DirectorySeparators))));
         }
 
         private static string CombinePath(Stack<string> path)
@@ -47,12 +47,12 @@ namespace TailBlazer.Infrastucture
             return string.Join(Path.DirectorySeparatorChar.ToString(), parts);
         }
 
-        private static Stack<string> GetDistinctPath(Node node, Stack<string> path)
+        private static Stack<string> GetLabel(Node node, Stack<string> path)
         {
-            return GetDistinctPath(node, path, result: new Stack<string>());
+            return GetLabel(node, path, result: new Stack<string>());
         }
 
-        private static Stack<string> GetDistinctPath(Node node, Stack<string> path, Stack<string> result)
+        private static Stack<string> GetLabel(Node node, Stack<string> path, Stack<string> result)
         {
             if (result == null)
             {
@@ -71,7 +71,7 @@ namespace TailBlazer.Infrastucture
             Node childNode;
             if (node.Children.TryGetValue(part, out childNode) && childNode.Count > 1)
             {
-                return GetDistinctPath(childNode, path, result);
+                return GetLabel(childNode, path, result);
             }
 
             return result;

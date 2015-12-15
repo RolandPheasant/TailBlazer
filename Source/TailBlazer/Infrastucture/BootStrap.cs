@@ -22,6 +22,7 @@ namespace TailBlazer.Infrastucture
 
 
             //run start up jobs
+            container.GetInstance<FileHeaderNamingJob>();
 
             window.Show();
              app.Run();

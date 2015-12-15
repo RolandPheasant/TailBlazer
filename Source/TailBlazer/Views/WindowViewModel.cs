@@ -20,6 +20,7 @@ namespace TailBlazer.Views
     public class WindowViewModel: AbstractNotifyPropertyChanged, IDisposable
     {
         private readonly ILogger _logger;
+        private readonly IWindowsController _windowsController;
         private readonly IObjectProvider _objectProvider;
         private readonly IDisposable _cleanUp;
         private ViewContainer _selected;
@@ -39,6 +40,7 @@ namespace TailBlazer.Views
             IWindowsController windowsController)
         {
             _logger = logger;
+            _windowsController = windowsController;
             _objectProvider = objectProvider;
             InterTabClient = new InterTabClient(windowFactory);
             OpenFileCommand =  new Command(OpenFile);
@@ -65,7 +67,7 @@ namespace TailBlazer.Views
         
         public void OpenFile()
         {
-            //1. open dialog to select file [get rid of this shit and create a material design file selector]
+            // open dialog to select file [get rid of this shit and create a material design file selector]
             var dialog = new OpenFileDialog {Filter = "All files (*.*)|*.*"};
             var result = dialog.ShowDialog();
             if (result != true) return;
@@ -83,15 +85,17 @@ namespace TailBlazer.Views
                 try
                 {
                     _logger.Info($"Attempting to open '{file.FullName}'");
-                    //2. resolve TailViewModel
+                    //1. resolve TailViewModel
                     var factory = _objectProvider.Get<FileTailerViewModelFactory>();
                     var viewModel = factory.Create(file);
 
-                    //3. Display it
-                    var newItem = new ViewContainer(file.Name, viewModel);
+                    //2. Display it
+                    var newItem = new ViewContainer(new FileHeader(file), viewModel);
+                        
                     //do the work on the ui thread
                     scheduler.MainThread.Schedule(() =>
                     {
+                        _windowsController.Register(newItem);
 
                         Views.Add(newItem);
                         _logger.Info($"Opened '{file.FullName}'");
@@ -111,7 +115,9 @@ namespace TailBlazer.Views
 
         private void ClosingTabItemHandlerImpl(ItemActionCallbackArgs<TabablzControl> args)
         {
+           
             var container = (ViewContainer)args.DragablzItem.DataContext;
+            _windowsController.Remove(container);
             if (container.Equals(Selected))
             {
                 Selected = Views.FirstOrDefault(vc => vc != container);

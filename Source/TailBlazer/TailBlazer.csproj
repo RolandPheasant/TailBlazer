@@ -125,11 +125,13 @@
     <Compile Include="Infrastucture\CheckedToLengthConverter.cs" />
     <Compile Include="Infrastucture\ClipboardHandler.cs" />
     <Compile Include="Infrastucture\ConsoleLogger.cs" />
+    <Compile Include="Infrastucture\FileHeader.cs" />
+    <Compile Include="Infrastucture\HeaderContent.cs" />
     <Compile Include="Infrastucture\IClipboardHandler.cs" />
     <Compile Include="Infrastucture\IAttachedListBox.cs" />
     <Compile Include="Infrastucture\ListBoxHelper.cs" />
     <Compile Include="Infrastucture\LogFactory.cs" />
-    <Compile Include="Infrastucture\DistinctPathTrie.cs" />
+    <Compile Include="Infrastucture\FileLabeller.cs" />
     <Compile Include="Infrastucture\SelectionMonitor.cs" />
     <Compile Include="Views\FileDropContainer.cs" />
     <Compile Include="Views\FileDropMonitor.cs" />
@@ -142,9 +144,6 @@
     </Compile>
     <Compile Include="Views\FileTailerViewModel.cs" />
     <Compile Include="Views\FileTailerViewModelFactory.cs" />
-    <Compile Include="Views\HeaderedContentView.xaml.cs">
-      <DependentUpon>HeaderedContentView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\IInlineViewerFactory.cs" />
     <Compile Include="Views\InlineView.xaml.cs">
       <DependentUpon>InlineView.xaml</DependentUpon>
@@ -198,10 +197,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\FileTailerView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\HeaderedContentView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,24 +1,7 @@
 ﻿using System;
-using DynamicData.Binding;
 
 namespace TailBlazer.Infrastucture
 {
-    public class HeaderContent: AbstractNotifyPropertyChanged
-    {
-        private  string _title;
-
-        public HeaderContent(string title)
-        {
-            _title = title;
-        }
-
-        public string Title
-        {
-            get { return _title; }
-            set { SetAndRaise(ref _title,value);}
-        }
-    }
-
     public class ViewContainer : IEquatable<ViewContainer>
     {
         public Guid Id { get; } = Guid.NewGuid();
@@ -27,6 +10,12 @@ namespace TailBlazer.Infrastucture
         public ViewContainer(string title, object content)
         {
             Header = new HeaderContent(title);
+            Content = content;
+        }
+
+        public ViewContainer(object header, object content)
+        {
+            Header = header;
             Content = content;
         }
 
