@@ -153,6 +153,7 @@
     <Compile Include="Views\InlineViewerArgs.cs" />
     <Compile Include="Views\InlineViewerFactory.cs" />
     <Compile Include="Views\IScrollReceiver.cs" />
+    <Compile Include="Views\IWindowsController.cs" />
     <Compile Include="Views\LineProxy.cs" />
     <Compile Include="Views\ScrollChangedArgs.cs" />
     <Compile Include="Views\ScrollDirection.cs" />
@@ -182,6 +183,7 @@
     <Compile Include="Infrastucture\ObjectProvider.cs" />
     <Compile Include="Infrastucture\ViewContainer.cs" />
     <Compile Include="Views\WindowFactory.cs" />
+    <Compile Include="Views\WindowsController.cs" />
     <Compile Include="Views\WindowViewModel.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

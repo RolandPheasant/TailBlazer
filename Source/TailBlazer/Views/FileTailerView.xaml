@@ -310,7 +310,7 @@
                           VerticalAlignment="Center"
                           IsChecked="{Binding ShowInline}"
                           Margin="4 0 4 0"
-                          >Show in-line</CheckBox>
+                          >Show inline</CheckBox>
 
 
                 </StackPanel>

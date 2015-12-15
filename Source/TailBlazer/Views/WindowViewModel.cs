@@ -33,7 +33,10 @@ namespace TailBlazer.Views
 
         public FileDropMonitor DropMonitor { get; } = new FileDropMonitor();
 
-        public WindowViewModel(IObjectProvider objectProvider, IWindowFactory windowFactory, ILogger logger)
+        public WindowViewModel(IObjectProvider objectProvider, 
+            IWindowFactory windowFactory, 
+            ILogger logger,
+            IWindowsController windowsController)
         {
             _logger = logger;
             _objectProvider = objectProvider;
@@ -93,7 +96,6 @@ namespace TailBlazer.Views
                         Views.Add(newItem);
                         _logger.Info($"Opened '{file.FullName}'");
                         Selected = newItem;
-
                     });
                 }
                 catch (Exception ex)
