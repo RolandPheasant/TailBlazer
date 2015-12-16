@@ -3,6 +3,7 @@ using System.IO;
 using StructureMap.Configuration.DSL;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
+using TailBlazer.Domain.Settings;
 using ILogger = TailBlazer.Domain.Infrastructure.ILogger;
 
 namespace TailBlazer.Infrastucture
@@ -21,6 +22,8 @@ namespace TailBlazer.Infrastucture
 
             For<ISelectionMonitor>().Use<SelectionMonitor>();
             For<ISearchInfoCollection>().Use<SearchInfoCollection>();
+
+            For<ISettingsStore>().Use<FileSettingsStore>().Singleton();
             
            For<IFileWatcher>().Use<FileWatcher>();
             Scan(scanner =>

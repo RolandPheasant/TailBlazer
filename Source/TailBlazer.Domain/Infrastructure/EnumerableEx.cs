@@ -34,15 +34,29 @@ namespace System.Collections
                 i++;
             }
         }
+        public static IEnumerable<T> FromDelimited<T>(this string source, Func<string,T> converter, string delimiter = ",")
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (converter == null) throw new ArgumentNullException(nameof(converter));
+            if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
+
+            if (string.IsNullOrWhiteSpace(source))
+                yield break;
+
+            var strings =  source.Split(delimiter.ToCharArray());
+            if (!strings.Any()) yield break;
+
+            foreach (var s in strings)
+                yield return converter(s);
+        }
 
         public static string ToDelimited<T>(this IEnumerable<T> source, string delimiter=",")
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            var array = source.AsArray();
-            if (!array.Any())
-                return string.Empty;
-            return string.Join(string.Empty, array.WithDelimiter(delimiter));
+            if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
 
+            var array = source.AsArray();
+            return !array.Any() ? string.Empty : string.Join(string.Empty, array.WithDelimiter(delimiter));
         }
 
         public static IEnumerable<string>  WithDelimiter<T>(this IEnumerable<T> source, string delimiter)

@@ -93,6 +93,9 @@
     <Compile Include="FileHandling\LineReaderEx.cs" />
     <Compile Include="FileHandling\LinesChangedReason.cs" />
     <Compile Include="FileHandling\Page.cs" />
+    <Compile Include="FileHandling\RecentFiles.cs" />
+    <Compile Include="FileHandling\IRecentFiles.cs" />
+    <Compile Include="FileHandling\RecentFilesToStateConverter.cs" />
     <Compile Include="FileHandling\ScrollReason.cs" />
     <Compile Include="FileHandling\ScrollRequest.cs" />
     <Compile Include="FileHandling\Index.cs" />
@@ -119,7 +122,10 @@
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Settings\IConverter.cs" />
     <Compile Include="Settings\ISetting.cs" />
+    <Compile Include="Settings\ISettingFactory.cs" />
     <Compile Include="Settings\ISettingsStore.cs" />
+    <Compile Include="Settings\Setting.cs" />
+    <Compile Include="Settings\SettingFactory.cs" />
     <Compile Include="Settings\SettingsStore.cs" />
     <Compile Include="Settings\State.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

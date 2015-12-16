@@ -4,6 +4,8 @@ namespace TailBlazer.Domain.Settings
 {
     public class State : IEquatable<State>
     {
+        public static readonly State Empty = new State(0,String.Empty);
+
         public int Version { get; }
         public string Value { get; }
 

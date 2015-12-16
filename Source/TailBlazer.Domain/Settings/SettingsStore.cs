@@ -10,12 +10,6 @@ namespace TailBlazer.Domain.Settings
     {
         private readonly ILogger _logger;
 
-        /// <summary>
-        /// Gets the location.
-        /// </summary>
-        /// <value>
-        /// The location.
-        /// </value>
         private string Location { get; }
         public FileSettingsStore(ILogger logger)
         {
@@ -49,7 +43,6 @@ namespace TailBlazer.Domain.Settings
             }
 
             var formatted = XDocument.Parse(writer.ToString());
-
             _logger.Info($"Writing value {formatted.ToString()}");
             File.WriteAllText(file, formatted.ToString());
 
@@ -60,6 +53,11 @@ namespace TailBlazer.Domain.Settings
             _logger.Info($"Reading setting for {key}");
 
             var file = Path.Combine(Location, $"{key}.setting");
+            var info = new FileInfo(file);
+
+            if (!info.Exists || info.Length == 0) return State.Empty;
+
+  
 
             var doc = XDocument.Load(file);
             var root = doc.Element("Setting");

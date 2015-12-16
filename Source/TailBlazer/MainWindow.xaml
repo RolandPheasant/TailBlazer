@@ -98,7 +98,44 @@
     <AdornerDecorator>
         <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
             <materialDesign:DrawerHost.LeftDrawerContent>
-                <TextBlock  Text="Under Development" Margin="12" FontSize="32"/>
+
+                <Grid>
+                    
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock     Margin="4 12 12 0"
+                                   Text="Funky  stuff coming soon"  FontSize="32"/>
+
+                    <StackPanel 
+                        Margin="4 12 4 4"
+                        Orientation="Vertical" Grid.Row="1">
+                       
+                        <TextBlock  Text="Recent Files" FontSize="14"/>
+                       
+                        <ItemsControl
+                              Margin="0 12 0 0"
+    
+                         ItemsSource="{Binding RecentFiles}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock   Margin="6 2 2 2" Text="{Binding FullName, Mode=OneWay}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
+
+                    <TextBlock   Grid.Row="2" Margin="4 12 4 4" Text="Additional Settings" FontSize="14"/>
+                    <TextBlock   Grid.Row="3" Margin="4 12 4 4" Text="Highlighting Opions" FontSize="14"/>
+                    <TextBlock   Grid.Row="4" Margin="4 12 4 4" Text="...plus more" FontSize="14"/>
+                </Grid>
+         
             </materialDesign:DrawerHost.LeftDrawerContent>
                 
             <Grid infrastucture:DependencyObjectHook.Receiver="{Binding DropMonitor}">

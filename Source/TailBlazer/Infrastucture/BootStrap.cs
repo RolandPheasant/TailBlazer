@@ -15,15 +15,17 @@ namespace TailBlazer.Infrastucture
             app.InitializeComponent();
 
 
-           var container =  new Container(x=> x.AddRegistry<AppRegistry>());
-           var factory = container.GetInstance<WindowFactory>();
-           var window = factory.Create();
-           container.Configure(x => x.For<Dispatcher>().Add(window.Dispatcher));
+            var tempWindowToGetDispatcher  = new MainWindow();
 
+           var container =  new Container(x=> x.AddRegistry<AppRegistry>());
+
+           container.Configure(x => x.For<Dispatcher>().Add(tempWindowToGetDispatcher.Dispatcher));
+            var factory = container.GetInstance<WindowFactory>();
+            var window = factory.Create();
 
             //run start up jobs
             container.GetInstance<FileHeaderNamingJob>();
-
+            tempWindowToGetDispatcher.Close();
             window.Show();
              app.Run();
         }
