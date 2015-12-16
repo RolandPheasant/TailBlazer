@@ -15,24 +15,20 @@ namespace TailBlazer.Views
         {
             if (windowsController == null) throw new ArgumentNullException(nameof(windowsController));
 
-            var filePages = windowsController.Views
+            _cleanUp = windowsController.Views
                 .Connect(vc => vc.Header is FileHeader)
                 .Transform(vc => (FileHeader) vc.Header)
-                .AsObservableCache();
-
-            var added = filePages.Connect()
-                .Subscribe(_ =>
+                .ToCollection()
+                .Subscribe(files =>
                 {
-                    var tree = new FileNamer(filePages.Items.Select(f=>f.FullName));
-                    filePages.Items.Select(page => new
+                    var renamer = new FileNamer(files.Select(f => f.FullName));
+                    files.Select(page => new
                     {
                         Item = page,
-                        Label = tree.GetName(page.FullName)
+                        Label = renamer.GetName(page.FullName)
                     })
-                        .ForEach(x=> x.Item.DisplayName = x.Label);
+                    .ForEach(x => x.Item.DisplayName = x.Label);
                 });
-
-            _cleanUp  = new CompositeDisposable(filePages, added);
         }
 
         public void Dispose()

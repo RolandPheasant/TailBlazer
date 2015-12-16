@@ -91,12 +91,12 @@ namespace TailBlazer.Views
 
                     //2. Display it
                     var newItem = new ViewContainer(new FileHeader(file), viewModel);
-                        
+                    
+                    _windowsController.Register(newItem);
+
                     //do the work on the ui thread
                     scheduler.MainThread.Schedule(() =>
                     {
-                        _windowsController.Register(newItem);
-
                         Views.Add(newItem);
                         _logger.Info($"Opened '{file.FullName}'");
                         Selected = newItem;
