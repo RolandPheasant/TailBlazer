@@ -123,6 +123,7 @@
     <Compile Include="Settings\SettingsStore.cs" />
     <Compile Include="Settings\State.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings\XmlEx.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

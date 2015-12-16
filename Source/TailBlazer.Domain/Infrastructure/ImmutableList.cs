@@ -66,10 +66,8 @@ namespace TailBlazer.Domain.Infrastructure
         public ImmutableList<T> Remove(T value)
         {
             var list = new List<T>(_data);
-            var i = list.IndexOf(value);
-            if (i < 0)
+            if (!list.Remove(value))
                 return this;
-
 
             return new ImmutableList<T>(list);
         }

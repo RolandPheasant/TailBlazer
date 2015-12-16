@@ -1,12 +1,15 @@
 using System;
 using System.IO;
+using System.Xml;
 using System.Xml.Linq;
+using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.Settings
 {
-
-    class FileSettingsStore : ISettingsStore
+    public class FileSettingsStore : ISettingsStore
     {
+        private readonly ILogger _logger;
+
         /// <summary>
         /// Gets the location.
         /// </summary>
@@ -14,42 +17,58 @@ namespace TailBlazer.Domain.Settings
         /// The location.
         /// </value>
         private string Location { get; }
-        public FileSettingsStore()
+        public FileSettingsStore(ILogger logger)
         {
+            _logger = logger;
+            Location = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TailBlazer");
 
-
-            Location = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TailBlazer");
+            var dir = new DirectoryInfo(Location);
+            if (!dir.Exists) dir.Create();
+            
+            _logger.Info($"Settings folder is {Location}");
         }
 
         public void Save(string key, State state)
         {
-
             var file = Path.Combine(Location, $"{key}.setting");
 
-            //XDocument  and / or xmlTextWriter 
-            //write the version [should be an attribute]
-            //write for the  version [should be an Element]
+            _logger.Info($"Creating setting for {key}");
 
-            //new StringWriter()
-            //new XMLTextWriter()
-            //writer.writeelement()
+            var writer = new StringWriter();
+            using (var xmlWriter = new XmlTextWriter(writer))
+            {
+                using (xmlWriter.WriteElement("Setting"))
+                {
+                    xmlWriter.WriteAttributeString("Version",state.Version.ToString());
+                    using (xmlWriter.WriteElement("State"))
+                    {
+                        xmlWriter.WriteString(state.Value);
+                    }
+                }
+                xmlWriter.Close();
+            }
 
-            throw new NotImplementedException();
+            var formatted = XDocument.Parse(writer.ToString());
+
+            _logger.Info($"Writing value {formatted.ToString()}");
+            File.WriteAllText(file, formatted.ToString());
 
         }
 
         public State Load(string key)
         {
+            _logger.Info($"Reading setting for {key}");
 
             var file = Path.Combine(Location, $"{key}.setting");
 
-            //query the version [should be an attribute]
-            //query for the  version [should be an Element]
+            var doc = XDocument.Load(file);
+            var root = doc.Element("Setting");
+            var versionString = root.AttributeOrThrow("Version");
+            var version = int.Parse(versionString);
+            var state = root.ElementOrThrow("State");
 
-            XDocument xmlFile = XDocument.Load(file);
-
-
-            throw new NotImplementedException();
+            _logger.Info($"{key} has the value {state}");
+            return new State(version, state);
         }
     }
 }

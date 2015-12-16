@@ -108,6 +108,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchedulerEx.cs" />
     <Compile Include="IndexerFixture.cs" />
+    <Compile Include="SettingsStoreFixture.cs" />
     <Compile Include="TestFile.cs" />
   </ItemGroup>
   <ItemGroup>
