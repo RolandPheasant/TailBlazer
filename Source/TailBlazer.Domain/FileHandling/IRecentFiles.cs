@@ -6,7 +6,7 @@ namespace TailBlazer.Domain.FileHandling
 {
     public interface IRecentFiles
     {
-        IObservableList<FileInfo> Items { get; }
+        IObservableList<RecentFile> Items { get; }
 
         void Register(FileInfo file);
     }

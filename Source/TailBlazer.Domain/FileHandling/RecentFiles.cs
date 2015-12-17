@@ -3,21 +3,39 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using DynamicData;
-using DynamicData.Kernel;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 
 namespace TailBlazer.Domain.FileHandling
 {
+
+    public class RecentFile
+    {
+        public DateTime Timestamp { get; }
+        public string  Name  { get; }
+
+        public RecentFile(FileInfo fileInfo)
+        {
+            Name = fileInfo.FullName;
+            Timestamp = DateTime.Now;
+        }
+
+        public RecentFile(DateTime timestamp, string name)
+        {
+            Timestamp = timestamp;
+            Name = name;
+        }
+    }
+
     public class RecentFiles : IRecentFiles, IDisposable
     {
         private const string SettingsKey = "RecentFiles";
 
         private readonly ILogger _logger;
         private readonly IDisposable _cleanUp;
-        private readonly  ISourceCache<FileInfo,string> _files = new SourceCache<FileInfo, string>(fi=>fi.FullName); 
-        
-        public IObservableList<FileInfo> Items { get; }
+        private readonly  ISourceCache<RecentFile, string> _files = new SourceCache<RecentFile, string>(fi=>fi.Name);
+
+        public IObservableList<RecentFile> Items { get; }
 
         public RecentFiles(ILogger logger, ISettingFactory settingFactory, ISettingsStore store)
         {
@@ -37,11 +55,11 @@ namespace TailBlazer.Domain.FileHandling
                 _files.Edit(innerCache =>
                 {
                     //all files are loaded when state changes, so only add new ones
-                    var newItems = files
-                        .Where(f => !innerCache.Lookup(f.FullName).HasValue)
-                        .ToArray();
+                    //var newItems = files
+                    //    .Where(f => !innerCache.Lookup(f.FullName).HasValue)
+                    //    .ToArray();
 
-                    innerCache.AddOrUpdate(newItems);
+                    //innerCache.AddOrUpdate(newItems);
                 });     
             });
        
@@ -58,12 +76,14 @@ namespace TailBlazer.Domain.FileHandling
         public void Register(FileInfo file)
         {
             if (file == null) throw new ArgumentNullException(nameof(file));
-            _files.AddOrUpdate(file);
+            
+            _files.AddOrUpdate(new RecentFile(file));
         }
 
         public void Remove(FileInfo file)
         {
-            _files.Remove(file);
+            _files.Remove(file.Name);
+
         }
 
         public void Dispose()

@@ -72,15 +72,15 @@ namespace TailBlazer.Views
 
             //move this out into it's own view model + create proxy so we can order
             //and timestamp etc
-            ReadOnlyObservableCollection<FileInfo> data;
-            var recentLoader = recentFiles.Items
-                                .Connect()
-                                .ObserveOn(schedulerProvider.MainThread)
-                                .Bind(out data)
-                                .Subscribe();
-            RecentFiles = data;
+            //ReadOnlyObservableCollection<FileInfo> data;
+            //var recentLoader = recentFiles.Items
+            //                    .Connect()
+            //                    .ObserveOn(schedulerProvider.MainThread)
+            //                    .Bind(out data)
+            //                    .Subscribe();
+          //  RecentFiles = data;
 
-            _cleanUp = new CompositeDisposable(recentLoader,
+            _cleanUp = new CompositeDisposable(//recentLoader,
                 isEmptyChecker,
                 fileDropped,
                 DropMonitor,

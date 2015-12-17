@@ -2,31 +2,44 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using TailBlazer.Domain.Settings;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class RecentFilesToStateConverter: IConverter<FileInfo[]>
+    public class RecentFilesToStateConverter: IConverter<RecentFile[]>
     {
-        public FileInfo[] Convert(State state)
+        public RecentFile[] Convert(State state)
         {
+
+
             if (state == null || state == State.Empty)
-                return new FileInfo[0];
-
-            return state.Value.FromDelimited(s => new FileInfo(s),Environment.NewLine).ToArray();
+                return new RecentFile[0];
+            
+            return null;
+         //   return state.Value.FromDelimited(s => new RecentFile(s),Environment.NewLine).ToArray();
         }
 
-        public State Convert(FileInfo[] state)
+        public State Convert(RecentFile[] files)
         {
-            if (state == null || !state.Any())
+            if (files == null || !files.Any())
                 return State.Empty;
+            
+            var root = new XElement(new XElement("Files", new XAttribute("Version",1)));
 
-            return new State(1, state.Select(fi=>fi.FullName).ToDelimited(Environment.NewLine));
+            var fileNodeArray = files.Select(f => new XElement("File",
+                new XAttribute("Name", f.Name),
+                new XAttribute("Date", f.Timestamp)));
+
+            fileNodeArray.ForEach(root.Add);
+
+            XDocument doc = new XDocument(root);
+            return new State(1, doc.ToString());
         }
 
-        public FileInfo[] GetDefaultValue()
+        public RecentFile[] GetDefaultValue()
         {
-            return new FileInfo[0];
+            return new RecentFile[0];
         }
     }
 }
