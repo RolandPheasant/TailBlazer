@@ -4,10 +4,12 @@ using DynamicData;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public interface IRecentFiles
+    public interface IRecentFileCollection
     {
         IObservableList<RecentFile> Items { get; }
 
-        void Register(FileInfo file);
+        void Add(RecentFile file);
+
+        void Remove(RecentFile file);
     }
 }

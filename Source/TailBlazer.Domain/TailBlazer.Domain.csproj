@@ -93,8 +93,9 @@
     <Compile Include="FileHandling\LineReaderEx.cs" />
     <Compile Include="FileHandling\LinesChangedReason.cs" />
     <Compile Include="FileHandling\Page.cs" />
-    <Compile Include="FileHandling\RecentFiles.cs" />
-    <Compile Include="FileHandling\IRecentFiles.cs" />
+    <Compile Include="FileHandling\RecentFile.cs" />
+    <Compile Include="FileHandling\RecentFileCollection.cs" />
+    <Compile Include="FileHandling\IRecentFileCollection.cs" />
     <Compile Include="FileHandling\RecentFilesToStateConverter.cs" />
     <Compile Include="FileHandling\ScrollReason.cs" />
     <Compile Include="FileHandling\ScrollRequest.cs" />

@@ -9,32 +9,31 @@ using System.Reactive.Linq;
 using System.Reflection;
 using System.Windows.Input;
 using Dragablz;
-using DynamicData;
 using DynamicData.Aggregation;
 using DynamicData.Binding;
 using Microsoft.Win32;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
 using System.Reactive.Concurrency;
-using TailBlazer.Domain.FileHandling;
 
 namespace TailBlazer.Views
 {
     public class WindowViewModel: AbstractNotifyPropertyChanged, IDisposable
     {
+
         private readonly ILogger _logger;
         private readonly IWindowsController _windowsController;
-        private readonly IRecentFiles _recentFiles;
         private readonly ISchedulerProvider _schedulerProvider;
         private readonly IObjectProvider _objectProvider;
         private readonly IDisposable _cleanUp;
         private ViewContainer _selected;
         private bool _isEmpty;
+        private bool _menuIsOpen;
 
         public ObservableCollection<ViewContainer> Views { get; } = new ObservableCollection<ViewContainer>();
 
-        public ReadOnlyObservableCollection<FileInfo> RecentFiles { get; } 
-
+        public RecentFilesViewModel RecentFiles { get; }
+        
         public IInterTabClient InterTabClient { get; }
         public ICommand OpenFileCommand { get; }
         public Command ShowInGitHubCommand { get; }
@@ -46,12 +45,12 @@ namespace TailBlazer.Views
             IWindowFactory windowFactory, 
             ILogger logger,
             IWindowsController windowsController,
-            IRecentFiles  recentFiles,
-            ISchedulerProvider schedulerProvider )
+            RecentFilesViewModel recentFilesViewModel,
+            ISchedulerProvider schedulerProvider)
         {
             _logger = logger;
             _windowsController = windowsController;
-            _recentFiles = recentFiles;
+            RecentFiles = recentFilesViewModel;
             _schedulerProvider = schedulerProvider;
             _objectProvider = objectProvider;
             InterTabClient = new InterTabClient(windowFactory);
@@ -68,22 +67,19 @@ namespace TailBlazer.Views
                                     .Select(count=>count==0)
                                     .Subscribe(isEmpty=> IsEmpty = isEmpty);
 
+            var openRecent = recentFilesViewModel.OpenFileRequest
+                                .Subscribe(file =>
+                                {
+                                    MenuIsOpen = false;
+                                    OpenFile(file);
+                                });
 
 
-            //move this out into it's own view model + create proxy so we can order
-            //and timestamp etc
-            //ReadOnlyObservableCollection<FileInfo> data;
-            //var recentLoader = recentFiles.Items
-            //                    .Connect()
-            //                    .ObserveOn(schedulerProvider.MainThread)
-            //                    .Bind(out data)
-            //                    .Subscribe();
-          //  RecentFiles = data;
-
-            _cleanUp = new CompositeDisposable(//recentLoader,
+            _cleanUp = new CompositeDisposable(recentFilesViewModel,
                 isEmptyChecker,
                 fileDropped,
                 DropMonitor,
+                openRecent,
                 Disposable.Create(() =>
                 {
                      Views.Select(vc => vc.Content)
@@ -114,7 +110,7 @@ namespace TailBlazer.Views
                 {
                     _logger.Info($"Attempting to open '{file.FullName}'");
 
-                    _recentFiles.Register(file);
+                    RecentFiles.Add(file);
 
                     //1. resolve TailViewModel
                     var factory = _objectProvider.Get<FileTailerViewModelFactory>();
@@ -169,6 +165,13 @@ namespace TailBlazer.Views
             get { return _isEmpty; }
             set { SetAndRaise(ref _isEmpty, value); }
         }
+
+        public bool MenuIsOpen
+        {
+            get { return _menuIsOpen; }
+            set { SetAndRaise(ref _menuIsOpen, value); }
+        }
+
 
         public void Dispose()
         {

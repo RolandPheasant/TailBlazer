@@ -155,6 +155,13 @@
     <Compile Include="Views\IScrollReceiver.cs" />
     <Compile Include="Views\IWindowsController.cs" />
     <Compile Include="Views\LineProxy.cs" />
+    <Compile Include="Views\OpenFileIcon.cs" />
+    <Compile Include="Views\RecentFileProxy.cs" />
+    <Compile Include="Views\RecentFilesView.xaml.cs">
+      <DependentUpon>RecentFilesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\RecentFilesViewModel.cs" />
+    <Compile Include="Views\RemoveIcon.cs" />
     <Compile Include="Views\ScrollChangedArgs.cs" />
     <Compile Include="Views\ScrollDirection.cs" />
     <Compile Include="Views\ScrollBoundsArgs.cs" />
@@ -202,6 +209,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\InlineView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\RecentFilesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

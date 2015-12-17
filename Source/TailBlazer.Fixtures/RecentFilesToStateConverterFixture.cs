@@ -1,4 +1,5 @@
 using System.IO;
+using FluentAssertions;
 using TailBlazer.Domain.FileHandling;
 using Xunit;
 
@@ -7,7 +8,7 @@ namespace TailBlazer.Fixtures
     public class RecentFilesToStateConverterFixture
     {
         [Fact]
-        public void ConvertFiles()
+        public void TwoWayConversion()
         {
 
             var files = new[]
@@ -17,9 +18,9 @@ namespace TailBlazer.Fixtures
             };
 
             var converter = new RecentFilesToStateConverter();
-
-            var converted = converter.Convert(files);
-
+            var state = converter.Convert(files);
+            var restored = converter.Convert(state);
+            restored.ShouldAllBeEquivalentTo(files);
         }
     }
 }

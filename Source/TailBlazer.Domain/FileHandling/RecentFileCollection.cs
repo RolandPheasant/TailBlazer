@@ -8,26 +8,7 @@ using TailBlazer.Domain.Settings;
 
 namespace TailBlazer.Domain.FileHandling
 {
-
-    public class RecentFile
-    {
-        public DateTime Timestamp { get; }
-        public string  Name  { get; }
-
-        public RecentFile(FileInfo fileInfo)
-        {
-            Name = fileInfo.FullName;
-            Timestamp = DateTime.Now;
-        }
-
-        public RecentFile(DateTime timestamp, string name)
-        {
-            Timestamp = timestamp;
-            Name = name;
-        }
-    }
-
-    public class RecentFiles : IRecentFiles, IDisposable
+    public class RecentFileCollection : IRecentFileCollection, IDisposable
     {
         private const string SettingsKey = "RecentFiles";
 
@@ -37,7 +18,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public IObservableList<RecentFile> Items { get; }
 
-        public RecentFiles(ILogger logger, ISettingFactory settingFactory, ISettingsStore store)
+        public RecentFileCollection(ILogger logger, ISettingFactory settingFactory, ISettingsStore store)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (store == null) throw new ArgumentNullException(nameof(store));
@@ -55,11 +36,11 @@ namespace TailBlazer.Domain.FileHandling
                 _files.Edit(innerCache =>
                 {
                     //all files are loaded when state changes, so only add new ones
-                    //var newItems = files
-                    //    .Where(f => !innerCache.Lookup(f.FullName).HasValue)
-                    //    .ToArray();
+                    var newItems = files
+                        .Where(f => !innerCache.Lookup(f.Name).HasValue)
+                        .ToArray();
 
-                    //innerCache.AddOrUpdate(newItems);
+                    innerCache.AddOrUpdate(newItems);
                 });     
             });
        
@@ -73,16 +54,16 @@ namespace TailBlazer.Domain.FileHandling
             _cleanUp = new CompositeDisposable(settingsWriter, loader, _files,Items);
         }
 
-        public void Register(FileInfo file)
+        public void Add(RecentFile file)
         {
             if (file == null) throw new ArgumentNullException(nameof(file));
             
-            _files.AddOrUpdate(new RecentFile(file));
+            _files.AddOrUpdate(file);
         }
 
-        public void Remove(FileInfo file)
+        public void Remove(RecentFile file)
         {
-            _files.Remove(file.Name);
+            _files.Remove(file);
 
         }
 

@@ -27,7 +27,7 @@ namespace TailBlazer.Fixtures
         [Fact]
         public void WriteComplexState()
         {
-            var state = new State(1, "<<something weird<>");
+            var state = new State(1, "<<something weird<> which breaks xml {}");
 
             var store = new FileSettingsStore(new NullLogger());
             store.Save("wierdfile", state);

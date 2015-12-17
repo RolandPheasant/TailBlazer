@@ -15,7 +15,7 @@ namespace TailBlazer.Infrastucture
             // Only work on concrete types
             if (!type.IsConcrete() || type.IsGenericType) return;
 
-            // Register against all the interfaces implemented
+            // Add against all the interfaces implemented
             // by this concrete class
             type.GetInterfaces()
                 .Where(@interface => @interface.Name == $"I{type.Name}" )

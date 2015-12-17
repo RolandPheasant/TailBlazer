@@ -16,6 +16,20 @@ namespace TailBlazer.Domain.Settings
             return Disposable.Create(source.WriteEndElement);
         }
 
+        public static XElement ElementOrThrow(this XDocument source, string elementName)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (elementName == null) throw new ArgumentNullException(nameof(elementName));
+
+            var element = source.Element(elementName);
+
+            if (element == null)
+                throw new ArgumentNullException($"{elementName} does not exist");
+
+
+            return element;
+        }
+
         public static string ElementOrThrow(this XElement source, string elementName)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
@@ -40,8 +54,9 @@ namespace TailBlazer.Domain.Settings
             if (element == null)
                 throw new ArgumentNullException($"{elementName} does not exist");
 
-
             return element.Value;
         }
+
+
     }
 }

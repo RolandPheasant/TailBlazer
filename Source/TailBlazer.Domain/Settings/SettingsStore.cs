@@ -11,6 +11,14 @@ namespace TailBlazer.Domain.Settings
         private readonly ILogger _logger;
 
         private string Location { get; }
+
+        private static class Structure
+        {
+            public const string Root = "Setting";
+            public const string Version = "Version";
+            public const string State = "State";
+        }
+
         public FileSettingsStore(ILogger logger)
         {
             _logger = logger;
@@ -28,23 +36,14 @@ namespace TailBlazer.Domain.Settings
 
             _logger.Info($"Creating setting for {key}");
 
-            var writer = new StringWriter();
-            using (var xmlWriter = new XmlTextWriter(writer))
-            {
-                using (xmlWriter.WriteElement("Setting"))
-                {
-                    xmlWriter.WriteAttributeString("Version",state.Version.ToString());
-                    using (xmlWriter.WriteElement("State"))
-                    {
-                        xmlWriter.WriteString(state.Value);
-                    }
-                }
-                xmlWriter.Close();
-            }
+            var root = new XElement(new XElement(Structure.Root, new XAttribute(Structure.Version,state.Version)));
+            var stateElement = new XElement(Structure.State, state.Value);
+            root.Add(stateElement);
+            var doc = new XDocument(root);
+            var fileText = doc.ToString();
 
-            var formatted = XDocument.Parse(writer.ToString());
-            _logger.Info($"Writing value {formatted.ToString()}");
-            File.WriteAllText(file, formatted.ToString());
+            _logger.Info($"Writing value {fileText}");
+            File.WriteAllText(file, fileText);
 
         }
 
@@ -57,10 +56,9 @@ namespace TailBlazer.Domain.Settings
 
             if (!info.Exists || info.Length == 0) return State.Empty;
 
-  
 
             var doc = XDocument.Load(file);
-            var root = doc.Element("Setting");
+            var root = doc.ElementOrThrow("Setting");
             var versionString = root.AttributeOrThrow("Version");
             var version = int.Parse(versionString);
             var state = root.ElementOrThrow("State");
