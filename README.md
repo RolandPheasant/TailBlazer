@@ -32,11 +32,10 @@ That's better. A tail program which is pleasing to my eyes!
 
  - Filter lines on regex
  - Conditionally highlight text
- - Store recent files and folders
  - Automatic creation of columns
  - Pipe filter to file
- - Copy text to clipboard
  - Ability to pin a file
+ - Plug in to external providers (see [#51](https://github.com/RolandPheasant/TailBlazer/issues/51))
 
 ## Future feature list (Folder tail)
 
