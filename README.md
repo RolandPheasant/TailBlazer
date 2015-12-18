@@ -3,7 +3,7 @@
 [![Join the chat at https://gitter.im/RolandPheasant/TailBlazer](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/RolandPheasant/TailBlazer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build status](https://ci.appveyor.com/api/projects/status/yot4rioy393j52eg?svg=true)](https://ci.appveyor.com/project/RolandPheasant/tailblazer) [![GitHub issues](https://img.shields.io/github/issues/RolandPheasant/TailBlazer.svg)](https://github.com/RolandPheasant/TailBlazer/issues)
 
 
-In my day to day professional life I am always tailing log files but have always been disappointed with the freebies on offer.The current crop of free ones all look like they were written in the 1990s, are very ugly and have limited functionality.
+In my day to day professional life I am always tailing log files but have always been disappointed with the utilities on offer. The current crop of free ones all look like they were written in the 1990s, are very ugly and have limited functionality.
 
 So I have decided to rectify this by creating a more modern version.  The mission statement is:  
 
@@ -26,16 +26,16 @@ That's better. A tail program which is pleasing to my eyes!
  - Apply multiple searches and toogle between search results
  - View search result in original position in file
  - Copy to clipboard
+ - Remembers recent files
 
 ## Future feature list
 
  - Filter lines on regex
  - Conditionally highlight text
- - Store recent files and folders
  - Automatic creation of columns
  - Pipe filter to file
- - Copy text to clipboard
  - Ability to pin a file
+ - Plug in to external providers (see [#51](https://github.com/RolandPheasant/TailBlazer/issues/51))
 
 ## Future feature list (Folder tail)
 
