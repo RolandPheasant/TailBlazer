@@ -39,18 +39,29 @@
                 <DataTemplate DataType="{x:Type local:RecentFileProxy}">
                     <Grid>
 
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <Button Style="{StaticResource MaterialDesignFlatButton}"
-                            Margin="2 0 2 2" Width="22" Height="22" Padding="0"
+                        <Button 
+                            HorizontalAlignment="Left"
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            Margin="2 0 2 2" Height="22" Padding="0"
                             VerticalAlignment="Center"
+                               
                             Command="{Binding OpenCommand}"
                             ToolTip="{Binding OpenToolTip}">
-                            <local:OpenFileIcon Width="14" Height="14"/>
+
+                            <StackPanel Orientation="Horizontal">
+
+                                <local:OpenFileIcon Width="14" Height="14"/>
+
+                                <TextBlock Foreground="Black" 
+                                           FontWeight="Light"
+                                           Margin="5 2 4 2" 
+                                   VerticalAlignment="Center"
+                                           
+                                   Text="{Binding Name}"/>
+                            </StackPanel>
+
+
+
                         </Button>
 
                         <!--<Button Grid.Column="1" 
@@ -62,9 +73,9 @@
                             <local:RemoveIcon Width="10" Height="10"/>
                         </Button>-->
                         
-                        <TextBlock Grid.Column="2" Margin="0 2 4 2" 
+                        <!--<TextBlock Grid.Column="2" Margin="0 2 4 2" 
                                    VerticalAlignment="Center"
-                                   Text="{Binding Name}"/>
+                                   Text="{Binding Name}"/>-->
 
 
 
