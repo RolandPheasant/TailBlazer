@@ -133,6 +133,8 @@
     <Compile Include="Infrastucture\LogFactory.cs" />
     <Compile Include="Infrastucture\FileNamer.cs" />
     <Compile Include="Infrastucture\SelectionMonitor.cs" />
+    <Compile Include="Settings\GeneralOptionsConverter.cs" />
+    <Compile Include="Settings\Theme.cs" />
     <Compile Include="Views\FileDropContainer.cs" />
     <Compile Include="Views\FileDropMonitor.cs" />
     <Compile Include="Views\FileHeaderNamingJob.cs" />
@@ -167,7 +169,7 @@
     <Compile Include="Infrastucture\ScrollBoundsArgs.cs" />
     <Compile Include="Views\SearchViewModel.cs" />
     <Compile Include="Views\SettingsIcon.cs" />
-    <Compile Include="Settings\ColourSettings.cs" />
+    <Compile Include="Settings\GeneralOptions.cs" />
     <Compile Include="Views\TailBlazerIcon.cs" />
     <Compile Include="Views\SearchCollection.cs" />
     <Compile Include="Infrastucture\VirtualScrollPanel.cs" />

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Xml.Linq;
 using DynamicData.Kernel;
 using TailBlazer.Domain.Settings;
@@ -45,32 +45,5 @@ namespace TailBlazer.Settings
         {
             return new GeneralOptions(Theme.Light, true, 5,100);
         }
-    }
-
-    public enum Theme
-    {
-        Dark, 
-        Light
-    }
-
-    public class  GeneralOptions
-    {
-        public Theme Theme { get;  }
-
-        public bool HighlightTail { get; }
-
-        public double HighlightDuration { get; }
-
-        public int Scale { get; }
-
-        public GeneralOptions(Theme theme, bool highlightTail, double highlightTailDuration, int scale)
-        {
-            Theme = theme;
-            HighlightTail = highlightTail;
-            HighlightDuration = highlightTailDuration;
-            Scale = scale;
-        }
-
-
     }
 }
