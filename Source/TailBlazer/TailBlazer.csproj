@@ -152,7 +152,7 @@
     <Compile Include="Views\InlineViewer.cs" />
     <Compile Include="Views\InlineViewerArgs.cs" />
     <Compile Include="Views\InlineViewerFactory.cs" />
-    <Compile Include="Views\IScrollReceiver.cs" />
+    <Compile Include="Infrastucture\IScrollReceiver.cs" />
     <Compile Include="Views\IWindowsController.cs" />
     <Compile Include="Views\LineProxy.cs" />
     <Compile Include="Views\OpenFileIcon.cs" />
@@ -162,14 +162,15 @@
     </Compile>
     <Compile Include="Views\RecentFilesViewModel.cs" />
     <Compile Include="Views\RemoveIcon.cs" />
-    <Compile Include="Views\ScrollChangedArgs.cs" />
-    <Compile Include="Views\ScrollDirection.cs" />
-    <Compile Include="Views\ScrollBoundsArgs.cs" />
+    <Compile Include="Infrastucture\ScrollChangedArgs.cs" />
+    <Compile Include="Infrastucture\ScrollDirection.cs" />
+    <Compile Include="Infrastucture\ScrollBoundsArgs.cs" />
     <Compile Include="Views\SearchViewModel.cs" />
     <Compile Include="Views\SettingsIcon.cs" />
+    <Compile Include="Settings\ColourSettings.cs" />
     <Compile Include="Views\TailBlazerIcon.cs" />
     <Compile Include="Views\SearchCollection.cs" />
-    <Compile Include="Views\VirtualScrollPanel.cs" />
+    <Compile Include="Infrastucture\VirtualScrollPanel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -1,6 +1,4 @@
-using System.Windows.Controls.Primitives;
-
-namespace TailBlazer.Views
+namespace TailBlazer.Infrastucture
 {
     public class ScrollBoundsArgs
     {

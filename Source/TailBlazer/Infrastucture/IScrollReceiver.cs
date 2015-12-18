@@ -1,4 +1,6 @@
-﻿namespace TailBlazer.Views
+﻿using TailBlazer.Views;
+
+namespace TailBlazer.Infrastucture
 {
     public interface IScrollReceiver
     {

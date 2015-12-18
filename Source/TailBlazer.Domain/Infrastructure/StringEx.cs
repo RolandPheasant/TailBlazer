@@ -5,8 +5,6 @@ using System.Reactive.Linq;
 // ReSharper disable once CheckNamespace
 namespace System
 {
-
-
     public static class StringEx
     {
         public static bool IsLongerThan(this string source, int length)

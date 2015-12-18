@@ -5,6 +5,7 @@ using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.Settings
 {
+
     public class Setting<T> : IEquatable<Setting<T>>, IDisposable, ISetting<T>
     {
         private readonly ILogger _logger;
@@ -36,6 +37,8 @@ namespace TailBlazer.Domain.Settings
             }
             catch (Exception ex)
             {
+                _value = converter.GetDefaultValue();
+                _rawValue= converter.Convert(_value).Value;
                 _logger.Error(ex, "Problem reading {0}", _key);
             }
     

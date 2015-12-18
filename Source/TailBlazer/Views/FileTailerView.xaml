@@ -344,7 +344,7 @@
 
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <local:VirtualScrollPanel ItemHeight="22"
+                        <infrastucture:VirtualScrollPanel ItemHeight="22"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
                                                 TotalItems="{Binding LatestCount.Value}"/>
