@@ -27,6 +27,7 @@ That's better. A tail program which is pleasing to my eyes!
  - View search result in original position in file
  - Copy to clipboard
  - Remembers recent files
+ - Can handle extemely large files (tested up to 45 Gb file)
 
 ## Future feature list
 
