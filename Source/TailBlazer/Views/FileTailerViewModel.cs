@@ -175,7 +175,7 @@ namespace TailBlazer.Views
                 {
                     try
                     {
-                        isSettingScrollPosition = true;
+                     //   isSettingScrollPosition = true;
                         FirstIndex = first;
                     }
                     finally
