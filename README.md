@@ -19,7 +19,7 @@ That's better. A tail program which is pleasing to my eyes!
 
  - Drag and drop to tail a file
  - Virtual file scrolling
- - Highlight new lines
+ - Highlight new lines (can be disabled)
  - Side by side monitoring of files
  - Auto tail or scroll mode
  - Filter lines to match text
@@ -27,6 +27,8 @@ That's better. A tail program which is pleasing to my eyes!
  - View search result in original position in file
  - Copy to clipboard
  - Remembers recent files
+ - Handle extemely large files (I have opened 45 Gb file)
+ - Dark and light theme
 
 ## Future feature list
 
@@ -62,7 +64,7 @@ I have been doing some major performance work see this  [Fast scrolling](https:/
 
 For me to produce this application I have used several community led open source projects all of which I love. So if you like this app I recommend checking out the following.
 
- - [Dynamic Data](https://gitter.im/RolandPheasant/DynamicData) Rx based collections developed by me. So please forgive the self-plug.
+ - [Dynamic Data](https://gitter.im/RolandPheasant/DynamicData) Rx based collections developed by me.
  - [Material Design ToolKit](https://github.com/ButchersBoy/MaterialDesignInXamlToolkit) by my friend and work colleage ButchersBoy. This brings WPF into the 21st century.
  - [Dragablz](https://github.com/ButchersBoy/Dragablz)  also by ButchersBoy. I think he is showing off now.
  - [MahApps](https://github.com/MahApps/MahApps.Metro) which was the first open source project to make WPF truly modern.
