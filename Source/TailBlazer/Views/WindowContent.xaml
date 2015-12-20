@@ -1,0 +1,87 @@
+﻿<UserControl x:Class="TailBlazer.Views.WindowContent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TailBlazer.Views"
+             xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
+             xmlns:dockablz="http://dragablz.net/winfx/xaml/dockablz"
+             xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <Grid infrastucture:DependencyObjectHook.Receiver="{Binding DropMonitor}">
+
+
+
+
+        <dockablz:Layout >
+
+
+
+
+            <dragablz:TabablzControl 
+
+                       
+                        x:Name="InitialTabablzControl"
+                            HeaderMemberPath="Header"             
+                            ShowDefaultCloseButton="True"
+                                      
+                            TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+                            Background="{DynamicResource MaterialDesignPaper}"
+                            ClosingItemCallback="{Binding ClosingTabItemHandler}"
+                            SelectedItem="{Binding Selected,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                            ItemsSource="{Binding  Views}" >
+
+
+                <!--<dragablz:TabablzControl.ItemTemplate>
+                            
+                            <DataTemplate>
+                                <Border BorderBrush="Yellow" BorderThickness="10">
+                                    <Border.RenderTransform>
+                                        <ScaleTransform ScaleX="2" ScaleY="2"/>
+                                    </Border.RenderTransform>
+                                    <ContentControl Content="{Binding}"/>
+                                </Border>
+                            </DataTemplate>
+                            
+                        </dragablz:TabablzControl.ItemTemplate>-->
+
+                <dragablz:TabablzControl.InterTabController>
+                    <dragablz:InterTabController InterTabClient="{Binding InterTabClient}"  />
+                </dragablz:TabablzControl.InterTabController>
+
+
+                <!--<dragablz:TabablzControl.ItemContainerStyle>
+                            
+                            
+                            </dragablz:TabablzControl.ItemContainerStyle>-->
+                <!--<Style TargetType="{x:Type dragablz:TabablzControl}">
+
+                            <Setter Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="{Binding GeneralOptions.ScaleRatio.Value}" 
+                                        ScaleY="{Binding GeneralOptions.ScaleRatio.Value}"/>
+                                </Setter.Value>
+                            </Setter>
+
+                        </Style>-->
+
+            </dragablz:TabablzControl>
+
+
+        </dockablz:Layout>
+
+        <StackPanel
+                Visibility="{Binding IsEmpty,Converter={StaticResource BooleanToVisibilityConverter}}"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Orientation="Vertical">
+
+            <TextBlock  FontSize="26" HorizontalAlignment="Center" Margin="0 0 0 4" Text="Drag files here"/>
+            <local:FileIcon BorderThickness="0" Width="50" Height="50" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+            <TextBlock FontSize="26" Margin="0 4 0 0" Text="to open" HorizontalAlignment="Center"/>
+        </StackPanel>
+    </Grid>
+
+</UserControl>

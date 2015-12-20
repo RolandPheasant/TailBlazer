@@ -1,17 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using StructureMap;
 using StructureMap.Pipeline;
 using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Infrastucture
 {
-    public class ObjectProvider : IObjectProvider
+    public class ObjectProvider : IObjectProvider, IObjectRegister
     {
         private readonly StructureMap.IContainer _container;
 
         public ObjectProvider(StructureMap.IContainer container)
         {
             _container = container;
+
         }
 
         public T Get<T>()
@@ -34,6 +36,12 @@ namespace TailBlazer.Infrastucture
                 args.SetArg(explictArg.Key, explictArg.Arg);
             }
             return _container.GetInstance<T>(args);
+        }
+
+        public void Register<T>(T instance)
+            where T:class
+        {
+            _container.Configure(x => x.For<T>().Use(instance));
         }
     }
 }

@@ -2,11 +2,10 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Linq;
-using System.Xml;
 using System.Xml.Linq;
 using TailBlazer.Domain.Settings;
 
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Domain.FileHandling.Recent
 {
     public class RecentFilesToStateConverter: IConverter<RecentFile[]>
     {
@@ -23,12 +22,12 @@ namespace TailBlazer.Domain.FileHandling
             if (state == null || state == State.Empty)
                 return new RecentFile[0];
 
-            //previous format
+            //v1 format is csv
             if (state.Version== 1)
                 return state.Value.FromDelimited(s => new RecentFile(new FileInfo(s)), Environment.NewLine).ToArray();
 
-            //v2 format is xml format
-            XDocument doc = XDocument.Parse(state.Value);
+            //v2 format is xml
+            var doc = XDocument.Parse(state.Value);
 
             var root = doc.ElementOrThrow(Structure.Root);
          

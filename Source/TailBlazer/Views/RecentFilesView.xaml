@@ -52,10 +52,10 @@
 
                                 <local:OpenFileIcon Width="14" Height="14"/>
 
-                                <TextBlock Foreground="Black" 
+                                <TextBlock Foreground="{DynamicResource MaterialDesignBody}" 
                                            FontWeight="Light"
                                            Margin="5 2 4 2" 
-                                   VerticalAlignment="Center"
+                                            VerticalAlignment="Center"
                                            
                                    Text="{Binding Name}"/>
                             </StackPanel>

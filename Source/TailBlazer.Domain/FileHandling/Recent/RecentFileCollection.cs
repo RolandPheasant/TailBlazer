@@ -1,35 +1,28 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using DynamicData;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Domain.FileHandling.Recent
 {
     public class RecentFileCollection : IRecentFileCollection, IDisposable
     {
-        private const string SettingsKey = "RecentFiles";
-
         private readonly ILogger _logger;
         private readonly IDisposable _cleanUp;
         private readonly  ISourceCache<RecentFile, string> _files = new SourceCache<RecentFile, string>(fi=>fi.Name);
 
         public IObservableList<RecentFile> Items { get; }
 
-        public RecentFileCollection(ILogger logger, ISettingFactory settingFactory, ISettingsStore store)
+        public RecentFileCollection(ILogger logger, ISetting<RecentFile[]> setting)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
-            if (store == null) throw new ArgumentNullException(nameof(store));
             _logger = logger;
 
-            //TODO:  create specialist object so we can sort / pin and timestamp etc
             Items = _files.Connect()
                         .RemoveKey()
                         .AsObservableList();
-
-            var setting = settingFactory.Create(new RecentFilesToStateConverter(), SettingsKey);
 
             var loader = setting.Value.Subscribe(files =>
             {

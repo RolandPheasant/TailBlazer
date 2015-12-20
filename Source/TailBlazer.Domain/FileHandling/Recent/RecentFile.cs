@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Domain.FileHandling.Recent
 {
     public class RecentFile : IEquatable<RecentFile>
     {

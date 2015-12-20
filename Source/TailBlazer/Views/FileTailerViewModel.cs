@@ -4,13 +4,16 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Windows;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
+using TailBlazer.Domain.Settings;
 using TailBlazer.Infrastucture;
+using TailBlazer.Settings;
 
 namespace TailBlazer.Views
 {
@@ -26,6 +29,7 @@ namespace TailBlazer.Views
         private int _pageSize;
         private LineProxy _selectedLine;
         private bool _showInline;
+        bool isSettingScrollPosition = false;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         public IProperty<int> SelectedItemsCount { get; }
@@ -42,18 +46,20 @@ namespace TailBlazer.Views
 
         public ISelectionMonitor SelectionMonitor { get; }
         public SearchCollection SearchCollection { get; }
-
         public InlineViewer InlineViewer { get; }
         public IProperty<bool> InlineViewerVisible { get; }
         public IProperty<bool> CanViewInline { get; }
-
+        public IProperty<bool> HighlightTail { get; }
+        public IProperty<bool> UsingDarkTheme { get; }
+  
         public FileTailerViewModel([NotNull] ILogger logger,
             [NotNull] ISchedulerProvider schedulerProvider,
             [NotNull] IFileWatcher fileWatcher,
             [NotNull] ISelectionMonitor selectionMonitor, 
             [NotNull] IClipboardHandler clipboardHandler, 
             [NotNull] ISearchInfoCollection searchInfoCollection, 
-            [NotNull] IInlineViewerFactory inlineViewerFactory)
+            [NotNull] IInlineViewerFactory inlineViewerFactory, 
+            [NotNull] ISetting<GeneralOptions> generalOptions)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
@@ -62,12 +68,32 @@ namespace TailBlazer.Views
             if (clipboardHandler == null) throw new ArgumentNullException(nameof(clipboardHandler));
             if (searchInfoCollection == null) throw new ArgumentNullException(nameof(searchInfoCollection));
             if (inlineViewerFactory == null) throw new ArgumentNullException(nameof(inlineViewerFactory));
+            if (generalOptions == null) throw new ArgumentNullException(nameof(generalOptions));
 
             SelectionMonitor = selectionMonitor;
             CopyToClipboardCommand = new Command(()=> clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
             SelectedItemsCount = selectionMonitor.Selected.Connect().QueryWhenChanged(collection=> collection.Count).ForBinding();
             SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
-            
+
+            UsingDarkTheme = generalOptions.Value
+                    .ObserveOn(schedulerProvider.MainThread)
+                    .Select(go => go.Theme== Theme.Dark)
+                    .ForBinding();
+
+            HighlightTail = generalOptions.Value
+                .ObserveOn(schedulerProvider.MainThread)
+                .Select(go => go.HighlightTail)
+                .ForBinding();
+
+            //HighlightDuration = generalOptions.Value
+            //    .ObserveOn(schedulerProvider.MainThread)
+            //    .Select(go =>
+            //    {
+            //        var duration = new Duration(TimeSpan.FromSeconds(go.HighlightDuration));
+            //        return duration;
+            //    })
+            //    .ForBinding();
+
             //An observable which acts as a scroll command
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
             var scroller = _userScrollRequested.CombineLatest(autoChanged, (user, auto) =>
@@ -75,6 +101,7 @@ namespace TailBlazer.Views
                             var mode = AutoTail ? ScrollReason.Tail : ScrollReason.User;
                             return  new ScrollRequest(mode, user.PageSize, user.FirstIndex);
                         })
+                        .Where(_=>!isSettingScrollPosition)
                         .ObserveOn(schedulerProvider.Background)
                         .DistinctUntilChanged();
 
@@ -136,12 +163,26 @@ namespace TailBlazer.Views
             CountText = indexed.Select(latest => $"{latest.Count.ToString("##,###")} lines").ForBinding();
             LatestCount = SearchCollection.Latest.Select(latest => latest.Count).ForBinding();
 
+
+
             //track first visible index
             var firstIndexMonitor = lineScroller.Lines.Connect()
                 .Buffer(TimeSpan.FromMilliseconds(250)).FlattenBufferResult()
-                .QueryWhenChanged(lines =>lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min())
+                .ToCollection()
+                .Select(lines => lines.Count == 0 ? 0 : lines.Select(l => l.Index).Max() - lines.Count+1)
                 .ObserveOn(schedulerProvider.MainThread)
-                .Subscribe(first => FirstIndex = first);
+                .Subscribe(first =>
+                {
+                    try
+                    {
+                        isSettingScrollPosition = true;
+                        FirstIndex = first;
+                    }
+                    finally
+                    {
+                        isSettingScrollPosition = false;
+                    }
+                });
 
             //Create objects required for inline viewing
             var isUserDefinedChanged = SearchCollection.WhenValueChanged(sc => sc.Selected)
@@ -175,14 +216,14 @@ namespace TailBlazer.Views
                 InlineViewerVisible,
                 SearchCollection,
                 searchInfoCollection,
+                HighlightTail,
+                UsingDarkTheme,
                 Disposable.Create(() =>
                 {
                     _userScrollRequested.OnCompleted();
                     (SelectionMonitor as IDisposable)?.Dispose();
                 }));
         }
-
-
 
         public LineProxy SelectedItem
         {
@@ -200,7 +241,8 @@ namespace TailBlazer.Views
                 However due to complexities int the interactions with the VirtualScrollPanel,
                 each time I have tried to remove it all hell has broken loose
             */
-            _userScrollRequested.OnNext(new ScrollRequest(mode, boundsArgs.PageSize,boundsArgs.FirstIndex));
+            if (!isSettingScrollPosition)
+                _userScrollRequested.OnNext(new ScrollRequest(mode, boundsArgs.PageSize,boundsArgs.FirstIndex));
             PageSize = boundsArgs.PageSize;
             FirstIndex = boundsArgs.FirstIndex;
         }

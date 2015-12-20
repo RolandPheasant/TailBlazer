@@ -1,6 +1,7 @@
 using System.IO;
 using FluentAssertions;
 using TailBlazer.Domain.FileHandling;
+using TailBlazer.Domain.FileHandling.Recent;
 using TailBlazer.Settings;
 using Xunit;
 

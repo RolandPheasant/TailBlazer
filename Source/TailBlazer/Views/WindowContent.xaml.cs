@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace TailBlazer.Views
 {
     /// <summary>
-    /// Interaction logic for HeaderedContentView.xaml
+    /// Interaction logic for WindowContent.xaml
     /// </summary>
-    public partial class HeaderedContentView : UserControl
+    public partial class WindowContent : UserControl
     {
-        public HeaderedContentView()
+        public WindowContent()
         {
             InitializeComponent();
         }

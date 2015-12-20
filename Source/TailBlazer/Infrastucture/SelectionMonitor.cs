@@ -36,8 +36,6 @@ namespace TailBlazer.Infrastucture
         private readonly ILogger _logger;
         private readonly ISourceList<LineProxy> _selected = new SourceList<LineProxy>();
         private readonly ISourceList<LineProxy> _recentlyRemovedFromVisibleRange = new SourceList<LineProxy>();
-
-
         private readonly IDisposable _cleanUp;
         private readonly SerialDisposable _controlSubscriber = new SerialDisposable();
         
@@ -126,7 +124,6 @@ namespace TailBlazer.Infrastucture
                                          || Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightCtrl));
 
                                         if (!isKeyDown) _selected.Clear();
-
                                     });
 
             var mouseUpHandler = Observable.FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(
@@ -142,8 +139,9 @@ namespace TailBlazer.Infrastucture
                 .Select(evt => evt.EventArgs);
 
 
-            //Handle selecting multiple rows with the mouse [TODO: Scroll up when the]
-            var mouseDragSelector2 =  selectedChanged
+            //Handle selecting multiple rows with the mouse
+            // TODO: Scroll up when the mouse it at the top of the screen
+            var mouseDragSelector =  selectedChanged
                     .Scan(new ImmutableList<LineProxy>(), (state, latest) =>
                     {
                         return state.Add(latest.AddedItems.OfType<LineProxy>().ToList());
@@ -153,7 +151,6 @@ namespace TailBlazer.Infrastucture
                     .Where(selection=>selection.Length>0)
                     .Subscribe(selection =>
                     {
-
                         var first = selection.OrderBy(proxy => proxy.Start).First();
                         var last = selection.OrderBy(proxy => proxy.Start).Last();
 
@@ -170,7 +167,7 @@ namespace TailBlazer.Infrastucture
 
             var selectionChanged = selectedChanged.Subscribe(OnSelectedItemsChanged);
 
-            _controlSubscriber.Disposable =new CompositeDisposable(mouseDown, mouseDragSelector2, selectionChanged, itemsAdded, itemsRemoved, dataSource.Connect());
+            _controlSubscriber.Disposable =new CompositeDisposable(mouseDown, mouseDragSelector, selectionChanged, itemsAdded, itemsRemoved, dataSource.Connect());
         }
 
 

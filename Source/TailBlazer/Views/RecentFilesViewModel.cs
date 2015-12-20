@@ -7,6 +7,7 @@ using System.Reactive.Subjects;
 using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.FileHandling;
+using TailBlazer.Domain.FileHandling.Recent;
 using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Views

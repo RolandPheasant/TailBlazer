@@ -15,12 +15,12 @@ using Microsoft.Win32;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
 using System.Reactive.Concurrency;
+using TailBlazer.Settings;
 
 namespace TailBlazer.Views
 {
     public class WindowViewModel: AbstractNotifyPropertyChanged, IDisposable
     {
-
         private readonly ILogger _logger;
         private readonly IWindowsController _windowsController;
         private readonly ISchedulerProvider _schedulerProvider;
@@ -31,9 +31,8 @@ namespace TailBlazer.Views
         private bool _menuIsOpen;
 
         public ObservableCollection<ViewContainer> Views { get; } = new ObservableCollection<ViewContainer>();
-
         public RecentFilesViewModel RecentFiles { get; }
-        
+        public GeneralOptionsViewModel GeneralOptions { get; }
         public IInterTabClient InterTabClient { get; }
         public ICommand OpenFileCommand { get; }
         public Command ShowInGitHubCommand { get; }
@@ -46,11 +45,13 @@ namespace TailBlazer.Views
             ILogger logger,
             IWindowsController windowsController,
             RecentFilesViewModel recentFilesViewModel,
+            GeneralOptionsViewModel generalOptionsViewModel,
             ISchedulerProvider schedulerProvider)
         {
             _logger = logger;
             _windowsController = windowsController;
             RecentFiles = recentFilesViewModel;
+            GeneralOptions = generalOptionsViewModel;
             _schedulerProvider = schedulerProvider;
             _objectProvider = objectProvider;
             InterTabClient = new InterTabClient(windowFactory);

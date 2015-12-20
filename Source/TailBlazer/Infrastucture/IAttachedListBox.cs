@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Windows.Controls;
 using DynamicData;
@@ -10,7 +11,7 @@ namespace TailBlazer.Infrastucture
         void Receive(ListBox selector);
     }
 
-    public interface ISelectionMonitor
+    public interface ISelectionMonitor: IDisposable
     {
         string GetSelectedText();
 

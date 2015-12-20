@@ -94,8 +94,7 @@
                 </Style.Triggers>
             </Style>
 
-
-            <Style x:Key="filterListBoxStyle" TargetType="{x:Type ListBox}">
+            <Style x:Key="FilterListBoxStyle" TargetType="{x:Type ListBox}">
 
                 <Setter Property="BorderBrush" Value="{StaticResource MaterialDesignTextBoxBorder}"/>
               
@@ -152,6 +151,8 @@
     </Control.Resources>
 
     <Grid>
+
+
         <ProgressBar
                 Visibility="{Binding IsLoading.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
                 Style="{StaticResource TailBlazerCircularProgressBar}" 
@@ -202,24 +203,24 @@
 
                 <TextBlock     Margin="4 0 0 0" Grid.Column="2"
                                Opacity="0.56"
-
-                               Width="43"
-                               TextAlignment="Center"
-                              TextWrapping="Wrap"
+                            Width="43"
+                            TextAlignment="Center"
+                            TextWrapping="Wrap"
                             Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
                             VerticalAlignment="Center"
                             Text="Switch Results"></TextBlock>
 
 
                 <ListBox Grid.Column="3" Margin="4 2 0 2" 
-                      
-                         VerticalAlignment="Stretch"
-                         Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
+                    TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+                    Background="{DynamicResource MaterialDesignPaper}"
+                    VerticalAlignment="Stretch"
+                    Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
                     SelectedItem="{Binding SearchCollection.Selected}"
                     ItemsSource="{Binding SearchCollection.Items}" 
-                     Style="{DynamicResource filterListBoxStyle}">
+                     Style="{DynamicResource FilterListBoxStyle}">
 
-                        <ListBox.ItemTemplate>
+                    <ListBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type local:SearchViewModel}">
                                 <Grid x:Name="Selection" VerticalAlignment="Center">
                                     <Grid.ColumnDefinitions>
@@ -321,10 +322,10 @@
             <ListBox   
                 VerticalAlignment="Stretch"
                 Grid.Row="1"
-                 ItemsSource="{Binding Lines}" 
+                ItemsSource="{Binding Lines}" 
                 SelectedItem="{Binding SelectedItem}"
-                 FontFamily="Consolas"
-                 SelectionMode="Extended"
+                FontFamily="Consolas"
+                SelectionMode="Extended"
                  infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}" >
 
                 <ListBox.Template>
@@ -373,7 +374,7 @@
 
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type local:LineProxy}">
-                        <Grid >
+                        <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
@@ -402,23 +403,55 @@
                             <Setter Property="Padding" Value="0"/>
                             <Setter Property="Height" Value="22"/>
                         </Style.Setters>
+                        
+                        
 
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsRecent}" Value="True">
-                                <DataTrigger.EnterActions>
+                            <MultiDataTrigger >
+
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Path=IsRecent}" Value="True"/>
+                                    <Condition Binding="{Binding Path=DataContext.HighlightTail.Value, ElementName=Control}" Value="True"/>
+                                    <Condition Binding="{Binding Path=DataContext.UsingDarkTheme.Value, ElementName=Control}" Value="False"/>
+                                </MultiDataTrigger.Conditions>
+
+                                <MultiDataTrigger.EnterActions>
                                     <BeginStoryboard>
                                         <Storyboard>
                                             <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Background).(SolidColorBrush.Color)" 
                                                                                FromBrush="{StaticResource SecondaryAccentBrush}" 
+                                                                              
                                                                                Duration="0:0:5"/>
                                             <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Foreground).(SolidColorBrush.Color)" 
                                                                                ToBrush="{StaticResource SecondaryAccentForegroundBrush}" 
+                                                                              
                                                                                Duration="0:0:5"/>
                                         </Storyboard>
                                     </BeginStoryboard>
 
-                                </DataTrigger.EnterActions>
-                            </DataTrigger>
+                                </MultiDataTrigger.EnterActions>
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger >
+
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Path=IsRecent}" Value="True"/>
+                                    <Condition Binding="{Binding Path=DataContext.HighlightTail.Value, ElementName=Control}" Value="True"/>
+                                    <Condition Binding="{Binding Path=DataContext.UsingDarkTheme.Value, ElementName=Control}" Value="True"/>
+                                </MultiDataTrigger.Conditions>
+
+                                <MultiDataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Foreground).(SolidColorBrush.Color)" 
+                                                                               ToBrush="{StaticResource MaterialDesignBody}" 
+                                                                               FromBrush="{StaticResource SecondaryAccentBrush}"
+                                                                               Duration="0:0:5"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+
+                                </MultiDataTrigger.EnterActions>
+                            </MultiDataTrigger>
                         </Style.Triggers>
                     </Style>
                 </ListBox.ItemContainerStyle>

@@ -133,7 +133,14 @@
     <Compile Include="Infrastucture\LogFactory.cs" />
     <Compile Include="Infrastucture\FileNamer.cs" />
     <Compile Include="Infrastucture\SelectionMonitor.cs" />
+    <Compile Include="Infrastucture\StartupController.cs" />
+    <Compile Include="Infrastucture\UhandledExceptionHandler.cs" />
     <Compile Include="Settings\GeneralOptionsConverter.cs" />
+    <Compile Include="Settings\GeneralOptionsView.xaml.cs">
+      <DependentUpon>GeneralOptionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\GeneralOptionsViewModel.cs" />
+    <Compile Include="Settings\PaletteHelper.cs" />
     <Compile Include="Settings\Theme.cs" />
     <Compile Include="Views\FileDropContainer.cs" />
     <Compile Include="Views\FileDropMonitor.cs" />
@@ -192,6 +199,9 @@
     <Compile Include="Infrastucture\Log4NetLogger.cs" />
     <Compile Include="Infrastucture\ObjectProvider.cs" />
     <Compile Include="Infrastucture\ViewContainer.cs" />
+    <Compile Include="Views\WindowContent.xaml.cs">
+      <DependentUpon>WindowContent.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\WindowFactory.cs" />
     <Compile Include="Views\WindowsController.cs" />
     <Compile Include="Views\WindowViewModel.cs" />
@@ -199,9 +209,13 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Themes\Colours.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="Settings\GeneralOptionsView.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Colours.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -216,6 +230,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\RecentFilesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WindowContent.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
