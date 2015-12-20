@@ -17,6 +17,7 @@ namespace TailBlazer.Infrastucture
         public INewTabHost<Window> GetNewHost(IInterTabClient interTabClient, object partition, TabablzControl source)
         {
             var window = _factory.Create();
+           
 
             return new NewTabHost<Window>(window, window.InitialTabablzControl);
         }

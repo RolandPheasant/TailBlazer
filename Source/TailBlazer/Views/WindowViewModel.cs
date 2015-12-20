@@ -29,7 +29,6 @@ namespace TailBlazer.Views
         private ViewContainer _selected;
         private bool _isEmpty;
         private bool _menuIsOpen;
-
         public ObservableCollection<ViewContainer> Views { get; } = new ObservableCollection<ViewContainer>();
         public RecentFilesViewModel RecentFiles { get; }
         public GeneralOptionsViewModel GeneralOptions { get; }
@@ -74,8 +73,7 @@ namespace TailBlazer.Views
                                     MenuIsOpen = false;
                                     OpenFile(file);
                                 });
-
-
+            
             _cleanUp = new CompositeDisposable(recentFilesViewModel,
                 isEmptyChecker,
                 fileDropped,
@@ -87,10 +85,9 @@ namespace TailBlazer.Views
                             .OfType<IDisposable>()
                             .ForEach(d=>d.Dispose());
                 }));
-
         }
-        
-        public void OpenFile()
+
+        private void OpenFile()
         {
             // open dialog to select file [get rid of this shit and create a material design file selector]
             var dialog = new OpenFileDialog {Filter = "All files (*.*)|*.*"};
@@ -100,13 +97,10 @@ namespace TailBlazer.Views
             OpenFile(new FileInfo(dialog.FileName));
         }
 
-        public void OpenFile(FileInfo file)
+        private void OpenFile(FileInfo file)
         {
-          // var scheduler = _objectProvider.Get<ISchedulerProvider>();
-
             _schedulerProvider.Background.Schedule(() =>
             {
-                //Handle errors
                 try
                 {
                     _logger.Info($"Attempting to open '{file.FullName}'");
@@ -141,6 +135,15 @@ namespace TailBlazer.Views
         }
 
         public ItemActionCallback ClosingTabItemHandler => ClosingTabItemHandlerImpl;
+
+        public void OnWindowClosing()
+        {
+            Views.ForEach(v => _windowsController.Remove(v));
+
+            Views.Select(vc => vc.Content)
+                .OfType<IDisposable>()
+                .ForEach(x => x.Dispose());
+        }
 
         private void ClosingTabItemHandlerImpl(ItemActionCallbackArgs<TabablzControl> args)
         {
@@ -178,5 +181,7 @@ namespace TailBlazer.Views
         {
             _cleanUp.Dispose();
         }
+
+
     }
 }

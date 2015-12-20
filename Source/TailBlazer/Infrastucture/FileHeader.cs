@@ -21,5 +21,7 @@ namespace TailBlazer.Infrastucture
             get { return _displayName; }
             set { SetAndRaise(ref _displayName,value);}
         }
+
+
     }
 }
