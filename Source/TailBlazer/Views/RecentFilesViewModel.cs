@@ -6,13 +6,12 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using DynamicData;
 using DynamicData.Binding;
-using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Recent;
 using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Views
 {
-    public class RecentFilesViewModel:AbstractNotifyPropertyChanged, IDisposable
+    public class RecentFilesViewModel: AbstractNotifyPropertyChanged, IDisposable
     {
         private readonly IRecentFileCollection _recentFileCollection;
         private readonly IDisposable _cleanUp;
@@ -25,8 +24,7 @@ namespace TailBlazer.Views
             _recentFileCollection = recentFileCollection;
             if (recentFileCollection == null) throw new ArgumentNullException(nameof(recentFileCollection));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
-
-
+            
             ReadOnlyObservableCollection<RecentFileProxy> data;
             var recentLoader = recentFileCollection.Items
                 .Connect()

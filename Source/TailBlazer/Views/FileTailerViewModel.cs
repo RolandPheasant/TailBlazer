@@ -162,9 +162,7 @@ namespace TailBlazer.Views
             Count = indexed.Select(latest=>latest.Count).ForBinding();
             CountText = indexed.Select(latest => $"{latest.Count.ToString("##,###")} lines").ForBinding();
             LatestCount = SearchCollection.Latest.Select(latest => latest.Count).ForBinding();
-
-
-
+            
             //track first visible index
             var firstIndexMonitor = lineScroller.Lines.Connect()
                 .Buffer(TimeSpan.FromMilliseconds(250)).FlattenBufferResult()
