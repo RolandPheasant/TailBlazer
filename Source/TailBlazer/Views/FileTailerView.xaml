@@ -133,10 +133,9 @@
                             <Trigger Property="IsKeyboardFocused" Value="true">
                                 <Setter  Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
                             </Trigger>
-                                <Trigger Property="IsFocused" Value="true">
-                                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueDarkBrush}"/>
-                                </Trigger>
-
+                            <Trigger Property="IsFocused" Value="true">
+                                <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueDarkBrush}"/>
+                            </Trigger>
                             </ControlTemplate.Triggers>
 
                     </ControlTemplate>
@@ -218,7 +217,7 @@
                     Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
                     SelectedItem="{Binding SearchCollection.Selected}"
                     ItemsSource="{Binding SearchCollection.Items}" 
-                     Style="{DynamicResource FilterListBoxStyle}">
+                    Style="{DynamicResource FilterListBoxStyle}">
 
                     <ListBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type local:SearchViewModel}">
@@ -444,7 +443,7 @@
                                     <BeginStoryboard>
                                         <Storyboard>
                                             <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Foreground).(SolidColorBrush.Color)" 
-                                                                               ToBrush="{StaticResource MaterialDesignBody}" 
+                                                                       
                                                                                FromBrush="{StaticResource SecondaryAccentBrush}"
                                                                                Duration="0:0:5"/>
                                         </Storyboard>

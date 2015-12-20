@@ -20,14 +20,15 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock  Text="General Options" FontSize="16" FontWeight="SemiBold"/>
+
+        <TextBlock  Text="Look And Feel" FontSize="16" FontWeight="SemiBold"/>
         <Grid Grid.Row="1" Margin="8">
-            
+
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -38,41 +39,21 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Theme</TextBlock>
-            <StackPanel  Grid.Row="0" Grid.Column="1" Orientation="Horizontal"      
-                         Margin="4 8 4 8">
-                <TextBlock VerticalAlignment="Center">Light</TextBlock>
+            <!--<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Theme</TextBlock>-->
+            <StackPanel  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
+                         Orientation="Horizontal"      
+                         Margin="0 8 4 8">
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left">Light</TextBlock>
                 <ToggleButton Margin="8 0 16 0" IsChecked="{Binding UseDarkTheme}"  />
                 <TextBlock VerticalAlignment="Center">Dark</TextBlock>
             </StackPanel>
 
-            <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Highlight Tail?</TextBlock>
-            <CheckBox  Grid.Row="1" Grid.Column="1" 
-                           VerticalAlignment="Center" 
-                           Margin="4"
-                           IsChecked="{Binding  HighlightTail}"/>
-
-            <TextBlock Grid.Row="2" Grid.Column="0" 
-                           VerticalAlignment="Center">Highlight Duration</TextBlock>
-
-            <Slider Grid.Row="2" Grid.Column="1" Minimum="0.1" Maximum="10" 
-                        Margin="4"
-                         Width="200"
-                        SmallChange="0.1"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        LargeChange="1"
-                        Value="{Binding HighlightDuration}"/>
-
-            <TextBlock  Grid.Row="2" Grid.Column="2"  
-                            VerticalAlignment="Center" 
-                            Text="{Binding HighlightDurationText.Value}"/>
 
 
-            <TextBlock Grid.Row="3" Grid.Column="0" 
+            <TextBlock Grid.Row="1" Grid.Column="0" 
                            VerticalAlignment="Center">Zoom</TextBlock>
 
-            <Slider Grid.Row="3" 
+            <Slider Grid.Row="1" 
                         Grid.Column="1" Minimum="50" Maximum="250" 
                         Width="200"
                         Margin="4"
@@ -83,10 +64,52 @@
                         LargeChange="5"
                         Value="{Binding Scale}"/>
 
-            <TextBlock  Grid.Row="3" Grid.Column="2"  
+            <TextBlock  Grid.Row="1" Grid.Column="2"  
                           
                             VerticalAlignment="Center" 
                             Text="{Binding ScaleText.Value}"/>
+        </Grid>
+
+        <TextBlock Grid.Row="2" Text="Highlight" 
+                   FontSize="16"
+                   Margin="0 12 0 0"
+                   FontWeight="SemiBold"/>
+        <Grid Grid.Row="3" Margin="8">
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+
+            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Highlight Tail?</TextBlock>
+            <CheckBox  Grid.Row="0" Grid.Column="1" 
+                           VerticalAlignment="Center" 
+                           Margin="4"
+                           IsChecked="{Binding  HighlightTail}"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" 
+                           VerticalAlignment="Center">Highlight Duration</TextBlock>
+
+            <Slider Grid.Row="1" Grid.Column="1" Minimum="0.1" Maximum="10" 
+                        Margin="4"
+                         Width="200"
+                        SmallChange="0.1"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"
+                        LargeChange="1"
+                        Value="{Binding HighlightDuration}"/>
+
+            <TextBlock  Grid.Row="1" Grid.Column="2"  
+                            VerticalAlignment="Center" 
+                            Text="{Binding HighlightDurationText.Value}"/>
+
         </Grid>
 
     </Grid>

@@ -199,9 +199,6 @@
     <Compile Include="Infrastucture\Log4NetLogger.cs" />
     <Compile Include="Infrastucture\ObjectProvider.cs" />
     <Compile Include="Infrastucture\ViewContainer.cs" />
-    <Compile Include="Views\WindowContent.xaml.cs">
-      <DependentUpon>WindowContent.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\WindowFactory.cs" />
     <Compile Include="Views\WindowsController.cs" />
     <Compile Include="Views\WindowViewModel.cs" />
@@ -230,10 +227,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\RecentFilesView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\WindowContent.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
