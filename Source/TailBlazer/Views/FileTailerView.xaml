@@ -19,7 +19,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
                 <ResourceDictionary Source="../Themes/Generic.xaml"></ResourceDictionary>
-
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <infrastucture:CheckedToLengthConverter TrueValue="*" FalseValue="*" x:Key="c1" />
@@ -96,7 +96,7 @@
 
             <Style x:Key="FilterListBoxStyle" TargetType="{x:Type ListBox}">
 
-                <Setter Property="BorderBrush" Value="{StaticResource MaterialDesignTextBoxBorder}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}"/>
               
                 <Setter Property="Template">
                     <Setter.Value>
@@ -289,10 +289,14 @@
                         Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
                         HorizontalAlignment="Left"
                         ToolTip="Search options"
-                        Height="14" Width="14"
+                        Margin="2 0 2 2" Height="22"
+                        Width="22"
+                        Padding="0"
                         VerticalAlignment="Center"
-                        Margin="2 2 0 2"  
-                        Style="{StaticResource SettingsButtonStyle}"/>
+                  
+                        Style="{StaticResource MaterialDesignFlatButton}">
+                    <local:SettingsIcon  Width="14" Height="14"/>
+                </Button>
 
                 <StackPanel    
                     VerticalAlignment="Center"
