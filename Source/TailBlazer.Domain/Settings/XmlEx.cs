@@ -39,10 +39,9 @@ namespace TailBlazer.Domain.Settings
 
             if (element==null)
                 throw new ArgumentNullException($"{elementName} does not exist");
-
-
             return element.Value;
         }
+
 
         public static string AttributeOrThrow(this XElement source, string elementName)
         {

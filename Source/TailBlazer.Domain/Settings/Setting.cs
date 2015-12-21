@@ -5,7 +5,6 @@ using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.Settings
 {
-
     public class Setting<T> : IEquatable<Setting<T>>, IDisposable, ISetting<T>
     {
         private readonly ILogger _logger;
@@ -32,8 +31,6 @@ namespace TailBlazer.Domain.Settings
                 var state = _settingsStore.Load(_key);
                 _rawValue = state.Value;
                 _value = converter.Convert(state);
-                _changed.OnNext(_value);
-
             }
             catch (Exception ex)
             {
@@ -41,29 +38,28 @@ namespace TailBlazer.Domain.Settings
                 _rawValue= converter.Convert(_value).Value;
                 _logger.Error(ex, "Problem reading {0}", _key);
             }
-    
+            _changed.OnNext(_value);
         }
         
         public void Write(T value)
         {
             var converted = _converter.Convert(value);
 
-            if (_rawValue != converted.Value)
-            {
-                _rawValue = converted.Value;
-                _value = value;
+            if (_rawValue == converted.Value) return;
 
-                try
-                {
-                    //make this awaitable
-                    _settingsStore.Save(_key, converted);
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error(ex,"Problem writing {0}", value);
-                }
-                _changed.OnNext(value);
+            _rawValue = converted.Value;
+            _value = value;
+
+            try
+            {
+                //make this awaitable
+                _settingsStore.Save(_key, converted);
             }
+            catch (Exception ex)
+            {
+                _logger.Error(ex,"Problem writing {0}", value);
+            }
+            _changed.OnNext(value);
         }
 
         #region Equality

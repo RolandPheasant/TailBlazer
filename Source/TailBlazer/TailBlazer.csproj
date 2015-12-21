@@ -141,6 +141,7 @@
     </Compile>
     <Compile Include="Settings\GeneralOptionsViewModel.cs" />
     <Compile Include="Settings\PaletteHelper.cs" />
+    <Compile Include="Settings\SearchOptions.cs" />
     <Compile Include="Settings\Theme.cs" />
     <Compile Include="Views\FileDropContainer.cs" />
     <Compile Include="Views\FileDropMonitor.cs" />
