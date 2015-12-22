@@ -191,14 +191,13 @@
                 <TextBox Grid.Column="1" x:Name="SearchTextBox" 
                         wpf:TextFieldAssist.Hint="{Binding SearchHint.Value}"          
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                        Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         VerticalAlignment="Center"
                         MinWidth="125">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding KeepSearchCommand}"/>
                     </TextBox.InputBindings>
                 </TextBox>
-
 
                 <TextBlock     Margin="4 0 0 0" Grid.Column="2"
                                Opacity="0.56"
@@ -289,8 +288,8 @@
                         Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
                         HorizontalAlignment="Left"
                         ToolTip="Search options"
-                        Margin="2 0 2 2" Height="22"
-                        Width="22"
+                        Margin="2 0 2 0" 
+                        Width="24" Height="24"
                         Padding="0"
                         VerticalAlignment="Center"
                   

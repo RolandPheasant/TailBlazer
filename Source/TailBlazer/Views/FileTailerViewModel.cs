@@ -45,6 +45,7 @@ namespace TailBlazer.Views
         public ICommand KeepSearchCommand { get; }
 
         public ISelectionMonitor SelectionMonitor { get; }
+        public SearchHints SearchHints { get;  }
         public SearchCollection SearchCollection { get; }
         public InlineViewer InlineViewer { get; }
         public IProperty<bool> InlineViewerVisible { get; }
@@ -59,7 +60,9 @@ namespace TailBlazer.Views
             [NotNull] IClipboardHandler clipboardHandler, 
             [NotNull] ISearchInfoCollection searchInfoCollection, 
             [NotNull] IInlineViewerFactory inlineViewerFactory, 
-            [NotNull] ISetting<GeneralOptions> generalOptions)
+            [NotNull] ISetting<GeneralOptions> generalOptions,
+            [NotNull] IRecentSearchCollection recentSearchCollection,
+            [NotNull] SearchHints searchHints)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
@@ -69,8 +72,10 @@ namespace TailBlazer.Views
             if (searchInfoCollection == null) throw new ArgumentNullException(nameof(searchInfoCollection));
             if (inlineViewerFactory == null) throw new ArgumentNullException(nameof(inlineViewerFactory));
             if (generalOptions == null) throw new ArgumentNullException(nameof(generalOptions));
+            if (searchHints == null) throw new ArgumentNullException(nameof(searchHints));
 
             SelectionMonitor = selectionMonitor;
+            SearchHints = searchHints;
             CopyToClipboardCommand = new Command(()=> clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
             SelectedItemsCount = selectionMonitor.Selected.Connect().QueryWhenChanged(collection=> collection.Count).ForBinding();
             SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
@@ -118,14 +123,16 @@ namespace TailBlazer.Views
             //command to add the current search to the tail collection
             KeepSearchCommand = new Command(() =>
             {
-                var text = SearchText;
+                var text = SearchHints.SearchText;
                 var latest =   fileWatcher.Latest
                     .Search(s => s.Contains(text, StringComparison.OrdinalIgnoreCase))
                     .Replay(1).RefCount();
 
                 searchInfoCollection.Add(text, latest);
-                SearchText = string.Empty;
-            },()=> SearchText.IsLongerThanOrEqualTo(3));
+                recentSearchCollection.Add(new RecentSearch(text));
+                SearchHints.SearchText = string.Empty;
+
+            },()=> SearchHints.SearchText.IsLongerThanOrEqualTo(3));
 
             //User feedback to show file size
             FileSizeText = fileWatcher.Latest.Select(fn=>fn.Size)
@@ -134,7 +141,7 @@ namespace TailBlazer.Views
                 .ForBinding();
 
             //User feedback to guide them whilst typing
-            SearchHint = this.WhenValueChanged(vm => vm.SearchText)
+            SearchHint = this.WhenValueChanged(vm => vm.SearchHints.SearchText)
                             .Select(text =>
                             {
                                 if (string.IsNullOrEmpty(text)) return "Type to search";
@@ -216,6 +223,7 @@ namespace TailBlazer.Views
                 searchInfoCollection,
                 HighlightTail,
                 UsingDarkTheme,
+                searchHints,
                 Disposable.Create(() =>
                 {
                     _userScrollRequested.OnCompleted();
@@ -251,11 +259,11 @@ namespace TailBlazer.Views
                 AutoTail = false;
 
         }
-        public string SearchText
-        {
-            get { return _searchText; }
-            set { SetAndRaise(ref _searchText, value); }
-        }
+        //public string SearchText
+        //{
+        //    get { return _searchText; }
+        //    set { SetAndRaise(ref _searchText, value); }
+        //}
 
         public bool AutoTail
         {

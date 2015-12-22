@@ -140,7 +140,11 @@
       <DependentUpon>GeneralOptionsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings\GeneralOptionsViewModel.cs" />
+    <Compile Include="Settings\IRecentSearchCollection.cs" />
     <Compile Include="Settings\PaletteHelper.cs" />
+    <Compile Include="Settings\RecentSearch.cs" />
+    <Compile Include="Settings\RecentSearchCollection.cs" />
+    <Compile Include="Settings\RecentFilesToStateConverter.cs" />
     <Compile Include="Settings\SearchOptions.cs" />
     <Compile Include="Settings\Theme.cs" />
     <Compile Include="Views\FileDropContainer.cs" />
@@ -175,6 +179,7 @@
     <Compile Include="Infrastucture\ScrollChangedArgs.cs" />
     <Compile Include="Infrastucture\ScrollDirection.cs" />
     <Compile Include="Infrastucture\ScrollBoundsArgs.cs" />
+    <Compile Include="Views\SearchHints.cs" />
     <Compile Include="Views\SearchViewModel.cs" />
     <Compile Include="Views\SettingsIcon.cs" />
     <Compile Include="Settings\GeneralOptions.cs" />

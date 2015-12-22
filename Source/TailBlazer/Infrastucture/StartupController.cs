@@ -26,6 +26,7 @@ namespace TailBlazer.Infrastucture
             settingsRegister.Register(new GeneralOptionsConverter(), "GeneralOptions");
             settingsRegister.Register(new RecentFilesToStateConverter(), "RecentFiles");
             settingsRegister.Register(new SearchOptionsConverter(), "SearchOptions");
+            settingsRegister.Register(new RecentSearchToStateConverter(), "RecentSearch");
             logger.Info("Starting complete");
 
         }

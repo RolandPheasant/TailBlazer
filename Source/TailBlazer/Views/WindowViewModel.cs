@@ -116,10 +116,11 @@ namespace TailBlazer.Views
                     
                     _windowsController.Register(newItem);
 
-
+                    _logger.Info($"Objects for '{file.FullName}' has been created.");
                     //do the work on the ui thread
                     _schedulerProvider.MainThread.Schedule(() =>
                     {
+                        
                         Views.Add(newItem);
                         _logger.Info($"Opened '{file.FullName}'");
                         Selected = newItem;
