@@ -11,8 +11,7 @@ namespace TailBlazer.Infrastucture
 {
     public class StartupController
     {
-        public StartupController(IObjectProvider objectProvider,IObjectRegister register,
-            ILogger logger)
+        public StartupController(IObjectProvider objectProvider,ILogger logger)
         {
 
             logger.Info($"Starting Tail Blazer version v{Assembly.GetEntryAssembly().GetName().Version}");
@@ -26,6 +25,7 @@ namespace TailBlazer.Infrastucture
             var settingsRegister = objectProvider.Get<ISettingsRegister>();
             settingsRegister.Register(new GeneralOptionsConverter(), "GeneralOptions");
             settingsRegister.Register(new RecentFilesToStateConverter(), "RecentFiles");
+            settingsRegister.Register(new SearchOptionsConverter(), "SearchOptions");
             logger.Info("Starting complete");
 
         }

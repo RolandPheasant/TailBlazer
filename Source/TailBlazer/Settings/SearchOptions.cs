@@ -18,6 +18,11 @@ using TailBlazer.Domain.Settings;
 namespace TailBlazer.Settings
 {
 
+    public class SeaarchOptionsViewModel
+    {
+        
+    }
+
     public class SearchOptionsConverter : IConverter<SearchOptions>
     {
         private static class Structure
