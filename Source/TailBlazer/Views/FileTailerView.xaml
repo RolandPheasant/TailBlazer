@@ -84,8 +84,9 @@
                 <Setter Property="Width" Value="12" />
                 <Setter Property="Height" Value="12" />
                 <Setter Property="Margin" Value="4 0 2 0" />
+
                 <Setter Property="Opacity" Value=".75" />
-                <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
+                  <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="true">
                         <Setter Property="Background" Value="{DynamicResource PrimaryHueLightBrush}"/>
@@ -256,7 +257,7 @@
                                     <Button Visibility="{Binding SearchType, Converter={StaticResource EqualityToVisibilityConverter},ConverterParameter={x:Static fileHandling:SearchType.User}}"
                                         Grid.Row="0"  Grid.Column="2"
                                         ToolTip="{Binding RemoveTooltip}"
-                                        Margin="4 0 0 4"
+                                         Margin="4 0 2 0"
                                         VerticalAlignment="Center"
                                         Command="{Binding RemoveCommand}"
                                         Style="{StaticResource CloseButtonStyle}"/>
@@ -286,14 +287,15 @@
 
                 <Button Grid.Column="4" 
                         Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
+                       Style="{StaticResource MaterialDesignFlatButton}"
                         HorizontalAlignment="Left"
                         ToolTip="Search options"
-                        Margin="2 0 2 0" 
+                    
                         Width="24" Height="24"
                         Padding="0"
                         VerticalAlignment="Center"
                   
-                        Style="{StaticResource MaterialDesignFlatButton}">
+                        >
                     <local:SettingsIcon  Width="14" Height="14"/>
                 </Button>
 
