@@ -147,7 +147,6 @@ namespace TailBlazer.Views
 
         private void ClosingTabItemHandlerImpl(ItemActionCallbackArgs<TabablzControl> args)
         {
-           
             var container = (ViewContainer)args.DragablzItem.DataContext;
             _windowsController.Remove(container);
             if (container.Equals(Selected))
