@@ -88,7 +88,7 @@
         </ResourceDictionary>
     </Control.Resources>
 
-    <Grid>
+    <Grid Margin="4">
         <ProgressBar
                 Visibility="{Binding IsLoading.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
                 Style="{StaticResource TailBlazerCircularProgressBar}" 

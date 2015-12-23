@@ -15,6 +15,7 @@ using Microsoft.Win32;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
 using System.Reactive.Concurrency;
+using DynamicData;
 using TailBlazer.Settings;
 
 namespace TailBlazer.Views
@@ -62,7 +63,8 @@ namespace TailBlazer.Views
 
             var fileDropped = DropMonitor.Dropped.Subscribe(OpenFile);
             var isEmptyChecker = Views.ToObservableChangeSet()
-                                    .Count()
+                                    .ToCollection()
+                                    .Select(items=>items.Count)
                                     .StartWith(0)
                                     .Select(count=>count==0)
                                     .Subscribe(isEmpty=> IsEmpty = isEmpty);
@@ -139,6 +141,7 @@ namespace TailBlazer.Views
 
         public void OnWindowClosing()
         {
+            _logger.Info("Window is closing. {0} view to close", Views.Count);
             Views.ForEach(v => _windowsController.Remove(v));
 
             Views.Select(vc => vc.Content)
@@ -148,6 +151,7 @@ namespace TailBlazer.Views
 
         private void ClosingTabItemHandlerImpl(ItemActionCallbackArgs<TabablzControl> args)
         {
+            _logger.Info("Tab is closing. {0} view to close", Views.Count);
             var container = (ViewContainer)args.DragablzItem.DataContext;
             _windowsController.Remove(container);
             if (container.Equals(Selected))
