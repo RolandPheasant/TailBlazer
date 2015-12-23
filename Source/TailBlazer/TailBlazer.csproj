@@ -169,6 +169,8 @@
     <Compile Include="Infrastucture\IScrollReceiver.cs" />
     <Compile Include="Views\IWindowsController.cs" />
     <Compile Include="Views\LineProxy.cs" />
+    <Compile Include="Views\LinesControl.cs" />
+    <Compile Include="Views\ListboxRowAnimationSetter.cs" />
     <Compile Include="Views\OpenFileIcon.cs" />
     <Compile Include="Views\RecentFileProxy.cs" />
     <Compile Include="Views\RecentFilesView.xaml.cs">
@@ -213,6 +215,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Settings\GeneralOptionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Buttons.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

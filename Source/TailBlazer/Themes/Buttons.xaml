@@ -1,0 +1,78 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:TailBlazer.Views">
+
+
+        <ResourceDictionary.MergedDictionaries>
+            <!--<ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
+            <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />-->
+            <ResourceDictionary Source="../Themes/Generic.xaml"></ResourceDictionary>
+            <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
+        </ResourceDictionary.MergedDictionaries>
+
+        <Style TargetType="{x:Type Button}" x:Key="SettingsButtonStyle" BasedOn="{StaticResource MaterialDesignMenuCommandButtonStyle}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid>
+                        <Ellipse Width="{TemplateBinding Width}"
+                                 Height="{TemplateBinding Height}"
+                                 Fill="{TemplateBinding Background}"/>
+                        <local:SettingsIcon  Width="12" Height="12"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Background" Value="{DynamicResource PrimaryHueMidForegroundBrush }" />
+        <Setter Property="Width" Value="22" />
+        <Setter Property="Height" Value="22" />
+        <Setter Property="Margin" Value="4 0 2 0" />
+        <Setter Property="Opacity" Value=".75" />
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush }" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="true">
+                <Setter Property="Background" Value="{DynamicResource PrimaryHueLightBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryHueLightForegroundBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+ 
+    <Style TargetType="{x:Type Button}" x:Key="CloseButtonStyle" BasedOn="{StaticResource MaterialDesignMenuCommandButtonStyle}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid>
+                        <Ellipse Width="{TemplateBinding Width}"
+                                 Height="{TemplateBinding Height}"
+                                 Fill="{TemplateBinding Background}"/>
+
+                        <Path x:Name="Path"
+                                      Data="M0.5,71 L70,0.5 M0.5,1 L70,70.5" 
+                                      Width="6" Height="6"
+                                      Stretch="Uniform"
+                                      Stroke="{TemplateBinding Foreground}"
+                                      StrokeThickness="1.5"
+                                      StrokeStartLineCap="Square" 
+                                      StrokeEndLineCap="Square"
+                                      SnapsToDevicePixels="True" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
+        <Setter Property="Width" Value="12" />
+        <Setter Property="Height" Value="12" />
+        <Setter Property="Margin" Value="4 0 2 0" />
+
+        <Setter Property="Opacity" Value=".75" />
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="true">
+                <Setter Property="Background" Value="{DynamicResource PrimaryHueLightBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryHueLightForegroundBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+
+</ResourceDictionary>

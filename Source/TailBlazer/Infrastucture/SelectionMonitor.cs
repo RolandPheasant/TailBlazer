@@ -7,7 +7,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Navigation;
 using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.Infrastructure;
@@ -29,7 +28,7 @@ namespace TailBlazer.Infrastucture
     /// 
     /// BTW: I hear you shout this code should be an abstraction but frankly I cannot be bothered (as this is such a specialisation).
     /// </summary>
-    public class SelectionMonitor : IDisposable, ISelectionMonitor, IAttachedListBox 
+    public class SelectionMonitor :  ISelectionMonitor, IAttachedListBox 
     {
         public IObservableList<LineProxy> Selected { get; }
 

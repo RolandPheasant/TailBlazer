@@ -23,7 +23,6 @@ namespace TailBlazer.Views
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
         private readonly ISubject<ScrollRequest> _userScrollRequested = new ReplaySubject<ScrollRequest>(1);
 
-        private string _searchText;
         private bool _autoTail=true;
         private int _firstIndex;
         private int _pageSize;
@@ -45,6 +44,8 @@ namespace TailBlazer.Views
         public ICommand KeepSearchCommand { get; }
 
         public ISelectionMonitor SelectionMonitor { get; }
+        //public ListboxRowAnimationSetter RowAnimationSetter { get; }
+
         public SearchHints SearchHints { get;  }
         public SearchCollection SearchCollection { get; }
         public InlineViewer InlineViewer { get; }
@@ -79,7 +80,7 @@ namespace TailBlazer.Views
             CopyToClipboardCommand = new Command(()=> clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
             SelectedItemsCount = selectionMonitor.Selected.Connect().QueryWhenChanged(collection=> collection.Count).ForBinding();
             SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
-
+            
             UsingDarkTheme = generalOptions.Value
                     .ObserveOn(schedulerProvider.MainThread)
                     .Select(go => go.Theme== Theme.Dark)
@@ -90,14 +91,14 @@ namespace TailBlazer.Views
                 .Select(go => go.HighlightTail)
                 .ForBinding();
 
-            //HighlightDuration = generalOptions.Value
-            //    .ObserveOn(schedulerProvider.MainThread)
-            //    .Select(go =>
-            //    {
-            //        var duration = new Duration(TimeSpan.FromSeconds(go.HighlightDuration));
-            //        return duration;
-            //    })
-            //    .ForBinding();
+            HighlightDuration = generalOptions.Value
+                .ObserveOn(schedulerProvider.MainThread)
+                .Select(go =>
+                {
+                    var duration = new Duration(TimeSpan.FromSeconds(go.HighlightDuration));
+                    return duration;
+                })
+                .ForBinding();
 
             //An observable which acts as a scroll command
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
@@ -230,6 +231,8 @@ namespace TailBlazer.Views
                     (SelectionMonitor as IDisposable)?.Dispose();
                 }));
         }
+
+        public IProperty<Duration> HighlightDuration { get;  }
 
         public LineProxy SelectedItem
         {

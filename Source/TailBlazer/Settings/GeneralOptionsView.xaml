@@ -95,10 +95,13 @@
                            IsChecked="{Binding  HighlightTail}"/>
 
             <TextBlock Grid.Row="1" Grid.Column="0" 
+                        Visibility="Collapsed"
                            VerticalAlignment="Center">Highlight Duration</TextBlock>
 
             <Slider Grid.Row="1" Grid.Column="1" Minimum="0.25" Maximum="10" 
                         Margin="6 4 4 4"
+                     
+                        Visibility="Collapsed"
                          Width="200"
                         SmallChange="0.25"
                         VerticalAlignment="Center"
@@ -107,7 +110,8 @@
                         Value="{Binding HighlightDuration}"/>
 
             <TextBlock  Grid.Row="1" Grid.Column="2"  
-                            VerticalAlignment="Center" 
+                          Visibility="Collapsed"   
+                        VerticalAlignment="Center" 
                             Text="{Binding HighlightDurationText.Value}"/>
 
         </Grid>
