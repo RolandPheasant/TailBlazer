@@ -1,32 +1,31 @@
 using System;
-using System.IO;
 
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Settings
 {
-    public class RecentFile : IEquatable<RecentFile>
+    public class RecentSearch : IEquatable<RecentSearch>
     {
         public DateTime Timestamp { get; }
-        public string  Name  { get; }
+        public string  Text  { get; }
 
-        public RecentFile(FileInfo fileInfo)
+        public RecentSearch(string seaarchText)
         {
-            Name = fileInfo.FullName;
+            Text = seaarchText;
             Timestamp = DateTime.Now;
         }
 
-        public RecentFile(DateTime timestamp, string name)
+        public RecentSearch(DateTime timestamp, string text)
         {
             Timestamp = timestamp;
-            Name = name;
+            Text = text;
         }
 
         #region Equality
 
-        public bool Equals(RecentFile other)
+        public bool Equals(RecentSearch other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Timestamp.Equals(other.Timestamp) && string.Equals(Name, other.Name);
+            return Timestamp.Equals(other.Timestamp) && string.Equals(Text, other.Text);
         }
 
         public override bool Equals(object obj)
@@ -34,23 +33,23 @@ namespace TailBlazer.Domain.FileHandling
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((RecentFile) obj);
+            return Equals((RecentSearch) obj);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                return (Timestamp.GetHashCode()*397) ^ (Name != null ? Name.GetHashCode() : 0);
+                return (Timestamp.GetHashCode()*397) ^ (Text?.GetHashCode() ?? 0);
             }
         }
 
-        public static bool operator ==(RecentFile left, RecentFile right)
+        public static bool operator ==(RecentSearch left, RecentSearch right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(RecentFile left, RecentFile right)
+        public static bool operator !=(RecentSearch left, RecentSearch right)
         {
             return !Equals(left, right);
         }
@@ -59,7 +58,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public override string ToString()
         {
-            return $"{Name} ({Timestamp})";
+            return $"{Text} ({Timestamp})";
         }
     }
 }

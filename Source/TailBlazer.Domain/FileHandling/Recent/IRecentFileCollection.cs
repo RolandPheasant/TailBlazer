@@ -1,8 +1,6 @@
-﻿using System.Reactive.Linq;
-using System.IO;
-using DynamicData;
+﻿using DynamicData;
 
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Domain.FileHandling.Recent
 {
     public interface IRecentFileCollection
     {

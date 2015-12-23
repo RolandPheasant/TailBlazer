@@ -13,11 +13,11 @@ namespace TailBlazer.Fixtures
      //  [Fact]
         public void GenerateFile()
         {
-            string fileName = @"C:\Work\File2.txt";
+            string fileName = @"U:\Large Files\SuperGiantFile.txt";
 
             //var file = File.Create(@"U:\GigFile.txt");
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 int start = 1000000 * i + 1;
                 File.AppendAllLines(fileName,Enumerable.Range(start,1000000).Select(line=>$"This is line number {line.ToString("0000000000")} in a very large file"));

@@ -8,7 +8,11 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Colours.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+  
             </ResourceDictionary.MergedDictionaries>
+
+
 
             <Style TargetType="{x:Type infrastucture:SearchableTextControl}">
                 <Setter Property="Template">
@@ -24,14 +28,10 @@
                 </Setter>
             </Style>
 
-
-
             <DataTemplate DataType="{x:Type views:FileTailerViewModel}">
-                <views:FileTailerView/>
+                <views:FileTailerView />
             </DataTemplate>
-
-
-
+            
             <DataTemplate DataType="{x:Type views:FileDropContainer}">
                 <Grid>
                     <Grid.ColumnDefinitions>

@@ -21,6 +21,7 @@ namespace TailBlazer.Views
         private readonly ISubject<ScrollRequest> _userScrollRequested = new ReplaySubject<ScrollRequest>(1);
         private int _firstIndex;
         private int _pageSize;
+        private bool _isSettingScrollPosition;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         public IProperty<int> Count { get; }
@@ -39,7 +40,7 @@ namespace TailBlazer.Views
             SelectionMonitor = selectionMonitor;
             CopyToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
 
-            bool isSettingScrollPosition = false;
+            _isSettingScrollPosition = false;
 
             var lineProvider = args.LineProvider;
             var selectedChanged = args.SelectedChanged;
@@ -48,7 +49,7 @@ namespace TailBlazer.Views
                     .CombineLatest(lineProvider, pageSize,(proxy, lp,pge) => new ScrollRequest(pge, (int) proxy.Start, true));
 
             var scrollUser = _userScrollRequested
-                .Where(x=>!isSettingScrollPosition)
+                .Where(x=>!_isSettingScrollPosition)
                 .Select(request => new ScrollRequest(ScrollReason.User, request.PageSize, request.FirstIndex));
             
             var scroller= scrollSelected.Merge(scrollUser)
@@ -69,18 +70,19 @@ namespace TailBlazer.Views
             // track first visible index[required to set scroll extent]
             var firstIndexMonitor = lineScroller.Lines.Connect()
                 .Buffer(TimeSpan.FromMilliseconds(250)).FlattenBufferResult()
-                .QueryWhenChanged(lines => lines.Count == 0 ? 0 : lines.Select(l => l.Index).Min())
+                .ToCollection()
+                .Select(lines => lines.Count == 0 ? 0 : lines.Select(l => l.Index).Max() - lines.Count + 1)
                 .ObserveOn(schedulerProvider.MainThread)
                 .Subscribe(first =>
                 {
                     try
                     {
-                        isSettingScrollPosition = true;
+                        _isSettingScrollPosition = true;
                         FirstIndex = first;
                     }
                     finally
                     {
-                        isSettingScrollPosition = false;
+                        _isSettingScrollPosition = false;
                     }
                 });
 
@@ -88,6 +90,7 @@ namespace TailBlazer.Views
                         loader,
                         Count,
                         firstIndexMonitor,
+                        SelectionMonitor,
                         Disposable.Create(() =>
                         {
                             _userScrollRequested.OnCompleted();
@@ -97,7 +100,8 @@ namespace TailBlazer.Views
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
         {
             if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));
-            _userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User, boundsArgs.PageSize, boundsArgs.FirstIndex));
+            if (!_isSettingScrollPosition)
+                _userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User, boundsArgs.PageSize, boundsArgs.FirstIndex));
             PageSize = boundsArgs.PageSize;
             FirstIndex = boundsArgs.FirstIndex;
         }

@@ -2,13 +2,12 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Linq;
-using System.Xml;
 using System.Xml.Linq;
 using TailBlazer.Domain.Settings;
 
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Settings
 {
-    public class RecentFilesToStateConverter: IConverter<RecentFile[]>
+    public class RecentSearchToStateConverter: IConverter<RecentSearch[]>
     {
         private static class Structure
         {
@@ -18,17 +17,12 @@ namespace TailBlazer.Domain.FileHandling
             public const string Date = "Date";
         }
 
-        public RecentFile[] Convert(State state)
+        public RecentSearch[] Convert(State state)
         {
             if (state == null || state == State.Empty)
-                return new RecentFile[0];
+                return new RecentSearch[0];
 
-            //previous format
-            if (state.Version== 1)
-                return state.Value.FromDelimited(s => new RecentFile(new FileInfo(s)), Environment.NewLine).ToArray();
-
-            //v2 format is xml format
-            XDocument doc = XDocument.Parse(state.Value);
+            var doc = XDocument.Parse(state.Value);
 
             var root = doc.ElementOrThrow(Structure.Root);
          
@@ -37,12 +31,12 @@ namespace TailBlazer.Domain.FileHandling
                             {
                                 var name = element.Attribute(Structure.Name).Value;
                                 var dateTime = element.Attribute(Structure.Date).Value;
-                                return new RecentFile(DateTime.Parse(dateTime),name);
+                                return new RecentSearch(DateTime.Parse(dateTime),name);
                             }).ToArray();
             return files;
         }
 
-        public State Convert(RecentFile[] files)
+        public State Convert(RecentSearch[] files)
         {
             if (files == null || !files.Any())
                 return State.Empty;
@@ -50,7 +44,7 @@ namespace TailBlazer.Domain.FileHandling
             var root = new XElement(new XElement(Structure.Root));
 
             var fileNodeArray = files.Select(f => new XElement(Structure.File,
-                new XAttribute(Structure.Name, f.Name),
+                new XAttribute(Structure.Name, f.Text),
                 new XAttribute(Structure.Date, f.Timestamp)));
 
             fileNodeArray.ForEach(root.Add);
@@ -59,9 +53,9 @@ namespace TailBlazer.Domain.FileHandling
             return new State(2, doc.ToString());
         }
 
-        public RecentFile[] GetDefaultValue()
+        public RecentSearch[] GetDefaultValue()
         {
-            return new RecentFile[0];
+            return new RecentSearch[0];
         }
     }
 }

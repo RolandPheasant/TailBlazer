@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace TailBlazer.Views
+namespace TailBlazer.Settings
 {
     /// <summary>
-    /// Interaction logic for HeaderedContentView.xaml
+    /// Interaction logic for GeneralOptionsView.xaml
     /// </summary>
-    public partial class HeaderedContentView : UserControl
+    public partial class GeneralOptionsView : UserControl
     {
-        public HeaderedContentView()
+        public GeneralOptionsView()
         {
             InitializeComponent();
         }

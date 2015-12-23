@@ -7,6 +7,10 @@
     xmlns:views="clr-namespace:TailBlazer.Views">
 
 
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
     <Style TargetType="{x:Type views:RemoveIcon}">
         <Setter Property="Template">
             <Setter.Value>
@@ -266,4 +270,16 @@
 
 
 
+    <Style TargetType="{x:Type views:LinesControl}" BasedOn="{StaticResource MaterialDesignListBox}">
+        <!--<Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type views:LinesControl}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>-->
+    </Style>
 </ResourceDictionary>

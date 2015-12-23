@@ -24,8 +24,13 @@ namespace TailBlazer.Infrastucture
             For<ISearchInfoCollection>().Use<SearchInfoCollection>();
 
             For<ISettingsStore>().Use<FileSettingsStore>().Singleton();
+            For<IFileWatcher>().Use<FileWatcher>();
+
+            For<UhandledExceptionHandler>().Singleton();
+            For<ObjectProvider>().Singleton();
+            Forward<ObjectProvider, IObjectProvider>();
+            Forward<ObjectProvider, IObjectRegister>();
             
-           For<IFileWatcher>().Use<FileWatcher>();
             Scan(scanner =>
             {
                 scanner.ExcludeType<ILogger>();
@@ -43,6 +48,7 @@ namespace TailBlazer.Infrastucture
                 scanner.AssemblyContainingType<AppRegistry>();
             });
         }
+
     }
 }
 

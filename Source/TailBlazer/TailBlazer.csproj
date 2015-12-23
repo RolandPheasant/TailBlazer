@@ -67,7 +67,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="MaterialDesignThemes.Wpf, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignThemes.1.2.1-ci373\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+      <HintPath>..\packages\MaterialDesignThemes.1.2.1-ci397\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="StructureMap, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
@@ -133,7 +133,19 @@
     <Compile Include="Infrastucture\LogFactory.cs" />
     <Compile Include="Infrastucture\FileNamer.cs" />
     <Compile Include="Infrastucture\SelectionMonitor.cs" />
+    <Compile Include="Infrastucture\StartupController.cs" />
+    <Compile Include="Infrastucture\UhandledExceptionHandler.cs" />
     <Compile Include="Settings\GeneralOptionsConverter.cs" />
+    <Compile Include="Settings\GeneralOptionsView.xaml.cs">
+      <DependentUpon>GeneralOptionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\GeneralOptionsViewModel.cs" />
+    <Compile Include="Settings\IRecentSearchCollection.cs" />
+    <Compile Include="Settings\PaletteHelper.cs" />
+    <Compile Include="Settings\RecentSearch.cs" />
+    <Compile Include="Settings\RecentSearchCollection.cs" />
+    <Compile Include="Settings\RecentFilesToStateConverter.cs" />
+    <Compile Include="Settings\SearchOptions.cs" />
     <Compile Include="Settings\Theme.cs" />
     <Compile Include="Views\FileDropContainer.cs" />
     <Compile Include="Views\FileDropMonitor.cs" />
@@ -157,6 +169,8 @@
     <Compile Include="Infrastucture\IScrollReceiver.cs" />
     <Compile Include="Views\IWindowsController.cs" />
     <Compile Include="Views\LineProxy.cs" />
+    <Compile Include="Views\LinesControl.cs" />
+    <Compile Include="Views\ListboxRowAnimationSetter.cs" />
     <Compile Include="Views\OpenFileIcon.cs" />
     <Compile Include="Views\RecentFileProxy.cs" />
     <Compile Include="Views\RecentFilesView.xaml.cs">
@@ -167,6 +181,7 @@
     <Compile Include="Infrastucture\ScrollChangedArgs.cs" />
     <Compile Include="Infrastucture\ScrollDirection.cs" />
     <Compile Include="Infrastucture\ScrollBoundsArgs.cs" />
+    <Compile Include="Views\SearchHints.cs" />
     <Compile Include="Views\SearchViewModel.cs" />
     <Compile Include="Views\SettingsIcon.cs" />
     <Compile Include="Settings\GeneralOptions.cs" />
@@ -199,9 +214,17 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Themes\Colours.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="Settings\GeneralOptionsView.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Buttons.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Colours.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>

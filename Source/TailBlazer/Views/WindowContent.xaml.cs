@@ -15,12 +15,14 @@ using System.Windows.Shapes;
 
 namespace TailBlazer.Views
 {
-
-    public class OpenFileIcon : Control
+    /// <summary>
+    /// Interaction logic for WindowContent.xaml
+    /// </summary>
+    public partial class WindowContent : UserControl
     {
-        static OpenFileIcon()
+        public WindowContent()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(OpenFileIcon), new FrameworkPropertyMetadata(typeof(OpenFileIcon)));
+            InitializeComponent();
         }
     }
 }

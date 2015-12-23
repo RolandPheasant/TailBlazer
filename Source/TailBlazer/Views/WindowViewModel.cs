@@ -15,12 +15,13 @@ using Microsoft.Win32;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
 using System.Reactive.Concurrency;
+using DynamicData;
+using TailBlazer.Settings;
 
 namespace TailBlazer.Views
 {
     public class WindowViewModel: AbstractNotifyPropertyChanged, IDisposable
     {
-
         private readonly ILogger _logger;
         private readonly IWindowsController _windowsController;
         private readonly ISchedulerProvider _schedulerProvider;
@@ -29,11 +30,9 @@ namespace TailBlazer.Views
         private ViewContainer _selected;
         private bool _isEmpty;
         private bool _menuIsOpen;
-
         public ObservableCollection<ViewContainer> Views { get; } = new ObservableCollection<ViewContainer>();
-
         public RecentFilesViewModel RecentFiles { get; }
-        
+        public GeneralOptionsViewModel GeneralOptions { get; }
         public IInterTabClient InterTabClient { get; }
         public ICommand OpenFileCommand { get; }
         public Command ShowInGitHubCommand { get; }
@@ -46,11 +45,13 @@ namespace TailBlazer.Views
             ILogger logger,
             IWindowsController windowsController,
             RecentFilesViewModel recentFilesViewModel,
+            GeneralOptionsViewModel generalOptionsViewModel,
             ISchedulerProvider schedulerProvider)
         {
             _logger = logger;
             _windowsController = windowsController;
             RecentFiles = recentFilesViewModel;
+            GeneralOptions = generalOptionsViewModel;
             _schedulerProvider = schedulerProvider;
             _objectProvider = objectProvider;
             InterTabClient = new InterTabClient(windowFactory);
@@ -62,7 +63,8 @@ namespace TailBlazer.Views
 
             var fileDropped = DropMonitor.Dropped.Subscribe(OpenFile);
             var isEmptyChecker = Views.ToObservableChangeSet()
-                                    .Count()
+                                    .ToCollection()
+                                    .Select(items=>items.Count)
                                     .StartWith(0)
                                     .Select(count=>count==0)
                                     .Subscribe(isEmpty=> IsEmpty = isEmpty);
@@ -73,8 +75,7 @@ namespace TailBlazer.Views
                                     MenuIsOpen = false;
                                     OpenFile(file);
                                 });
-
-
+            
             _cleanUp = new CompositeDisposable(recentFilesViewModel,
                 isEmptyChecker,
                 fileDropped,
@@ -86,10 +87,9 @@ namespace TailBlazer.Views
                             .OfType<IDisposable>()
                             .ForEach(d=>d.Dispose());
                 }));
-
         }
-        
-        public void OpenFile()
+
+        private void OpenFile()
         {
             // open dialog to select file [get rid of this shit and create a material design file selector]
             var dialog = new OpenFileDialog {Filter = "All files (*.*)|*.*"};
@@ -99,13 +99,10 @@ namespace TailBlazer.Views
             OpenFile(new FileInfo(dialog.FileName));
         }
 
-        public void OpenFile(FileInfo file)
+        private void OpenFile(FileInfo file)
         {
-          // var scheduler = _objectProvider.Get<ISchedulerProvider>();
-
             _schedulerProvider.Background.Schedule(() =>
             {
-                //Handle errors
                 try
                 {
                     _logger.Info($"Attempting to open '{file.FullName}'");
@@ -121,10 +118,11 @@ namespace TailBlazer.Views
                     
                     _windowsController.Register(newItem);
 
-
+                    _logger.Info($"Objects for '{file.FullName}' has been created.");
                     //do the work on the ui thread
                     _schedulerProvider.MainThread.Schedule(() =>
                     {
+                        
                         Views.Add(newItem);
                         _logger.Info($"Opened '{file.FullName}'");
                         Selected = newItem;
@@ -141,9 +139,19 @@ namespace TailBlazer.Views
 
         public ItemActionCallback ClosingTabItemHandler => ClosingTabItemHandlerImpl;
 
+        public void OnWindowClosing()
+        {
+            _logger.Info("Window is closing. {0} view to close", Views.Count);
+            Views.ForEach(v => _windowsController.Remove(v));
+
+            Views.Select(vc => vc.Content)
+                .OfType<IDisposable>()
+                .ForEach(x => x.Dispose());
+        }
+
         private void ClosingTabItemHandlerImpl(ItemActionCallbackArgs<TabablzControl> args)
         {
-           
+            _logger.Info("Tab is closing. {0} view to close", Views.Count);
             var container = (ViewContainer)args.DragablzItem.DataContext;
             _windowsController.Remove(container);
             if (container.Equals(Selected))
@@ -177,5 +185,7 @@ namespace TailBlazer.Views
         {
             _cleanUp.Dispose();
         }
+
+
     }
 }

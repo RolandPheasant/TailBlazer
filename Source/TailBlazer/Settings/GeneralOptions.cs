@@ -17,7 +17,5 @@
             HighlightDuration = highlightTailDuration;
             Scale = scale;
         }
-
-
     }
 }

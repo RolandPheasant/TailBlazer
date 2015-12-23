@@ -5,7 +5,6 @@ namespace TailBlazer.Views
 {
     public interface IInlineViewerFactory
     {
-        InlineViewer Create(IObservable<ILineProvider> lineProvider,
-            IObservable<LineProxy> selectedChanged);
+        InlineViewer Create(IObservable<ILineProvider> lineProvider,IObservable<LineProxy> selectedChanged);
     }
 }

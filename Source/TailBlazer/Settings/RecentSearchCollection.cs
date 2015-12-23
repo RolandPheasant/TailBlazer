@@ -1,35 +1,28 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using DynamicData;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Settings
 {
-    public class RecentFileCollection : IRecentFileCollection, IDisposable
+    public class RecentSearchCollection : IRecentSearchCollection, IDisposable
     {
-        private const string SettingsKey = "RecentFiles";
-
         private readonly ILogger _logger;
         private readonly IDisposable _cleanUp;
-        private readonly  ISourceCache<RecentFile, string> _files = new SourceCache<RecentFile, string>(fi=>fi.Name);
+        private readonly  ISourceCache<RecentSearch, string> _files = new SourceCache<RecentSearch, string>(fi=>fi.Text);
 
-        public IObservableList<RecentFile> Items { get; }
+        public IObservableList<RecentSearch> Items { get; }
 
-        public RecentFileCollection(ILogger logger, ISettingFactory settingFactory, ISettingsStore store)
+        public RecentSearchCollection(ILogger logger, ISetting<RecentSearch[]> setting)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
-            if (store == null) throw new ArgumentNullException(nameof(store));
             _logger = logger;
 
-            //TODO:  create specialist object so we can sort / pin and timestamp etc
             Items = _files.Connect()
                         .RemoveKey()
                         .AsObservableList();
-
-            var setting = settingFactory.Create(new RecentFilesToStateConverter(), SettingsKey);
 
             var loader = setting.Value.Subscribe(files =>
             {
@@ -37,7 +30,7 @@ namespace TailBlazer.Domain.FileHandling
                 {
                     //all files are loaded when state changes, so only add new ones
                     var newItems = files
-                        .Where(f => !innerCache.Lookup(f.Name).HasValue)
+                        .Where(f => !innerCache.Lookup(f.Text).HasValue)
                         .ToArray();
 
                     innerCache.AddOrUpdate(newItems);
@@ -54,14 +47,14 @@ namespace TailBlazer.Domain.FileHandling
             _cleanUp = new CompositeDisposable(settingsWriter, loader, _files,Items);
         }
 
-        public void Add(RecentFile file)
+        public void Add(RecentSearch file)
         {
             if (file == null) throw new ArgumentNullException(nameof(file));
             
             _files.AddOrUpdate(file);
         }
 
-        public void Remove(RecentFile file)
+        public void Remove(RecentSearch file)
         {
             _files.Remove(file);
 
