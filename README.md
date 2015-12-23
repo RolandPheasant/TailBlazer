@@ -59,6 +59,19 @@ There has been an enthusiastic and indeed overwhelming demand for Tail Blazer an
 
 I have been doing some major performance work see this  [Fast scrolling](https://github.com/RolandPheasant/TailBlazer/blob/master/Documents/Fast%20Scrolling.md). And I have to say I am absolutely delighted with the result.
 
+## More images
+
+Don't like the light background? Change it to dark.
+
+![Dark theme](https://github.com/RolandPheasant/TailBlazer/blob/master/Images/LightAndDarkTheme.gif)
+
+Text too small? Then zoom.
+
+![Zoom](https://github.com/RolandPheasant/TailBlazer/blob/master/Images/Zoom.gif)
+
+Don't like new line highlight? Turn it off. 
+
+![Zoom](https://github.com/RolandPheasant/TailBlazer/blob/master/Images/NoHighlight.gif)
 
 ## Roll call of honour
 
