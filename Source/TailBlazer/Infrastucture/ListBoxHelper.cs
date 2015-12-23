@@ -25,8 +25,8 @@ namespace TailBlazer.Infrastucture
 
         public static void PropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
         {
-            //var receiver = args.NewValue as IAttachedListBox;
-         //   receiver?.Receive((ListBox)sender);
+            var receiver = args.NewValue as IAttachedListBox;
+            receiver?.Receive((ListBox)sender);
         }
 
 
