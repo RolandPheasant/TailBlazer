@@ -125,6 +125,7 @@
     <Compile Include="Infrastucture\CheckedToLengthConverter.cs" />
     <Compile Include="Infrastucture\ClipboardHandler.cs" />
     <Compile Include="Infrastucture\ConsoleLogger.cs" />
+    <Compile Include="Infrastucture\FileAssociations.cs" />
     <Compile Include="Infrastucture\FileHeader.cs" />
     <Compile Include="Infrastucture\HeaderContent.cs" />
     <Compile Include="Infrastucture\IClipboardHandler.cs" />
@@ -132,6 +133,7 @@
     <Compile Include="Infrastucture\ListBoxHelper.cs" />
     <Compile Include="Infrastucture\LogFactory.cs" />
     <Compile Include="Infrastucture\FileNamer.cs" />
+    <Compile Include="Infrastucture\MouseWheelGesture.cs" />
     <Compile Include="Infrastucture\SelectionMonitor.cs" />
     <Compile Include="Infrastucture\StartupController.cs" />
     <Compile Include="Infrastucture\UhandledExceptionHandler.cs" />

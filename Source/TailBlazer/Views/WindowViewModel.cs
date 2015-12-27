@@ -9,7 +9,6 @@ using System.Reactive.Linq;
 using System.Reflection;
 using System.Windows.Input;
 using Dragablz;
-using DynamicData.Aggregation;
 using DynamicData.Binding;
 using Microsoft.Win32;
 using TailBlazer.Domain.Infrastructure;
@@ -38,6 +37,10 @@ namespace TailBlazer.Views
         public Command ShowInGitHubCommand { get; }
         public string Version { get; }
 
+        public ICommand ZoomInCommand { get; }
+        public ICommand ZoomOutCommand { get; }
+
+
         public FileDropMonitor DropMonitor { get; } = new FileDropMonitor();
 
         public WindowViewModel(IObjectProvider objectProvider, 
@@ -58,6 +61,8 @@ namespace TailBlazer.Views
             OpenFileCommand =  new Command(OpenFile);
             ShowInGitHubCommand = new Command(()=>   Process.Start("https://github.com/RolandPheasant"));
 
+            ZoomOutCommand= new Command(()=> { GeneralOptions.Scale = GeneralOptions.Scale + 5; });
+            ZoomInCommand = new Command(() => { GeneralOptions.Scale = GeneralOptions.Scale - 5; });
 
             Version = $"v{Assembly.GetEntryAssembly().GetName().Version.ToString(3)}";
 

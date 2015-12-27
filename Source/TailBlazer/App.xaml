@@ -9,10 +9,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Colours.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
-  
             </ResourceDictionary.MergedDictionaries>
-
-
 
             <Style TargetType="{x:Type infrastucture:SearchableTextControl}">
                 <Setter Property="Template">
@@ -33,7 +30,7 @@
             </DataTemplate>
             
             <DataTemplate DataType="{x:Type views:FileDropContainer}">
-                <Grid>
+                <Grid TextElement.Foreground="{DynamicResource MaterialDesignBody}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
