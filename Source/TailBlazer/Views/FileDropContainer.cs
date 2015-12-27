@@ -8,7 +8,7 @@ namespace TailBlazer.Views
     {
         public FileDropContainer(IEnumerable<string> files)
         {
-            Files = files.Select(Path.GetFileName);
+            Files = files.Select(Path.GetFileName).ToArray();
         }
 
         public IEnumerable<string> Files { get; }

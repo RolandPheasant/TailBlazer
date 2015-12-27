@@ -39,8 +39,7 @@ namespace TailBlazer.Views
 
         public ICommand ZoomInCommand { get; }
         public ICommand ZoomOutCommand { get; }
-
-
+        
         public FileDropMonitor DropMonitor { get; } = new FileDropMonitor();
 
         public WindowViewModel(IObjectProvider objectProvider, 

@@ -105,7 +105,7 @@ namespace TailBlazer.Views
                 Effects = effects;
             }
 
-            public DragDropEffects Effects { get; private set; }
+            private DragDropEffects Effects { get; set; }
 
             public Point MousePosition
             {
