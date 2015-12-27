@@ -1,4 +1,4 @@
-# Tail Blazer
+# ![Comet](Images/CometGreen.svg "Tail Blazer") Tail Blazer
 
 [![Join the chat at https://gitter.im/RolandPheasant/TailBlazer](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/RolandPheasant/TailBlazer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build status](https://ci.appveyor.com/api/projects/status/yot4rioy393j52eg?svg=true)](https://ci.appveyor.com/project/RolandPheasant/tailblazer) [![GitHub issues](https://img.shields.io/github/issues/RolandPheasant/TailBlazer.svg)](https://github.com/RolandPheasant/TailBlazer/issues)
 
@@ -11,7 +11,7 @@ So I have decided to rectify this by creating a more modern version.  The missio
 
 After a few iterations I have come up with this:  
 
-![Tail Blazer](https://github.com/RolandPheasant/TailBlazer/blob/master/Images/Tailing.gif)
+![Tail Blazer](Images/Tailing.gif)
 
 That's better. A tail program which is pleasing to my eyes!
 
@@ -55,23 +55,26 @@ There has been an enthusiastic and indeed overwhelming demand for Tail Blazer an
  - Fork, clone or download the source code and build using Visual Studio 2015
  - Grab the binaries from the [release page](https://github.com/RolandPheasant/TailBlazer/releases), extract and double click TailBlazer.exe to run. These releases will be regularly updated.
 
-## Performance
+## Very large files and fast scrolling
 
-I have been doing some major performance work see this  [Fast scrolling](https://github.com/RolandPheasant/TailBlazer/blob/master/Documents/Fast%20Scrolling.md). And I have to say I am absolutely delighted with the result.
+Tail Blazer can easily handle a file of any size. The largest file I have tested was 47 Gb which was the maximum file size I could create before my disk would become full.
 
-## More images
+![Dark theme](Images/47GbFile.gif)
+
+
+## User Settings
 
 Don't like the light background? Change it to dark.
 
-![Dark theme](https://github.com/RolandPheasant/TailBlazer/blob/master/Images/LightAndDarkTheme.gif)
+![Dark theme](Images/LightAndDarkTheme.gif)
 
 Text too small? Then zoom.
 
-![Zoom](https://github.com/RolandPheasant/TailBlazer/blob/master/Images/Zoom.gif)
+![Zoom](Images/Zoom.gif)
 
 Don't like new line highlight? Turn it off. 
 
-![Zoom](https://github.com/RolandPheasant/TailBlazer/blob/master/Images/NoHighlight.gif)
+![Zoom](Images/NoHighlight.gif)
 
 ## Roll call of honour
 
