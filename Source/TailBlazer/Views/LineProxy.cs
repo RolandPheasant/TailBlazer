@@ -14,9 +14,9 @@ namespace TailBlazer.Views
 
         public Line Line { get; }
         public long Start { get; }
-
         public int Index { get; }
         public string Text => Line.Text;
+
         public bool IsRecent { get; }
 
         public LineProxy(Line line)
@@ -24,7 +24,7 @@ namespace TailBlazer.Views
             Start = line.LineInfo.Start;
             Index = line.LineInfo.Index;
             Line = line;
-            IsRecent = line.Timestamp.HasValue && DateTime.Now.Subtract(line.Timestamp.Value).TotalSeconds < 1;
+            IsRecent = line.Timestamp.HasValue && DateTime.Now.Subtract(line.Timestamp.Value).TotalSeconds < 0.25;
         }
 
 
@@ -78,7 +78,7 @@ namespace TailBlazer.Views
 
         public override string ToString()
         {
-            return $"Line: {Line}";
+            return $"{Line}";
         }
     }
 }

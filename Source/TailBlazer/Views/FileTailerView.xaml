@@ -239,24 +239,21 @@
                     VerticalAlignment="Center"
                     Grid.Column="5" Margin="4 0 4 0" Orientation="Vertical">
 
-                    <CheckBox Visibility="{Binding }"
-                        HorizontalAlignment="Left"
-                          VerticalAlignment="Center"
-                          IsChecked="{Binding AutoTail}"
-                          Margin="4 0 4 0"
-                          >Follow tail</CheckBox>
+                    <CheckBox HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            IsChecked="{Binding AutoTail}"
+                            Margin="4 0 4 0"
+                            Content="Follow tail"/>
 
                     <CheckBox Visibility="{Binding CanViewInline.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
-                        HorizontalAlignment="Left"
-                          VerticalAlignment="Center"
-                          IsChecked="{Binding ShowInline}"
-                          Margin="4 0 4 0"
-                          >Show inline</CheckBox>
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            IsChecked="{Binding ShowInline}"
+                            Content="Show inline"
+                            Margin="4 0 4 0"/>
 
 
                 </StackPanel>
-
-
             </Grid>
 
             <ListBox 
@@ -268,12 +265,13 @@
                 SelectionMode="Extended"
                 infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}">
 
-                <!--<local:LinesControl.AnimationSetter>
+                <!--<infrastucture:ListBoxHelper.RowAnimationSetter>
                     <local:ListboxRowAnimationSetter
                         Duration="{Binding HighlightDuration.Value}"
                         IsEnabled="{Binding HighlightTail.Value}">
                     </local:ListboxRowAnimationSetter>
-                </local:LinesControl.AnimationSetter>-->
+                </infrastucture:ListBoxHelper.RowAnimationSetter>-->
+                
 
                 <ListBox.Template>
                     <ControlTemplate>

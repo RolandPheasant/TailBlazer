@@ -110,9 +110,9 @@
                         Value="{Binding HighlightDuration}"/>
 
             <TextBlock  Grid.Row="1" Grid.Column="2"  
-                          Visibility="Collapsed"   
+                        Visibility="Collapsed"   
                         VerticalAlignment="Center" 
-                            Text="{Binding HighlightDurationText.Value}"/>
+                         Text="{Binding HighlightDurationText.Value}"/>
 
         </Grid>
 
