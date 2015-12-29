@@ -59,5 +59,28 @@ namespace TailBlazer.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+        ///&lt;configuration&gt;
+        ///&lt;log4net&gt;
+        ///&lt;appender name=&quot;OutputDebugStringAppender&quot; type=&quot;log4net.Appender.OutputDebugStringAppender&quot; &gt;
+        ///  &lt;layout type=&quot;log4net.Layout.PatternLayout&quot;&gt;
+        ///    &lt;conversionPattern value=&quot;[TailBlazer] %level %date{HH:mm:ss,fff} - %message%n&quot; /&gt;
+        ///  &lt;/layout&gt;
+        ///&lt;root&gt;
+        ///	&lt;level value=&quot;All&quot;/&gt;
+        ///&lt;appender-ref ref=&quot;OutputDebugStringAppender&quot;/&gt;
+        ///&lt;/root&gt;
+        ///&lt;/appender&gt;
+        ///&lt;/log4net&gt;
+        ///&lt;/configuration&gt;
+        ///.
+        /// </summary>
+        internal static string log4net {
+            get {
+                return ResourceManager.GetString("log4net", resourceCulture);
+            }
+        }
     }
 }

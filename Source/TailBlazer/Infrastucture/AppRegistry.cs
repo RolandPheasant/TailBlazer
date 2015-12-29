@@ -15,9 +15,16 @@ namespace TailBlazer.Infrastucture
             //set up logging
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
             if (!File.Exists(path))
-                throw new FileNotFoundException("The log4net.config file was not found" + path);
-
-            log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(path));
+            {
+                // should use the default config which is a resource
+                using (var stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(TailBlazer.Properties.Resources.log4net)))
+                {
+                    log4net.Config.XmlConfigurator.Configure(stream);
+                }
+            }
+            else {
+                log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(path));
+            }
             For<ILogger>().Use<Log4NetLogger>().Ctor<Type>("type").Is(x => x.ParentType).AlwaysUnique();
 
             For<ISelectionMonitor>().Use<SelectionMonitor>();
