@@ -113,7 +113,7 @@ namespace TailBlazer.Infrastucture
                 });
 
             //clear selection when the mouse is clicked and no other key is pressed
-            var mouseDown = Observable.FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(
+            var mouseDownHandler = Observable.FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(
                                     h => selector.PreviewMouseLeftButtonDown += h,
                                     h => selector.PreviewMouseLeftButtonDown -= h)
                                     .Select(evt => evt.EventArgs)
@@ -138,12 +138,19 @@ namespace TailBlazer.Infrastucture
                 .Select(evt => evt.EventArgs);
 
 
+            var mouseDown = Observable.FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(
+                                        h => selector.PreviewMouseLeftButtonDown += h,
+                                        h => selector.PreviewMouseLeftButtonDown -= h)
+                                        .Select(evt => evt.EventArgs);
+
             //Handle selecting multiple rows with the mouse
             // TODO: Scroll up when the mouse it at the top of the screen
-            var mouseDragSelector =  selectedChanged
+            var mouseDragSelector =  selectedChanged.CombineLatest(mouseDown, (slct,down) =>new  { slct, down })
+                    
+                   
                     .Scan(new ImmutableList<LineProxy>(), (state, latest) =>
                     {
-                        return state.Add(latest.AddedItems.OfType<LineProxy>().ToList());
+                        return state.Add(latest.slct.AddedItems.OfType<LineProxy>().ToList());
                     }).Select(list => list.Data.Distinct().ToArray())
                     .TakeUntil(mouseUpHandler)
                     .Repeat()
@@ -166,7 +173,7 @@ namespace TailBlazer.Infrastucture
 
             var selectionChanged = selectedChanged.Subscribe(OnSelectedItemsChanged);
 
-            _controlSubscriber.Disposable =new CompositeDisposable(mouseDown, mouseDragSelector, selectionChanged, itemsAdded, itemsRemoved, dataSource.Connect());
+            _controlSubscriber.Disposable =new CompositeDisposable(mouseDownHandler, mouseDragSelector, selectionChanged, itemsAdded, itemsRemoved, dataSource.Connect());
         }
 
 

@@ -367,6 +367,8 @@ namespace TailBlazer.Infrastucture
         {
             if (double.IsInfinity(offset)) return;
             var diff = (int)((offset - _extentInfo.VerticalOffset) / ItemHeight);
+
+         //   Console.WriteLine($"Scrolling by {diff} lines");
             InvokeStartIndexCommand(diff);
         }
 
