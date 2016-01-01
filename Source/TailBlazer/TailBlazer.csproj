@@ -163,6 +163,9 @@
     </Compile>
     <Compile Include="Views\FileTailerViewModel.cs" />
     <Compile Include="Views\FileTailerViewModelFactory.cs" />
+    <Compile Include="Views\Formatting\MatchedStringEx.cs" />
+    <Compile Include="Views\Formatting\MatchedString.cs" />
+    <Compile Include="Views\Formatting\MatchedStringEnumerator.cs" />
     <Compile Include="Views\IInlineViewerFactory.cs" />
     <Compile Include="Views\InlineView.xaml.cs">
       <DependentUpon>InlineView.xaml</DependentUpon>

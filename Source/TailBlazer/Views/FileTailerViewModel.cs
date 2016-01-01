@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -17,6 +18,27 @@ using TailBlazer.Settings;
 
 namespace TailBlazer.Views
 {
+
+    public class FormattedText
+    {
+        
+    }
+
+    public class TextFormatter
+    {
+        private readonly ISearchInfoCollection _searchInfoCollection;
+
+        public TextFormatter(ISearchInfoCollection searchInfoCollection)
+        {
+            _searchInfoCollection = searchInfoCollection;
+        }
+
+        public IEnumerable<FormattedText> Format(string text)
+        {
+            
+        }
+    }
+
     public class FileTailerViewModel: AbstractNotifyPropertyChanged, IDisposable, IScrollReceiver
     {
         private readonly IDisposable _cleanUp;
@@ -42,7 +64,6 @@ namespace TailBlazer.Views
         public IProperty<string> HightlightText { get; }
         public ICommand CopyToClipboardCommand { get; }
         public ICommand KeepSearchCommand { get; }
-
         public ISelectionMonitor SelectionMonitor { get; }
         //public ListboxRowAnimationSetter RowAnimationSetter { get; }
 
@@ -112,7 +133,7 @@ namespace TailBlazer.Views
                         .DistinctUntilChanged();
 
             //tailer is the main object used to tail, scroll and filter in a file
-            var lineScroller = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);  //fileTailerFactory.Create(fileInfo, SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
+            var lineScroller = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);  
 
             //Add a complete file display [No search info here]
             var indexed = fileWatcher.Latest.Index()
@@ -148,10 +169,9 @@ namespace TailBlazer.Views
                                 if (string.IsNullOrEmpty(text)) return "Type to search";
                                 return text.Length < 3 ? "Enter at least 3 characters" : "Hit enter to search";
                             }).ForBinding();
-
-            var selectedText = SearchCollection.SelectedText;
-
+            
             //Only highlight search text when at least 3 letters have been entered
+            var selectedText = SearchCollection.SelectedText;
             HightlightText = selectedText.ForBinding();
             ShouldHightlightMatchingText = selectedText
                 .Select(searchText => !string.IsNullOrEmpty(searchText) && searchText.Length >= 3)
@@ -198,8 +218,7 @@ namespace TailBlazer.Views
 
             var inlineViewerVisible = isUserDefinedChanged.CombineLatest(this.WhenValueChanged(vm => vm.ShowInline),
                                                             (userDefined, showInline) => userDefined && showInline);
-
-
+            
             CanViewInline = isUserDefinedChanged.ForBinding();
             InlineViewerVisible = inlineViewerVisible.ForBinding();
 
@@ -228,7 +247,7 @@ namespace TailBlazer.Views
                 Disposable.Create(() =>
                 {
                     _userScrollRequested.OnCompleted();
-                    (SelectionMonitor as IDisposable)?.Dispose();
+                    SelectionMonitor?.Dispose();
                 }));
         }
 

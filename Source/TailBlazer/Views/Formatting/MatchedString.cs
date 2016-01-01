@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using DynamicData.Kernel;
 
-namespace TailBlazer.Fixtures
+namespace TailBlazer.Views.Formatting
 {
     public class MatchedString : IEquatable<MatchedString>
     {
@@ -15,8 +12,7 @@ namespace TailBlazer.Fixtures
             Part = part;
             IsMatch = isMatch;
         }
-
-
+        
 
         #region Equality
 
@@ -58,40 +54,6 @@ namespace TailBlazer.Fixtures
         public override string ToString()
         {
             return $"{Part}, ({IsMatch})";
-        }
-    }
-
-    public static class SplitStringIntoMatches
-    {
-
-        public static IEnumerable<MatchedString> MatchString(this string source, string textToMatch)
-        {
-            return new StringMatchEnumerator(source, textToMatch);
-        }
-        public static IEnumerable<MatchedString> MatchString(this string source, IEnumerable<string> itemsToMatch)
-        {
-            return new StringMatchEnumerator(source, itemsToMatch);
-            //var strings = itemsToMatch.AsArray();
-            //MatchedString[] matches = new MatchedString[0];
-            //for (int i = 0; i < strings.Length; i++)
-            //{
-            //    var stringToMatch = strings[i];
-            //    if (i == 0)
-            //    {
-            //        matches = source.MatchString(stringToMatch).ToArray();
-            //    }
-            //    else
-            //    {
-            //        matches = matches.SelectMany(ms =>
-            //        {
-            //            if (ms.IsMatch)
-            //                return new [] {ms};
-
-            //            return ms.Part.MatchString(stringToMatch).ToArray();
-            //        }).ToArray();
-            //    }
-            //}
-            //return matches;
         }
     }
 }
