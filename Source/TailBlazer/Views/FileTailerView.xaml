@@ -136,7 +136,7 @@
                     </TextBox.InputBindings>
                 </TextBox>
 
-                <TextBlock     Margin="4 0 0 0" Grid.Column="2"
+                <TextBlock     Margin="8 0 0 0" Grid.Column="2"
                                Opacity="0.56"
                             Width="43"
                             TextAlignment="Center"

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DynamicData.Kernel;
 
 namespace TailBlazer.Fixtures
 {
@@ -107,29 +108,29 @@ namespace TailBlazer.Fixtures
             }
 
 
-            MatchedString[] latest;
-            foreach (var textToMatch in _itemsToMatch)
+            var strings = _itemsToMatch.AsArray();
+            MatchedString[] matches = new MatchedString[0];
+            for (int i = 0; i < strings.Length; i++)
             {
-
-                latest = Yield(_input, textToMatch).ToArray();
-
-
-                foreach (var child in latest)
+                var stringToMatch = strings[i];
+                if (i == 0)
                 {
-                    if (child.IsMatch)
-                    {
-                        yield return child;
-                    }
-                    else
-                    {
-                      //  yield return child;
-                        foreach (var result in Yield(child.Part, textToMatch))
-                        {
-                            yield return result;
-                        }
-                    }
-
+                    matches = _input.MatchString(stringToMatch).ToArray();
                 }
+                else
+                {
+                    matches = matches.SelectMany(ms =>
+                    {
+                        if (ms.IsMatch)
+                            return new[] { ms };
+
+                        return ms.Part.MatchString(stringToMatch).ToArray();
+                    }).ToArray();
+                }
+            }
+            foreach (var matchedString in matches)
+            {
+                yield return matchedString;
             }
 
         }
