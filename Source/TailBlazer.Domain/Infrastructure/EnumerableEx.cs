@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DynamicData.Kernel;
 
 // ReSharper disable once CheckNamespace
 namespace System.Collections
@@ -72,10 +73,10 @@ namespace System.Collections
 
         }
 
-        public static T[] AsArray<T>(this IEnumerable<T> source)
-        {
-            return source as T[] ?? source.ToArray();
-        }
+        //public static T[] AsArray<T>(this IEnumerable<T> source)
+        //{
+        //    return source as T[] ?? source.ToArray();
+        //}
 
     }
 }

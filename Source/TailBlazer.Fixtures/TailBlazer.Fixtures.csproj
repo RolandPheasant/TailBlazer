@@ -111,6 +111,7 @@
     <Compile Include="IndexerFixture.cs" />
     <Compile Include="SettingsStoreFixture.cs" />
     <Compile Include="SplitFileByMatchingTextFixture.cs" />
+    <Compile Include="StringMatchEnumerator.cs" />
     <Compile Include="TestFile.cs" />
   </ItemGroup>
   <ItemGroup>
