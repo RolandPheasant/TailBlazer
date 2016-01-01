@@ -31,12 +31,14 @@ namespace TailBlazer.Views
         public InlineViewer([NotNull] InlineViewerArgs args,
             [NotNull] IClipboardHandler clipboardHandler,
             [NotNull] ISchedulerProvider schedulerProvider, 
-            [NotNull] ISelectionMonitor selectionMonitor)
+            [NotNull] ISelectionMonitor selectionMonitor, 
+            [NotNull] ILineProxyFactory lineProxyFactory)
         {
             if (args == null) throw new ArgumentNullException(nameof(args));
             if (clipboardHandler == null) throw new ArgumentNullException(nameof(clipboardHandler));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (selectionMonitor == null) throw new ArgumentNullException(nameof(selectionMonitor));
+            if (lineProxyFactory == null) throw new ArgumentNullException(nameof(lineProxyFactory));
             SelectionMonitor = selectionMonitor;
             CopyToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
 
@@ -61,10 +63,11 @@ namespace TailBlazer.Views
             
             //load lines into observable collection
             var loader = lineScroller.Lines.Connect()
-                .Transform(line => new LineProxy(line))
+                .Transform(lineProxyFactory.Create)
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)
+                .DisposeMany()
                 .Subscribe();
 
             // track first visible index[required to set scroll extent]

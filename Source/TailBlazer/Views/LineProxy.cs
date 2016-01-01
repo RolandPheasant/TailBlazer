@@ -1,12 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Reactive.Disposables;
 using DynamicData.Binding;
+using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
+using TailBlazer.Domain.Infrastructure;
+using TailBlazer.Views.Formatting;
 
 namespace TailBlazer.Views
 {
-    public class LineProxy: IComparable<LineProxy>, IComparable, IEquatable<LineProxy>
+    public class LineProxy: AbstractNotifyPropertyChanged,IComparable<LineProxy>, IComparable, IEquatable<LineProxy>, IDisposable
     {
+        private readonly IDisposable _cleanUp;
 
         public static readonly IComparer<LineProxy> DefaultSort = SortExpressionComparer<LineProxy>
             .Ascending(p => p.Line.LineInfo.Start)
@@ -17,16 +22,22 @@ namespace TailBlazer.Views
         public int Index { get; }
         public string Text => Line.Text;
 
+        public  IProperty<IEnumerable<FormattedText>> FormattedText { get; }
+
         public bool IsRecent { get; }
 
-        public LineProxy(Line line)
+        public LineProxy([NotNull] Line line, [NotNull] IObservable<IEnumerable<FormattedText>> formattedText)
         {
+            if (line == null) throw new ArgumentNullException(nameof(line));
+            if (formattedText == null) throw new ArgumentNullException(nameof(formattedText));
             Start = line.LineInfo.Start;
             Index = line.LineInfo.Index;
             Line = line;
             IsRecent = line.Timestamp.HasValue && DateTime.Now.Subtract(line.Timestamp.Value).TotalSeconds < 0.25;
-        }
 
+            FormattedText = formattedText.ForBinding();
+            _cleanUp = FormattedText;
+        }
 
 
         public int CompareTo(LineProxy other)
@@ -64,6 +75,7 @@ namespace TailBlazer.Views
             }
         }
 
+
         public static bool operator ==(LineProxy left, LineProxy right)
         {
             return Equals(left, right);
@@ -75,6 +87,12 @@ namespace TailBlazer.Views
         }
 
         #endregion
+
+        public void Dispose()
+        {
+            _cleanUp.Dispose();
+        }
+
 
         public override string ToString()
         {

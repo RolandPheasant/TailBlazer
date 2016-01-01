@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace TailBlazer.Views.Formatting
+namespace TailBlazer.Domain.Formatting
 {
     public static class MatchedStringEx
     { 

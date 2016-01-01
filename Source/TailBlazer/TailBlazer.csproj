@@ -163,10 +163,12 @@
     </Compile>
     <Compile Include="Views\FileTailerViewModel.cs" />
     <Compile Include="Views\FileTailerViewModelFactory.cs" />
-    <Compile Include="Views\Formatting\MatchedStringEx.cs" />
+    <Compile Include="Views\Formatting\ITextFormatter.cs" />
     <Compile Include="Views\Formatting\MatchedString.cs" />
-    <Compile Include="Views\Formatting\MatchedStringEnumerator.cs" />
+    <Compile Include="Views\Formatting\TextBlockFormatter.cs" />
+    <Compile Include="Views\Formatting\TextFormatter.cs" />
     <Compile Include="Views\IInlineViewerFactory.cs" />
+    <Compile Include="Views\ILineProxyFactory.cs" />
     <Compile Include="Views\InlineView.xaml.cs">
       <DependentUpon>InlineView.xaml</DependentUpon>
     </Compile>
@@ -176,6 +178,7 @@
     <Compile Include="Infrastucture\IScrollReceiver.cs" />
     <Compile Include="Views\IWindowsController.cs" />
     <Compile Include="Views\LineProxy.cs" />
+    <Compile Include="Views\LineProxyFactory.cs" />
     <Compile Include="Views\LinesControl.cs" />
     <Compile Include="Views\ListboxRowAnimationSetter.cs" />
     <Compile Include="Views\OpenFileIcon.cs" />

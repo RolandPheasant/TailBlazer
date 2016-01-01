@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Linq;
 using FluentAssertions;
-using TailBlazer.Views.Formatting;
+using TailBlazer.Domain.Formatting;
 using Xunit;
 
 namespace TailBlazer.Fixtures

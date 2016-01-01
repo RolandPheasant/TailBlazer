@@ -29,7 +29,6 @@ namespace TailBlazer.Infrastucture
 
             For<ISelectionMonitor>().Use<SelectionMonitor>();
             For<ISearchInfoCollection>().Use<SearchInfoCollection>();
-
             For<ISettingsStore>().Use<FileSettingsStore>().Singleton();
             For<IFileWatcher>().Use<FileWatcher>();
 
@@ -44,10 +43,8 @@ namespace TailBlazer.Infrastucture
 
                 //to do, need a auto-exclude these AppConventions
                 scanner.ExcludeType<SelectionMonitor>();
-                scanner.ExcludeType<SearchInfoCollection>();
+                scanner.ExcludeType<ISearchInfoCollection>();
                 scanner.ExcludeType<FileWatcher>();
-
-                //  scanner.ExcludeType<ISelectionMonitor>();
                 scanner.LookForRegistries();
                 scanner.Convention<AppConventions>();
 

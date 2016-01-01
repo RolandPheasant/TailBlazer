@@ -5,11 +5,9 @@ using TailBlazer.Views;
 
 namespace TailBlazer.Infrastucture
 {
-    public  class ListBoxHelper: FrameworkElement
+    public  class ListBoxHelper
     {
-
-
-
+        
         public static readonly DependencyProperty SelectionMonitorProperty = DependencyProperty.RegisterAttached("SelectionMonitor", typeof(IAttachedListBox), typeof(ListBoxHelper),
             new PropertyMetadata(default(ISelectionMonitor), PropertyChanged));
 

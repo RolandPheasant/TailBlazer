@@ -1,59 +1,23 @@
-using System;
+using System.Windows.Media;
+using DynamicData.Kernel;
+using TailBlazer.Domain.Formatting;
 
 namespace TailBlazer.Views.Formatting
 {
-    public class MatchedString : IEquatable<MatchedString>
+    public class FormattedText
     {
-        public string Part { get; }
-        public bool IsMatch { get; }
+        public string Text { get; }
+        public Optional<Brush> Brush { get; }
 
-        public MatchedString(string part, bool isMatch)
+
+        public bool Highlight { get; }
+
+        public FormattedText(MatchedString matchedString)
         {
-            Part = part;
-            IsMatch = isMatch;
-        }
-        
+            Text = matchedString.Part;
+            Highlight = matchedString.IsMatch;
+            Brush = null;
 
-        #region Equality
-
-        public bool Equals(MatchedString other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return string.Equals(Part, other.Part) && IsMatch == other.IsMatch;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((MatchedString)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return ((Part?.GetHashCode() ?? 0) * 397) ^ IsMatch.GetHashCode();
-            }
-        }
-
-        public static bool operator ==(MatchedString left, MatchedString right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(MatchedString left, MatchedString right)
-        {
-            return !Equals(left, right);
-        }
-
-        #endregion
-
-        public override string ToString()
-        {
-            return $"{Part}, ({IsMatch})";
         }
     }
 }

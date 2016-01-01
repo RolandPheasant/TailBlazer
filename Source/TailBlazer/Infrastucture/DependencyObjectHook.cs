@@ -29,7 +29,5 @@ namespace TailBlazer.Infrastucture
 
             receiver?.Receive(sender);
         }
-
-
     }
 }

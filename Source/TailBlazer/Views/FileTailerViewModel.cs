@@ -19,26 +19,6 @@ using TailBlazer.Settings;
 namespace TailBlazer.Views
 {
 
-    public class FormattedText
-    {
-        
-    }
-
-    public class TextFormatter
-    {
-        private readonly ISearchInfoCollection _searchInfoCollection;
-
-        public TextFormatter(ISearchInfoCollection searchInfoCollection)
-        {
-            _searchInfoCollection = searchInfoCollection;
-        }
-
-        public IEnumerable<FormattedText> Format(string text)
-        {
-            
-        }
-    }
-
     public class FileTailerViewModel: AbstractNotifyPropertyChanged, IDisposable, IScrollReceiver
     {
         private readonly IDisposable _cleanUp;
@@ -65,7 +45,6 @@ namespace TailBlazer.Views
         public ICommand CopyToClipboardCommand { get; }
         public ICommand KeepSearchCommand { get; }
         public ISelectionMonitor SelectionMonitor { get; }
-        //public ListboxRowAnimationSetter RowAnimationSetter { get; }
 
         public SearchHints SearchHints { get;  }
         public SearchCollection SearchCollection { get; }
@@ -84,7 +63,8 @@ namespace TailBlazer.Views
             [NotNull] IInlineViewerFactory inlineViewerFactory, 
             [NotNull] ISetting<GeneralOptions> generalOptions,
             [NotNull] IRecentSearchCollection recentSearchCollection,
-            [NotNull] SearchHints searchHints)
+            [NotNull] SearchHints searchHints, 
+            [NotNull] ILineProxyFactory lineProxyFactory)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
@@ -95,6 +75,7 @@ namespace TailBlazer.Views
             if (inlineViewerFactory == null) throw new ArgumentNullException(nameof(inlineViewerFactory));
             if (generalOptions == null) throw new ArgumentNullException(nameof(generalOptions));
             if (searchHints == null) throw new ArgumentNullException(nameof(searchHints));
+            if (lineProxyFactory == null) throw new ArgumentNullException(nameof(lineProxyFactory));
 
             SelectionMonitor = selectionMonitor;
             SearchHints = searchHints;
@@ -179,10 +160,11 @@ namespace TailBlazer.Views
 
             //load lines into observable collection
             var loader = lineScroller.Lines.Connect()
-                .Transform(line => new LineProxy(line))
+                .Transform(lineProxyFactory.Create)
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)
+                .DisposeMany()
                 .Subscribe(changes => logger.Info($"Rows changed. {changes.Adds} adds, {changes.Removes} removed"), 
                             ex => logger.Error(ex, "There is a problem with bind data"));
             

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DynamicData.Kernel;
 
-namespace TailBlazer.Views.Formatting
+namespace TailBlazer.Domain.Formatting
 {
 
     public class MatchedStringEnumerator : IEnumerable<MatchedString>

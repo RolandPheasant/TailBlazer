@@ -8,7 +8,8 @@
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:fileHandling="clr-namespace:TailBlazer.Domain.FileHandling;assembly=TailBlazer.Domain"
-            TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             xmlns:formatting="clr-namespace:TailBlazer.Views.Formatting"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
             Background="{DynamicResource MaterialDesignPaper}"
              x:Name="Control"
              mc:Ignorable="d" 
@@ -329,14 +330,19 @@
                                        Visibility="Collapsed" 
                                        Opacity="0.55" 
                                        MinWidth="25"/>
-                            <infrastucture:SearchableTextControl Grid.Column="1" 
+
+
+                            <TextBlock Grid.Column="1"  Margin="6 0 0 0" 
+                                       formatting:TextBlockFormatter.FormattedText="{Binding FormattedText.Value}"/>
+                            
+                            <!--<infrastucture:SearchableTextControl Grid.Column="1" 
                                                              Margin="6 0 0 0"   
                                                             IsHighlight="{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"  
                                                             SearchText="{Binding ElementName=Control,Path=DataContext.HightlightText.Value}"
                                                             IsMatchCase="False"
                                                             HighlightBackground="{StaticResource SecondaryAccentBrush}"
                                                             HighlightForeground="{StaticResource SecondaryAccentForegroundBrush}"
-                                                            Text="{Binding Text}"/>
+                                                            Text="{Binding Text}"/>-->
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
