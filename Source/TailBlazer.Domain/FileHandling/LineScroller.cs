@@ -69,9 +69,22 @@ namespace TailBlazer.Domain.FileHandling
             scrollRequest = scrollRequest.Synchronize(locker);
             latest = latest.Synchronize(locker);
 
-            var aggregator = latest.CombineLatest(scrollRequest, (currentLines, scroll) => currentLines.ReadLines(scroll).ToArray())
+            var aggregator = latest
+                .CombineLatest(scrollRequest, (currentLines, scroll) =>
+                {
+                    try
+                    {
+                        return currentLines.ReadLines(scroll).ToArray();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+
+                })
                 .Subscribe(currentPage =>
                 {
+
                     var previous = lines.Items.ToArray();
                     var added = currentPage.Except(previous, Line.TextStartComparer).ToArray();
                     var removed = previous.Except(currentPage, Line.TextStartComparer).ToArray();

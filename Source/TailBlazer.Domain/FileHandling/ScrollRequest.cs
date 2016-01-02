@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -43,6 +44,7 @@ namespace TailBlazer.Domain.FileHandling
 
             return PageSize == other.PageSize && FirstIndex == other.FirstIndex && Mode == other.Mode;
         }
+
 
         public override bool Equals(object obj)
         {

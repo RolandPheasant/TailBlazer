@@ -11,7 +11,7 @@ namespace TailBlazer.Domain.FileHandling
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (scroll == null) throw new ArgumentNullException(nameof(scroll));
 
-            int first = scroll.FirstIndex;
+            var first = scroll.FirstIndex;
             int size = scroll.PageSize;
 
             if (scroll.Mode == ScrollReason.Tail)
