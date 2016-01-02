@@ -11,6 +11,9 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+
+
+
             <Style TargetType="{x:Type infrastucture:SearchableTextControl}">
                 <Setter Property="Template">
                     <Setter.Value>
@@ -18,7 +21,7 @@
                             <Border Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}">
-                                <TextBlock TextWrapping="Wrap" x:Name="PART_TEXT"/>
+                                <TextBlock  x:Name="PART_TEXT"/>
                             </Border>
                         </ControlTemplate>
                     </Setter.Value>

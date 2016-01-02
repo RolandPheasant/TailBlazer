@@ -14,9 +14,11 @@ namespace TailBlazer.Views
         }
 
         public InlineViewer Create(IObservable<ILineProvider> lineProvider,
-            IObservable<LineProxy> selectedChanged)
+            IObservable<LineProxy> selectedChanged, 
+            ILineProxyFactory lineProxyFactory)
         {
-            var args = new InlineViewerArgs(lineProvider, selectedChanged);
+            var args = new InlineViewerArgs(lineProvider, selectedChanged, lineProxyFactory);
+
             return _objectProvider.Get<InlineViewer>(new ExplictArg("args", args));
         }
     }

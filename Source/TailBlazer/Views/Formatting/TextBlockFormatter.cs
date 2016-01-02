@@ -3,13 +3,45 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace TailBlazer.Views.Formatting
 {
-    public  class TextBlockFormatter
+
+
+    public static class TextBlockFormatter
     {
-        public static readonly DependencyProperty FormattedTextProperty = DependencyProperty.RegisterAttached(
-            "FormattedText", typeof (IEnumerable<FormattedText>), typeof (TextBlockFormatter), new PropertyMetadata(default(IEnumerable<FormattedText>),OnFormattedTextChanged));
+        public static readonly DependencyProperty ForegroundProperty = DependencyProperty.RegisterAttached("Foreground", typeof (Brush), typeof (TextBlockFormatter), new PropertyMetadata(default(Brush)));
+
+
+        public static void SetForeground(UIElement element, Brush value)
+        {
+            element.SetValue(ForegroundProperty, value);
+        }
+
+        public static Brush GetForeground(UIElement element)
+        {
+            return (Brush)element.GetValue(ForegroundProperty);
+        }
+
+
+
+        public static readonly DependencyProperty HighlightBackgroundProperty = DependencyProperty.RegisterAttached("HighlightBackground", typeof (Brush), typeof (TextBlockFormatter), new PropertyMetadata(default(Brush), OnBackgroundChanged));
+
+        public static void SetHighlightBackground(UIElement element, Brush value)
+        {
+            element.SetValue(HighlightBackgroundProperty, value);
+        }
+
+        public static Brush GetHighlightBackground(UIElement element)
+        {
+            return (Brush)element.GetValue(HighlightBackgroundProperty);
+        }
+
+        public static readonly DependencyProperty FormattedTextProperty = DependencyProperty.RegisterAttached("FormattedText", typeof (IEnumerable<FormattedText>), typeof (TextBlockFormatter), new PropertyMetadata(default(IEnumerable<FormattedText>),OnFormattedTextChanged));
+
+
+
 
 
         public static void SetFormattedText(UIElement element, IEnumerable<FormattedText> value)
@@ -20,6 +52,12 @@ namespace TailBlazer.Views.Formatting
         public static IEnumerable<FormattedText> GetFormattedText(UIElement element)
         {
             return (IEnumerable<FormattedText>)element.GetValue(FormattedTextProperty);
+        }
+
+        public static void OnBackgroundChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
+        {
+
+           //if (e)
         }
 
         public static void OnFormattedTextChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
@@ -43,6 +81,11 @@ namespace TailBlazer.Views.Formatting
             textBlock.Inlines.Clear();
             textBlock.Inlines.AddRange(textBlocks.Select(ft =>
             {
+                var run = new Run(ft.Text);
+
+                var background = GetHighlightBackground(textBlock);
+                if (background != null) run.Background = background;
+
                 return new Run(ft.Text);
             }));
         }

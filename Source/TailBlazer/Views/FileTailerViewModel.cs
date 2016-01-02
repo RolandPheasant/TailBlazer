@@ -9,12 +9,14 @@ using System.Windows;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
+using DynamicData.PLinq;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Infrastucture;
 using TailBlazer.Settings;
+using TailBlazer.Views.Formatting;
 
 namespace TailBlazer.Views
 {
@@ -63,8 +65,7 @@ namespace TailBlazer.Views
             [NotNull] IInlineViewerFactory inlineViewerFactory, 
             [NotNull] ISetting<GeneralOptions> generalOptions,
             [NotNull] IRecentSearchCollection recentSearchCollection,
-            [NotNull] SearchHints searchHints, 
-            [NotNull] ILineProxyFactory lineProxyFactory)
+            [NotNull] SearchHints searchHints)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
@@ -75,14 +76,15 @@ namespace TailBlazer.Views
             if (inlineViewerFactory == null) throw new ArgumentNullException(nameof(inlineViewerFactory));
             if (generalOptions == null) throw new ArgumentNullException(nameof(generalOptions));
             if (searchHints == null) throw new ArgumentNullException(nameof(searchHints));
-            if (lineProxyFactory == null) throw new ArgumentNullException(nameof(lineProxyFactory));
 
             SelectionMonitor = selectionMonitor;
             SearchHints = searchHints;
             CopyToClipboardCommand = new Command(()=> clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
             SelectedItemsCount = selectionMonitor.Selected.Connect().QueryWhenChanged(collection=> collection.Count).ForBinding();
             SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
-            
+
+
+
             UsingDarkTheme = generalOptions.Value
                     .ObserveOn(schedulerProvider.MainThread)
                     .Select(go => go.Theme== Theme.Dark)
@@ -159,8 +161,9 @@ namespace TailBlazer.Views
                 .ForBinding();
 
             //load lines into observable collection
+            var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchInfoCollection));
             var loader = lineScroller.Lines.Connect()
-                .Transform(lineProxyFactory.Create)
+                .Transform(lineProxyFactory.Create, new ParallelisationOptions(ParallelType.Ordered,5))
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)
@@ -206,7 +209,7 @@ namespace TailBlazer.Views
 
             //return an empty line provider unless user is viewing inline - this saves needless trips to the file
             var inline = indexed.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : new EmptyLineProvider());
-            InlineViewer = inlineViewerFactory.Create(inline, this.WhenValueChanged(vm => vm.SelectedItem));
+            InlineViewer = inlineViewerFactory.Create(inline, this.WhenValueChanged(vm => vm.SelectedItem),lineProxyFactory);
 
             _cleanUp = new CompositeDisposable(lineScroller,
                 loader,

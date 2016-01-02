@@ -1,3 +1,4 @@
+using System;
 using System.Windows.Media;
 using DynamicData.Kernel;
 using TailBlazer.Domain.Formatting;
@@ -17,6 +18,7 @@ namespace TailBlazer.Views.Formatting
             Text = matchedString.Part;
             Highlight = matchedString.IsMatch;
             Brush = null;
+
 
         }
     }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.Formatting
@@ -62,14 +63,14 @@ namespace TailBlazer.Domain.Formatting
 
         private  static IEnumerable<MatchedString> Yield(string input, string tomatch)
         {
-            var split = input.Split(new[] { tomatch }, StringSplitOptions.None);
+            //TODO: Check whether there are perf-issues with RegEx
+            var split = Regex.Split(input, tomatch, RegexOptions.IgnoreCase);
+            //   var split = input.Split(new[] { tomatch }, StringSplitOptions.None);
+
             var length = split.Length;
 
-            if (length == 0)
-            {
-                yield break;
-            }
-
+            if (length == 0) yield break;
+            
             if (length == 1)
             {
                 yield return new MatchedString(input, false);
@@ -82,11 +83,12 @@ namespace TailBlazer.Domain.Formatting
 
                 if (string.IsNullOrEmpty(current))
                 {
-
+                    //TODO: Get original string back as the user may have searched in a different case
                     yield return new MatchedString(tomatch, true);
                 }
                 else if (i > 0 && !string.IsNullOrEmpty(split[i - 1]))
                 {
+                    //TODO: Get original string back as the user may have searched in a different case
                     yield return new MatchedString(tomatch, true);
                     yield return new MatchedString(current, false);
 

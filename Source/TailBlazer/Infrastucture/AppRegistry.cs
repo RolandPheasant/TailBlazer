@@ -4,6 +4,7 @@ using StructureMap.Configuration.DSL;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
+using TailBlazer.Views.Formatting;
 using ILogger = TailBlazer.Domain.Infrastructure.ILogger;
 
 namespace TailBlazer.Infrastucture
@@ -22,15 +23,19 @@ namespace TailBlazer.Infrastucture
                     log4net.Config.XmlConfigurator.Configure(stream);
                 }
             }
-            else {
+            else
+            {
                 log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(path));
             }
             For<ILogger>().Use<Log4NetLogger>().Ctor<Type>("type").Is(x => x.ParentType).AlwaysUnique();
 
             For<ISelectionMonitor>().Use<SelectionMonitor>();
-            For<ISearchInfoCollection>().Use<SearchInfoCollection>();
+            For<ISearchInfoCollection>().Use<SearchInfoCollection>().Transient();
+            For<ITextFormatter>().Use<TextFormatter>();
+
             For<ISettingsStore>().Use<FileSettingsStore>().Singleton();
             For<IFileWatcher>().Use<FileWatcher>();
+
 
             For<UhandledExceptionHandler>().Singleton();
             For<ObjectProvider>().Singleton();
@@ -41,9 +46,11 @@ namespace TailBlazer.Infrastucture
             {
                 scanner.ExcludeType<ILogger>();
 
-                //to do, need a auto-exclude these AppConventions
-                scanner.ExcludeType<SelectionMonitor>();
-                scanner.ExcludeType<ISearchInfoCollection>();
+                //to do, need a auto-exclude these from AppConventions
+                scanner.ExcludeType<ISelectionMonitor>();
+                scanner.ExcludeType<SearchInfoCollection>();
+                scanner.ExcludeType<ITextFormatter>();
+
                 scanner.ExcludeType<FileWatcher>();
                 scanner.LookForRegistries();
                 scanner.Convention<AppConventions>();

@@ -130,6 +130,7 @@
     <Compile Include="Infrastucture\FileAssociations.cs" />
     <Compile Include="Infrastucture\FileHeader.cs" />
     <Compile Include="Infrastucture\HeaderContent.cs" />
+    <Compile Include="Infrastucture\HighlightTextControl.cs" />
     <Compile Include="Infrastucture\IClipboardHandler.cs" />
     <Compile Include="Infrastucture\IAttachedListBox.cs" />
     <Compile Include="Infrastucture\ListBoxHelper.cs" />

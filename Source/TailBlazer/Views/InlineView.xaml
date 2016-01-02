@@ -92,20 +92,17 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <!--IsHighlight="{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"  
-                                                            SearchText="{Binding ElementName=Control,Path=DataContext.HightlightText.Value}"-->
+
                         <TextBlock Text="{Binding Start, Mode=OneWay}" 
                                    Visibility="Collapsed" 
                                    Opacity="0.55" 
                                    MinWidth="25"/>
-                        <infrastucture:SearchableTextControl Grid.Column="1" 
-                                                             Margin="6 0 0 0"   
-                                                            IsHighlight="{Binding Path=DataContext.ShouldHightlightMatchingText.Value,RelativeSource={RelativeSource AncestorType={x:Type local:FileTailerView}}}"
-                                                            SearchText="{Binding Path=DataContext.HightlightText.Value,RelativeSource={RelativeSource AncestorType={x:Type local:FileTailerView}}}"
-                                                            IsMatchCase="False"
-                                                            HighlightBackground="{StaticResource SecondaryAccentBrush}"
-                                                            HighlightForeground="{StaticResource SecondaryAccentForegroundBrush}"
-                                                            Text="{Binding Text}"/>
+
+                        <!--HighlightEnabled = "{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"-->
+                        <infrastucture:HighlightTextControl Grid.Column="1"  Margin="6 0 0 0" 
+                                        FormattedText = "{Binding FormattedText.Value}"
+                                        HighlightForeground = "{StaticResource SecondaryAccentForegroundBrush}"
+                                        HighlightBackground = "{StaticResource SecondaryAccentBrush}"/>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

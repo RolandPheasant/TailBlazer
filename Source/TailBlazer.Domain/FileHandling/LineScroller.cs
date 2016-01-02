@@ -14,7 +14,7 @@ namespace TailBlazer.Domain.FileHandling
     {
         private readonly IDisposable _cleanUp;
         
-        public IObservableList<Line> Lines { get; }
+        public IObservableCache<Line,LineKey> Lines { get; }
 
 
         [Obsolete("USE OTHER OVERLOAD")]
@@ -30,8 +30,8 @@ namespace TailBlazer.Domain.FileHandling
 
             logger.Info($"Constructing file tailer for {file.FullName}");
 
-            var lines = new SourceList<Line>();
-            Lines = lines.AsObservableList();
+            var lines = new SourceCache<Line, LineKey>(l=>l.Key);
+            Lines = lines.AsObservableCache();
 
             var locker = new object();
             scrollRequest = scrollRequest.Synchronize(locker);
@@ -44,10 +44,10 @@ namespace TailBlazer.Domain.FileHandling
                     var added = currentPage.Except(previous,Line.TextStartComparer).ToArray();
                     var removed = previous.Except(currentPage, Line.TextStartComparer).ToArray();
 
-                    lines.Edit(innerList =>
+                    lines.Edit(innerCache =>
                     {
-                        if (removed.Any()) innerList.RemoveMany(removed);
-                        if (added.Any()) innerList.AddRange(added);
+                        if (removed.Any()) innerCache.Remove(removed);
+                        if (added.Any()) innerCache.AddOrUpdate(added);
                     });
                 });
 
@@ -60,8 +60,9 @@ namespace TailBlazer.Domain.FileHandling
             if (latest == null) throw new ArgumentNullException(nameof(latest));
             if (scrollRequest == null) throw new ArgumentNullException(nameof(scrollRequest));
 
-            var lines = new SourceList<Line>();
-            Lines = lines.AsObservableList();
+
+            var lines = new SourceCache<Line, LineKey>(l => l.Key);
+            Lines = lines.AsObservableCache();
 
             var locker = new object();
 
@@ -75,10 +76,11 @@ namespace TailBlazer.Domain.FileHandling
                     var added = currentPage.Except(previous, Line.TextStartComparer).ToArray();
                     var removed = previous.Except(currentPage, Line.TextStartComparer).ToArray();
 
-                    lines.Edit(innerList =>
+
+                    lines.Edit(innerCache =>
                     {
-                        if (removed.Any()) innerList.RemoveMany(removed);
-                        if (added.Any()) innerList.AddRange(added);
+                        if (removed.Any()) innerCache.Remove(removed);
+                        if (added.Any()) innerCache.AddOrUpdate(added);
                     });
                 });
 

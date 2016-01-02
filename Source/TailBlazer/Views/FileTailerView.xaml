@@ -331,18 +331,11 @@
                                        Opacity="0.55" 
                                        MinWidth="25"/>
 
-
-                            <TextBlock Grid.Column="1"  Margin="6 0 0 0" 
-                                       formatting:TextBlockFormatter.FormattedText="{Binding FormattedText.Value}"/>
-                            
-                            <!--<infrastucture:SearchableTextControl Grid.Column="1" 
-                                                             Margin="6 0 0 0"   
-                                                            IsHighlight="{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"  
-                                                            SearchText="{Binding ElementName=Control,Path=DataContext.HightlightText.Value}"
-                                                            IsMatchCase="False"
-                                                            HighlightBackground="{StaticResource SecondaryAccentBrush}"
-                                                            HighlightForeground="{StaticResource SecondaryAccentForegroundBrush}"
-                                                            Text="{Binding Text}"/>-->
+                            <!--HighlightEnabled = "{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"-->
+                            <infrastucture:HighlightTextControl Grid.Column="1"  Margin="6 0 0 0" 
+                                        FormattedText = "{Binding FormattedText.Value}"
+                                        HighlightForeground = "{StaticResource SecondaryAccentForegroundBrush}"
+                                        HighlightBackground = "{StaticResource SecondaryAccentBrush}"/>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

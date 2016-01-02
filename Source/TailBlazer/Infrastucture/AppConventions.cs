@@ -12,6 +12,8 @@ namespace TailBlazer.Infrastucture
     {
         public void Process(Type type, Registry registry)
         {
+
+
             // Only work on concrete types
             if (!type.IsConcrete() || type.IsGenericType) return;
 
@@ -23,6 +25,7 @@ namespace TailBlazer.Infrastucture
 
             if (type.Name.EndsWith("Job"))
                 registry.For(type).Singleton();
+
         }
     }
 }
