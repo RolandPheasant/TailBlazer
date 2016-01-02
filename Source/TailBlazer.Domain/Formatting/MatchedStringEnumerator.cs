@@ -81,26 +81,33 @@ namespace TailBlazer.Domain.Formatting
 
             for (int i = 0; i < split.Length; i++)
             {
-                var current = split[i];
+                var current = split[i] ?? string.Empty;
 
                 if (string.IsNullOrEmpty(current))
                 {
                     //Get original string back as the user may have searched in a different case
                     var originalString = input.Substring(currentLength, tomatch.Length);
                     yield return new MatchedString(originalString, true);
+
+                    currentLength = current.Length + currentLength + tomatch.Length;
                 }
                 else if (i > 0 && !string.IsNullOrEmpty(split[i - 1]))
                 {
                     //Get original string back as the user may have searched in a different case
                     var originalString = input.Substring(currentLength, tomatch.Length);
+               
+
                     yield return new MatchedString(originalString, true);
                     yield return new MatchedString(current, false);
+
+                    currentLength = current.Length + currentLength + tomatch.Length;
                 }
                 else
                 {
                     yield return new MatchedString(current, false);
+                    currentLength = current.Length + currentLength;
                 }
-                currentLength = current?.Length ?? 0;
+             
             }
         }
 

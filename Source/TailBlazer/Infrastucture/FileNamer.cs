@@ -30,7 +30,7 @@ namespace TailBlazer.Infrastucture
 
         private static string CombinePath(Stack<string> path)
         {
-            var parts = new List<string>(capacity: 3);
+            var parts = new List<string>(3);
 
             parts.Add(path.First());
 

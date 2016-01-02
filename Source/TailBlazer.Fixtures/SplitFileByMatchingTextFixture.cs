@@ -7,8 +7,6 @@ using Xunit;
 
 namespace TailBlazer.Fixtures
 {
-
-
     public class SplitFileByMatchingTextFixture
     {
         public SplitFileByMatchingTextFixture()

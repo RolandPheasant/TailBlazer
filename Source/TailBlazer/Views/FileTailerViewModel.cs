@@ -82,9 +82,7 @@ namespace TailBlazer.Views
             CopyToClipboardCommand = new Command(()=> clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
             SelectedItemsCount = selectionMonitor.Selected.Connect().QueryWhenChanged(collection=> collection.Count).ForBinding();
             SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
-
-
-
+            
             UsingDarkTheme = generalOptions.Value
                     .ObserveOn(schedulerProvider.MainThread)
                     .Select(go => go.Theme== Theme.Dark)
@@ -199,8 +197,7 @@ namespace TailBlazer.Views
             var isUserDefinedChanged = SearchCollection.WhenValueChanged(sc => sc.Selected)
                 .Select(selected => selected.IsUserDefined)
                 .DistinctUntilChanged();
-
-
+            
             var inlineViewerVisible = isUserDefinedChanged.CombineLatest(this.WhenValueChanged(vm => vm.ShowInline),
                                                             (userDefined, showInline) => userDefined && showInline);
             
