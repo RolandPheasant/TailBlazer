@@ -65,7 +65,6 @@ namespace TailBlazer.Domain.Formatting
         {
             //TODO: Check whether there are perf-issues with RegEx
             var split = Regex.Split(input, tomatch, RegexOptions.IgnoreCase);
-            //   var split = input.Split(new[] { tomatch }, StringSplitOptions.None);
 
             var length = split.Length;
 
@@ -76,27 +75,32 @@ namespace TailBlazer.Domain.Formatting
                 yield return new MatchedString(input, false);
                 yield break;
             }
-            
+
+          //  int start =0;
+            int currentLength = 0;
+
             for (int i = 0; i < split.Length; i++)
             {
                 var current = split[i];
 
                 if (string.IsNullOrEmpty(current))
                 {
-                    //TODO: Get original string back as the user may have searched in a different case
-                    yield return new MatchedString(tomatch, true);
+                    //Get original string back as the user may have searched in a different case
+                    var originalString = input.Substring(currentLength, tomatch.Length);
+                    yield return new MatchedString(originalString, true);
                 }
                 else if (i > 0 && !string.IsNullOrEmpty(split[i - 1]))
                 {
-                    //TODO: Get original string back as the user may have searched in a different case
-                    yield return new MatchedString(tomatch, true);
+                    //Get original string back as the user may have searched in a different case
+                    var originalString = input.Substring(currentLength, tomatch.Length);
+                    yield return new MatchedString(originalString, true);
                     yield return new MatchedString(current, false);
-
                 }
                 else
                 {
                     yield return new MatchedString(current, false);
                 }
+                currentLength = current?.Length ?? 0;
             }
         }
 
