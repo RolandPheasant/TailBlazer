@@ -331,7 +331,8 @@
                                        MinWidth="25"/>
 
                             <!--HighlightEnabled = "{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"-->
-                            <infrastucture:HighlightTextControl Grid.Column="1"  Margin="6 0 0 0" 
+                            <infrastucture:HighlightTextControl Grid.Column="1"  
+                                        Margin="6 0 0 0"           
                                         FormattedText = "{Binding FormattedText.Value}"
                                         HighlightForeground = "{StaticResource SecondaryAccentForegroundBrush}"
                                         HighlightBackground = "{StaticResource SecondaryAccentBrush}"/>
@@ -360,11 +361,9 @@
                                         <Storyboard>
                                             <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Background).(SolidColorBrush.Color)" 
                                                                                FromBrush="{StaticResource SecondaryAccentBrush}" 
-                                                                              
                                                                                Duration="0:0:5"/>
                                             <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Foreground).(SolidColorBrush.Color)" 
                                                                                ToBrush="{StaticResource SecondaryAccentForegroundBrush}" 
-                                                                              
                                                                                Duration="0:0:5"/>
                                         </Storyboard>
                                     </BeginStoryboard>
