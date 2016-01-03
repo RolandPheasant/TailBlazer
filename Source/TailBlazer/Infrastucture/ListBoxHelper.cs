@@ -31,7 +31,21 @@ namespace TailBlazer.Infrastucture
 
         public static readonly DependencyProperty RowAnimationSetterProperty = DependencyProperty.RegisterAttached(
             "RowAnimationSetter", typeof (ListboxRowAnimationSetter), typeof (ListBoxHelper),
-            new PropertyMetadata(default(ListboxRowAnimationSetter), PropertyChanged));
+            new PropertyMetadata(default(ListboxRowAnimationSetter), RowAnimationSetterChanged));
+
+
+        public static void RowAnimationSetterChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
+        {
+
+            var listBox = (ListBox) sender;
+
+            listBox.DataContextChanged += (s, e) => ((ListboxRowAnimationSetter) args.NewValue).DataContext = listBox.DataContext;
+
+            //((ListboxRowAnimationSetter)args.NewValue).AddHandler(); 
+
+            //var receiver = args.NewValue as IAttachedListBox;
+            //receiver?.Receive((ListBox)sender);
+        }
 
 
         public static void SetRowAnimationSetter(Selector element, ListboxRowAnimationSetter value)

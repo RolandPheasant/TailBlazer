@@ -47,7 +47,7 @@ namespace TailBlazer.Infrastucture
                 scanner.ExcludeType<ILogger>();
 
                 //to do, need a auto-exclude these from AppConventions
-                scanner.ExcludeType<ISelectionMonitor>();
+                scanner.ExcludeType<SelectionMonitor>();
                 scanner.ExcludeType<SearchInfoCollection>();
                 scanner.ExcludeType<ITextFormatter>();
 

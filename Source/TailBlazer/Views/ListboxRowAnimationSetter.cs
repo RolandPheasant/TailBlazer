@@ -42,6 +42,7 @@ namespace TailBlazer.Views
 
         public static void OnPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
         {
+
         }
 
     }

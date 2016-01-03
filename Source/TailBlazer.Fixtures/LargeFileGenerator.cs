@@ -24,6 +24,32 @@ namespace TailBlazer.Fixtures
             } 
         }
 
+      //  [Fact]
+        public void GenerateWideLinesInFile()
+        {
+            string fileName = @"U:\Large Files\WideFile.txt";
+
+            //var file = File.Create(@"U:\WideFile.txt");
+
+            var template = "0123456789abcdefghijklmnopqrstuvwxyz";
+            var sb = new StringBuilder();
+
+            for (int i = 0; i < 250; i++)
+            {
+                sb.Append(i);
+                sb.Append("_");
+                sb.Append(template);
+             
+            }
+
+            for (int i = 0; i < 1000; i++)
+            {
+
+
+                File.AppendAllLines(fileName,new string[] {sb.ToString()});
+            }
+        }
+
         public void AddToFile()
         {
 

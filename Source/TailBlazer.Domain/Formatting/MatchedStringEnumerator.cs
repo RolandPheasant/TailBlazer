@@ -63,6 +63,11 @@ namespace TailBlazer.Domain.Formatting
 
         private  static IEnumerable<MatchedString> Yield(string input, string tomatch)
         {
+
+            if (string.IsNullOrEmpty(input))
+                yield break;
+
+
             //TODO: Check whether there are perf-issues with RegEx
             var split = Regex.Split(input, tomatch, RegexOptions.IgnoreCase);
 

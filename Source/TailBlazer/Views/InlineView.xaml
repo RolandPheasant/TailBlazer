@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TailBlazer.Views"
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
-             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
               d:DataContext="{d:DesignInstance local:InlineViewer, IsDesignTimeCreatable=False}"
              d:DesignHeight="300" d:DesignWidth="300">
@@ -20,13 +19,6 @@
                 <ResourceDictionary Source="../Themes/Generic.xaml"></ResourceDictionary>
 
             </ResourceDictionary.MergedDictionaries>
-
-            <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"/>
-            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-            <infrastucture:NotEqualsToVisibilityConverter x:Key="NotEqualsToVisibilityConverter"/>
-            <system:Int32 x:Key="Zero">0</system:Int32>
-            <system:Int32 x:Key="One">1</system:Int32>
-
 
         </ResourceDictionary>
     </Control.Resources>

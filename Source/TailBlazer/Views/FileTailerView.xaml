@@ -272,17 +272,17 @@
                     </local:ListboxRowAnimationSetter>
                 </infrastucture:ListBoxHelper.RowAnimationSetter>-->
                 
-
                 <ListBox.Template>
                     <ControlTemplate>
-                        <ScrollViewer x:Name="ScrollViewer" 
+                        <ScrollViewer 
                                         VerticalScrollBarVisibility="Auto"
                                         HorizontalScrollBarVisibility="Auto"
                                         CanContentScroll="True"
                                         Padding="{TemplateBinding Padding}"
                                         Background="{TemplateBinding Background}" 
-                                        BorderBrush="Transparent" BorderThickness="0" 
-                                        IsTabStop="False">
+                                        BorderBrush="Transparent" 
+                                        BorderThickness="0" 
+                                        IsHitTestVisible="True">
                             <ItemsPresenter/>
                         </ScrollViewer>
                     </ControlTemplate>

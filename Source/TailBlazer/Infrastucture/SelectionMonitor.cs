@@ -78,6 +78,9 @@ namespace TailBlazer.Infrastucture
         {
             _selector = selector;
 
+
+            _selector.SelectionChanged += _selector_SelectionChanged;
+
             var dataSource = ((ReadOnlyObservableCollection<LineProxy>) selector.ItemsSource)
                 .ToObservableChangeSet()
                 .Publish();
@@ -176,6 +179,10 @@ namespace TailBlazer.Infrastucture
             _controlSubscriber.Disposable =new CompositeDisposable(mouseDownHandler, mouseDragSelector, selectionChanged, itemsAdded, itemsRemoved, dataSource.Connect());
         }
 
+        private void _selector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+          
+        }
 
         private void OnSelectedItemsChanged(SelectionChangedEventArgs args)
         {

@@ -102,7 +102,7 @@
                         Margin="6 4 4 4"
                      
                         Visibility="Collapsed"
-                         Width="200"
+                        Width="200"
                         SmallChange="0.25"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Left"
@@ -112,7 +112,7 @@
             <TextBlock  Grid.Row="1" Grid.Column="2"  
                         Visibility="Collapsed"   
                         VerticalAlignment="Center" 
-                         Text="{Binding HighlightDurationText.Value}"/>
+                        Text="{Binding HighlightDurationText.Value}"/>
 
         </Grid>
 
