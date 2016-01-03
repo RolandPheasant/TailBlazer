@@ -7,4 +7,5 @@ namespace TailBlazer.Domain.FileHandling
     {
         IObservableCache<Line, LineKey> Lines { get; }
     }
+
 }

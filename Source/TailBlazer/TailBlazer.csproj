@@ -165,7 +165,7 @@
     <Compile Include="Views\FileTailerViewModel.cs" />
     <Compile Include="Views\FileTailerViewModelFactory.cs" />
     <Compile Include="Views\Formatting\ITextFormatter.cs" />
-    <Compile Include="Views\Formatting\MatchedString.cs" />
+    <Compile Include="Views\Formatting\DisplayText.cs" />
     <Compile Include="Views\Formatting\TextBlockFormatter.cs" />
     <Compile Include="Views\Formatting\TextFormatter.cs" />
     <Compile Include="Views\IInlineViewerFactory.cs" />

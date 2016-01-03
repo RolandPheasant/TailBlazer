@@ -259,6 +259,9 @@ namespace TailBlazer.Domain.FileHandling
                     var relativePosition = (index - firstLineInContainer);
                     var relativeIndex = relativePosition / sparseIndex.Compression;
                     var offset = relativePosition % sparseIndex.Compression;
+
+                    if (relativeIndex == sparseIndex.IndexCount)
+                        relativeIndex = sparseIndex.IndexCount - 1;
                     var start = relativeIndex == 0 ? 0 : sparseIndex.Indicies[relativeIndex - 1];
                     return new RelativeIndex(index, start, offset,false);
                 }

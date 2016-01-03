@@ -30,18 +30,9 @@ namespace TailBlazer.Views
         private int _pageSize;
         private LineProxy _selectedLine;
         private bool _showInline;
-        bool isSettingScrollPosition = false;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
-        public IProperty<int> SelectedItemsCount { get; }
-        public IProperty<bool> ShouldHightlightMatchingText { get; }
-        public IProperty<string> SearchHint { get; }
-        public IProperty<int> Count { get; }
-        public IProperty<string> CountText { get; }
-        public IProperty<int> LatestCount { get; }
-        public IProperty<string> FileSizeText { get; }
-        public IProperty<bool> IsLoading { get; }
-        public IProperty<string> HightlightText { get; }
+
         public ICommand CopyToClipboardCommand { get; }
         public ICommand KeepSearchCommand { get; }
         public ISelectionMonitor SelectionMonitor { get; }
@@ -49,6 +40,13 @@ namespace TailBlazer.Views
         public SearchHints SearchHints { get;  }
         public SearchCollection SearchCollection { get; }
         public InlineViewer InlineViewer { get; }
+        public IProperty<int> SelectedItemsCount { get; }
+        public IProperty<string> SearchHint { get; }
+        public IProperty<int> Count { get; }
+        public IProperty<string> CountText { get; }
+        public IProperty<int> LatestCount { get; }
+        public IProperty<string> FileSizeText { get; }
+        public IProperty<bool> IsLoading { get; }
         public IProperty<bool> InlineViewerVisible { get; }
         public IProperty<bool> CanViewInline { get; }
         public IProperty<bool> HighlightTail { get; }
@@ -84,21 +82,17 @@ namespace TailBlazer.Views
             
             UsingDarkTheme = generalOptions.Value
                     .ObserveOn(schedulerProvider.MainThread)
-                    .Select(go => go.Theme== Theme.Dark)
+                    .Select(options => options.Theme== Theme.Dark)
                     .ForBinding();
 
             HighlightTail = generalOptions.Value
                 .ObserveOn(schedulerProvider.MainThread)
-                .Select(go => go.HighlightTail)
+                .Select(options => options.HighlightTail)
                 .ForBinding();
 
             HighlightDuration = generalOptions.Value
                 .ObserveOn(schedulerProvider.MainThread)
-                .Select(go =>
-                {
-                    var duration = new Duration(TimeSpan.FromSeconds(go.HighlightDuration));
-                    return duration;
-                })
+                .Select(options => new Duration(TimeSpan.FromSeconds(options.HighlightDuration)))
                 .ForBinding();
 
             //An observable which acts as a scroll command
@@ -108,7 +102,6 @@ namespace TailBlazer.Views
                             var mode = AutoTail ? ScrollReason.Tail : ScrollReason.User;
                             return  new ScrollRequest(mode, user.PageSize, user.FirstIndex);
                         })
-                        .Where(_=>!isSettingScrollPosition)
                         .ObserveOn(schedulerProvider.Background)
                         .DistinctUntilChanged();
 
@@ -149,13 +142,6 @@ namespace TailBlazer.Views
                                 if (string.IsNullOrEmpty(text)) return "Type to search";
                                 return text.Length < 3 ? "Enter at least 3 characters" : "Hit enter to search";
                             }).ForBinding();
-            
-            //Only highlight search text when at least 3 letters have been entered
-            var selectedText = SearchCollection.SelectedText;
-            HightlightText = selectedText.ForBinding();
-            ShouldHightlightMatchingText = selectedText
-                .Select(searchText => !string.IsNullOrEmpty(searchText) && searchText.Length >= 3)
-                .ForBinding();
 
             //load lines into observable collection
             var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchInfoCollection));
@@ -179,18 +165,7 @@ namespace TailBlazer.Views
                 .ToCollection()
                 .Select(lines => lines.Count == 0 ? 0 : lines.Select(l => l.Index).Max() - lines.Count+1)
                 .ObserveOn(schedulerProvider.MainThread)
-                .Subscribe(first =>
-                {
-                    try
-                    {
-                     //   isSettingScrollPosition = true;
-                        FirstIndex = first;
-                    }
-                    finally
-                    {
-                        isSettingScrollPosition = false;
-                    }
-                });
+                .Subscribe(first => FirstIndex = first);
 
             //Create objects required for inline viewing
             var isUserDefinedChanged = SearchCollection.WhenValueChanged(sc => sc.Selected)
@@ -215,7 +190,6 @@ namespace TailBlazer.Views
                 LatestCount,
                 FileSizeText,
                 SearchHint,
-                ShouldHightlightMatchingText,
                 SelectedItemsCount,
                 CanViewInline,
                 InlineViewer,
@@ -231,41 +205,35 @@ namespace TailBlazer.Views
                     SelectionMonitor?.Dispose();
                 }));
         }
-
-
-        public LineProxy SelectedItem
-        {
-            get { return _selectedLine; }
-            set { SetAndRaise(ref _selectedLine, value);}
-        }
-
+        
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
         {
             if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));
             var mode = AutoTail ? ScrollReason.Tail : ScrollReason.User;
+
+            PageSize = boundsArgs.PageSize;
+            FirstIndex = boundsArgs.FirstIndex;
 
             /*
                 I need to get rid of this subject as I prefer functional over imperative. 
                 However due to complexities int the interactions with the VirtualScrollPanel,
                 each time I have tried to remove it all hell has broken loose
             */
-            if (!isSettingScrollPosition)
-                _userScrollRequested.OnNext(new ScrollRequest(mode, boundsArgs.PageSize,boundsArgs.FirstIndex));
-            PageSize = boundsArgs.PageSize;
-            FirstIndex = boundsArgs.FirstIndex;
+            _userScrollRequested.OnNext(new ScrollRequest(mode, boundsArgs.PageSize,boundsArgs.FirstIndex));
+ 
         }
 
         void IScrollReceiver.ScrollChanged(ScrollChangedArgs scrollChangedArgs)
         {
             if (scrollChangedArgs.Direction == ScrollDirection.Up)
                 AutoTail = false;
-
         }
-        //public string SearchText
-        //{
-        //    get { return _searchText; }
-        //    set { SetAndRaise(ref _searchText, value); }
-        //}
+
+        public LineProxy SelectedItem
+        {
+            get { return _selectedLine; }
+            set { SetAndRaise(ref _selectedLine, value); }
+        }
 
         public bool AutoTail
         {

@@ -6,7 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
-using FormattedText = TailBlazer.Views.Formatting.FormattedText;
+using TailBlazer.Views.Formatting;
 
 namespace TailBlazer.Infrastucture
 {
@@ -38,11 +38,11 @@ namespace TailBlazer.Infrastucture
         }
 
         public static readonly DependencyProperty FormattedTextProperty = DependencyProperty.Register(
-            "FormattedText", typeof (IEnumerable<FormattedText>), typeof (HighlightTextControl), new PropertyMetadata(default(IEnumerable<FormattedText>), UpdateControlCallBack));
+            "FormattedText", typeof (IEnumerable<DisplayText>), typeof (HighlightTextControl), new PropertyMetadata(default(IEnumerable<DisplayText>), UpdateControlCallBack));
 
-        public IEnumerable<FormattedText> FormattedText
+        public IEnumerable<DisplayText> FormattedText
         {
-            get { return (IEnumerable<FormattedText>) GetValue(FormattedTextProperty); }
+            get { return (IEnumerable<DisplayText>) GetValue(FormattedTextProperty); }
             set { SetValue(FormattedTextProperty, value); }
         }
 
