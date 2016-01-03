@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -20,7 +19,6 @@ using TailBlazer.Views.Formatting;
 
 namespace TailBlazer.Views
 {
-
     public class FileTailerViewModel: AbstractNotifyPropertyChanged, IDisposable, IScrollReceiver
     {
         private readonly IDisposable _cleanUp;
@@ -55,7 +53,8 @@ namespace TailBlazer.Views
         public IProperty<bool> CanViewInline { get; }
         public IProperty<bool> HighlightTail { get; }
         public IProperty<bool> UsingDarkTheme { get; }
-  
+        public IProperty<Duration> HighlightDuration { get; }
+
         public FileTailerViewModel([NotNull] ILogger logger,
             [NotNull] ISchedulerProvider schedulerProvider,
             [NotNull] IFileWatcher fileWatcher,
@@ -206,10 +205,7 @@ namespace TailBlazer.Views
 
             //return an empty line provider unless user is viewing inline - this saves needless trips to the file
             var inline = indexed.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : new EmptyLineProvider());
-            InlineViewer = inlineViewerFactory.Create(inline, this.WhenValueChanged(vm => vm.SelectedItem).Do(x =>
-            {
-                Console.WriteLine(x);
-            }),lineProxyFactory);
+            InlineViewer = inlineViewerFactory.Create(inline, this.WhenValueChanged(vm => vm.SelectedItem),lineProxyFactory);
 
             _cleanUp = new CompositeDisposable(lineScroller,
                 loader,
@@ -236,7 +232,6 @@ namespace TailBlazer.Views
                 }));
         }
 
-        public IProperty<Duration> HighlightDuration { get;  }
 
         public LineProxy SelectedItem
         {

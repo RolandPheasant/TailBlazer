@@ -122,7 +122,7 @@ namespace TailBlazer.Domain.FileHandling
                 using (var reader = new StreamReaderExtended(stream, Encoding, false))
                 {
 
-                    var startPosition = (long)scroll.FirstIndex;
+                    var startPosition = scroll.Position;
                     var first = (int)CalculateIndexByPositon(startPosition);
                     reader.BaseStream.Seek(startPosition, SeekOrigin.Begin);
 

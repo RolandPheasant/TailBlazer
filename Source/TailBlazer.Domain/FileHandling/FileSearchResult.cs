@@ -155,7 +155,7 @@ namespace TailBlazer.Domain.FileHandling
             if (scroll.SpecifiedByPosition)
             {
                 //get line number fro
-                first = IndexOf(scroll.FirstIndex);
+                first = IndexOf(scroll.Position);
             }
             else
             {

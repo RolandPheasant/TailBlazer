@@ -46,7 +46,7 @@ namespace TailBlazer.Views
             var selectedChanged = args.SelectedChanged;
             var pageSize = this.WhenValueChanged(vm=>vm.PageSize);
             var scrollSelected = selectedChanged.Where(proxy => proxy != null)
-                    .CombineLatest(lineProvider, pageSize,(proxy, lp,pge) => new ScrollRequest(pge, (int) proxy.Start, true));
+                    .CombineLatest(lineProvider, pageSize,(proxy, lp,pge) => new ScrollRequest(pge,  proxy.Start));
 
             var scrollUser = _userScrollRequested
                 .Where(x=>!_isSettingScrollPosition)

@@ -52,7 +52,8 @@ namespace TailBlazer.Views
 
            SelectedText = this.WhenValueChanged(sc => sc.Selected)
                                 .Where(x => x != null)
-                                .Select(svm => svm.Text).Replay(1).RefCount();
+                                .Select(svm => svm.Text)
+                                .Replay(1).RefCount();
 
            Latest = this.WhenValueChanged(sc => sc.Selected)
                 .Where(x=>x!=null)
