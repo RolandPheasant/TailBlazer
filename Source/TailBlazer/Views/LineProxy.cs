@@ -22,11 +22,11 @@ namespace TailBlazer.Views
         public int Index { get; }
         public string Text => Line.Text;
 
-        public  IProperty<IEnumerable<FormattedText>> FormattedText { get; }
+        public  IProperty<IEnumerable<DisplayText>> FormattedText { get; }
 
         public bool IsRecent { get; }
 
-        public LineProxy([NotNull] Line line, [NotNull] IObservable<IEnumerable<FormattedText>> formattedText)
+        public LineProxy([NotNull] Line line, [NotNull] IObservable<IEnumerable<DisplayText>> formattedText)
         {
             if (line == null) throw new ArgumentNullException(nameof(line));
             if (formattedText == null) throw new ArgumentNullException(nameof(formattedText));

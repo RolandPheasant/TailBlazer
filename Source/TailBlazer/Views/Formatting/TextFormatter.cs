@@ -21,13 +21,13 @@ namespace TailBlazer.Views.Formatting
                 .RefCount();
         }
 
-        public IObservable<IEnumerable<FormattedText>> GetFormatter(string inputText)
+        public IObservable<IEnumerable<DisplayText>> GetFormatter(string inputText)
         {
             return _strings.Select(searchText =>
             {
                 return inputText
                     .MatchString(searchText)
-                    .Select(ms=>new FormattedText(ms));
+                    .Select(ms=>new DisplayText(ms));
             });
         }
     }

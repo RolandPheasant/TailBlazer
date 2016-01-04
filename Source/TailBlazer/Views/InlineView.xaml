@@ -106,10 +106,16 @@
                         <Setter Property="Padding" Value="0"/>
                         <Setter Property="Height" Value="22"/>
                     </Style.Setters>
-
+                    <!--"{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"-->
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsRecent}" Value="True">
-                            <DataTrigger.EnterActions>
+                        <MultiDataTrigger >
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=IsRecent}" Value="True"/>
+                                <Condition Binding="{Binding  RelativeSource={RelativeSource FindAncestor, AncestorType=local:FileTailerView},Path=DataContext.HighlightTail.Value}" Value="True"/>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:FileTailerView}, Path=DataContext.UsingDarkTheme.Value}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+
+                            <MultiDataTrigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>
                                         <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Background).(SolidColorBrush.Color)" 
@@ -121,8 +127,28 @@
                                     </Storyboard>
                                 </BeginStoryboard>
 
-                            </DataTrigger.EnterActions>
-                        </DataTrigger>
+                            </MultiDataTrigger.EnterActions>
+                        </MultiDataTrigger>
+
+                        <MultiDataTrigger >
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=IsRecent}" Value="True"/>
+                                <Condition Binding="{Binding  RelativeSource={RelativeSource FindAncestor, AncestorType=local:FileTailerView},Path=DataContext.HighlightTail.Value}" Value="True"/>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:FileTailerView}, Path=DataContext.UsingDarkTheme.Value}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+
+                            <MultiDataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Foreground).(SolidColorBrush.Color)" 
+                                                                       
+                                                                               FromBrush="{StaticResource SecondaryAccentBrush}"
+                                                                               Duration="0:0:5"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+
+                            </MultiDataTrigger.EnterActions>
+                        </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
             </ListBox.ItemContainerStyle>

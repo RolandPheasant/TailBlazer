@@ -5,6 +5,6 @@ namespace TailBlazer.Views.Formatting
 {
     public interface ITextFormatter
     {
-        IObservable<IEnumerable<FormattedText>> GetFormatter(string inputText);
+        IObservable<IEnumerable<DisplayText>> GetFormatter(string inputText);
     }
 }

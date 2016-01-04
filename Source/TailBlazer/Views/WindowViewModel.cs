@@ -145,7 +145,6 @@ namespace TailBlazer.Views
                 {
                     //TODO: Create a failed to load view
                     _logger.Error(ex, $"There was a problem opening '{file.FullName}'");
-
                 }
             });
         }

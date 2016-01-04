@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -8,6 +9,22 @@ using System.Windows.Media;
 
 namespace TailBlazer.Infrastucture
 {
+    public static class MeasureEx
+    {
+        public static Size MeasureString(this Control source,  string candidate)
+        {
+            var formattedText = new FormattedText(
+                candidate,
+                CultureInfo.CurrentUICulture,
+                FlowDirection.LeftToRight,
+                new Typeface(source.FontFamily, source.FontStyle, source.FontWeight, source.FontStretch),
+                source.FontSize,
+                Brushes.Black);
+
+            return new Size(formattedText.Width, formattedText.Height);
+        }
+    }
+
     /// <summary>
     /// This is adapted (butchered!) from VirtualWrapPanel in https://github.com/samueldjack/VirtualCollection
     /// 

@@ -175,7 +175,6 @@
                                                 FontWeight="Bold"
                                                 BaselineAlignment="Bottom"
                                                 Text="{Binding Text, Mode=OneWay}"/>
-                                    
                                             <Run BaselineAlignment="Bottom" Text="{Binding  CountText}"/>
                                     </TextBlock>
 
@@ -194,7 +193,6 @@
                                     <Button Visibility="{Binding SearchType, Converter={StaticResource EqualityToVisibilityConverter},ConverterParameter={x:Static search:SearchType.User}}"
                                         Grid.Row="0"  Grid.Column="2"
                                         ToolTip="{Binding RemoveTooltip}"
-                                         Margin="4 0 2 0"
                                         VerticalAlignment="Center"
                                         Command="{Binding RemoveCommand}"
                                         Style="{StaticResource CloseButtonStyle}"/>
@@ -320,24 +318,11 @@
 
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type local:LineProxy}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock Text="{Binding Start, Mode=OneWay}" 
-                                       Visibility="Collapsed" 
-                                       Opacity="0.55" 
-                                       MinWidth="25"/>
-
-                            <!--HighlightEnabled = "{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"-->
-                            <infrastucture:HighlightTextControl Grid.Column="1"  
-                                        Margin="6 0 0 0"           
+                        <infrastucture:HighlightTextControl
+                                        Margin="6 0 0 0"                        
                                         FormattedText = "{Binding FormattedText.Value}"
                                         HighlightForeground = "{StaticResource SecondaryAccentForegroundBrush}"
                                         HighlightBackground = "{StaticResource SecondaryAccentBrush}"/>
-                        </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
 
