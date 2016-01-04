@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -101,6 +102,14 @@ namespace TailBlazer.Views
             if (result != true) return;
 
             OpenFile(new FileInfo(dialog.FileName));
+        }
+
+        public void OpenFiles(IEnumerable<string> files=null)
+        {
+            if (files == null) return;
+
+            foreach (var file in files)
+                OpenFile(new FileInfo(file));
         }
 
         private void OpenFile(FileInfo file)

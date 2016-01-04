@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling

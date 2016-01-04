@@ -36,26 +36,29 @@ namespace TailBlazer.Domain.Formatting
                 {
                     yield return result;
                 }
-                yield break;
             }
-
-            var strings = _itemsToMatch.AsArray();
-            MatchedString[] matches = new MatchedString[0];
-            for (int i = 0; i < strings.Length; i++)
+            else
             {
-                var stringToMatch = strings[i];
-                if (i == 0)
+                var strings = _itemsToMatch.AsArray();
+                var matches = new MatchedString[0];
+                for (int i = 0; i < strings.Length; i++)
                 {
-                    matches = Yield(_input, stringToMatch).ToArray();
+                    var stringToMatch = strings[i];
+                    if (i == 0)
+                    {
+                        matches = Yield(_input, stringToMatch).ToArray();
+                    }
+                    else
+                    {
+                        matches = matches.SelectMany(ms => ms.IsMatch 
+                                        ? new[] {ms} 
+                                        : Yield(ms.Part, stringToMatch)).ToArray();
+                    }
                 }
-                else
+                foreach (var matchedString in matches)
                 {
-                    matches = matches.SelectMany(ms => ms.IsMatch ? new[] { ms } : Yield(ms.Part, stringToMatch)).ToArray();
+                    yield return matchedString;
                 }
-            }
-            foreach (var matchedString in matches)
-            {
-                yield return matchedString;
             }
 
         }

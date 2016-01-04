@@ -8,6 +8,7 @@
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:fileHandling="clr-namespace:TailBlazer.Domain.FileHandling;assembly=TailBlazer.Domain"
+             xmlns:search="clr-namespace:TailBlazer.Domain.FileHandling.Search;assembly=TailBlazer.Domain"
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
             Background="{DynamicResource MaterialDesignPaper}"
              x:Name="Control"
@@ -190,7 +191,7 @@
                                             IsIndeterminate="False"/>
 
 
-                                    <Button Visibility="{Binding SearchType, Converter={StaticResource EqualityToVisibilityConverter},ConverterParameter={x:Static fileHandling:SearchType.User}}"
+                                    <Button Visibility="{Binding SearchType, Converter={StaticResource EqualityToVisibilityConverter},ConverterParameter={x:Static search:SearchType.User}}"
                                         Grid.Row="0"  Grid.Column="2"
                                         ToolTip="{Binding RemoveTooltip}"
                                          Margin="4 0 2 0"

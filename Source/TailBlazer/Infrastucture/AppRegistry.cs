@@ -2,6 +2,7 @@
 using System.IO;
 using StructureMap.Configuration.DSL;
 using TailBlazer.Domain.FileHandling;
+using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Views.Formatting;
@@ -30,7 +31,9 @@ namespace TailBlazer.Infrastucture
             For<ILogger>().Use<Log4NetLogger>().Ctor<Type>("type").Is(x => x.ParentType).AlwaysUnique();
 
             For<ISelectionMonitor>().Use<SelectionMonitor>();
-            For<ISearchInfoCollection>().Use<SearchInfoCollection>().Transient();
+            For<ISearchInfoCollection>().Use<SearchInfoCollection>();
+            For<ISearchMetadataCollection>().Use<SearchMetadataCollection>();
+            
             For<ITextFormatter>().Use<TextFormatter>();
 
             For<ISettingsStore>().Use<FileSettingsStore>().Singleton();
@@ -49,6 +52,7 @@ namespace TailBlazer.Infrastucture
                 //to do, need a auto-exclude these from AppConventions
                 scanner.ExcludeType<SelectionMonitor>();
                 scanner.ExcludeType<SearchInfoCollection>();
+                scanner.ExcludeType<SearchMetadataCollection>();
                 scanner.ExcludeType<ITextFormatter>();
 
                 scanner.ExcludeType<FileWatcher>();

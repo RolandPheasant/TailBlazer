@@ -1,13 +1,14 @@
 using System;
 using TailBlazer.Domain.Annotations;
 
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Domain.FileHandling.Search
 {
     public sealed class SearchInfo : IEquatable<SearchInfo>
     {
         public string SearchText { get;  }
         public IObservable<ILineProvider> Latest { get;  }
         public SearchType SearchType { get;  }
+        
 
         public SearchInfo([NotNull] string searchText, [NotNull] IObservable<ILineProvider> latest, SearchType searchType)
         {

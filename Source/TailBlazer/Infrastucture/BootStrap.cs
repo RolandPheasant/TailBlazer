@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
 using StructureMap;
@@ -11,6 +13,7 @@ namespace TailBlazer.Infrastucture
         [STAThread]
         public static void Main(string[] args)
         {
+
             var app = new App { ShutdownMode = ShutdownMode.OnLastWindowClose };
             app.InitializeComponent();
 
@@ -22,7 +25,9 @@ namespace TailBlazer.Infrastucture
             container.GetInstance<StartupController>();
 
             var factory = container.GetInstance<WindowFactory>();
-            var window = factory.Create();
+
+            var window = factory.Create(args);
+
 
             tempWindowToGetDispatcher.Close();
             window.Show();

@@ -8,6 +8,7 @@ using System.Reactive.Linq;
 using System.Text;
 using DynamicData;
 using TailBlazer.Domain.Annotations;
+using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling

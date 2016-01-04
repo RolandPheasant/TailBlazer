@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Dragablz;
 using TailBlazer.Domain.Infrastructure;
-using TailBlazer.Infrastucture;
+
 
 namespace TailBlazer.Views
 {
@@ -14,12 +15,12 @@ namespace TailBlazer.Views
             _objectProvider = objectProvider;
         }
 
-        public MainWindow Create()
+
+        public MainWindow Create(IEnumerable<string> files = null)
         {
             var window = new MainWindow();
             var model = _objectProvider.Get<WindowViewModel>();
-           // if (showMenu) model.ShowMenu();
-
+            model.OpenFiles(files);
             window.DataContext = model;
 
             window.Closing += (sender, e) =>

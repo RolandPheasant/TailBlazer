@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.FileHandling;
+using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Views

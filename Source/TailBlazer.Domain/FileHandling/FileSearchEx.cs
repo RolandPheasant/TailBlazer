@@ -4,6 +4,7 @@ using System.IO;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using TailBlazer.Domain.FileHandling.Search;
 
 namespace TailBlazer.Domain.FileHandling
 {

@@ -84,7 +84,7 @@
     <Compile Include="FileHandling\ILineScroller.cs" />
     <Compile Include="FileHandling\IndexEx.cs" />
     <Compile Include="FileHandling\IndexType.cs" />
-    <Compile Include="FileHandling\ISearchInfoCollection.cs" />
+    <Compile Include="FileHandling\Search\ISearchInfoCollection.cs" />
     <Compile Include="FileHandling\LineIndexType.cs" />
     <Compile Include="FileHandling\FileNotification.cs" />
     <Compile Include="FileHandling\FileNotificationType.cs" />
@@ -102,9 +102,13 @@
     <Compile Include="FileHandling\Index.cs" />
     <Compile Include="FileHandling\IndexCollection.cs" />
     <Compile Include="FileHandling\Indexer.cs" />
+    <Compile Include="FileHandling\Search\ISearchMetadataCollection.cs" />
+    <Compile Include="FileHandling\Search\SearchMetadata.cs" />
+    <Compile Include="FileHandling\Search\SearchMetadataCollection.cs" />
+    <Compile Include="FileHandling\Search\SearchType.cs" />
     <Compile Include="FileHandling\StreamReaderExtended.cs" />
-    <Compile Include="FileHandling\SearchInfoCollection.cs" />
-    <Compile Include="FileHandling\SearchInfo.cs" />
+    <Compile Include="FileHandling\Search\SearchInfoCollection.cs" />
+    <Compile Include="FileHandling\Search\SearchInfo.cs" />
     <Compile Include="FileHandling\TailInfo.cs" />
     <Compile Include="Formatting\MatchedString.cs" />
     <Compile Include="Formatting\MatchedStringEnumerator.cs" />
@@ -141,6 +145,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
