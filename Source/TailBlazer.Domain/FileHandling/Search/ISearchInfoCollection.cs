@@ -7,7 +7,9 @@ namespace TailBlazer.Domain.FileHandling.Search
     {
         IObservableCache<SearchInfo, CaseInsensitiveString> Searches { get; }
 
-        void Add(string searchText, IObservable<ILineProvider> latest, SearchType type = SearchType.User);
+        IObservable<ILineProvider> All { get; }
+
+        void Add(string searchText);
         void Remove(string searchText);
     }
 }

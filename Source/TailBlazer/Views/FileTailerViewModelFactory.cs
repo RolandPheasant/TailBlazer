@@ -27,12 +27,19 @@ namespace TailBlazer.Views
                 new ExplictArg("scheduler",_schedulerProvider.Background)
             });
 
-            //var searchInfo = _objectProvider.Get<ISearchInfoCollection>();
+            var searchInfo = _objectProvider.Get<ISearchInfoCollection>
+                (
+                    new ExplictArg("fileWatcher", fileWatcher)
+                );
 
 
 
             //I hate explicity specify named args - so fragile but hey ho.
-            return _objectProvider.Get<FileTailerViewModel>(new ExplictArg("fileWatcher", fileWatcher));
+            return _objectProvider.Get<FileTailerViewModel>(new[] 
+            {
+                new ExplictArg("fileWatcher", fileWatcher),
+                new ExplictArg("searchInfoCollection", searchInfo),
+            });
         }
     }
 }

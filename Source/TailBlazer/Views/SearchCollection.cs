@@ -32,7 +32,7 @@ namespace TailBlazer.Views
                 .DisposeMany()
                 .AsObservableCache();
             
-            var shared = viewModels.Connect().Publish();
+            var shared = viewModels.Connect();//.Publish();
 
             var binderLoader = shared
                 .Sort(SortExpressionComparer<SearchViewModel>.Ascending(tvm => tvm.Text))
@@ -44,7 +44,8 @@ namespace TailBlazer.Views
                 .Flatten()
                 .Select(change => change.Current)
                 .Subscribe(latest => Selected = latest);
-            
+
+
             var removed = shared.WhereReasonsAre(ChangeReason.Remove)
                 .Subscribe(_ => Selected = viewModels.Items.First());
 
@@ -58,9 +59,12 @@ namespace TailBlazer.Views
 
            Latest = this.WhenValueChanged(sc => sc.Selected)
                 .Where(x=>x!=null)
-                .Select(svm => svm.Latest).Switch().Replay(1).RefCount();
+                .Select(svm => svm.Latest)
+                .Switch()
+                .Replay(1).RefCount();
 
-            _cleanUp = new CompositeDisposable(viewModels, binderLoader, counter, removed, autoSelector, shared.Connect());
+
+            _cleanUp = new CompositeDisposable(viewModels, binderLoader, counter, removed, autoSelector);
         }
         
 

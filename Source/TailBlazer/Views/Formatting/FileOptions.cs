@@ -37,13 +37,13 @@ namespace TailBlazer.Views.Formatting
     {
     }
 
-    public class FileOptionCollection : IFileOptionCollection
-    {
-        public FileOptionCollection(ISearchInfoCollection searchInfoCollection)
-        {
-            //file options = SearchInfoCollection + HighlightCollection
+    //public class FileOptionCollection : IFileOptionCollection
+    //{
+    //    public FileOptionCollection(ISearchInfoCollection searchInfoCollection)
+    //    {
+    //        //file options = SearchInfoCollection + HighlightCollection
        
 
-        }
-    }
+    //    }
+    //}
 }

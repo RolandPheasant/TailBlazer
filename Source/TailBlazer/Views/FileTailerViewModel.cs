@@ -80,7 +80,7 @@ namespace TailBlazer.Views
             CopyToClipboardCommand = new Command(()=> clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
             SelectedItemsCount = selectionMonitor.Selected.Connect().QueryWhenChanged(collection=> collection.Count).ForBinding();
             SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
-            
+
             UsingDarkTheme = generalOptions.Value
                     .ObserveOn(schedulerProvider.MainThread)
                     .Select(options => options.Theme== Theme.Dark)
@@ -106,25 +106,13 @@ namespace TailBlazer.Views
                         .ObserveOn(schedulerProvider.Background)
                         .DistinctUntilChanged();
 
-            //tailer is the main object used to tail, scroll and filter in a file
-            var lineScroller = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);  
-
-            //Add a complete file display [No search info here]
-            var indexed = fileWatcher.Latest.Index()
-                .Replay(1).RefCount();
-
-            IsLoading = indexed.Take(1).Select(_ => false).StartWith(true).ForBinding();
-            searchInfoCollection.Add("<All>", indexed, SearchType.All);
+            IsLoading = searchInfoCollection.All.Take(1).Select(_ => false).StartWith(true).ForBinding();
             
             //command to add the current search to the tail collection
             KeepSearchCommand = new Command(() =>
             {
                 var text = SearchHints.SearchText;
-                var latest =   fileWatcher.Latest
-                    .Search(s => s.Contains(text, StringComparison.OrdinalIgnoreCase))
-                    .Replay(1).RefCount();
-
-                searchInfoCollection.Add(text, latest);
+                searchInfoCollection.Add(text);
                 recentSearchCollection.Add(new RecentSearch(text));
                 SearchHints.SearchText = string.Empty;
 
@@ -144,10 +132,15 @@ namespace TailBlazer.Views
                                 return text.Length < 3 ? "Enter at least 3 characters" : "Hit enter to search";
                             }).ForBinding();
 
+         
+
+            //tailer is the main object used to tail, scroll and filter in a file
+            var lineScroller = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
+
             //load lines into observable collection
             var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchInfoCollection));
             var loader = lineScroller.Lines.Connect()
-                .Transform(lineProxyFactory.Create, new ParallelisationOptions(ParallelType.Ordered,5))
+                .Transform(x=>lineProxyFactory.Create(x), new ParallelisationOptions(ParallelType.Ordered,5))
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)
@@ -156,8 +149,8 @@ namespace TailBlazer.Views
                             ex => logger.Error(ex, "There is a problem with bind data"));
             
             //monitor matching lines and start index,
-            Count = indexed.Select(latest=>latest.Count).ForBinding();
-            CountText = indexed.Select(latest => $"{latest.Count.ToString("##,###")} lines").ForBinding();
+            Count = searchInfoCollection.All.Select(latest=>latest.Count).ForBinding();
+            CountText = searchInfoCollection.All.Select(latest => $"{latest.Count.ToString("##,###")} lines").ForBinding();
             LatestCount = SearchCollection.Latest.Select(latest => latest.Count).ForBinding();
             
             //track first visible index
@@ -180,7 +173,7 @@ namespace TailBlazer.Views
             InlineViewerVisible = inlineViewerVisible.ForBinding();
 
             //return an empty line provider unless user is viewing inline - this saves needless trips to the file
-            var inline = indexed.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : new EmptyLineProvider());
+            var inline = searchInfoCollection.All.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : new EmptyLineProvider());
             InlineViewer = inlineViewerFactory.Create(inline, this.WhenValueChanged(vm => vm.SelectedItem),lineProxyFactory);
 
             _cleanUp = new CompositeDisposable(lineScroller,
