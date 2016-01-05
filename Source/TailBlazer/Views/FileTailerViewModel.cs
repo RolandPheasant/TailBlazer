@@ -62,7 +62,8 @@ namespace TailBlazer.Views
             [NotNull] ISearchInfoCollection searchInfoCollection, 
             [NotNull] IInlineViewerFactory inlineViewerFactory, 
             [NotNull] ISetting<GeneralOptions> generalOptions,
-            [NotNull] IRecentSearchCollection recentSearchCollection,
+            [NotNull] IRecentSearchCollection recentSearchCollection, 
+            [NotNull] ISearchMetadataCollection searchMetadataCollection,
             [NotNull] SearchHints searchHints)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
@@ -73,6 +74,7 @@ namespace TailBlazer.Views
             if (searchInfoCollection == null) throw new ArgumentNullException(nameof(searchInfoCollection));
             if (inlineViewerFactory == null) throw new ArgumentNullException(nameof(inlineViewerFactory));
             if (generalOptions == null) throw new ArgumentNullException(nameof(generalOptions));
+            if (searchMetadataCollection == null) throw new ArgumentNullException(nameof(searchMetadataCollection));
             if (searchHints == null) throw new ArgumentNullException(nameof(searchHints));
 
             SelectionMonitor = selectionMonitor;
@@ -193,6 +195,7 @@ namespace TailBlazer.Views
                 HighlightTail,
                 UsingDarkTheme,
                 searchHints,
+                searchMetadataCollection,
                 Disposable.Create(() =>
                 {
                     _userScrollRequested.OnCompleted();
