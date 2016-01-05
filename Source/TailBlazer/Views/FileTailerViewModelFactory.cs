@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using TailBlazer.Domain.FileHandling;
+using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Views
@@ -25,6 +26,10 @@ namespace TailBlazer.Views
                 new ExplictArg("fileInfo", fileInfo),
                 new ExplictArg("scheduler",_schedulerProvider.Background)
             });
+
+            //var searchInfo = _objectProvider.Get<ISearchInfoCollection>();
+
+
 
             //I hate explicity specify named args - so fragile but hey ho.
             return _objectProvider.Get<FileTailerViewModel>(new ExplictArg("fileWatcher", fileWatcher));

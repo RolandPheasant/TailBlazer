@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using StructureMap;
 using StructureMap.Configuration.DSL;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Search;
