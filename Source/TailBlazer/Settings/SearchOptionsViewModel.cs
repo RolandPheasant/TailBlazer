@@ -21,6 +21,7 @@ namespace TailBlazer.Settings
         public ReadOnlyObservableCollection<SearchOptionsProxy> Data { get; }
 
         public ICommand AddSearchCommand { get; }
+        public IProperty<string> SearchHint { get; }
 
         public SearchOptionsViewModel(ISearchMetadataCollection metadataCollection, ISchedulerProvider schedulerProvider)
         {
@@ -52,8 +53,20 @@ namespace TailBlazer.Settings
             var commandRefresher = this.WhenValueChanged(vm => vm.SearchText)
                                     .Subscribe(_ => ((Command) AddSearchCommand).Refresh());
 
-            _cleanUp = new CompositeDisposable(commandRefresher, userOptions);
+
+            //User feedback to guide them whilst typing
+            SearchHint = this.WhenValueChanged(vm => vm.SearchText)
+                            .Select(text =>
+                            {
+                                if (string.IsNullOrEmpty(text)) return "Type to highlight";
+                                return text.Length < 3 ? "Enter at least 3 characters" : "Hit enter for more options";
+                            }).ForBinding();
+
+
+            _cleanUp = new CompositeDisposable(commandRefresher, userOptions, SearchHint);
         }
+
+
 
 
         public string SearchText

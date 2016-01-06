@@ -21,112 +21,114 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"/>
-            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-            <infrastucture:NotEqualsToVisibilityConverter x:Key="NotEqualsToVisibilityConverter"/>
-            <system:Int32 x:Key="Zero">0</system:Int32>
-            <system:Int32 x:Key="One">1</system:Int32>
-
         </ResourceDictionary>
     </Control.Resources>
-    <Grid Height="250" Width="350" Margin="8">
+
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition  Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        
+        <TextBlock 
+                Margin="6,8,0,0"
+                FontSize="16"
+                FontWeight="DemiBold"
+                Text="Search and Highlight Options"/>
 
-        <Grid >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+        <Grid Grid.Row="1" Height="250" Width="350" Margin="8">
+            <Grid.RowDefinitions>
+                <RowDefinition  Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-            <Viewbox Width="24" Height="24" Margin="0 0 0 0">
-                <Canvas Width="24" Height="24">
-                    <Path Data="M3,2H21V2H21V4H20.92L15,9.92V22.91L9,16.91V9.91L3.09,4H3V2M11,16.08L13,18.08V9H13.09L18.09,4H5.92L10.92,9H11V16.08Z" 
+
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Viewbox Width="24" Height="24" Margin="0 0 0 0">
+                    <Canvas Width="24" Height="24">
+                        <Path Data="M3,2H21V2H21V4H20.92L15,9.92V22.91L9,16.91V9.91L3.09,4H3V2M11,16.08L13,18.08V9H13.09L18.09,4H5.92L10.92,9H11V16.08Z" 
                                   Fill="{Binding ElementName=SearchTextBox, Path=BorderBrush}" />
-                </Canvas>
-            </Viewbox>
+                    </Canvas>
+                </Viewbox>
 
-            <TextBox Grid.Column="1" x:Name="SearchTextBox" 
-                      
+                <TextBox Grid.Column="1" x:Name="SearchTextBox" 
+                        wpf:TextFieldAssist.Hint="{Binding SearchHint.Value}"          
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         VerticalAlignment="Center"
                         MinWidth="125">
-                <TextBox.InputBindings>
-                    <KeyBinding Key="Enter" Command="{Binding  AddSearchCommand}"/>
-                </TextBox.InputBindings>
-            </TextBox>
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding  AddSearchCommand}"/>
+                    </TextBox.InputBindings>
+                </TextBox>
 
-        </Grid>
+            </Grid>
 
 
 
-        <ScrollViewer Grid.Row="1" Margin="2 4 2 4"
+            <ScrollViewer Grid.Row="1" Margin="2 8 2 4"
                       HorizontalScrollBarVisibility="Hidden"
                       VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding Data}">
+                <ItemsControl ItemsSource="{Binding Data}">
 
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type local:SearchOptionsProxy}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type local:SearchOptionsProxy}">
 
-                        <Grid Margin="0 4 4 4">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            
-                            
-                            <TextBlock Text="{Binding Text}"
+                            <Grid Margin="0 4 4 4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+
+                                <TextBlock Text="{Binding Text}"
                                         VerticalAlignment="Center"/>
-                            
-                            <CheckBox Margin="4 0 0 0" Grid.Column="1" 
+
+                                <CheckBox Margin="4 0 0 0" Grid.Column="1" 
                                       VerticalAlignment="Center"
                                       IsChecked="{Binding Filter}" 
                                       Content="Filter"/>
-                            <CheckBox Margin="4 0 0 0" Grid.Column="2" 
+                                <CheckBox Margin="4 0 0 0" Grid.Column="2" 
                                       VerticalAlignment="Center"
                                       IsChecked="{Binding Highlight}" 
                                       Content="Highlight"/>
 
 
-                            <Button Margin="8 0 6 0"
+                                <Button Margin="8 0 6 0"
                                         Grid.Column="3" 
                              
                                         ToolTip="{Binding RemoveTooltip}"
                                         VerticalAlignment="Center"
                                         Command="{Binding RemoveCommand}"
                                         Style="{StaticResource CloseButtonStyle}"/>
-                        </Grid>
-                        
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
-        
+                            </Grid>
 
-        <StackPanel Orientation="Horizontal" Grid.Row="2"
-                    >
-            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}"
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+
+            <Button  Grid.Row="2" IsDefault="True"
+                 HorizontalAlignment="Right"
+                 Style="{DynamicResource MaterialDesignFlatButton}"
                     Command="{x:Static wpf:DialogHost.CloseDialogCommand}">
-                <Button.CommandParameter>
-                    <system:Boolean>True</system:Boolean>
-                </Button.CommandParameter>
-                OK
+                Finished
             </Button>
-            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}"
-                    Command="{x:Static wpf:DialogHost.CloseDialogCommand}">
-                <Button.CommandParameter>
-                    <system:Boolean>False</system:Boolean>
-                </Button.CommandParameter>
-                CANCEL
-            </Button>
-        </StackPanel>
 
 
+
+
+        </Grid>
     </Grid>
+    
+
 </UserControl>
