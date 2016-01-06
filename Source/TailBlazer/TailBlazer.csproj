@@ -124,6 +124,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DialogNames.cs" />
     <Compile Include="Infrastucture\CheckedToLengthConverter.cs" />
     <Compile Include="Infrastucture\ClipboardHandler.cs" />
     <Compile Include="Infrastucture\ConsoleLogger.cs" />
@@ -150,7 +151,14 @@
     <Compile Include="Settings\RecentSearch.cs" />
     <Compile Include="Settings\RecentSearchCollection.cs" />
     <Compile Include="Settings\RecentFilesToStateConverter.cs" />
+    <Compile Include="Settings\SearchOptionsProxy.cs" />
+    <Compile Include="Settings\SearchOptionsView.xaml.cs">
+      <DependentUpon>SearchOptionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\SearchOptionsViewModel.cs" />
     <Compile Include="Settings\SearchOptions.cs" />
+    <Compile Include="Settings\SearchOptionsConverter.cs" />
+    <Compile Include="Settings\SwatchesProvider.cs" />
     <Compile Include="Settings\Theme.cs" />
     <Compile Include="Views\FileDropContainer.cs" />
     <Compile Include="Views\FileDropMonitor.cs" />
@@ -227,6 +235,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Settings\GeneralOptionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Settings\SearchOptionsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

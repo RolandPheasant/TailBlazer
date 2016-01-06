@@ -33,7 +33,7 @@ namespace TailBlazer.Infrastucture
 
             For<ISelectionMonitor>().Use<SelectionMonitor>();
             For<ISearchInfoCollection>().Use<SearchInfoCollection>();
-            For<ISearchMetadataCollection>().Use<SearchMetadataCollection>();
+            For<ISearchMetadataCollection>().Use<SearchMetadataCollection>().Transient();
             
             For<ITextFormatter>().Use<TextFormatter>();
 

@@ -3,6 +3,7 @@ using System.IO;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
+using TailBlazer.Settings;
 
 namespace TailBlazer.Views
 {
@@ -27,9 +28,18 @@ namespace TailBlazer.Views
                 new ExplictArg("scheduler",_schedulerProvider.Background)
             });
 
+
+            var searchMetadataCollection = _objectProvider.Get<ISearchMetadataCollection>();
+            var searchOptionsViewModel = new SearchOptionsViewModel(searchMetadataCollection, _schedulerProvider);
+
+
             var searchInfo = _objectProvider.Get<ISearchInfoCollection>
-                (
-                    new ExplictArg("fileWatcher", fileWatcher)
+                (new[]
+                    {
+                        new ExplictArg("fileWatcher", fileWatcher),
+                        new ExplictArg("searchMetadataCollection", searchMetadataCollection),
+                
+                    }
                 );
 
 
@@ -39,6 +49,8 @@ namespace TailBlazer.Views
             {
                 new ExplictArg("fileWatcher", fileWatcher),
                 new ExplictArg("searchInfoCollection", searchInfo),
+                new ExplictArg("searchMetadataCollection", searchMetadataCollection),
+               new ExplictArg("searchOptionsViewModel", searchOptionsViewModel)
             });
         }
     }

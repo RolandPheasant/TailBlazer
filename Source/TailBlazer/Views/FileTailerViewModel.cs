@@ -9,6 +9,7 @@ using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
 using DynamicData.PLinq;
+using MaterialDesignThemes.Wpf;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Search;
@@ -35,8 +36,9 @@ namespace TailBlazer.Views
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
 
         public ICommand CopyToClipboardCommand { get; }
-        public ICommand KeepSearchCommand { get; }
+        public ICommand AddSearchCommand { get; }
         public ISelectionMonitor SelectionMonitor { get; }
+        public SearchOptionsViewModel SearchOptions { get;  }
 
         public SearchHints SearchHints { get;  }
         public SearchCollection SearchCollection { get; }
@@ -54,6 +56,8 @@ namespace TailBlazer.Views
         public IProperty<bool> UsingDarkTheme { get; }
         public IProperty<Duration> HighlightDuration { get; }
 
+        public ICommand OpenSearchOptionsCommand => new Command(OpenSearchOptions);
+
         public FileTailerViewModel([NotNull] ILogger logger,
             [NotNull] ISchedulerProvider schedulerProvider,
             [NotNull] IFileWatcher fileWatcher,
@@ -64,6 +68,7 @@ namespace TailBlazer.Views
             [NotNull] ISetting<GeneralOptions> generalOptions,
             [NotNull] IRecentSearchCollection recentSearchCollection, 
             [NotNull] ISearchMetadataCollection searchMetadataCollection,
+            [NotNull] SearchOptionsViewModel searchOptionsViewModel,
             [NotNull] SearchHints searchHints)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
@@ -75,9 +80,11 @@ namespace TailBlazer.Views
             if (inlineViewerFactory == null) throw new ArgumentNullException(nameof(inlineViewerFactory));
             if (generalOptions == null) throw new ArgumentNullException(nameof(generalOptions));
             if (searchMetadataCollection == null) throw new ArgumentNullException(nameof(searchMetadataCollection));
+            if (searchOptionsViewModel == null) throw new ArgumentNullException(nameof(searchOptionsViewModel));
             if (searchHints == null) throw new ArgumentNullException(nameof(searchHints));
 
             SelectionMonitor = selectionMonitor;
+            SearchOptions = searchOptionsViewModel;
             SearchHints = searchHints;
             CopyToClipboardCommand = new Command(()=> clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
             SelectedItemsCount = selectionMonitor.Selected.Connect().QueryWhenChanged(collection=> collection.Count).ForBinding();
@@ -111,7 +118,7 @@ namespace TailBlazer.Views
             IsLoading = searchInfoCollection.All.Take(1).Select(_ => false).StartWith(true).ForBinding();
             
             //command to add the current search to the tail collection
-            KeepSearchCommand = new Command(() =>
+            AddSearchCommand = new Command(() =>
             {
                 var text = SearchHints.SearchText;
                 searchInfoCollection.Add(text);
@@ -134,13 +141,11 @@ namespace TailBlazer.Views
                                 return text.Length < 3 ? "Enter at least 3 characters" : "Hit enter to search";
                             }).ForBinding();
 
-         
-
             //tailer is the main object used to tail, scroll and filter in a file
             var lineScroller = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
 
             //load lines into observable collection
-            var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchInfoCollection));
+            var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection));
             var loader = lineScroller.Lines.Connect()
                 .Transform(x=>lineProxyFactory.Create(x), new ParallelisationOptions(ParallelType.Ordered,5))
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
@@ -196,11 +201,11 @@ namespace TailBlazer.Views
                 UsingDarkTheme,
                 searchHints,
                 searchMetadataCollection,
-                Disposable.Create(() =>
-                {
-                    _userScrollRequested.OnCompleted();
-                    SelectionMonitor?.Dispose();
-                }));
+                searchMetadataCollection,
+                SelectionMonitor,
+                SearchOptions,
+                Disposable.Create(_userScrollRequested.OnCompleted)
+                );
         }
         
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
@@ -220,6 +225,21 @@ namespace TailBlazer.Views
  
         }
 
+        public async void OpenSearchOptions()
+        {
+            var view = new SearchOptionsView
+            {
+                DataContext = this.SearchOptions
+            };
+
+            //show the dialog
+            var result = await DialogHost.Show(view, DialogNames.EntireWindow);
+            //Console.WriteLine("Dialog was closed, the CommandParameter used to close it was: " + (result ?? "NULL"));
+        }
+        private void ClosingEventHandler(object sender, DialogClosingEventArgs eventArgs)
+        {
+         //  Console.WriteLine("You can intercept the closing event, and cancel here.");
+        }
         void IScrollReceiver.ScrollChanged(ScrollChangedArgs scrollChangedArgs)
         {
             if (scrollChangedArgs.Direction == ScrollDirection.Up)

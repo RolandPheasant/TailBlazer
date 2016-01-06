@@ -1,0 +1,132 @@
+﻿<UserControl x:Class="TailBlazer.Settings.SearchOptionsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TailBlazer.Settings"
+             xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
+             xmlns:search="clr-namespace:TailBlazer.Domain.FileHandling.Search;assembly=TailBlazer.Domain"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance local:SearchOptionsViewModel}"
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+    
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
+                <ResourceDictionary Source="../Themes/Buttons.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"/>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <infrastucture:NotEqualsToVisibilityConverter x:Key="NotEqualsToVisibilityConverter"/>
+            <system:Int32 x:Key="Zero">0</system:Int32>
+            <system:Int32 x:Key="One">1</system:Int32>
+
+        </ResourceDictionary>
+    </Control.Resources>
+    <Grid Height="250" Width="350" Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition  Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Viewbox Width="24" Height="24" Margin="0 0 0 0">
+                <Canvas Width="24" Height="24">
+                    <Path Data="M3,2H21V2H21V4H20.92L15,9.92V22.91L9,16.91V9.91L3.09,4H3V2M11,16.08L13,18.08V9H13.09L18.09,4H5.92L10.92,9H11V16.08Z" 
+                                  Fill="{Binding ElementName=SearchTextBox, Path=BorderBrush}" />
+                </Canvas>
+            </Viewbox>
+
+            <TextBox Grid.Column="1" x:Name="SearchTextBox" 
+                      
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                        Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        VerticalAlignment="Center"
+                        MinWidth="125">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Enter" Command="{Binding  AddSearchCommand}"/>
+                </TextBox.InputBindings>
+            </TextBox>
+
+        </Grid>
+
+
+
+        <ScrollViewer Grid.Row="1" Margin="2 4 2 4"
+                      HorizontalScrollBarVisibility="Hidden"
+                      VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Data}">
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type local:SearchOptionsProxy}">
+
+                        <Grid Margin="0 4 4 4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            
+                            <TextBlock Text="{Binding Text}"
+                                        VerticalAlignment="Center"/>
+                            
+                            <CheckBox Margin="4 0 0 0" Grid.Column="1" 
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding Filter}" 
+                                      Content="Filter"/>
+                            <CheckBox Margin="4 0 0 0" Grid.Column="2" 
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding Highlight}" 
+                                      Content="Highlight"/>
+
+
+                            <Button Margin="8 0 6 0"
+                                        Grid.Column="3" 
+                             
+                                        ToolTip="{Binding RemoveTooltip}"
+                                        VerticalAlignment="Center"
+                                        Command="{Binding RemoveCommand}"
+                                        Style="{StaticResource CloseButtonStyle}"/>
+                        </Grid>
+                        
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        
+
+        <StackPanel Orientation="Horizontal" Grid.Row="2"
+                    >
+            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}"
+                    Command="{x:Static wpf:DialogHost.CloseDialogCommand}">
+                <Button.CommandParameter>
+                    <system:Boolean>True</system:Boolean>
+                </Button.CommandParameter>
+                OK
+            </Button>
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}"
+                    Command="{x:Static wpf:DialogHost.CloseDialogCommand}">
+                <Button.CommandParameter>
+                    <system:Boolean>False</system:Boolean>
+                </Button.CommandParameter>
+                CANCEL
+            </Button>
+        </StackPanel>
+
+
+    </Grid>
+</UserControl>

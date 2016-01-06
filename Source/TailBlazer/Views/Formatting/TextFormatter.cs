@@ -13,9 +13,9 @@ namespace TailBlazer.Views.Formatting
     {
         private readonly IObservable<IEnumerable<string>> _strings;
 
-        public TextFormatter(ISearchInfoCollection searchInfoCollection)
+        public TextFormatter(ISearchMetadataCollection searchInfoCollection)
         {
-            _strings = searchInfoCollection.Searches.Connect()
+            _strings = searchInfoCollection.Metadata.Connect()
                 .QueryWhenChanged(query => query.Items.Select(si => si.SearchText))
                 .Replay(1)
                 .RefCount();
@@ -27,7 +27,7 @@ namespace TailBlazer.Views.Formatting
             {
                 return inputText
                     .MatchString(searchText)
-                    .Select(ms=>new DisplayText(ms));
+                    .Select(ms => new DisplayText(ms));
             });
         }
     }

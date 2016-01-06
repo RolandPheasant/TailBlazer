@@ -46,6 +46,15 @@ namespace TailBlazer.Infrastucture
             set { SetValue(FormattedTextProperty, value); }
         }
 
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
+            "Text", typeof (string), typeof (HighlightTextControl), new PropertyMetadata(default(string)));
+
+        public string Text
+        {
+            get { return (string) GetValue(TextProperty); }
+            set { SetValue(TextProperty, value); }
+        }
+
         public static readonly DependencyProperty HighlightEnabledProperty = DependencyProperty.Register(
             "HighlightEnabled", typeof (bool), typeof (HighlightTextControl), new PropertyMetadata(true, UpdateControlCallBack));
 
@@ -72,15 +81,16 @@ namespace TailBlazer.Infrastucture
         protected override void OnRender(DrawingContext drawingContext)
         {
 
+            _textBlock.Inlines.Clear();
             if (FormattedText == null)
             {
+                if (Text!=null)
+                    _textBlock.Inlines.Add(Text);
+
                 base.OnRender(drawingContext);
                 return;
             }
 
-
-
-            _textBlock.Inlines.Clear();
             _textBlock.Inlines.AddRange(FormattedText.Select(ft =>
             {
                 var run = new Run(ft.Text);

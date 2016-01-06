@@ -17,9 +17,9 @@ namespace TailBlazer.Domain.FileHandling.Search
 
         private readonly IDisposable _cleanUp;
 
-        public SearchInfoCollection(ISearchMetadataCollection metadataCollection, IFileWatcher fileWatcher)
+        public SearchInfoCollection(ISearchMetadataCollection searchMetadataCollection, IFileWatcher fileWatcher)
         {
-            _metadataCollection = metadataCollection;
+            _metadataCollection = searchMetadataCollection;
             _fileWatcher = fileWatcher;
 
             //Add a complete file display
@@ -28,7 +28,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             var systemSearches = new SourceCache<SearchInfo, CaseInsensitiveString>(t => (CaseInsensitiveString)t.SearchText);
             systemSearches.AddOrUpdate(new SearchInfo("<All>", All, SearchType.All));
 
-            var userSearches = metadataCollection.Metadata
+            var userSearches = searchMetadataCollection.Metadata
                 .Connect(meta => meta.Filter)
                 .Transform(meta =>
                 {

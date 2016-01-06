@@ -7,7 +7,6 @@
              xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
-             xmlns:fileHandling="clr-namespace:TailBlazer.Domain.FileHandling;assembly=TailBlazer.Domain"
              xmlns:search="clr-namespace:TailBlazer.Domain.FileHandling.Search;assembly=TailBlazer.Domain"
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
             Background="{DynamicResource MaterialDesignPaper}"
@@ -89,7 +88,8 @@
         </ResourceDictionary>
     </Control.Resources>
 
-    <Grid Margin="4">
+
+        <Grid Margin="4">
         <ProgressBar
                 Visibility="{Binding IsLoading.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
                 Style="{StaticResource TailBlazerCircularProgressBar}" 
@@ -133,7 +133,7 @@
                         VerticalAlignment="Center"
                         MinWidth="125">
                     <TextBox.InputBindings>
-                        <KeyBinding Key="Enter" Command="{Binding KeepSearchCommand}"/>
+                        <KeyBinding Key="Enter" Command="{Binding AddSearchCommand}"/>
                     </TextBox.InputBindings>
                 </TextBox>
 
@@ -221,8 +221,9 @@
                 <!--</Border>-->
 
                 <Button Grid.Column="4" 
-                        Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
-                       Style="{StaticResource MaterialDesignFlatButton}"
+
+                        Style="{StaticResource MaterialDesignFlatButton}"
+                        Command="{Binding OpenSearchOptionsCommand}"
                         HorizontalAlignment="Left"
                         ToolTip="Search options"
                     
@@ -319,7 +320,8 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type local:LineProxy}">
                         <infrastucture:HighlightTextControl
-                                        Margin="6 0 0 0"                        
+                                        Margin="6 0 0 0"   
+                                        Text="{Binding Text}" 
                                         FormattedText = "{Binding FormattedText.Value}"
                                         HighlightForeground = "{StaticResource SecondaryAccentForegroundBrush}"
                                         HighlightBackground = "{StaticResource SecondaryAccentBrush}"/>
@@ -457,4 +459,5 @@
         </Grid>
 
     </Grid>
+
 </UserControl>

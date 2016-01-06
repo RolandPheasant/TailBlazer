@@ -11,6 +11,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:settings="clr-namespace:TailBlazer.Settings"
         xmlns:themes="clr-namespace:Dragablz.Themes;assembly=Dragablz"
+        xmlns:tailBlazer="clr-namespace:TailBlazer"
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
@@ -107,7 +108,9 @@
     </controls:MetroWindow.LeftWindowCommands>
 
     <AdornerDecorator>
-        <Grid infrastucture:DependencyObjectHook.Receiver="{Binding DropMonitor}">
+        <materialDesign:DialogHost Identifier="{x:Static tailBlazer:DialogNames.EntireWindow}">
+         
+            <Grid infrastucture:DependencyObjectHook.Receiver="{Binding DropMonitor}">
             <Grid.InputBindings>
                 <MouseBinding Gesture="{x:Static infrastucture:MouseWheelGesture.ControlDown}"  
                                 Command="{Binding ZoomInCommand}" />
@@ -174,5 +177,6 @@
         </materialDesign:DrawerHost>
 
         </Grid>
+        </materialDesign:DialogHost>
     </AdornerDecorator>
 </controls:MetroWindow>
