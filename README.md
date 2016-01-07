@@ -55,11 +55,18 @@ There has been an enthusiastic and indeed overwhelming demand for Tail Blazer an
  - Fork, clone or download the source code and build using Visual Studio 2015
  - Grab the binaries from the [release page](https://github.com/RolandPheasant/TailBlazer/releases), extract and double click TailBlazer.exe to run. These releases will be regularly updated.
 
+## Highlight and filter options
+
+There are options to allow text highlighting without apply a filter and vice versa.
+
+![Hightlight](Images/HighlightText.gif)
+
+
 ## Very large files and fast scrolling
 
 Tail Blazer can easily handle a file of any size. The largest file I have tested was 47 Gb which was the maximum file size I could create before my disk would become full.
 
-![Dark theme](Images/47GbFile.gif)
+![Large File](Images/47GbFile.gif)
 
 
 ## User Settings
