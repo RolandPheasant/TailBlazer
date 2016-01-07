@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -66,7 +64,7 @@ namespace TailBlazer.Infrastucture
 
         private static void UpdateControlCallBack(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            HighlightTextControl obj = d as HighlightTextControl;
+            var obj = (HighlightTextControl)d;
             obj.InvalidateVisual();
         }
 
@@ -74,8 +72,7 @@ namespace TailBlazer.Infrastucture
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            _textBlock = (TextBlock)this.Template.FindName("PART_TEXT", this);
-
+            _textBlock = (TextBlock)Template.FindName("PART_TEXT", this);
         }
 
         protected override void OnRender(DrawingContext drawingContext)

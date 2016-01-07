@@ -92,6 +92,7 @@
 
                         <!--HighlightEnabled = "{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"-->
                         <infrastucture:HighlightTextControl Grid.Column="1"  Margin="6 0 0 0" 
+                                        Text="{Binding Text}"                    
                                         FormattedText = "{Binding FormattedText.Value}"
                                         HighlightForeground = "{StaticResource SecondaryAccentForegroundBrush}"
                                         HighlightBackground = "{StaticResource SecondaryAccentBrush}"/>

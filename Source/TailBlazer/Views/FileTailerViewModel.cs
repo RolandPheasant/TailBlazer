@@ -32,6 +32,7 @@ namespace TailBlazer.Views
         private int _pageSize;
         private LineProxy _selectedLine;
         private bool _showInline;
+        private bool _isSettingScrollPosition;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
 
@@ -237,7 +238,7 @@ namespace TailBlazer.Views
             };
 
             //show the dialog
-           var result =  await DialogHost.Show(view, Id);
+           await DialogHost.Show(view, Id);
         }
 
         void IScrollReceiver.ScrollChanged(ScrollChangedArgs scrollChangedArgs)

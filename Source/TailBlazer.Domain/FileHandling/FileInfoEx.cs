@@ -6,7 +6,6 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Text;
 using DynamicData.Kernel;
-using TailBlazer.Domain.FileHandling.Search;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -56,7 +55,6 @@ namespace TailBlazer.Domain.FileHandling
                 .Scan((FileNotification) null, (state, _) => state == null
                     ? new FileNotification(file)
                     : new FileNotification(state));
-            // .DistinctUntilChanged();
         }
 
 
