@@ -13,7 +13,7 @@ namespace TailBlazer.Domain.FileHandling.Search
         private readonly IDisposable _cleanUp;
 
         public IObservableCache<SearchInfo, CaseInsensitiveString> Searches { get; }
-
+        
         public IObservable<ILineProvider> All { get; }
         
         public SearchInfoCollection(ISearchMetadataCollection searchMetadataCollection, IFileWatcher fileWatcher)

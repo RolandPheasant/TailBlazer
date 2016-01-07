@@ -74,7 +74,8 @@ namespace TailBlazer.Domain.FileHandling
                 {
                     try
                     {
-                        return currentLines.ReadLines(scroll).ToArray();
+                        var x = currentLines.ReadLines(scroll).ToArray();
+                        return x;
                     }
                     catch (Exception ex)
                     {
