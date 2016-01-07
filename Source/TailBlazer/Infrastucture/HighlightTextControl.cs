@@ -81,7 +81,7 @@ namespace TailBlazer.Infrastucture
         protected override void OnRender(DrawingContext drawingContext)
         {
 
-            //_textBlock.Inlines.Clear();
+            _textBlock.Inlines.Clear();
             if (FormattedText == null || !FormattedText.Any())
             {
                 if (Text!=null)

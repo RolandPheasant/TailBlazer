@@ -149,13 +149,13 @@
 
 
                     <ListBox Grid.Column="3" Margin="4 2 0 2" 
-                    TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-                    Background="{DynamicResource MaterialDesignPaper}"
-                    VerticalAlignment="Stretch"
-                    Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
-                    SelectedItem="{Binding SearchCollection.Selected}"
-                    ItemsSource="{Binding SearchCollection.Items}" 
-                    Style="{DynamicResource FilterListBoxStyle}">
+                        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+                        Background="{DynamicResource MaterialDesignPaper}"
+                        VerticalAlignment="Stretch"
+                        Visibility="{Binding SearchCollection.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource One}}"
+                        SelectedItem="{Binding SearchCollection.Selected}"
+                        ItemsSource="{Binding SearchCollection.Items}" 
+                        Style="{DynamicResource FilterListBoxStyle}">
 
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type local:SearchViewModel}">
@@ -329,7 +329,6 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
 
-
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
                             <Style.Setters>
@@ -394,10 +393,10 @@
                           BorderThickness="1" HorizontalAlignment="Stretch"/>
 
                 <local:InlineView 
-                VerticalAlignment="Stretch"
-                Visibility="{Binding Path=DataContext.InlineViewerVisible.Value, ElementName=Control,Converter={StaticResource BooleanToVisibilityConverter}}"
-                DataContext="{Binding InlineViewer}"
-                Grid.Row="3" />
+                    VerticalAlignment="Stretch"
+                    Visibility="{Binding Path=DataContext.InlineViewerVisible.Value, ElementName=Control,Converter={StaticResource BooleanToVisibilityConverter}}"
+                    DataContext="{Binding InlineViewer}"
+                    Grid.Row="3" />
 
                 <Grid    Grid.Row="4"
               Margin = "0 0 0 -4"       

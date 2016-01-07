@@ -173,7 +173,9 @@ namespace TailBlazer.Views
             var isUserDefinedChanged = SearchCollection.WhenValueChanged(sc => sc.Selected)
                 .Where(selected=> selected!=null)
                 .Select(selected => selected.IsUserDefined)
-                .DistinctUntilChanged();
+                .DistinctUntilChanged()
+                .Replay(1)
+                .RefCount();
             
             var inlineViewerVisible = isUserDefinedChanged.CombineLatest(this.WhenValueChanged(vm => vm.ShowInline),
                                                             (userDefined, showInline) => userDefined && showInline);
