@@ -400,6 +400,7 @@ namespace TailBlazer.Infrastucture
 
         private void InvokeStartIndexCommand(int lines)
         {
+
             if (_isInMeasure) return;
 
             var firstIndex = StartIndex + lines;
