@@ -35,6 +35,7 @@ namespace TailBlazer.Views
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
 
+        public Guid Id { get; }= Guid.NewGuid();
         public ICommand CopyToClipboardCommand { get; }
         public ICommand AddSearchCommand { get; }
         public ISelectionMonitor SelectionMonitor { get; }
@@ -170,6 +171,7 @@ namespace TailBlazer.Views
 
             //Create objects required for inline viewing
             var isUserDefinedChanged = SearchCollection.WhenValueChanged(sc => sc.Selected)
+                .Where(selected=> selected!=null)
                 .Select(selected => selected.IsUserDefined)
                 .DistinctUntilChanged();
             
@@ -233,13 +235,9 @@ namespace TailBlazer.Views
             };
 
             //show the dialog
-            var result = await DialogHost.Show(view, DialogNames.EntireWindow);
-            //Console.WriteLine("Dialog was closed, the CommandParameter used to close it was: " + (result ?? "NULL"));
+           var result =  await DialogHost.Show(view, Id);
         }
-        private void ClosingEventHandler(object sender, DialogClosingEventArgs eventArgs)
-        {
-         //  Console.WriteLine("You can intercept the closing event, and cancel here.");
-        }
+
         void IScrollReceiver.ScrollChanged(ScrollChangedArgs scrollChangedArgs)
         {
             if (scrollChangedArgs.Direction == ScrollDirection.Up)

@@ -13,9 +13,11 @@ namespace TailBlazer.Views.Formatting
     {
         private readonly IObservable<IEnumerable<string>> _strings;
 
-        public TextFormatter(ISearchMetadataCollection searchInfoCollection)
+        public TextFormatter(ISearchMetadataCollection searchMetadataCollection)
         {
-            _strings = searchInfoCollection.Metadata.Connect()
+            _strings = searchMetadataCollection.Metadata
+                .Connect(meta => meta.Highlight)
+                .IgnoreUpdateWhen((current, previous) => current.Highlight == previous.Highlight)
                 .QueryWhenChanged(query => query.Items.Select(si => si.SearchText))
                 .Replay(1)
                 .RefCount();

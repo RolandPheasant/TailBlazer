@@ -25,21 +25,26 @@ namespace TailBlazer.Settings
 
         public SearchOptionsViewModel(ISearchMetadataCollection metadataCollection, ISchedulerProvider schedulerProvider)
         {
-            //options for colour
-            //options for highlight
-            //option to filter
-            
+            //TODO: options for colour
+
             var swatches = new SwatchesProvider().Swatches;
-
-
+            
             ReadOnlyObservableCollection<SearchOptionsProxy> data;
-            var userOptions = metadataCollection.Metadata
-                .Connect()
+
+            var userOptions = metadataCollection.Metadata.Connect()
+                .WhereReasonsAre(ChangeReason.Add, ChangeReason.Remove) //ignore updates because we update from here
                 .Transform(meta => new SearchOptionsProxy(meta, swatches,m => metadataCollection.Remove(m.SearchText)))
+                .SubscribeMany(so =>
+                {
+                    //when a value changes, write the original value back to the cache
+                    return so.WhenAnyPropertyChanged()
+                        .Subscribe(_ => metadataCollection.Add(new SearchMetadata(so.Text, so.Filter, so.Highlight)));
+                })
                 .Sort(SortExpressionComparer<SearchOptionsProxy>.Ascending(proxy=>proxy.Text))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out data)
                 .Subscribe();
+
             Data = data;
 
             AddSearchCommand = new Command(() =>
@@ -52,8 +57,7 @@ namespace TailBlazer.Settings
 
             var commandRefresher = this.WhenValueChanged(vm => vm.SearchText)
                                     .Subscribe(_ => ((Command) AddSearchCommand).Refresh());
-
-
+            
             //User feedback to guide them whilst typing
             SearchHint = this.WhenValueChanged(vm => vm.SearchText)
                             .Select(text =>
@@ -61,8 +65,7 @@ namespace TailBlazer.Settings
                                 if (string.IsNullOrEmpty(text)) return "Type to highlight";
                                 return text.Length < 3 ? "Enter at least 3 characters" : "Hit enter for more options";
                             }).ForBinding();
-
-
+            
             _cleanUp = new CompositeDisposable(commandRefresher, userOptions, SearchHint);
         }
 

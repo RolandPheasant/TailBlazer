@@ -10,13 +10,12 @@ namespace TailBlazer.Domain.FileHandling.Search
     {
         private readonly ISearchMetadataCollection _metadataCollection;
         private readonly IFileWatcher _fileWatcher;
+        private readonly IDisposable _cleanUp;
 
         public IObservableCache<SearchInfo, CaseInsensitiveString> Searches { get; }
 
         public IObservable<ILineProvider> All { get; }
-
-        private readonly IDisposable _cleanUp;
-
+        
         public SearchInfoCollection(ISearchMetadataCollection searchMetadataCollection, IFileWatcher fileWatcher)
         {
             _metadataCollection = searchMetadataCollection;
@@ -24,12 +23,15 @@ namespace TailBlazer.Domain.FileHandling.Search
 
             //Add a complete file display
             All = fileWatcher.Latest.Index().Replay(1).RefCount();
-            
+
+            //create a collection with 1 item, which is used to show entire file
             var systemSearches = new SourceCache<SearchInfo, CaseInsensitiveString>(t => (CaseInsensitiveString)t.SearchText);
             systemSearches.AddOrUpdate(new SearchInfo("<All>", All, SearchType.All));
 
+            //create a collection of all possible user filters
             var userSearches = searchMetadataCollection.Metadata
                 .Connect(meta => meta.Filter)
+                .IgnoreUpdateWhen((current,previous)=>current.Filter == previous.Filter)
                 .Transform(meta =>
                 {
                     var latest = _fileWatcher.Latest
@@ -39,6 +41,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                     return new SearchInfo(meta.SearchText, latest, SearchType.User);
                 });
 
+            //combine te results into a single collection
             Searches = systemSearches.Connect()
                     .Or(userSearches)
                     .AsObservableCache();

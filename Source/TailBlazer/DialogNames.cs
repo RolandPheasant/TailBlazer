@@ -9,6 +9,7 @@ namespace TailBlazer
     public static class DialogNames
     {
 
-        public readonly static string EntireWindow = "EntireWindow";
+        public static readonly string EntireWindow = "EntireWindow";
+        public static readonly string TabContent = "TabContent";
     }
 }
