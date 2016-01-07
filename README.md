@@ -29,11 +29,11 @@ That's better. A tail program which is pleasing to my eyes!
  - Remembers recent files
  - Handle extemely large files (I have opened a 45 Gb file)
  - Dark and light theme
+ - Conditionally highlight text
 
 ## Future feature list
 
  - Filter lines on regex
- - Conditionally highlight text
  - Automatic creation of columns
  - Pipe filter to file
  - Ability to pin a file
