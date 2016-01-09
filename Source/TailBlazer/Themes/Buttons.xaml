@@ -11,7 +11,8 @@
             <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
         </ResourceDictionary.MergedDictionaries>
 
-        <Style TargetType="{x:Type Button}" x:Key="SettingsButtonStyle" BasedOn="{StaticResource MaterialDesignMenuCommandButtonStyle}">
+        <Style TargetType="{x:Type Button}" x:Key="SettingsButtonStyle" 
+               BasedOn="{StaticResource MaterialDesignMenuCommandButtonStyle}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
