@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TailBlazer.Views"
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
+             xmlns:controls="clr-namespace:TailBlazer.Controls"
              mc:Ignorable="d" 
               d:DataContext="{d:DesignInstance local:InlineViewer, IsDesignTimeCreatable=False}"
              d:DesignHeight="300" d:DesignWidth="300">
@@ -48,7 +49,7 @@
 
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <infrastucture:VirtualScrollPanel ItemHeight="22"
+                    <controls:VirtualScrollPanel ItemHeight="22"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
                                                 TotalItems="{Binding Count.Value}"/>
@@ -91,7 +92,7 @@
                                    MinWidth="25"/>
 
                         <!--HighlightEnabled = "{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"-->
-                        <infrastucture:HighlightTextControl Grid.Column="1"  Margin="6 0 0 0" 
+                        <controls:HighlightTextControl Grid.Column="1"  Margin="6 0 0 0" 
                                         Text="{Binding Text}"                    
                                         FormattedText = "{Binding FormattedText.Value}"
                                         HighlightForeground = "{StaticResource SecondaryAccentForegroundBrush}"

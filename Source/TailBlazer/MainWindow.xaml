@@ -12,6 +12,7 @@
         xmlns:settings="clr-namespace:TailBlazer.Settings"
         xmlns:themes="clr-namespace:Dragablz.Themes;assembly=Dragablz"
         xmlns:tailBlazer="clr-namespace:TailBlazer"
+        xmlns:controls1="clr-namespace:TailBlazer.Controls"
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
@@ -100,7 +101,7 @@
                     Command ="{Binding OpenFileCommand}"
                     ToolTipService.ShowOnDisabled="True"
                     ToolTip="Open file">
-                    <views:FileIcon Width="14" Height="14" Foreground="White"/>
+                    <controls1:FileIcon Width="14" Height="14" Foreground="White"/>
                 </Button>
             </StackPanel>
 
@@ -169,7 +170,7 @@
                     IsHitTestVisible="False">
 
                     <TextBlock  FontSize="26" HorizontalAlignment="Center" Margin="0 0 0 4" Text="Drag files here"/>
-                    <views:FileIcon x:Name="FileIcon" BorderThickness="0" Width="50" Height="50" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    <controls1:FileIcon x:Name="FileIcon" BorderThickness="0" Width="50" Height="50" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                     <TextBlock FontSize="26" Margin="0 4 0 0" Text="to open" HorizontalAlignment="Center"/>
 
                 </StackPanel>

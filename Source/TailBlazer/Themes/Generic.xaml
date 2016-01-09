@@ -3,7 +3,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
     xmlns:themes="clr-namespace:Dragablz.Themes;assembly=Dragablz"
-    xmlns:views="clr-namespace:TailBlazer.Views">
+    xmlns:views="clr-namespace:TailBlazer.Views"
+    xmlns:controls="clr-namespace:TailBlazer.Controls">
 
 
     <ResourceDictionary.MergedDictionaries>
@@ -12,10 +13,10 @@
 
 
 
-    <Style TargetType="{x:Type infrastucture:HighlightTextControl}">
+    <Style TargetType="{x:Type controls:HighlightTextControl}">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type infrastucture:HighlightTextControl}">
+                <ControlTemplate TargetType="{x:Type controls:HighlightTextControl}">
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
@@ -46,10 +47,10 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type views:OpenFileIcon}">
+    <Style TargetType="{x:Type controls:OpenFileIcon}">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type views:OpenFileIcon}">
+                <ControlTemplate TargetType="{x:Type controls:OpenFileIcon}">
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
@@ -66,10 +67,10 @@
         </Setter>
     </Style>
     
-    <Style TargetType="{x:Type views:SettingsIcon}">
+    <Style TargetType="{x:Type controls:SettingsIcon}">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type views:SettingsIcon}">
+                <ControlTemplate TargetType="{x:Type controls:SettingsIcon}">
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
@@ -85,10 +86,10 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type views:FileIcon}">
+    <Style TargetType="{x:Type controls:FileIcon}">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type views:FileIcon}">
+                <ControlTemplate TargetType="{x:Type controls:FileIcon}">
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
@@ -106,10 +107,10 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type views:TailBlazerIcon}">
+    <Style TargetType="{x:Type controls:TailBlazerIcon}">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type views:TailBlazerIcon}">
+                <ControlTemplate TargetType="{x:Type controls:TailBlazerIcon}">
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">

@@ -115,6 +115,7 @@
     <Compile Include="Formatting\MatchedString.cs" />
     <Compile Include="Formatting\MatchedStringEnumerator.cs" />
     <Compile Include="Formatting\MatchedStringEx.cs" />
+    <Compile Include="Infrastructure\ConsoleLogger.cs" />
     <Compile Include="Infrastructure\DynamicDataEx.cs" />
     <Compile Include="Infrastructure\EnumerableEx.cs" />
     <Compile Include="Infrastructure\Equality.cs" />

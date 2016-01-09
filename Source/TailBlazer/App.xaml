@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:TailBlazer"
              xmlns:views="clr-namespace:TailBlazer.Views"
-             xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture">
+             xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
+             xmlns:controls="clr-namespace:TailBlazer.Controls">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -14,10 +15,10 @@
 
 
 
-            <Style TargetType="{x:Type infrastucture:SearchableTextControl}">
+            <Style TargetType="{x:Type controls:SearchableTextControl}">
                 <Setter Property="Template">
                     <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type infrastucture:SearchableTextControl}">
+                        <ControlTemplate TargetType="{x:Type controls:SearchableTextControl}">
                             <Border Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}">
@@ -39,7 +40,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     
-                    <views:FileIcon
+                    <controls:FileIcon
                             BorderThickness="0"
                             Width="22" 
                             Height="22" 

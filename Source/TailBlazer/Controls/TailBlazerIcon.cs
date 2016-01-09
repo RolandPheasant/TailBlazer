@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace TailBlazer.Views
+namespace TailBlazer.Controls
 {
     public class TailBlazerIcon : Control
     {

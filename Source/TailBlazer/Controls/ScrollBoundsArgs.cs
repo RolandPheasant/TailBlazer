@@ -1,4 +1,4 @@
-namespace TailBlazer.Infrastucture
+namespace TailBlazer.Controls
 {
     public class ScrollBoundsArgs
     {

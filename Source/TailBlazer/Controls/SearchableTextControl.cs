@@ -21,7 +21,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 
-namespace TailBlazer.Infrastucture
+namespace TailBlazer.Controls
 {
     public class SearchableTextControl : Control
     {

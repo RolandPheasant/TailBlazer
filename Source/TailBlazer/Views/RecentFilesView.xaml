@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TailBlazer.Views"
+             xmlns:controls="clr-namespace:TailBlazer.Controls"
              mc:Ignorable="d" 
                d:DataContext="{d:DesignInstance local:RecentFilesViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="300" d:DesignWidth="300">
@@ -50,7 +51,7 @@
 
                             <StackPanel Orientation="Horizontal">
 
-                                <local:OpenFileIcon Width="14" Height="14"/>
+                                <controls:OpenFileIcon Width="14" Height="14"/>
 
                                 <TextBlock Foreground="{DynamicResource MaterialDesignBody}" 
                                            FontWeight="Light"

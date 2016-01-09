@@ -10,6 +10,7 @@ using DynamicData;
 using DynamicData.Binding;
 using DynamicData.PLinq;
 using MaterialDesignThemes.Wpf;
+using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Search;

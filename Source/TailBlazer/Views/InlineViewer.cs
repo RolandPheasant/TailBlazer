@@ -8,6 +8,7 @@ using System.Windows.Input;
 using DynamicData;
 using TailBlazer.Domain.Annotations;
 using DynamicData.Binding;
+using TailBlazer.Controls;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;

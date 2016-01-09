@@ -6,7 +6,7 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using TailBlazer.Views.Formatting;
 
-namespace TailBlazer.Infrastucture
+namespace TailBlazer.Controls
 {
 
     public class HighlightTextControl : Control

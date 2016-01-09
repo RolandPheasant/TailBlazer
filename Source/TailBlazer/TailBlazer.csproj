@@ -38,7 +38,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>TailBlazer.Infrastucture.BootStrap</StartupObject>
+    <StartupObject>TailBlazer.BootStrap</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>tailblazer.ico</ApplicationIcon>
@@ -127,11 +127,8 @@
     <Compile Include="DialogNames.cs" />
     <Compile Include="Infrastucture\CheckedToLengthConverter.cs" />
     <Compile Include="Infrastucture\ClipboardHandler.cs" />
-    <Compile Include="Infrastucture\ConsoleLogger.cs" />
-    <Compile Include="Infrastucture\FileAssociations.cs" />
     <Compile Include="Infrastucture\FileHeader.cs" />
-    <Compile Include="Infrastucture\HeaderContent.cs" />
-    <Compile Include="Infrastucture\HighlightTextControl.cs" />
+    <Compile Include="Controls\HighlightTextControl.cs" />
     <Compile Include="Infrastucture\IClipboardHandler.cs" />
     <Compile Include="Infrastucture\IAttachedListBox.cs" />
     <Compile Include="Infrastucture\ListBoxHelper.cs" />
@@ -163,9 +160,9 @@
     <Compile Include="Views\FileDropContainer.cs" />
     <Compile Include="Views\FileDropMonitor.cs" />
     <Compile Include="Views\FileHeaderNamingJob.cs" />
-    <Compile Include="Views\FileIcon.cs" />
+    <Compile Include="Controls\FileIcon.cs" />
     <Compile Include="Infrastucture\SchedulerProvider.cs" />
-    <Compile Include="Infrastucture\SearchableTextControl.cs" />
+    <Compile Include="Controls\SearchableTextControl.cs" />
     <Compile Include="Infrastucture\SolidColorAnimation.cs" />
     <Compile Include="Views\FileTailerView.xaml.cs">
       <DependentUpon>FileTailerView.xaml</DependentUpon>
@@ -190,23 +187,23 @@
     <Compile Include="Views\LineProxyFactory.cs" />
     <Compile Include="Views\LinesControl.cs" />
     <Compile Include="Views\ListboxRowAnimationSetter.cs" />
-    <Compile Include="Views\OpenFileIcon.cs" />
+    <Compile Include="Controls\OpenFileIcon.cs" />
     <Compile Include="Views\RecentFileProxy.cs" />
     <Compile Include="Views\RecentFilesView.xaml.cs">
       <DependentUpon>RecentFilesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\RecentFilesViewModel.cs" />
     <Compile Include="Views\RemoveIcon.cs" />
-    <Compile Include="Infrastucture\ScrollChangedArgs.cs" />
-    <Compile Include="Infrastucture\ScrollDirection.cs" />
-    <Compile Include="Infrastucture\ScrollBoundsArgs.cs" />
+    <Compile Include="Controls\ScrollChangedArgs.cs" />
+    <Compile Include="Controls\ScrollDirection.cs" />
+    <Compile Include="Controls\ScrollBoundsArgs.cs" />
     <Compile Include="Views\SearchHints.cs" />
     <Compile Include="Views\SearchViewModel.cs" />
-    <Compile Include="Views\SettingsIcon.cs" />
+    <Compile Include="Controls\SettingsIcon.cs" />
     <Compile Include="Settings\GeneralOptions.cs" />
-    <Compile Include="Views\TailBlazerIcon.cs" />
+    <Compile Include="Controls\TailBlazerIcon.cs" />
     <Compile Include="Views\SearchCollection.cs" />
-    <Compile Include="Infrastucture\VirtualScrollPanel.cs" />
+    <Compile Include="Controls\VirtualScrollPanel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -218,7 +215,7 @@
     <Compile Include="Infrastucture\AppConventions.cs" />
     <Compile Include="Infrastucture\AppRegistry.cs" />
     <Compile Include="Infrastucture\BooleanToVisibilityConverter.cs" />
-    <Compile Include="Infrastucture\BootStrap.cs" />
+    <Compile Include="BootStrap.cs" />
     <Compile Include="Infrastucture\Command.cs" />
     <Compile Include="Infrastucture\DependencyObjectHook.cs" />
     <Compile Include="Infrastucture\IntertabClient.cs" />
@@ -310,6 +307,7 @@
   <ItemGroup>
     <Resource Include="FodyWeavers.xml" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.28.3\build\Fody.targets" Condition="Exists('..\packages\Fody.1.28.3\build\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

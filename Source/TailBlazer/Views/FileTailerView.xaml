@@ -9,6 +9,7 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:search="clr-namespace:TailBlazer.Domain.FileHandling.Search;assembly=TailBlazer.Domain"
              xmlns:tailBlazer="clr-namespace:TailBlazer"
+             xmlns:controls="clr-namespace:TailBlazer.Controls"
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
             Background="{DynamicResource MaterialDesignPaper}"
              x:Name="Control"
@@ -233,7 +234,7 @@
                         VerticalAlignment="Center"
                   
                         >
-                        <local:SettingsIcon  Width="14" Height="14"/>
+                        <controls:SettingsIcon  Width="14" Height="14"/>
                     </Button>
 
                     <StackPanel    
@@ -291,7 +292,7 @@
 
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <infrastucture:VirtualScrollPanel ItemHeight="22"
+                            <controls:VirtualScrollPanel ItemHeight="22"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
                                                 TotalItems="{Binding LatestCount.Value}"/>
@@ -320,7 +321,7 @@
 
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type local:LineProxy}">
-                            <infrastucture:HighlightTextControl
+                            <controls:HighlightTextControl
                                         Margin="6 0 0 0"   
                                         Text="{Binding Text}" 
                                         FormattedText = "{Binding FormattedText.Value}"

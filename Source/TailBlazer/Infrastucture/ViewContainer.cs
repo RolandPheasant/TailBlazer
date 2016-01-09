@@ -7,11 +7,7 @@ namespace TailBlazer.Infrastucture
         public Guid Id { get; } = Guid.NewGuid();
 
 
-        public ViewContainer(string title, object content)
-        {
-            Header = new HeaderContent(title);
-            Content = content;
-        }
+
 
         public ViewContainer(object header, object content)
         {

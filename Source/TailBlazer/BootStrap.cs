@@ -1,12 +1,11 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
 using StructureMap;
+using TailBlazer.Infrastucture;
 using TailBlazer.Views;
 
-namespace TailBlazer.Infrastucture
+namespace TailBlazer
 {
     public class BootStrap
     {

@@ -6,8 +6,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using TailBlazer.Infrastucture;
 
-namespace TailBlazer.Infrastucture
+namespace TailBlazer.Controls
 {
     public static class MeasureEx
     {

@@ -8,6 +8,7 @@ using System.Threading;
 using FluentAssertions;
 using Microsoft.Reactive.Testing;
 using TailBlazer.Domain.FileHandling;
+using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
 using Xunit;
 
