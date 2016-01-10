@@ -137,7 +137,7 @@ namespace TailBlazer.Views
                 .ForBinding();
 
             //User feedback to guide them whilst typing
-            SearchHint = this.WhenValueChanged(vm => vm.SearchHints.SearchText)
+            SearchHint = SearchHints.WhenValueChanged(vm => vm.SearchText)
                             .Select(text =>
                             {
                                 if (string.IsNullOrEmpty(text)) return "Type to search";

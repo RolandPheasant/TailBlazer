@@ -24,7 +24,7 @@ namespace TailBlazer.Views
 
         public  IProperty<IEnumerable<DisplayText>> FormattedText { get; }
 
-        public bool IsRecent { get; }
+        public bool IsRecent => Line.Timestamp.HasValue && DateTime.Now.Subtract(Line.Timestamp.Value).TotalSeconds < 0.25;
 
         public LineProxy([NotNull] Line line, [NotNull] IObservable<IEnumerable<DisplayText>> formattedText)
         {
@@ -33,11 +33,13 @@ namespace TailBlazer.Views
             Start = line.LineInfo.Start;
             Index = line.LineInfo.Index;
             Line = line;
-            IsRecent = line.Timestamp.HasValue && DateTime.Now.Subtract(line.Timestamp.Value).TotalSeconds < 0.25;
+    
 
             FormattedText = formattedText.ForBinding();
             _cleanUp = FormattedText;
         }
+
+
 
 
         public int CompareTo(LineProxy other)

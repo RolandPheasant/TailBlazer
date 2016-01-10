@@ -30,7 +30,7 @@
 
         d:DataContext="{d:DesignInstance views:WindowViewModel, IsDesignTimeCreatable=False}"
         Title="Tail Blazer" 
-        Height="650"
+        Height="500"
         Width="850">
 
     <Window.Resources>
