@@ -1,6 +1,8 @@
 # Tail Blazer
 
-[![Join the chat at https://gitter.im/RolandPheasant/TailBlazer](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/RolandPheasant/TailBlazer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build status](https://ci.appveyor.com/api/projects/status/yot4rioy393j52eg?svg=true)](https://ci.appveyor.com/project/RolandPheasant/tailblazer) [![GitHub issues](https://img.shields.io/github/issues/RolandPheasant/TailBlazer.svg)](https://github.com/RolandPheasant/TailBlazer/issues)
+[![Join the chat at https://gitter.im/RolandPheasant/TailBlazer](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/RolandPheasant/TailBlazer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build status](https://ci.appveyor.com/api/projects/status/yot4rioy393j52eg?svg=true)](https://ci.appveyor.com/project/RolandPheasant/tailblazer) [![GitHub issues](https://img.shields.io/github/issues/RolandPheasant/TailBlazer.svg)](https://github.com/RolandPheasant/TailBlazer/issues) 
+
+[![](https://img.shields.io/github/downloads/RolandPheasant/TailBlazer/total.svg)](https://github.com/RolandPheasant/TailBlazer/releases) [![](https://img.shields.io/chocolatey/dt/tailblazer.svg)](https://chocolatey.org/packages/tailblazer) [![](https://img.shields.io/chocolatey/v/tailblazer.svg)](https://chocolatey.org/packages/tailblazer)
 
 
 In my day to day professional life I am always tailing log files but have always been disappointed with the utilities on offer. The current crop of free ones all look like they were written in the 1990s, are very ugly and have limited functionality.
@@ -48,12 +50,11 @@ That's better. A tail program which is pleasing to my eyes!
 
 Feel free to get involved by reporting issues and submitting a feature request. Feedback is welcome and and is required to make this a first class system. But before raising an issue check out [issues](https://github.com/RolandPheasant/TailBlazer/issues) to see whether one has already been raised.  
 
-## Building Tail Blazer
-
-There has been an enthusiastic and indeed overwhelming demand for Tail Blazer and many people have asked where can they get it from.  When I get the time I will create an official packaged release but for now anyone who want to use it can either
+## Download Tail Blazer
 
  - Fork, clone or download the source code and build using Visual Studio 2015
- - Grab the binaries from the [release page](https://github.com/RolandPheasant/TailBlazer/releases), extract and double click TailBlazer.exe to run. These releases will be regularly updated.
+ - Install it via [Chocolatey](https://chocolatey.org/packages/tailblazer)
+ - Grab the binaries from the [release page](https://github.com/RolandPheasant/TailBlazer/releases), extract and double click TailBlazer.exe to run.
 
 ## Very large files and fast scrolling
 
