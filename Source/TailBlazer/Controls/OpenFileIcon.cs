@@ -3,7 +3,6 @@ using System.Windows.Controls;
 
 namespace TailBlazer.Controls
 {
-
     public class OpenFileIcon : Control
     {
         static OpenFileIcon()
