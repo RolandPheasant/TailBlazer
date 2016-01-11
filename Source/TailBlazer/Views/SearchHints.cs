@@ -13,6 +13,7 @@ namespace TailBlazer.Views
         private readonly ReadOnlyObservableCollection<string> _hints;
         private readonly IDisposable _cleanUp;
         private string _searchText;
+        private bool _useRegEx;
 
         public SearchHints(IRecentSearchCollection recentSearchCollection, ISchedulerProvider schedulerProvider)
         {
@@ -44,6 +45,12 @@ namespace TailBlazer.Views
         {
             get { return _searchText; }
             set { SetAndRaise(ref _searchText, value); }
+        }
+
+        public bool UseRegEx
+        {
+            get { return _useRegEx; }
+            set { SetAndRaise(ref _useRegEx, value); }
         }
 
         public ReadOnlyObservableCollection<string> Hints => _hints;

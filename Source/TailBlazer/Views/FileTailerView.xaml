@@ -8,7 +8,6 @@
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:search="clr-namespace:TailBlazer.Domain.FileHandling.Search;assembly=TailBlazer.Domain"
-             xmlns:tailBlazer="clr-namespace:TailBlazer"
              xmlns:controls="clr-namespace:TailBlazer.Controls"
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
             Background="{DynamicResource MaterialDesignPaper}"
@@ -22,10 +21,11 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
-                <ResourceDictionary Source="../Themes/Generic.xaml"></ResourceDictionary>
-                <ResourceDictionary Source="../Themes/Buttons.xaml"></ResourceDictionary>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
+                <ResourceDictionary Source="../Themes/Generic.xaml"/>
+                <ResourceDictionary Source="../Themes/Buttons.xaml"/>
+                <ResourceDictionary Source="../Themes/ToggleButtons.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <infrastucture:CheckedToLengthConverter TrueValue="*" FalseValue="*" x:Key="c1" />
@@ -87,101 +87,6 @@
 
 
             </Style>
-         
-            <Style x:Key="ToggleButtonStyle1" TargetType="{x:Type ToggleButton}">
-                <Setter Property="Foreground" Value="#FF616161"/>
-                <Setter Property="Background" Value="#FFE0E0E0"/>
-                <Setter Property="Width" Value="40"/>
-                <Setter Property="Height" Value="40"/>
-                <Setter Property="FontSize" Value="18"/>
-                <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                <Setter Property="Padding" Value="0"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type ToggleButton}">
-                            <Grid ClipToBounds="True" Clip="{Binding RenderedGeometry, ElementName=UncheckedEllipse}">
-                                <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroup x:Name="CommonStates">
-                                        <VisualState x:Name="Normal"/>
-                                        <VisualState x:Name="Disabled">
-                                            <Storyboard>
-                                                <DoubleAnimation Duration="0" To="0.23" Storyboard.TargetProperty="(UIElement.Opacity)"/>
-                                            </Storyboard>
-                                        </VisualState>
-                                    </VisualStateGroup>
-                                    <VisualStateGroup x:Name="CheckStates">
-                                        <VisualStateGroup.Transitions>
-                                            <VisualTransition From="*" GeneratedDuration="0" GeneratedEasingFunction="{x:Null}" To="Checked">
-                                                <Storyboard>
-                                                    <DoubleAnimationUsingKeyFrames Duration="0:0:0.2" Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="CheckedEllipse">
-                                                        <LinearDoubleKeyFrame KeyTime="0" Value="0"/>
-                                                        <LinearDoubleKeyFrame KeyTime="0:0:0.1" Value="40"/>
-                                                    </DoubleAnimationUsingKeyFrames>
-                                                    <DoubleAnimationUsingKeyFrames Duration="0:0:0.2" Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="CheckedEllipse">
-                                                        <LinearDoubleKeyFrame KeyTime="0" Value="0"/>
-                                                        <LinearDoubleKeyFrame KeyTime="0:0:0.1" Value="40"/>
-                                                    </DoubleAnimationUsingKeyFrames>
-                                                </Storyboard>
-                                            </VisualTransition>
-                                            <VisualTransition From="Checked" GeneratedDuration="0" GeneratedEasingFunction="{x:Null}" To="Unchecked">
-                                                <Storyboard>
-                                                    <DoubleAnimationUsingKeyFrames Duration="0:0:0.2" Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="CheckedEllipse">
-                                                        <LinearDoubleKeyFrame KeyTime="0" Value="40"/>
-                                                        <LinearDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
-                                                    </DoubleAnimationUsingKeyFrames>
-                                                    <DoubleAnimationUsingKeyFrames Duration="0:0:0.2" Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="CheckedEllipse">
-                                                        <LinearDoubleKeyFrame KeyTime="0" Value="40"/>
-                                                        <LinearDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
-                                                    </DoubleAnimationUsingKeyFrames>
-                                                </Storyboard>
-                                            </VisualTransition>
-                                        </VisualStateGroup.Transitions>
-                                        <VisualState x:Name="Checked">
-                                            <Storyboard>
-                                                <DoubleAnimation Duration="0" To="40" Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="CheckedEllipse"/>
-                                                <DoubleAnimation Duration="0" To="40" Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="CheckedEllipse"/>
-                                            </Storyboard>
-                                        </VisualState>
-                                        <VisualState x:Name="Unchecked">
-                                            <Storyboard>
-                                                <DoubleAnimation Duration="0" To="0" Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="CheckedEllipse"/>
-                                                <DoubleAnimation Duration="0" To="0" Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="CheckedEllipse"/>
-                                            </Storyboard>
-                                        </VisualState>
-                                    </VisualStateGroup>
-                                </VisualStateManager.VisualStateGroups>
-                                <Ellipse x:Name="HoverEllipse" Fill="Transparent" Height="{TemplateBinding Height}" Stroke="Transparent" StrokeThickness="1" Width="{TemplateBinding Width}"/>
-                                <Ellipse x:Name="CheckedEllipse" Fill="{TemplateBinding Background}" Height="{TemplateBinding Height}" Width="{TemplateBinding Width}"/>
-                               
-                                <Grid>
-                                    <controls:RegexIcon   x:Name="UnCheckedImage" 
-                                            Margin="4 0 0 0"
-                                                          
-                                            Width="24" Height="24" Foreground="{Binding ElementName=SearchTextBox, Path=BorderBrush}"/>
-
-                                    <controls:FilterIcon   x:Name="CheckedImage" 
-                                                           Opacity="1"
-                                                            Margin="4 0 0 0"
-                                                            Width="24" Height="24" Foreground="{Binding ElementName=SearchTextBox, Path=BorderBrush}"/>
-                                </Grid>
-                                
-                                <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" 
-                                                  Content="{TemplateBinding Content}" 
-                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
-                                                  Margin="{TemplateBinding Padding}" 
-                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                            </Grid>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Stroke" TargetName="HoverEllipse" Value="{Binding Background, RelativeSource={RelativeSource TemplatedParent}}"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
         </ResourceDictionary>
     </Control.Resources>
 
@@ -217,31 +122,18 @@
                     </Grid.ColumnDefinitions>
 
 
+                    <ToggleButton  Style="{DynamicResource SearchToggleStyle}" 
+                                   IsChecked="{Binding SearchHints.UseRegEx}" 
+                                   Margin="4 0 0 0"/>
 
-                    <!--<ToggleButton  Style="{DynamicResource ToggleButtonStyle1}" Padding="4">
-                        <controls:FilterIcon  
-                            Margin="4 0 0 0"
-                            Width="24" Height="24" Foreground="{Binding ElementName=SearchTextBox, Path=BorderBrush}"/>
-
-                    </ToggleButton>-->
-                    <controls:FilterIcon  
-                            Margin="4 0 0 0"
-                            Width="24" Height="24" Foreground="{Binding ElementName=SearchTextBox, Path=BorderBrush}"/>
-
-
-                    <!--<controls:RegexIcon  
-                        Margin="4 0 0 0"
-                        Width="24" Height="24" Foreground="{Binding ElementName=SearchTextBox, Path=BorderBrush}"/>-->
-
-
-                    <TextBox Grid.Column="1" x:Name="SearchTextBox" 
+                    <TextBox Grid.Column="1" 
                         
-                             Margin="6 0 0 0"
-                        wpf:TextFieldAssist.Hint="{Binding SearchHint.Value}"          
-                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                        Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        VerticalAlignment="Center"
-                        MinWidth="125">
+                            Margin="1 0 0 0"
+                            wpf:TextFieldAssist.Hint="{Binding SearchHint.Value}"          
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                            Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            VerticalAlignment="Center"
+                            MinWidth="125">
                         <TextBox.InputBindings>
                             <KeyBinding Key="Enter" Command="{Binding AddSearchCommand}"/>
                         </TextBox.InputBindings>

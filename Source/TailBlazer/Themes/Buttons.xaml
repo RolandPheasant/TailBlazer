@@ -10,6 +10,8 @@
             <ResourceDictionary Source="../Themes/Generic.xaml"></ResourceDictionary>
             <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
         </ResourceDictionary.MergedDictionaries>
+    
+    
 
         <Style TargetType="{x:Type Button}" x:Key="SettingsButtonStyle" 
                BasedOn="{StaticResource MaterialDesignMenuCommandButtonStyle}">
