@@ -5,12 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TailBlazer.Settings"
              xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:system="clr-namespace:System;assembly=mscorlib"
-             xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
-             xmlns:search="clr-namespace:TailBlazer.Domain.FileHandling.Search;assembly=TailBlazer.Domain"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:SearchOptionsViewModel}"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300">
 
     <Control.Resources>
         <ResourceDictionary>
@@ -52,14 +49,15 @@
 
 
                 <ToggleButton  Style="{DynamicResource SearchToggleStyle}" 
-                                    Margin="4 0 0 0"/>
+                               IsChecked="{Binding SearchHints.UseRegEx}"     
+                               />
 
                 <TextBox Grid.Column="1" 
-                        wpf:TextFieldAssist.Hint="{Binding SearchHint.Value}"          
+                        wpf:TextFieldAssist.Hint="{Binding SearchHints.SearchHint.Value}"          
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                        Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,ValidatesOnDataErrors=True}"
                         VerticalAlignment="Center"
-                        MinWidth="125">
+                        MinWidth="150">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding  AddSearchCommand}"/>
                     </TextBox.InputBindings>

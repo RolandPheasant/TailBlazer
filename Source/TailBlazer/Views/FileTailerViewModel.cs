@@ -42,12 +42,10 @@ namespace TailBlazer.Views
         public ICommand AddSearchCommand { get; }
         public ISelectionMonitor SelectionMonitor { get; }
         public SearchOptionsViewModel SearchOptions { get;  }
-
         public SearchHints SearchHints { get;  }
         public SearchCollection SearchCollection { get; }
         public InlineViewer InlineViewer { get; }
         public IProperty<int> SelectedItemsCount { get; }
-        public IProperty<string> SearchHint { get; }
         public IProperty<int> Count { get; }
         public IProperty<string> CountText { get; }
         public IProperty<int> LatestCount { get; }
@@ -136,14 +134,6 @@ namespace TailBlazer.Views
                 .DistinctUntilChanged()
                 .ForBinding();
 
-            //User feedback to guide them whilst typing
-            SearchHint = SearchHints.WhenValueChanged(vm => vm.SearchText)
-                            .Select(text =>
-                            {
-                                if (string.IsNullOrEmpty(text)) return "Type to search";
-                                return text.Length < 3 ? "Enter at least 3 characters" : "Hit enter to search";
-                            }).ForBinding();
-
             //tailer is the main object used to tail, scroll and filter in a file
             var lineScroller = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
 
@@ -196,7 +186,6 @@ namespace TailBlazer.Views
                 Count,
                 LatestCount,
                 FileSizeText,
-                SearchHint,
                 SelectedItemsCount,
                 CanViewInline,
                 InlineViewer,
@@ -210,8 +199,7 @@ namespace TailBlazer.Views
                 searchMetadataCollection,
                 SelectionMonitor,
                 SearchOptions,
-                Disposable.Create(_userScrollRequested.OnCompleted)
-                );
+                Disposable.Create(_userScrollRequested.OnCompleted));
         }
         
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)

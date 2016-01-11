@@ -9,11 +9,13 @@ using TailBlazer.Domain;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
+using TailBlazer.Views;
 
 namespace TailBlazer.Settings
 {
     public class SearchOptionsViewModel: AbstractNotifyPropertyChanged, IDisposable
     {
+
         //create text to add new option - default to highlight without search
         private readonly IDisposable _cleanUp;
         private string _searchText;
@@ -21,10 +23,14 @@ namespace TailBlazer.Settings
         public ReadOnlyObservableCollection<SearchOptionsProxy> Data { get; }
 
         public ICommand AddSearchCommand { get; }
-        public IProperty<string> SearchHint { get; }
+      //  public IProperty<string> SearchHint { get; }
+        public SearchHints SearchHints { get;  }
 
-        public SearchOptionsViewModel(ISearchMetadataCollection metadataCollection, ISchedulerProvider schedulerProvider)
+        public SearchOptionsViewModel(ISearchMetadataCollection metadataCollection, 
+            ISchedulerProvider schedulerProvider,
+            SearchHints searchHints)
         {
+            SearchHints = searchHints;
             //TODO: options for colour
 
             var swatches = new SwatchesProvider().Swatches;
@@ -58,15 +64,9 @@ namespace TailBlazer.Settings
             var commandRefresher = this.WhenValueChanged(vm => vm.SearchText)
                                     .Subscribe(_ => ((Command) AddSearchCommand).Refresh());
             
-            //User feedback to guide them whilst typing
-            SearchHint = this.WhenValueChanged(vm => vm.SearchText)
-                            .Select(text =>
-                            {
-                                if (string.IsNullOrEmpty(text)) return "Type to highlight";
-                                return text.Length < 3 ? "Enter at least 3 characters" : "Hit enter for more options";
-                            }).ForBinding();
+
             
-            _cleanUp = new CompositeDisposable(commandRefresher, userOptions, SearchHint);
+            _cleanUp = new CompositeDisposable(commandRefresher, userOptions);
         }
 
 
