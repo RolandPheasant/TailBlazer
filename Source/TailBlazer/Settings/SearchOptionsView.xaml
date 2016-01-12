@@ -6,6 +6,8 @@
              xmlns:local="clr-namespace:TailBlazer.Settings"
              xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
+                TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
+                Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
              d:DataContext="{d:DesignInstance local:SearchOptionsViewModel}"
              d:DesignHeight="300">
 

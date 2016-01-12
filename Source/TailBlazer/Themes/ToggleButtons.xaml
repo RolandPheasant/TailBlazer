@@ -7,7 +7,7 @@
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-        <Style x:Key="FocusVisual">
+    <Style x:Key="FocusVisual">
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
@@ -16,7 +16,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style x:Key="SearchToggleStyle" TargetType="{x:Type ToggleButton}">
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
         <Setter Property="Background" Value="Transparent"/>
@@ -28,7 +28,7 @@
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Padding" Value="4 4 4 4"/>
-        
+
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ToggleButton}">
@@ -53,13 +53,27 @@
                                             <EasingDoubleKeyFrame KeyTime="0" Value="1"/>
                                         </DoubleAnimationUsingKeyFrames>
                                         <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="UnCheckedImage">
+                                            <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
                                             <EasingDoubleKeyFrame KeyTime="1" Value="0"/>
                                         </DoubleAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
-                                <VisualState x:Name="Unchecked"/>
+                                <VisualState x:Name="Unchecked">
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="CheckedImage">
+                                            <EasingDoubleKeyFrame KeyTime="1" Value="0"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="UnCheckedImage">
+                                            <EasingDoubleKeyFrame KeyTime="0" Value="1">
+                                                <EasingDoubleKeyFrame.EasingFunction>
+                                                    <ExponentialEase EasingMode="EaseOut"/>
+                                                </EasingDoubleKeyFrame.EasingFunction>
+                                            </EasingDoubleKeyFrame>
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
 
-                                
+
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
 
@@ -95,6 +109,6 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="IsChecked" Value="False"></Setter>
+        <!--<Setter Property="IsChecked" Value="False"></Setter>-->
     </Style>
 </ResourceDictionary>
