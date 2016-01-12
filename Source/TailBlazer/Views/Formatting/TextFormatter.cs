@@ -10,25 +10,25 @@ namespace TailBlazer.Views.Formatting
 {
     public class TextFormatter : ITextFormatter
     {
-        private readonly IObservable<IEnumerable<string>> _strings;
+        private readonly IObservable<IEnumerable<SearchMetadata>> _strings;
 
         public TextFormatter(ISearchMetadataCollection searchMetadataCollection)
         {
             _strings = searchMetadataCollection.Metadata
                 .Connect(meta => meta.Highlight && !meta.UseRegex)
-                .IgnoreUpdateWhen((current, previous) => current.Highlight == previous.Highlight)
-                .QueryWhenChanged(query => query.Items.Select(si => si.SearchText))
+                .IgnoreUpdateWhen((current, previous) => current.Highlight == previous.Highlight && current.UseRegex == previous.UseRegex)
+                .QueryWhenChanged(query => query.Items.Select(si => si))
                 .Replay(1)
                 .RefCount();
         }
 
         public IObservable<IEnumerable<DisplayText>> GetFormatter(string inputText)
         {
-            return _strings.Select(searchText =>
+            return _strings.Select(meta =>
             {
                 //split into 2 parts. 1) matching text 2) matching regex
                 return inputText
-                    .MatchString(searchText)
+                    .MatchString(meta)
                     .Select(ms => new DisplayText(ms));
             });
         }

@@ -61,7 +61,7 @@
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,ValidatesOnDataErrors=True}"
                         VerticalAlignment="Center"
-                        MinWidth="150">
+                        MinWidth="180">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding  AddSearchCommand}"/>
                     </TextBox.InputBindings>
