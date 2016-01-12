@@ -105,6 +105,7 @@
     <Compile Include="FileHandling\IndexCollection.cs" />
     <Compile Include="FileHandling\Indexer.cs" />
     <Compile Include="FileHandling\Search\ISearchMetadataCollection.cs" />
+    <Compile Include="FileHandling\Search\SearchEx.cs" />
     <Compile Include="FileHandling\Search\SearchMetadata.cs" />
     <Compile Include="FileHandling\Search\SearchMetadataCollection.cs" />
     <Compile Include="FileHandling\Search\SearchType.cs" />
@@ -115,7 +116,7 @@
     <Compile Include="Formatting\MatchedString.cs" />
     <Compile Include="Formatting\MatchedStringEnumerator.cs" />
     <Compile Include="Formatting\MatchedStringEx.cs" />
-    <Compile Include="Infrastructure\ConsoleLogger.cs" />
+    <Compile Include="Infrastructure\NullLogger.cs" />
     <Compile Include="Infrastructure\DynamicDataEx.cs" />
     <Compile Include="Infrastructure\EnumerableEx.cs" />
     <Compile Include="Infrastructure\Equality.cs" />

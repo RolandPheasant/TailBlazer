@@ -35,7 +35,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                 .Transform(meta =>
                 {
                     var latest = _fileWatcher.Latest
-                        .Search(s => s.Contains(meta.SearchText, StringComparison.OrdinalIgnoreCase))
+                        .Search(meta.BuildPredicate())
                         .Replay(1).RefCount();
 
                     return new SearchInfo(meta.SearchText, latest, SearchType.User);

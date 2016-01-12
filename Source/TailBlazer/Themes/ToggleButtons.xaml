@@ -89,9 +89,7 @@
                                                 Padding="{TemplateBinding Padding}" 
                                                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
 
-                            <Grid  
-                                   
-                                    Margin="{TemplateBinding Padding}" RenderTransformOrigin="0.5,0.5">
+                            <Grid  Margin="{TemplateBinding Padding}" RenderTransformOrigin="0.5,0.5">
                                 <Grid.RenderTransform>
                                     <TransformGroup>
                                         <ScaleTransform/>
