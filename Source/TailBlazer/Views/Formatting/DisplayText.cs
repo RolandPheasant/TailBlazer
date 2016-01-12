@@ -1,9 +1,20 @@
+using System.Collections.Generic;
 using System.Windows.Media;
 using DynamicData.Kernel;
 using TailBlazer.Domain.Formatting;
 
 namespace TailBlazer.Views.Formatting
 {
+
+    
+
+    public class DisplayTextCollection
+    {
+        public DisplayTextCollection(IEnumerable<DisplayText> displayItems )
+        {
+        }
+    }
+
     public class DisplayText
     {
         public string Text { get; }

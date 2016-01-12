@@ -12,5 +12,10 @@ namespace TailBlazer.Domain.Formatting
         {
             return new MatchedStringEnumerator(source, itemsToMatch);
         }
+
+        //public static string SafeSubstring(this string source, IEnumerable<string> itemsToMatch)
+        //{
+        //    return new MatchedStringEnumerator(source, itemsToMatch);
+        //}
     }
 }

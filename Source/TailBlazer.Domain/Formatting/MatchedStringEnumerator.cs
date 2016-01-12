@@ -98,9 +98,14 @@ namespace TailBlazer.Domain.Formatting
                     yield return new MatchedString(originalString, true);
 
                     currentLength = current.Length + currentLength + tomatch.Length;
+                    if (currentLength + tomatch.Length > input.Length)
+                        yield break;
                 }
                 else if (i > 0 && !string.IsNullOrEmpty(split[i - 1]))
                 {
+                    if (currentLength + tomatch.Length > input.Length)
+                        yield break;
+
                     //Get original string back as the user may have searched in a different case
                     var originalString = input.Substring(currentLength, tomatch.Length);
                
@@ -119,6 +124,7 @@ namespace TailBlazer.Domain.Formatting
             }
         }
 
+        
 
         IEnumerator IEnumerable.GetEnumerator()
         {

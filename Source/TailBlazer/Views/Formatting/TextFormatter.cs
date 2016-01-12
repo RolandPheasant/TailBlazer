@@ -15,7 +15,7 @@ namespace TailBlazer.Views.Formatting
         public TextFormatter(ISearchMetadataCollection searchMetadataCollection)
         {
             _strings = searchMetadataCollection.Metadata
-                .Connect(meta => meta.Highlight)
+                .Connect(meta => meta.Highlight && !meta.UseRegex)
                 .IgnoreUpdateWhen((current, previous) => current.Highlight == previous.Highlight)
                 .QueryWhenChanged(query => query.Items.Select(si => si.SearchText))
                 .Replay(1)
@@ -26,6 +26,7 @@ namespace TailBlazer.Views.Formatting
         {
             return _strings.Select(searchText =>
             {
+                //split into 2 parts. 1) matching text 2) matching regex
                 return inputText
                     .MatchString(searchText)
                     .Select(ms => new DisplayText(ms));
