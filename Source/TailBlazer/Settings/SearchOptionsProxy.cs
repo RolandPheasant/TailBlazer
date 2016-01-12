@@ -14,6 +14,7 @@ namespace TailBlazer.Settings
         private readonly SearchMetadata _searchMetadata;
         private bool _highlight;
         private bool _filter;
+        private bool _useRegex;
 
         public string Text => _searchMetadata.SearchText.ToUpper();
 
@@ -33,6 +34,7 @@ namespace TailBlazer.Settings
             _searchMetadata = searchMetadata;
             Highlight = _searchMetadata.Highlight;
             Filter = _searchMetadata.Filter;
+            UseRegex = searchMetadata.UseRegex;
             RemoveCommand = new Command(() => removeAction(searchMetadata));
         }
 
@@ -46,6 +48,13 @@ namespace TailBlazer.Settings
         {
             get { return _filter; }
             set { SetAndRaise(ref _filter, value); }
+        }
+
+
+        public bool UseRegex
+        {
+            get { return _useRegex; }
+            set { SetAndRaise(ref _useRegex, value); }
         }
     }
 }

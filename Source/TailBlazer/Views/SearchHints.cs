@@ -17,7 +17,7 @@ namespace TailBlazer.Views
         private readonly ReadOnlyObservableCollection<string> _hints;
         private readonly IDisposable _cleanUp;
         private string _searchText;
-        private bool _useRegEx;
+        private bool _useRegex;
         
         public IProperty<string> SearchHint { get; }
 
@@ -33,7 +33,7 @@ namespace TailBlazer.Views
 
             //User feedback to guide them whilst typing
             var searchText = this.WhenValueChanged(vm => vm.SearchText);
-            var useRegEx = this.WhenValueChanged(vm => vm.UseRegEx);
+            var useRegEx = this.WhenValueChanged(vm => vm.UseRegex);
 
             //if regex then validate
            var combined = searchText.CombineLatest(useRegEx, (text, regex) => new {text, regex}).Publish();
@@ -95,10 +95,10 @@ namespace TailBlazer.Views
             set { SetAndRaise(ref _searchText, value); }
         }
 
-        public bool UseRegEx
+        public bool UseRegex
         {
-            get { return _useRegEx; }
-            set { SetAndRaise(ref _useRegEx, value); }
+            get { return _useRegex; }
+            set { SetAndRaise(ref _useRegex, value); }
         }
 
         public ReadOnlyObservableCollection<string> Hints => _hints;

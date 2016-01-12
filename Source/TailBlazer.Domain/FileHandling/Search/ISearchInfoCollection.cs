@@ -9,7 +9,7 @@ namespace TailBlazer.Domain.FileHandling.Search
 
         IObservable<ILineProvider> All { get; }
 
-        void Add(string searchText);
+        void Add(string searchText, bool useRegex);
         void Remove(string searchText);
     }
 }

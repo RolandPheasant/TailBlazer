@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:controls="clr-namespace:TailBlazer.Controls">
+                    xmlns:controls="clr-namespace:TailBlazer.Controls"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
 
     <ResourceDictionary.MergedDictionaries>
@@ -23,7 +24,7 @@
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}"/>
-        <Setter Property="Width" Value="32"/>
+        <Setter Property="Width" Value="40"/>
         <Setter Property="Height" Value="40"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -79,16 +80,32 @@
 
                         <Border x:Name="border" 
                                 Background="{TemplateBinding Background}" 
-                                CornerRadius="2">
+                                CornerRadius="2"/>
 
-                            <Grid   Height="24" Width="24" 
-                                    Margin="{TemplateBinding Padding}">
+                        <materialDesign:Ripple   Focusable="True"     
+                                                Feedback="{DynamicResource MaterialDesignBody}"
+                                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                Padding="{TemplateBinding Padding}" 
+                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+
+                            <Grid  
+                                   
+                                    Margin="{TemplateBinding Padding}" RenderTransformOrigin="0.5,0.5">
+                                <Grid.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Grid.RenderTransform>
                                 <controls:RegexIcon   x:Name="CheckedImage" Opacity="0" />
                                 <controls:FilterIcon   x:Name="UnCheckedImage" Opacity="1" />
 
                             </Grid>
 
-                        </Border>
+                        </materialDesign:Ripple>
                     </Grid>
                     <ControlTemplate.Triggers>
 
@@ -99,7 +116,6 @@
 
                         <Trigger Property="IsChecked" Value="False">
                             <Setter Property="ToolTip" Value="Search using plain text"/>
-                            <!--<Setter Property=""></Setter>-->
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter Property="ToolTip" Value="Search using a regular expression"/>
@@ -109,6 +125,5 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <!--<Setter Property="IsChecked" Value="False"></Setter>-->
     </Style>
 </ResourceDictionary>

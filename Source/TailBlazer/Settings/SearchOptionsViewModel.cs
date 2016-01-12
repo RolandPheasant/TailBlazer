@@ -44,7 +44,7 @@ namespace TailBlazer.Settings
                 {
                     //when a value changes, write the original value back to the cache
                     return so.WhenAnyPropertyChanged()
-                        .Subscribe(_ => metadataCollection.Add(new SearchMetadata(so.Text, so.Filter, so.Highlight)));
+                        .Subscribe(_ => metadataCollection.Add(new SearchMetadata(so.Text, so.Filter, so.Highlight,so.UseRegex)));
                 })
                 .Sort(SortExpressionComparer<SearchOptionsProxy>.Ascending(proxy=>proxy.Text))
                 .ObserveOn(schedulerProvider.MainThread)
@@ -55,7 +55,7 @@ namespace TailBlazer.Settings
 
             AddSearchCommand = new Command(() =>
             {
-                    metadataCollection.Add(new SearchMetadata(SearchText,false,true));
+                    metadataCollection.Add(new SearchMetadata(SearchText,false,true, SearchHints.UseRegex));
                     SearchText = string.Empty;
 
             }, () => SearchText.IsLongerThanOrEqualTo(3) && !metadataCollection.Metadata.Lookup((CaseInsensitiveString)SearchText).HasValue);

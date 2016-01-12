@@ -49,10 +49,10 @@ namespace TailBlazer.Domain.FileHandling.Search
             _cleanUp = new CompositeDisposable(Searches, systemSearches);
         }
 
-        public void Add([NotNull] string searchText)
+        public void Add([NotNull] string searchText, bool useRegex)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
-            _metadataCollection.Add(new SearchMetadata(searchText,true,true));
+            _metadataCollection.Add(new SearchMetadata(searchText,true,true, useRegex));
         }
 
         public void Remove(string searchText)

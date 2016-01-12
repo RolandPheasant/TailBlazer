@@ -6,8 +6,8 @@
              xmlns:local="clr-namespace:TailBlazer.Settings"
              xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
-                TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
-                Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
+            TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
+             Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
              d:DataContext="{d:DesignInstance local:SearchOptionsViewModel}"
              d:DesignHeight="300">
 
@@ -35,7 +35,7 @@
                 FontWeight="DemiBold"
                 Text="Search and Highlight Options"/>
 
-        <Grid Grid.Row="1" Height="250" Width="350" Margin="8">
+        <Grid Grid.Row="1" Height="250" Width="375" Margin="8">
             <Grid.RowDefinitions>
                 <RowDefinition  Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -51,8 +51,10 @@
 
 
                 <ToggleButton  Style="{DynamicResource SearchToggleStyle}" 
-                               IsChecked="{Binding SearchHints.UseRegEx}"     
-                               />
+                                  Margin="2 0 0 0"
+                                   Padding="2"
+                                   Width="32"
+                               IsChecked="{Binding SearchHints.UseRegex}"/>
 
                 <TextBox Grid.Column="1" 
                         wpf:TextFieldAssist.Hint="{Binding SearchHints.SearchHint.Value}"          
@@ -78,30 +80,39 @@
                         <DataTemplate DataType="{x:Type local:SearchOptionsProxy}">
 
                             <Grid Margin="0 4 4 4">
+                                
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
+                                <ToggleButton  Style="{DynamicResource SearchToggleStyle}" 
+                                               Padding="2"
+                                               Width="22"
+                                               Height="22"
+                                               VerticalAlignment="Center"
+                                    IsChecked="{Binding  UseRegex}"/>
 
-                                <TextBlock Text="{Binding Text}"
-                                        VerticalAlignment="Center"/>
+                                <TextBlock Margin="4 0 0 0"  Grid.Column="1" 
+                                           Text="{Binding Text}"
+                                            VerticalAlignment="Center"/>
 
-                                <CheckBox Margin="4 0 0 0" Grid.Column="1" 
+                                <CheckBox Margin="4 0 0 0" Grid.Column="2" 
                                       VerticalAlignment="Center"
                                       IsChecked="{Binding Filter}" 
                                       Content="Filter"/>
-                                <CheckBox Margin="4 0 0 0" Grid.Column="2" 
+                                
+                                <CheckBox Margin="4 0 0 0" Grid.Column="3" 
                                       VerticalAlignment="Center"
                                       IsChecked="{Binding Highlight}" 
                                       Content="Highlight"/>
 
 
                                 <Button Margin="8 0 6 0"
-                                        Grid.Column="3" 
-                             
+                                        Grid.Column="4" 
                                         ToolTip="{Binding RemoveTooltip}"
                                         VerticalAlignment="Center"
                                         Command="{Binding RemoveCommand}"

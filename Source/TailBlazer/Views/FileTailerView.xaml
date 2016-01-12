@@ -124,7 +124,9 @@
 
                     <ToggleButton  Style="{DynamicResource SearchToggleStyle}" 
                                    Margin="2 0 0 0"
-                                   IsChecked="{Binding SearchHints.UseRegEx}"/>
+                                   Padding="2"
+                                   Width="32"    
+                                   IsChecked="{Binding SearchHints.UseRegex}"/>
 
                     <TextBox Grid.Column="1" 
                             wpf:TextFieldAssist.Hint="{Binding SearchHints.SearchHint.Value}"    

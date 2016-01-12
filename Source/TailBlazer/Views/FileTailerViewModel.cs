@@ -122,7 +122,7 @@ namespace TailBlazer.Views
             AddSearchCommand = new Command(() =>
             {
                 var text = SearchHints.SearchText;
-                searchInfoCollection.Add(text);
+                searchInfoCollection.Add(text,SearchHints.UseRegex);
                 recentSearchCollection.Add(new RecentSearch(text));
                 SearchHints.SearchText = string.Empty;
 

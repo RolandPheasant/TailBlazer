@@ -10,7 +10,6 @@
         xmlns:views="clr-namespace:TailBlazer.Views"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:settings="clr-namespace:TailBlazer.Settings"
-        xmlns:themes="clr-namespace:Dragablz.Themes;assembly=Dragablz"
         xmlns:tailBlazer="clr-namespace:TailBlazer"
         xmlns:controls1="clr-namespace:TailBlazer.Controls"
         mc:Ignorable="d"

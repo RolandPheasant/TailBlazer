@@ -8,14 +8,16 @@ namespace TailBlazer.Domain.FileHandling.Search
         public string SearchText { get; }
         public bool Filter { get; }
         public bool Highlight { get; }
+        public bool UseRegex { get; }
 
-        public SearchMetadata([NotNull] string searchText, bool filter, bool highlight)
+        public SearchMetadata([NotNull] string searchText, bool filter, bool highlight, bool useRegex)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
 
             SearchText = searchText;
             Filter = filter;
             Highlight = highlight;
+            UseRegex = useRegex;
         }
     }
 }
