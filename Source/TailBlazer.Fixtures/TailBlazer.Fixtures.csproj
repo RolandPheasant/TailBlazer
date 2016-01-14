@@ -110,7 +110,6 @@
     <Compile Include="SchedulerEx.cs" />
     <Compile Include="IndexerFixture.cs" />
     <Compile Include="SettingsStoreFixture.cs" />
-    <Compile Include="SplitFileByMatchingRegexFixture.cs" />
     <Compile Include="SplitFileByMatchingTextFixture.cs" />
     <Compile Include="TestFile.cs" />
   </ItemGroup>
