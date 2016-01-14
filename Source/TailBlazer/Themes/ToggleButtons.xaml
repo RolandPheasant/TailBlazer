@@ -108,7 +108,7 @@
                     <ControlTemplate.Triggers>
 
                         <Trigger Property="IsMouseOver" Value="true">
-                            <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource AttentionToActionBrush}" />
+                            <!--<Setter Property="BorderBrush" TargetName="border" Value="{StaticResource AttentionToActionBrush}" />-->
                             <Setter Property="Background" TargetName="border" Value="{DynamicResource MaterialDesignFlatButtonClick}" />
                         </Trigger>
 

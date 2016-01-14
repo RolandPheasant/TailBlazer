@@ -15,8 +15,8 @@ namespace TailBlazer.Views.Formatting
         public TextFormatter(ISearchMetadataCollection searchMetadataCollection)
         {
             _strings = searchMetadataCollection.Metadata
-                .Connect(meta => meta.Highlight && !meta.UseRegex)
-                .IgnoreUpdateWhen((current, previous) => current.Highlight == previous.Highlight && current.UseRegex == previous.UseRegex)
+                .Connect(meta => meta.Highlight)
+                .IgnoreUpdateWhen((current, previous) => SearchMetadata.EffectsHighlightComparer.Equals(current, previous))
                 .QueryWhenChanged(query => query.Items.Select(si => si))
                 .Replay(1)
                 .RefCount();

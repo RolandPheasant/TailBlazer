@@ -15,6 +15,7 @@ namespace TailBlazer.Settings
         private bool _highlight;
         private bool _filter;
         private bool _useRegex;
+        private bool _ignoreCase;
 
         public string Text => _searchMetadata.SearchText.ToUpper();
 
@@ -35,6 +36,8 @@ namespace TailBlazer.Settings
             Highlight = _searchMetadata.Highlight;
             Filter = _searchMetadata.Filter;
             UseRegex = searchMetadata.UseRegex;
+            IgnoreCase = searchMetadata.IgnoreCase;
+
             RemoveCommand = new Command(() => removeAction(searchMetadata));
         }
 
@@ -55,6 +58,12 @@ namespace TailBlazer.Settings
         {
             get { return _useRegex; }
             set { SetAndRaise(ref _useRegex, value); }
+        }
+
+        public bool IgnoreCase
+        {
+            get { return _ignoreCase; }
+            set { SetAndRaise(ref _ignoreCase, value); }
         }
     }
 }

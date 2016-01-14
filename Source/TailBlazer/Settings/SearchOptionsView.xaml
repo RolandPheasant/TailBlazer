@@ -87,6 +87,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
                                 <ToggleButton  Style="{DynamicResource SearchToggleStyle}" 
@@ -110,9 +111,14 @@
                                       IsChecked="{Binding Highlight}" 
                                       Content="Highlight"/>
 
+                                <CheckBox Margin="4 0 0 0" Grid.Column="4" 
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding IgnoreCase}" 
+                                      Content="Ignore Case"/>
+
 
                                 <Button Margin="8 0 6 0"
-                                        Grid.Column="4" 
+                                        Grid.Column="5" 
                                         ToolTip="{Binding RemoveTooltip}"
                                         VerticalAlignment="Center"
                                         Command="{Binding RemoveCommand}"

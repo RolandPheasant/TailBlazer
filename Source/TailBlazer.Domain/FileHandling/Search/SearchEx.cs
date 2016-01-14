@@ -7,17 +7,28 @@ namespace TailBlazer.Domain.FileHandling.Search
     {
         public static Func<string, bool> BuildPredicate(this SearchMetadata source)
         {
+            const RegexOptions caseInsensitiveOptions = RegexOptions.IgnorePatternWhitespace
+                                                        | RegexOptions.Compiled
+                                                        | RegexOptions.IgnoreCase;
+
+            const RegexOptions caseSensitiveOptions = RegexOptions.IgnorePatternWhitespace
+                                                      | RegexOptions.Compiled;
+
             Func<string, bool> predicate;
             if (!source.UseRegex)
             {
-                predicate = s => s.Contains(source.SearchText, StringComparison.OrdinalIgnoreCase);
+                var stringComparison = source.IgnoreCase ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+                predicate = s => s.Contains(source.SearchText, stringComparison);
             }
             else
             {
-                var regex = new Regex(source.SearchText);
+                var options = source.IgnoreCase ? caseInsensitiveOptions : caseSensitiveOptions;
+                var regex = new Regex(source.SearchText, options);
                 predicate = s => regex.IsMatch(s);
             }
             return predicate;
-        } 
+        }
     }
+}
+
 }

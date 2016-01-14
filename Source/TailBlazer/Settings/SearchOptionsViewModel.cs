@@ -15,7 +15,6 @@ namespace TailBlazer.Settings
 {
     public class SearchOptionsViewModel: AbstractNotifyPropertyChanged, IDisposable
     {
-
         //create text to add new option - default to highlight without search
         private readonly IDisposable _cleanUp;
         private string _searchText;
@@ -44,7 +43,7 @@ namespace TailBlazer.Settings
                 {
                     //when a value changes, write the original value back to the cache
                     return so.WhenAnyPropertyChanged()
-                        .Subscribe(_ => metadataCollection.Add(new SearchMetadata(so.Text, so.Filter, so.Highlight,so.UseRegex)));
+                        .Subscribe(_ => metadataCollection.Add(new SearchMetadata(so.Text, so.Filter, so.Highlight,so.UseRegex,so.IgnoreCase)));
                 })
                 .Sort(SortExpressionComparer<SearchOptionsProxy>.Ascending(proxy=>proxy.Text))
                 .ObserveOn(schedulerProvider.MainThread)
@@ -55,7 +54,7 @@ namespace TailBlazer.Settings
 
             AddSearchCommand = new Command(() =>
             {
-                    metadataCollection.Add(new SearchMetadata(SearchText,false,true, SearchHints.UseRegex));
+                    metadataCollection.Add(new SearchMetadata(SearchText,false,true, SearchHints.UseRegex,true));
                     SearchText = string.Empty;
 
             }, () => SearchText.IsLongerThanOrEqualTo(3) && !metadataCollection.Metadata.Lookup((CaseInsensitiveString)SearchText).HasValue);
@@ -68,9 +67,7 @@ namespace TailBlazer.Settings
             
             _cleanUp = new CompositeDisposable(commandRefresher, userOptions);
         }
-
-
-
+        
 
         public string SearchText
         {

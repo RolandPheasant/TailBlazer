@@ -28,10 +28,11 @@ namespace TailBlazer.Domain.FileHandling.Search
             var systemSearches = new SourceCache<SearchInfo, CaseInsensitiveString>(t => (CaseInsensitiveString)t.SearchText);
             systemSearches.AddOrUpdate(new SearchInfo("<All>", All, SearchType.All));
 
+
             //create a collection of all possible user filters
             var userSearches = searchMetadataCollection.Metadata
                 .Connect(meta => meta.Filter)
-                .IgnoreUpdateWhen((current,previous)=>current.Filter == previous.Filter)
+                .IgnoreUpdateWhen((current,previous)=> SearchMetadata.EffectsFilterComparer.Equals(current, previous))
                 .Transform(meta =>
                 {
                     var latest = _fileWatcher.Latest
@@ -52,7 +53,7 @@ namespace TailBlazer.Domain.FileHandling.Search
         public void Add([NotNull] string searchText, bool useRegex)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
-            _metadataCollection.Add(new SearchMetadata(searchText,true,true, useRegex));
+            _metadataCollection.Add(new SearchMetadata(searchText,true,true, useRegex,true));
         }
 
         public void Remove(string searchText)
