@@ -12,7 +12,7 @@ namespace TailBlazer.Domain.FileHandling.Search
         private readonly IFileWatcher _fileWatcher;
         private readonly IDisposable _cleanUp;
 
-        public IObservableCache<SearchInfo, CaseInsensitiveString> Searches { get; }
+        public IObservableCache<SearchInfo, string> Searches { get; }
         
         public IObservable<ILineProvider> All { get; }
         
@@ -25,7 +25,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             All = fileWatcher.Latest.Index().Replay(1).RefCount();
 
             //create a collection with 1 item, which is used to show entire file
-            var systemSearches = new SourceCache<SearchInfo, CaseInsensitiveString>(t => (CaseInsensitiveString)t.SearchText);
+            var systemSearches = new SourceCache<SearchInfo, string>(t => t.SearchText);
             systemSearches.AddOrUpdate(new SearchInfo("<All>", All, SearchType.All));
 
 
@@ -58,7 +58,7 @@ namespace TailBlazer.Domain.FileHandling.Search
 
         public void Remove(string searchText)
         {
-            _metadataCollection.Remove((CaseInsensitiveString)searchText);
+            _metadataCollection.Remove(searchText);
         }
 
         public void Dispose()

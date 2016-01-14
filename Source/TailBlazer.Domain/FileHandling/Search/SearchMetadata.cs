@@ -33,7 +33,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                 if (ReferenceEquals(y, null)) return false;
                 if (x.GetType() != y.GetType()) return false;
 
-                var stringComparison = x.IgnoreCase ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+                var stringComparison = x.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
                 return string.Equals(x.SearchText, y.SearchText, stringComparison)
                     && x.Highlight == y.Highlight 
                     && x.UseRegex == y.UseRegex && x.IgnoreCase == y.IgnoreCase;
@@ -43,7 +43,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             {
                 unchecked
                 {
-                    var comparer = obj.IgnoreCase ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
+                    var comparer = obj.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
                     var hashCode = (obj.SearchText != null ? comparer.GetHashCode(obj.SearchText) : 0);
                     hashCode = (hashCode*397) ^ obj.Highlight.GetHashCode();
                     hashCode = (hashCode*397) ^ obj.UseRegex.GetHashCode();
@@ -69,7 +69,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                 if (ReferenceEquals(y, null)) return false;
                 if (x.GetType() != y.GetType()) return false;
 
-                var stringComparison = x.IgnoreCase ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+                var stringComparison = x.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
                 return string.Equals(x.SearchText, y.SearchText, stringComparison) 
                     && x.Filter == y.Filter && x.UseRegex == y.UseRegex && x.IgnoreCase == y.IgnoreCase;
             }
@@ -78,7 +78,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             {
                 unchecked
                 {
-                    var comparer = obj.IgnoreCase ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
+                    var comparer = obj.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
                     var hashCode = (obj.SearchText != null ? comparer.GetHashCode(obj.SearchText) : 0);
                     hashCode = (hashCode*397) ^ obj.Filter.GetHashCode();
                     hashCode = (hashCode*397) ^ obj.UseRegex.GetHashCode();

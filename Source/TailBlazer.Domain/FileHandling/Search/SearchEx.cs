@@ -17,7 +17,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             Func<string, bool> predicate;
             if (!source.UseRegex)
             {
-                var stringComparison = source.IgnoreCase ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+                var stringComparison = source.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
                 predicate = s => s.Contains(source.SearchText, stringComparison);
             }
             else
@@ -31,4 +31,3 @@ namespace TailBlazer.Domain.FileHandling.Search
     }
 }
 
-}

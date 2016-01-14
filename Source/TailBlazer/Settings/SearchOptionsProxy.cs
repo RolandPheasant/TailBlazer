@@ -17,7 +17,7 @@ namespace TailBlazer.Settings
         private bool _useRegex;
         private bool _ignoreCase;
 
-        public string Text => _searchMetadata.SearchText.ToUpper();
+        public string Text => _searchMetadata.SearchText;
 
         public string RemoveTooltip => $"Get rid of {Text}?";
 

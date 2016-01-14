@@ -57,7 +57,7 @@ namespace TailBlazer.Settings
                     metadataCollection.Add(new SearchMetadata(SearchText,false,true, SearchHints.UseRegex,true));
                     SearchText = string.Empty;
 
-            }, () => SearchText.IsLongerThanOrEqualTo(3) && !metadataCollection.Metadata.Lookup((CaseInsensitiveString)SearchText).HasValue);
+            }, () => SearchText.IsLongerThanOrEqualTo(3) && !metadataCollection.Metadata.Lookup(SearchText).HasValue);
 
 
             var commandRefresher = this.WhenValueChanged(vm => vm.SearchText)

@@ -7,8 +7,8 @@ namespace TailBlazer.Domain.FileHandling.Search
 {
     public sealed class SearchMetadataCollection : ISearchMetadataCollection
     {
-        private readonly ISourceCache<SearchMetadata, CaseInsensitiveString> _searches = new SourceCache<SearchMetadata, CaseInsensitiveString>(t => (CaseInsensitiveString)t.SearchText);
-        public IObservableCache<SearchMetadata, CaseInsensitiveString> Metadata { get; }
+        private readonly ISourceCache<SearchMetadata, string> _searches = new SourceCache<SearchMetadata, string>(t => t.SearchText);
+        public IObservableCache<SearchMetadata, string> Metadata { get; }
 
         private readonly IDisposable _cleanUp;
 
@@ -26,7 +26,7 @@ namespace TailBlazer.Domain.FileHandling.Search
 
         public void Remove(string searchText)
         {
-            _searches.Remove((CaseInsensitiveString)searchText);
+            _searches.Remove(searchText);
         }
 
         public void Dispose()
