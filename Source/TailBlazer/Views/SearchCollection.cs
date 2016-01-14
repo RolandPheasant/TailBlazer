@@ -35,7 +35,9 @@ namespace TailBlazer.Views
             var shared = viewModels.Connect();//.Publish();
 
             var binderLoader = shared
-                .Sort(SortExpressionComparer<SearchViewModel>.Ascending(tvm => tvm.Text))
+                .Sort(SortExpressionComparer<SearchViewModel>
+                               .Ascending(tvm => tvm.SearchType== SearchType.All ? 1:2)
+                               .ThenByAscending(tvm => tvm.Text))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _items)
                 .Subscribe();

@@ -21,7 +21,7 @@ namespace TailBlazer.Views
 
         public ICommand  RemoveCommand { get; }
 
-        public string Text => _tail.SearchText.ToUpper();
+        public string Text => _tail.SearchText;
 
         public string RemoveTooltip => $"Get rid of {Text}?";
 

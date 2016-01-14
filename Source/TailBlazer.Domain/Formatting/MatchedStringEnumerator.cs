@@ -186,10 +186,12 @@ namespace TailBlazer.Domain.Formatting
                 //get matching text
                 var matches = Regex.Matches(input, tomatch.SearchText, tomatch.IgnoreCase ? CaseInsensitiveOptions : CaseSensitiveOptions);
 
-                if (matches.Count == 0) yield break;
+                if (matches.Count == 0)
+                    yield return new MatchedString(input,false);
 
 
-                var childMatches = new MatchedStringEnumerator(input, matches.Cast<Match>().Select(match => match.Value).ToArray());
+                var childMatches = new MatchedStringEnumerator(input, matches.Cast<Match>().Select(match => match.Value)
+                                            .ToArray());
 
                 foreach (var item in childMatches)
                 {
