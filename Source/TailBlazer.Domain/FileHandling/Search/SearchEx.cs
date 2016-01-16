@@ -1,5 +1,6 @@
 using System;
 using System.Text.RegularExpressions;
+using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.FileHandling.Search
 {
@@ -27,6 +28,25 @@ namespace TailBlazer.Domain.FileHandling.Search
                 predicate = s => regex.IsMatch(s);
             }
             return predicate;
+        }
+
+        public static Optional<Regex> BuildRegEx(this SearchMetadata source)
+        {
+            
+            const RegexOptions caseInsensitiveOptions = RegexOptions.IgnorePatternWhitespace
+                                                        | RegexOptions.Compiled
+                                                        | RegexOptions.IgnoreCase;
+
+            const RegexOptions caseSensitiveOptions = RegexOptions.IgnorePatternWhitespace
+                                                      | RegexOptions.Compiled;
+
+
+            if (source.UseRegex)
+            {
+                var options = source.IgnoreCase ? caseInsensitiveOptions : caseSensitiveOptions;
+                return new Regex(source.SearchText, options);
+            }
+            return Optional<Regex>.None;
         }
     }
 }

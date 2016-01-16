@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using DynamicData.Kernel;
 using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling.Search
@@ -13,6 +15,10 @@ namespace TailBlazer.Domain.FileHandling.Search
 
         public bool IgnoreCase { get; }
 
+        public Optional<Regex> RegEx { get; }
+
+        public Func<string, bool> Predicate { get; }
+
         public SearchMetadata([NotNull] string searchText, bool filter, bool highlight, bool useRegex, bool ignoreCase)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
@@ -22,7 +28,11 @@ namespace TailBlazer.Domain.FileHandling.Search
             Highlight = highlight;
             UseRegex = useRegex;
             IgnoreCase = ignoreCase;
+
+            RegEx = this.BuildRegEx();
+            Predicate = this.BuildPredicate();
         }
+
 
         private sealed class EffectsHighlightEqualityComparer : IEqualityComparer<SearchMetadata>
         {
@@ -53,12 +63,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             }
         }
 
-        private static readonly IEqualityComparer<SearchMetadata> EffectsHighlightComparerInstance = new EffectsHighlightEqualityComparer();
-
-        public static IEqualityComparer<SearchMetadata> EffectsHighlightComparer
-        {
-            get { return EffectsHighlightComparerInstance; }
-        }
+        public static IEqualityComparer<SearchMetadata> EffectsHighlightComparer { get; } = new EffectsHighlightEqualityComparer();
 
         private sealed class EffectsFilterEqualityComparer : IEqualityComparer<SearchMetadata>
         {
@@ -88,11 +93,6 @@ namespace TailBlazer.Domain.FileHandling.Search
             }
         }
 
-        private static readonly IEqualityComparer<SearchMetadata> EffectsFilterComparerInstance = new EffectsFilterEqualityComparer();
-
-        public static IEqualityComparer<SearchMetadata> EffectsFilterComparer
-        {
-            get { return EffectsFilterComparerInstance; }
-        }
+        public static IEqualityComparer<SearchMetadata> EffectsFilterComparer { get; } = new EffectsFilterEqualityComparer();
     }
 }

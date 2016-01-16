@@ -17,19 +17,14 @@ namespace TailBlazer.Domain.Formatting
 
         public static IEnumerable<MatchedString> MatchString(this string source, SearchMetadata itemsToMatch)
         {
-            //Doctor this to allow ReEx matching
             return new SearchMetadataEnumerator(source, new []{ itemsToMatch });
         }
 
         public static IEnumerable<MatchedString> MatchString(this string source, IEnumerable<SearchMetadata> itemsToMatch)
         {
-            //Doctor this to allow ReEx matching
             return new SearchMetadataEnumerator(source, itemsToMatch).ToArray();
         }
         
-        //public static string SafeSubstring(this string source, IEnumerable<string> itemsToMatch)
-        //{
-        //    return new MatchedStringEnumerator(source, itemsToMatch);
-        //}
+
     }
 }

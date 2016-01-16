@@ -6,7 +6,6 @@ using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using DynamicData;
 using DynamicData.Binding;
-using DynamicData.Kernel;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Settings;
 
@@ -14,7 +13,7 @@ namespace TailBlazer.Views
 {
     public class RegexInspector
     {
-        private static readonly char[] SpecialChars = @"\!@#$%^&*()[]+?".ToCharArray();
+        private  readonly char[] _specialChars = @"\!@#$%^&*()[]+?".ToCharArray();
 
         private readonly Regex _isPlainText;
 
@@ -26,8 +25,8 @@ namespace TailBlazer.Views
 
         public bool DoesThisLookLikeRegEx(string text)
         {
-            //return text.IndexOfAny(SpecialChars) != -1;
             return !_isPlainText.IsMatch(text);
+            //return text.IndexOfAny(_specialChars) != -1;
         }
     }
 
@@ -92,11 +91,11 @@ namespace TailBlazer.Views
 
                                 if (x.regex)
                                 {
-                                    return x.text.Length < 3 ? "Enter at least 2 characters"
+                                    return x.text.Length < 3 ? "Enter 2 characters to search using reg ex"
                                                                     : "Hit enter for reg ex search";
                                 }
 
-                                return x.text.Length < 3 ? "Enter at least 3 characters" 
+                                return x.text.Length < 3 ? "Enter 2 characters to search using plain text"
                                                                     : "Hit enter for text search";
                             }).ForBinding();
 
