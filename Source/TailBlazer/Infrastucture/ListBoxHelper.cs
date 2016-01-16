@@ -1,7 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using TailBlazer.Views;
 
 namespace TailBlazer.Infrastucture
 {
@@ -27,35 +26,5 @@ namespace TailBlazer.Infrastucture
             receiver?.Receive((ListBox)sender);
         }
 
-
-
-        public static readonly DependencyProperty RowAnimationSetterProperty = DependencyProperty.RegisterAttached(
-            "RowAnimationSetter", typeof (ListboxRowAnimationSetter), typeof (ListBoxHelper),
-            new PropertyMetadata(default(ListboxRowAnimationSetter), RowAnimationSetterChanged));
-
-
-        public static void RowAnimationSetterChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
-        {
-
-            var listBox = (ListBox) sender;
-
-            listBox.DataContextChanged += (s, e) => ((ListboxRowAnimationSetter) args.NewValue).DataContext = listBox.DataContext;
-
-            //((ListboxRowAnimationSetter)args.NewValue).AddHandler(); 
-
-            //var receiver = args.NewValue as IAttachedListBox;
-            //receiver?.Receive((ListBox)sender);
-        }
-
-
-        public static void SetRowAnimationSetter(Selector element, ListboxRowAnimationSetter value)
-        {
-            element.SetValue(RowAnimationSetterProperty, value);
-        }
-
-        public static ListboxRowAnimationSetter GetRowAnimationSetter(Selector element)
-        {
-            return (ListboxRowAnimationSetter)element.GetValue(RowAnimationSetterProperty);
-        }
     }
 }

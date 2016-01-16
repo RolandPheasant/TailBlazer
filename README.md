@@ -25,17 +25,17 @@ That's better. A tail program which is pleasing to my eyes!
  - Side by side monitoring of files
  - Auto tail or scroll mode
  - Filter lines to match text
+ - Conditionally highlight text
+ - Filter or highlight using regex
  - Apply multiple searches and toogle between search results
  - View search result in original position in file
  - Copy to clipboard
  - Remembers recent files
  - Handle extemely large files (I have opened a 45 Gb file)
  - Dark and light theme
- - Conditionally highlight text
 
 ## Future feature list
 
- - Filter lines on regex
  - Automatic creation of columns
  - Pipe filter to file
  - Ability to pin a file
@@ -61,7 +61,6 @@ Feel free to get involved by reporting issues and submitting a feature request. 
 Tail Blazer can easily handle a file of any size. The largest file I have tested was 47 Gb which was the maximum file size I could create before my disk would become full.
 
 ![Large File](Images/47GbFile.gif)
-
 
 ## User Settings
 

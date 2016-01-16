@@ -4,16 +4,10 @@
 
 
         <ResourceDictionary.MergedDictionaries>
-            <!--<ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
-            <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />-->
-       
             <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
         </ResourceDictionary.MergedDictionaries>
     
-    
-
-        <Style TargetType="{x:Type Button}" x:Key="SettingsButtonStyle" 
-               BasedOn="{StaticResource MaterialDesignMenuCommandButtonStyle}">
+        <Style TargetType="{x:Type Button}" x:Key="SettingsButtonStyle" BasedOn="{StaticResource MaterialDesignMenuCommandButtonStyle}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
@@ -57,7 +51,7 @@
                                       StrokeThickness="1.5"
                                       StrokeStartLineCap="Square" 
                                       StrokeEndLineCap="Square"
-                                      SnapsToDevicePixels="True" />
+                                        SnapsToDevicePixels="False"/>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

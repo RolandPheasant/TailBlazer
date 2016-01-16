@@ -1,19 +1,21 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿#region Usings
+
+using System.Collections.Generic;
 using StructureMap;
 using StructureMap.Pipeline;
 using TailBlazer.Domain.Infrastructure;
+
+#endregion
 
 namespace TailBlazer.Infrastucture
 {
     public class ObjectProvider : IObjectProvider, IObjectRegister
     {
-        private readonly StructureMap.IContainer _container;
+        private readonly IContainer _container;
 
-        public ObjectProvider(StructureMap.IContainer container)
+        public ObjectProvider(IContainer container)
         {
             _container = container;
-
         }
 
         public T Get<T>()
@@ -24,7 +26,7 @@ namespace TailBlazer.Infrastucture
         public T Get<T>(ExplictArg explictArg)
         {
             var args = new ExplicitArguments();
-            args.SetArg(explictArg.Key,explictArg.Arg);
+            args.SetArg(explictArg.Key, explictArg.Arg);
             return _container.GetInstance<T>(args);
         }
 
@@ -39,7 +41,7 @@ namespace TailBlazer.Infrastucture
         }
 
         public void Register<T>(T instance)
-            where T:class
+            where T : class
         {
             _container.Configure(x => x.For<T>().Use(instance));
         }

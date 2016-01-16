@@ -56,12 +56,11 @@
             <Slider Grid.Row="1" 
                         Grid.Column="1" Minimum="50" Maximum="250" 
                         Width="200"
-                           Margin="6 4 4 4"
-                        SmallChange="1"
+                        Margin="6 4 4 4"
+                        SmallChange="5"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Left"
-                
-                        LargeChange="5"
+                        LargeChange="10"
                         Value="{Binding Scale}"/>
 
             <TextBlock  Grid.Row="1" Grid.Column="2"  

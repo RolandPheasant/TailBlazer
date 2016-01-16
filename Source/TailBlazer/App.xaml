@@ -1,9 +1,7 @@
 ﻿<Application x:Class="TailBlazer.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:TailBlazer"
              xmlns:views="clr-namespace:TailBlazer.Views"
-             xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              xmlns:controls="clr-namespace:TailBlazer.Controls">
     <Application.Resources>
         <ResourceDictionary>
@@ -13,21 +11,6 @@
             </ResourceDictionary.MergedDictionaries>
 
 
-
-
-            <Style TargetType="{x:Type controls:SearchableTextControl}">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type controls:SearchableTextControl}">
-                            <Border Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}">
-                                <TextBlock  x:Name="PART_TEXT"/>
-                            </Border>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
 
             <DataTemplate DataType="{x:Type views:FileTailerViewModel}">
                 <views:FileTailerView />

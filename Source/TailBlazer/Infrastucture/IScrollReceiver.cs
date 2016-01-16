@@ -1,5 +1,4 @@
 ﻿using TailBlazer.Controls;
-using TailBlazer.Views;
 
 namespace TailBlazer.Infrastucture
 {

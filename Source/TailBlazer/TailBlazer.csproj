@@ -186,8 +186,6 @@
     <Compile Include="Views\IWindowsController.cs" />
     <Compile Include="Views\LineProxy.cs" />
     <Compile Include="Views\LineProxyFactory.cs" />
-    <Compile Include="Views\LinesControl.cs" />
-    <Compile Include="Views\ListboxRowAnimationSetter.cs" />
     <Compile Include="Controls\OpenFileIcon.cs" />
     <Compile Include="Views\RecentFileProxy.cs" />
     <Compile Include="Views\RecentFilesView.xaml.cs">
