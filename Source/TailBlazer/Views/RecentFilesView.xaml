@@ -13,7 +13,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
-
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
                 <ResourceDictionary Source="../Themes/Generic.xaml"></ResourceDictionary>
 
@@ -24,8 +23,7 @@
     </UserControl.Resources>
     
     <Grid>
-         <!--Grid.Row="1">-->
-        
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*" MaxHeight="250"/>
@@ -45,7 +43,6 @@
                             Style="{StaticResource MaterialDesignFlatButton}"
                             Margin="2 0 2 2" Height="22" Padding="0"
                             VerticalAlignment="Center"
-                               
                             Command="{Binding OpenCommand}"
                             ToolTip="{Binding OpenToolTip}">
 

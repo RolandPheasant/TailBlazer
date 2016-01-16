@@ -5,7 +5,6 @@ using System.Reactive.Disposables;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
-using TailBlazer.Domain;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
@@ -22,7 +21,6 @@ namespace TailBlazer.Settings
         public ReadOnlyObservableCollection<SearchOptionsProxy> Data { get; }
 
         public ICommand AddSearchCommand { get; }
-      //  public IProperty<string> SearchHint { get; }
         public SearchHints SearchHints { get;  }
 
         public SearchOptionsViewModel(ISearchMetadataCollection metadataCollection, 

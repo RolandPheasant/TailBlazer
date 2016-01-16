@@ -6,11 +6,30 @@ using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using DynamicData;
 using DynamicData.Binding;
+using DynamicData.Kernel;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Settings;
 
 namespace TailBlazer.Views
 {
+    public class RegexInspector
+    {
+        private static readonly char[] SpecialChars = @"\!@#$%^&*()[]+?".ToCharArray();
+
+        private readonly Regex _isPlainText;
+
+        public RegexInspector()
+        {
+
+            _isPlainText = new Regex("^[a-zA-Z0-9 ]*$");
+        }
+
+        public bool DoesThisLookLikeRegEx(string text)
+        {
+            //return text.IndexOfAny(SpecialChars) != -1;
+            return !_isPlainText.IsMatch(text);
+        }
+    }
 
     public class SearchHints : AbstractNotifyPropertyChanged, IDisposable, IDataErrorInfo
     {
@@ -18,7 +37,9 @@ namespace TailBlazer.Views
         private readonly IDisposable _cleanUp;
         private string _searchText;
         private bool _useRegex;
-        
+
+        private readonly RegexInspector _regexInspector = new RegexInspector();
+
         public IProperty<string> SearchHint { get; }
 
         private IProperty<ValidationResult> IsValid { get; }
@@ -58,24 +79,37 @@ namespace TailBlazer.Views
             }).ForBinding();
 
 
+            var predictRegex = this.WhenValueChanged(vm => vm.SearchText)
+                                        .Where(text=>!string.IsNullOrEmpty(text))
+                                        .Select(text=>_regexInspector.DoesThisLookLikeRegEx(text))
+                                        .DistinctUntilChanged()
+                                        .Subscribe(likeRegex=> UseRegex= likeRegex);
+
             SearchHint = combined.Select(x=>
                             {
                                 if (string.IsNullOrEmpty(x.text))
                                     return $"Type to search using {(x.regex ? "reg ex" : "plain text")}";
 
-                                return x.text.Length < 3 ? "Enter at least 3 characters" : "Hit enter for more options";
+                                if (x.regex)
+                                {
+                                    return x.text.Length < 3 ? "Enter at least 2 characters"
+                                                                    : "Hit enter for reg ex search";
+                                }
+
+                                return x.text.Length < 3 ? "Enter at least 3 characters" 
+                                                                    : "Hit enter for text search";
                             }).ForBinding();
 
-            //observe customers and currency pairs using OR operator, and bind to the observable collection
+
             var dataLoader = recentSearchCollection.Items.Connect()
-                .Filter(filter)     //filter strings
+                .Filter(filter)  
                 .Transform(recentSearch=> recentSearch.Text)
                 .Sort(SortExpressionComparer<string>.Ascending(str => str))
                 .ObserveOn(schedulerProvider.MainThread)
-                .Bind(out _hints)       //bind to hints list
+                .Bind(out _hints) 
                 .Subscribe();
 
-            _cleanUp = new CompositeDisposable(SearchHint, dataLoader, IsValid, combined.Connect());
+            _cleanUp = new CompositeDisposable(SearchHint, dataLoader, IsValid, predictRegex, combined.Connect());
         }
 
 

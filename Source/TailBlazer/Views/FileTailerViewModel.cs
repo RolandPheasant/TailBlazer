@@ -24,6 +24,7 @@ namespace TailBlazer.Views
 {
     public class FileTailerViewModel: AbstractNotifyPropertyChanged, IDisposable, IScrollReceiver
     {
+        private readonly IObjectProvider _objectProvider;
         private readonly IDisposable _cleanUp;
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
         private readonly ISubject<ScrollRequest> _userScrollRequested = new ReplaySubject<ScrollRequest>(1);
@@ -41,7 +42,7 @@ namespace TailBlazer.Views
         public ICommand CopyToClipboardCommand { get; }
         public ICommand AddSearchCommand { get; }
         public ISelectionMonitor SelectionMonitor { get; }
-        public SearchOptionsViewModel SearchOptions { get;  }
+        private SearchOptionsViewModel SearchOptions { get;  }
         public SearchHints SearchHints { get;  }
         public SearchCollection SearchCollection { get; }
         public InlineViewer InlineViewer { get; }
@@ -70,8 +71,10 @@ namespace TailBlazer.Views
             [NotNull] IRecentSearchCollection recentSearchCollection, 
             [NotNull] ISearchMetadataCollection searchMetadataCollection,
             [NotNull] SearchOptionsViewModel searchOptionsViewModel,
-            [NotNull] SearchHints searchHints)
+            [NotNull] SearchHints searchHints,
+            IObjectProvider objectProvider)
         {
+            _objectProvider = objectProvider;
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (fileWatcher == null) throw new ArgumentNullException(nameof(fileWatcher));
@@ -202,6 +205,21 @@ namespace TailBlazer.Views
                 Disposable.Create(_userScrollRequested.OnCompleted));
         }
         
+
+
+        private async void OpenSearchOptions()
+        {
+            var view = new SearchOptionsView
+            {
+                DataContext = SearchOptions
+            };
+
+            //show the dialog
+           await DialogHost.Show(view, Id);
+        }
+
+
+
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
         {
             if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));
@@ -215,19 +233,8 @@ namespace TailBlazer.Views
                 However due to complexities int the interactions with the VirtualScrollPanel,
                 each time I have tried to remove it all hell has broken loose
             */
-            _userScrollRequested.OnNext(new ScrollRequest(mode, boundsArgs.PageSize,boundsArgs.FirstIndex));
- 
-        }
+            _userScrollRequested.OnNext(new ScrollRequest(mode, boundsArgs.PageSize, boundsArgs.FirstIndex));
 
-        public async void OpenSearchOptions()
-        {
-            var view = new SearchOptionsView
-            {
-                DataContext = this.SearchOptions
-            };
-
-            //show the dialog
-           await DialogHost.Show(view, Id);
         }
 
         void IScrollReceiver.ScrollChanged(ScrollChangedArgs scrollChangedArgs)
