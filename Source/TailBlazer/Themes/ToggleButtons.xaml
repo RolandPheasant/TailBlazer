@@ -99,7 +99,7 @@
                                     </TransformGroup>
                                 </Grid.RenderTransform>
                                 <controls:RegexIcon   x:Name="CheckedImage" Opacity="0" />
-                                <controls:FilterIcon   x:Name="UnCheckedImage" Opacity="1" />
+                                <controls:SearchIcon   x:Name="UnCheckedImage" Opacity="1" />
 
                             </Grid>
 

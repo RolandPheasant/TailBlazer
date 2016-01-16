@@ -4,8 +4,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using TailBlazer.Domain.Formatting;
 
-namespace TailBlazer.Views.Formatting
+namespace TailBlazer.Controls
 {
 
 

@@ -4,8 +4,8 @@ using System.Reactive.Disposables;
 using DynamicData.Binding;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
+using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
-using TailBlazer.Views.Formatting;
 
 namespace TailBlazer.Views
 {

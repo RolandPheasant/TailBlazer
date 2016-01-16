@@ -113,9 +113,12 @@
     <Compile Include="FileHandling\Search\SearchInfoCollection.cs" />
     <Compile Include="FileHandling\Search\SearchInfo.cs" />
     <Compile Include="FileHandling\TailInfo.cs" />
+    <Compile Include="Formatting\DisplayText.cs" />
+    <Compile Include="Formatting\ITextFormatter.cs" />
     <Compile Include="Formatting\MatchedString.cs" />
     <Compile Include="Formatting\MatchedStringEnumerator.cs" />
     <Compile Include="Formatting\MatchedStringEx.cs" />
+    <Compile Include="Formatting\TextFormatter.cs" />
     <Compile Include="Infrastructure\NullLogger.cs" />
     <Compile Include="Infrastructure\DynamicDataEx.cs" />
     <Compile Include="Infrastructure\EnumerableEx.cs" />

@@ -1,5 +1,5 @@
 using TailBlazer.Domain.FileHandling;
-using TailBlazer.Views.Formatting;
+using TailBlazer.Domain.Formatting;
 
 namespace TailBlazer.Views
 {

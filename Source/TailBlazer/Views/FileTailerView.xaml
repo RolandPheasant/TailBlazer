@@ -23,7 +23,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
-                <ResourceDictionary Source="../Themes/Generic.xaml"/>
+                <ResourceDictionary Source="../Themes/ProgressBar.xaml"/>
                 <ResourceDictionary Source="../Themes/Buttons.xaml"/>
                 <ResourceDictionary Source="../Themes/ToggleButtons.xaml"/>
             </ResourceDictionary.MergedDictionaries>

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace TailBlazer.Views.Formatting
+namespace TailBlazer.Domain.Formatting
 {
     public interface ITextFormatter
     {

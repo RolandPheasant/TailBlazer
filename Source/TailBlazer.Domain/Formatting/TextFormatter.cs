@@ -4,9 +4,8 @@ using System.Linq;
 using System.Reactive.Linq;
 using DynamicData;
 using TailBlazer.Domain.FileHandling.Search;
-using TailBlazer.Domain.Formatting;
 
-namespace TailBlazer.Views.Formatting
+namespace TailBlazer.Domain.Formatting
 {
     public class TextFormatter : ITextFormatter
     {
