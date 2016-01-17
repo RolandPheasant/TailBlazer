@@ -26,6 +26,7 @@
                 <ResourceDictionary Source="../Themes/ProgressBar.xaml"/>
                 <ResourceDictionary Source="../Themes/Buttons.xaml"/>
                 <ResourceDictionary Source="../Themes/ToggleButtons.xaml"/>
+                <ResourceDictionary Source="../Themes/TextBoxes.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <infrastucture:CheckedToLengthConverter TrueValue="*" FalseValue="*" x:Key="c1" />
@@ -122,20 +123,33 @@
                     </Grid.ColumnDefinitions>
 
 
-                    <ToggleButton  Style="{DynamicResource SearchToggleStyle}" 
+                    <ToggleButton
                                    Margin="2 0 0 0"
                                    Padding="2,2,2,-2"
-                                   Width="32"    
-                                   IsChecked="{Binding SearchHints.UseRegex}"/>
+                                   Width="32" 
+                                   IsChecked="{Binding SearchHints.UseRegex}">
+
+                        <ToggleButton.Style>
+                            <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource  SearchToggleStyle}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SearchHints.IsValid.Value.IsValid}" Value="False">
+                                        <Setter Property="Foreground" Value="{DynamicResource ValidationErrorBrush}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
 
                     <TextBox Grid.Column="1" 
-                            wpf:TextFieldAssist.Hint="{Binding SearchHints.SearchHint.Value}"    
-                            Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                            Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=True}"
+                            Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                            wpf:TextFieldAssist.Hint="{Binding SearchHints.IsValid.Value.Message}" 
                             VerticalAlignment="Center"
+                            wpf:ValidationAssist.UsePopup="False"
+                            Style="{StaticResource FloatingHintAndErrorTextBox}"
+                            Validation.ErrorTemplate="{StaticResource BorderOnlyValidationErrorTemplate}" 
                             MinWidth="180">
                         <TextBox.InputBindings>
-                            <KeyBinding Key="Enter" Command="{Binding AddSearchCommand}"/>
+                            <KeyBinding Key="Enter" Command="{Binding SearchHints.AddSearchCommand}"/>
                         </TextBox.InputBindings>
                     </TextBox>
 
@@ -230,13 +244,14 @@
                         Command="{Binding OpenSearchOptionsCommand}"
                         HorizontalAlignment="Left"
                         ToolTip="Search options"
-                    
+                        
                         Width="24" Height="24"
                         Padding="0"
                         VerticalAlignment="Center"
                   
                         >
                         <controls:SettingsIcon  Width="14" Height="14"/>
+  
                     </Button>
 
                     <StackPanel    

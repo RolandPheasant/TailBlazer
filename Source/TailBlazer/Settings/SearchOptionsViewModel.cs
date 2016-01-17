@@ -20,7 +20,7 @@ namespace TailBlazer.Settings
 
         public ReadOnlyObservableCollection<SearchOptionsProxy> Data { get; }
 
-        public ICommand AddSearchCommand { get; }
+
         public SearchHints SearchHints { get;  }
 
         public SearchOptionsViewModel(ISearchMetadataCollection metadataCollection, 
@@ -50,20 +50,14 @@ namespace TailBlazer.Settings
 
             Data = data;
 
-            AddSearchCommand = new Command(() =>
+            //command to add the current search to the tail collection
+            var searchInvoker = SearchHints.SearchRequested.Subscribe(request =>
             {
-                    metadataCollection.Add(new SearchMetadata(SearchText,false,true, SearchHints.UseRegex,true));
-                    SearchText = string.Empty;
-
-            }, () => SearchText.IsLongerThanOrEqualTo(3) && !metadataCollection.Metadata.Lookup(SearchText).HasValue);
-
-
-            var commandRefresher = this.WhenValueChanged(vm => vm.SearchText)
-                                    .Subscribe(_ => ((Command) AddSearchCommand).Refresh());
-            
+                metadataCollection.Add(new SearchMetadata(request.Text, false, true, request.UseRegEx, true));
+            });
 
             
-            _cleanUp = new CompositeDisposable(commandRefresher, userOptions);
+            _cleanUp = new CompositeDisposable(searchInvoker, userOptions, searchInvoker);
         }
         
 

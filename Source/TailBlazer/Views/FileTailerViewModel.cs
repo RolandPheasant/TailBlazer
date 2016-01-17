@@ -120,16 +120,12 @@ namespace TailBlazer.Views
                         .DistinctUntilChanged();
 
             IsLoading = searchInfoCollection.All.Take(1).Select(_ => false).StartWith(true).ForBinding();
-            
-            //command to add the current search to the tail collection
-            AddSearchCommand = new Command(() =>
-            {
-                var text = SearchHints.SearchText;
-                searchInfoCollection.Add(text,SearchHints.UseRegex);
-                recentSearchCollection.Add(new RecentSearch(text));
-                SearchHints.SearchText = string.Empty;
 
-            },()=> SearchHints.SearchText.IsLongerThanOrEqualTo(3));
+            //command to add the current search to the tail collection
+            var searchInvoker = SearchHints.SearchRequested.Subscribe(request =>
+            {
+                searchInfoCollection.Add(request.Text, request.UseRegEx);
+            });
 
             //User feedback to show file size
             FileSizeText = fileWatcher.Latest.Select(fn=>fn.Size)
@@ -202,6 +198,7 @@ namespace TailBlazer.Views
                 searchMetadataCollection,
                 SelectionMonitor,
                 SearchOptions,
+                searchInvoker,
                 Disposable.Create(_userScrollRequested.OnCompleted));
         }
         

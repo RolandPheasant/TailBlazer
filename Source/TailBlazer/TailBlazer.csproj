@@ -68,8 +68,8 @@
       <HintPath>..\packages\MaterialDesignColors.1.1.2\lib\net45\MaterialDesignColors.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MaterialDesignThemes.Wpf, Version=1.3.2.465, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignThemes.1.3.2.465\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.1.4.0-ci470\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -128,6 +128,7 @@
     <Compile Include="Controls\FilterIcon.cs" />
     <Compile Include="Controls\RegexIcon.cs" />
     <Compile Include="Controls\SearchIcon.cs" />
+    <Compile Include="Controls\SearchTextbox.cs" />
     <Compile Include="DialogNames.cs" />
     <Compile Include="Infrastucture\CheckedToLengthConverter.cs" />
     <Compile Include="Infrastucture\ClipboardHandler.cs" />
@@ -166,7 +167,6 @@
     <Compile Include="Views\FileHeaderNamingJob.cs" />
     <Compile Include="Controls\FileIcon.cs" />
     <Compile Include="Infrastucture\SchedulerProvider.cs" />
-    <Compile Include="Controls\SearchableTextControl.cs" />
     <Compile Include="Infrastucture\SolidColorAnimation.cs" />
     <Compile Include="Views\FileTailerView.xaml.cs">
       <DependentUpon>FileTailerView.xaml</DependentUpon>
@@ -256,6 +256,10 @@
     <Page Include="Themes\ProgressBar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\TextBoxes.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\ToggleButtons.xaml">
       <SubType>Designer</SubType>

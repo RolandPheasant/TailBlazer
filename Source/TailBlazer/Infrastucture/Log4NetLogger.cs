@@ -46,7 +46,16 @@ namespace TailBlazer.Infrastucture
         public void Info(string message, params object[] values)
         {
             if (!_log.IsInfoEnabled) return;
-            _log.InfoFormat(message, values);
+            if (values.Length == 0)
+            {
+                _log.Info(message);
+        
+            }
+            else
+            {
+                _log.InfoFormat(message, values);
+            }
+
         }
 
         public void Warn(string message, params object[] values)

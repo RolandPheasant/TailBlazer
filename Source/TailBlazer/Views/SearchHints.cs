@@ -3,10 +3,14 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Text.RegularExpressions;
+using System.Windows.Controls;
+using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.Infrastructure;
+using TailBlazer.Infrastucture;
 using TailBlazer.Settings;
 
 namespace TailBlazer.Views
@@ -26,7 +30,64 @@ namespace TailBlazer.Views
         public bool DoesThisLookLikeRegEx(string text)
         {
             return !_isPlainText.IsMatch(text);
-            //return text.IndexOfAny(_specialChars) != -1;
+        }
+    }
+
+    public class SearchRequest
+    {
+        public string Text { get;  }
+        public bool UseRegEx { get;  }
+
+        public SearchRequest(string text, bool useRegEx)
+        {
+            Text = text;
+            UseRegEx = useRegEx;
+        }
+    }
+    public class SearchHintMessage
+    {
+
+        public static readonly SearchHintMessage Valid = new SearchHintMessage(true, null);
+
+        public bool IsValid { get; }
+        public string Message { get; }
+
+        public SearchHintMessage(bool isValid, string message)
+        {
+            IsValid = isValid;
+            Message = message;
+        }
+
+    }
+    public static class SearchRequestEx
+    {
+        public static SearchHintMessage BuildMessage(this SearchRequest source)
+        {
+            if (string.IsNullOrEmpty(source.Text))
+                return new SearchHintMessage(true, $"Type to search using {(source.UseRegEx ? "reg ex" : "plain text")}");
+
+            if (string.IsNullOrEmpty(source.Text))
+                return SearchHintMessage.Valid;
+
+            if (source.UseRegEx && !source.Text.IsLongerThanOrEqualTo(2))
+                return new SearchHintMessage(false, "Reg ex must be at least 2 characters");
+
+            if (!source.UseRegEx && !source.Text.IsLongerThanOrEqualTo(3))
+                return new SearchHintMessage(false, "Search text must be at least 3 characters");
+
+            try
+            {
+                var test = new Regex(source.Text);
+            }
+            catch (ArgumentException)
+            {
+                return new SearchHintMessage(false, "Invalid regular expression");
+            }
+
+
+            var message = $"Hit enter to search using {(source.UseRegEx ? "reg ex" : "plain text")}";
+
+            return new SearchHintMessage(true, message);
         }
     }
 
@@ -39,9 +100,12 @@ namespace TailBlazer.Views
 
         private readonly RegexInspector _regexInspector = new RegexInspector();
 
-        public IProperty<string> SearchHint { get; }
 
-        private IProperty<ValidationResult> IsValid { get; }
+        public IProperty<SearchHintMessage> IsValid { get; }
+
+        public ICommand AddSearchCommand { get; }
+
+        public IObservable<SearchRequest> SearchRequested { get; } 
 
 
         public SearchHints(IRecentSearchCollection recentSearchCollection, ISchedulerProvider schedulerProvider)
@@ -56,27 +120,14 @@ namespace TailBlazer.Views
             var useRegEx = this.WhenValueChanged(vm => vm.UseRegex);
 
             //if regex then validate
-           var combined = searchText.CombineLatest(useRegEx, (text, regex) => new {text, regex}).Publish();
 
-            IsValid = combined.Select(x =>
-            {
-                if (!x.regex)
-                    return ValidationResult.Valid;
+            var combined = searchText.CombineLatest(useRegEx, (text, regex) => new SearchRequest(text, regex))
+                .Publish();
 
-                if (x.text==null)
-                    return new ValidationResult(false,"Regular expression cannot be null");
-                try
-                {
-                    var test = Regex.Match("", x.text);
-                }
-                catch (ArgumentException)
-                {
-                    return new ValidationResult(true, "Invalid regular expression");
-                }
 
-                return new ValidationResult(true, null);
-            }).ForBinding();
 
+            IsValid = combined.Select(searchRequest => searchRequest.BuildMessage()).ForBinding();
+            
 
             var predictRegex = this.WhenValueChanged(vm => vm.SearchText)
                                         .Where(text=>!string.IsNullOrEmpty(text))
@@ -84,20 +135,17 @@ namespace TailBlazer.Views
                                         .DistinctUntilChanged()
                                         .Subscribe(likeRegex=> UseRegex= likeRegex);
 
-            SearchHint = combined.Select(x=>
-                            {
-                                if (string.IsNullOrEmpty(x.text))
-                                    return $"Type to search using {(x.regex ? "reg ex" : "plain text")}";
+            //Handle adding new search
+            var searchRequested = new Subject<SearchRequest>();
+            SearchRequested = searchRequested.AsObservable();
+            AddSearchCommand = new Command(() =>
+            {
+                recentSearchCollection.Add(new RecentSearch(SearchText));
+                searchRequested.OnNext(new SearchRequest(SearchText, UseRegex));
+                SearchText = string.Empty;
+                UseRegex = false;
 
-                                if (x.regex)
-                                {
-                                    return x.text.Length < 3 ? "Enter 2 characters to search using reg ex"
-                                                                    : "Hit enter for reg ex search";
-                                }
-
-                                return x.text.Length < 3 ? "Enter 2 characters to search using plain text"
-                                                                    : "Hit enter for text search";
-                            }).ForBinding();
+            }, () => IsValid.Value.IsValid);
 
 
             var dataLoader = recentSearchCollection.Items.Connect()
@@ -108,7 +156,7 @@ namespace TailBlazer.Views
                 .Bind(out _hints) 
                 .Subscribe();
 
-            _cleanUp = new CompositeDisposable(SearchHint, dataLoader, IsValid, predictRegex, combined.Connect());
+            _cleanUp = new CompositeDisposable( dataLoader, IsValid, predictRegex, Disposable.Create(searchRequested.OnCompleted), combined.Connect());
         }
 
 
@@ -143,28 +191,13 @@ namespace TailBlazer.Views
 
         #region Data error 
         
-
         string IDataErrorInfo.this[string columnName] => IsValid.Value.IsValid ? null : IsValid.Value.Message;
 
         string IDataErrorInfo.Error => null;
 
         #endregion
 
-        private class ValidationResult
-        {
 
-            public static readonly ValidationResult Valid = new ValidationResult(true, null);
-            
-            public bool IsValid { get;  }
-            public string Message { get;  }
-
-            public ValidationResult(bool isValid, string message)
-            {
-                IsValid = isValid;
-                Message = message;
-            }
-
-        }
 
     }
 }
