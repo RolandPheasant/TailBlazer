@@ -297,7 +297,7 @@
                 </infrastucture:ListBoxHelper.RowAnimationSetter>-->
 
                     <ListBox.Template>
-                        <ControlTemplate>
+                        <ControlTemplate TargetType="{x:Type ListBox}">
                             <ScrollViewer 
                                         VerticalScrollBarVisibility="Auto"
                                         HorizontalScrollBarVisibility="Auto"
@@ -306,6 +306,9 @@
                                         Background="{TemplateBinding Background}" 
                                         BorderBrush="Transparent" 
                                         BorderThickness="0" 
+                                        KeyboardNavigation.TabNavigation="Cycle"
+                                        KeyboardNavigation.DirectionalNavigation="Cycle"
+                                        KeyboardNavigation.IsTabStop="False"
                                         IsHitTestVisible="True">
                                 <ItemsPresenter/>
                             </ScrollViewer>

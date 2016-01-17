@@ -106,11 +106,23 @@ namespace TailBlazer.Controls
             _itemsControl = ItemsControl.GetItemsOwner(this);
             _itemsGenerator = (IRecyclingItemContainerGenerator)ItemContainerGenerator;
 
+
+            _itemsControl.LostFocus += _itemsControl_LostFocus;
+            _itemsControl.LostKeyboardFocus += _itemsControl_LostKeyboardFocus;
             InvalidateMeasure();
         }
-        
 
-         private static void OnStartIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private void _itemsControl_LostKeyboardFocus(object sender, System.Windows.Input.KeyboardFocusChangedEventArgs e)
+        {
+         //   _itemsControl.Focus();
+        }
+
+        private void _itemsControl_LostFocus(object sender, RoutedEventArgs e)
+        {
+            //_itemsControl.Focus();
+        }
+
+        private static void OnStartIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var panel = (VirtualScrollPanel)d;
             panel. CallbackStartIndexChanged(Convert.ToInt32(e.NewValue));
