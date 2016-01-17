@@ -8,19 +8,6 @@
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
     </ResourceDictionary.MergedDictionaries>
     
-    <Style TargetType="{x:Type controls:SearchTextbox}">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type controls:SearchTextbox}">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
 
   <ControlTemplate x:Key="BorderOnlyValidationErrorTemplate">
     <ControlTemplate.Resources>

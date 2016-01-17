@@ -1,0 +1,165 @@
+﻿<UserControl x:Class="TailBlazer.Views.InlineView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TailBlazer.Views"
+             xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
+             xmlns:controls="clr-namespace:TailBlazer.Controls"
+             xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
+             mc:Ignorable="d" 
+              d:DataContext="{d:DesignInstance tail:InlineViewer, IsDesignTimeCreatable=False}"
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
+                <!--<ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Buttons.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ToggleButtons.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/TextBoxes.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Colours.xaml" />-->
+
+            </ResourceDictionary.MergedDictionaries>
+
+        </ResourceDictionary>
+    </Control.Resources>
+
+    <Grid>
+
+        <ListBox  
+                 ItemsSource="{Binding Lines}" 
+                 FontFamily="Consolas"
+                 SelectionMode="Extended"
+                 infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}" >
+
+            <ListBox.Template>
+                <ControlTemplate>
+                    <ScrollViewer x:Name="ScrollViewer" 
+                                        VerticalScrollBarVisibility="Auto"
+                                        HorizontalScrollBarVisibility="Auto"
+                                        CanContentScroll="True"
+                                        Padding="{TemplateBinding Padding}"
+                                        Background="{TemplateBinding Background}" 
+                                        BorderBrush="Transparent" BorderThickness="0" 
+                                        IsTabStop="False">
+                        <ItemsPresenter/>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ListBox.Template>
+
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <controls:VirtualScrollPanel ItemHeight="22"
+                                                ScrollReceiver="{Binding}"  
+                                                StartIndex="{Binding FirstIndex}"
+                                                TotalItems="{Binding Count.Value}"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+
+
+            <ListBox.InputBindings>
+                <KeyBinding Key="C" Modifiers="Control" Command="{Binding CopyToClipboardCommand}"/>
+            </ListBox.InputBindings>
+
+            <ListBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="_Copy" Command="{Binding CopyToClipboardCommand}">
+                        <MenuItem.Icon>
+                            <Viewbox Width="16" Height="16">
+                                <Canvas Width="24" Height="24">
+                                    <Path Data="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" 
+                                              Fill="{DynamicResource MaterialDesignBody}" />
+                                </Canvas>
+                            </Viewbox>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </ContextMenu>
+            </ListBox.ContextMenu>
+
+            <ListBox.ItemTemplate>
+
+
+                <DataTemplate DataType="{x:Type tail:LineProxy}">
+                    <Grid >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="{Binding Start, Mode=OneWay}" 
+                                   Visibility="Collapsed" 
+                                   Opacity="0.55" 
+                                   MinWidth="25"/>
+
+                        <!--HighlightEnabled = "{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"-->
+                        <controls:HighlightTextControl Grid.Column="1"  Margin="6 0 0 0" 
+                                        Text="{Binding Text}"                    
+                                        FormattedText = "{Binding FormattedText.Value}"
+                                        HighlightForeground = "{StaticResource SecondaryAccentForegroundBrush}"
+                                        HighlightBackground = "{StaticResource SecondaryAccentBrush}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+
+
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
+                    <Style.Setters>
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="Height" Value="22"/>
+                    </Style.Setters>
+                    <!--"{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"-->
+                    <Style.Triggers>
+                        <MultiDataTrigger >
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=IsRecent}" Value="True"/>
+                                <Condition Binding="{Binding  RelativeSource={RelativeSource FindAncestor, AncestorType=tail:FileTailerView},Path=DataContext.HighlightTail.Value}" Value="True"/>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=tail:FileTailerView}, Path=DataContext.UsingDarkTheme.Value}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+
+                            <MultiDataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Background).(SolidColorBrush.Color)" 
+                                                                               FromBrush="{StaticResource SecondaryAccentBrush}" 
+                                                                               Duration="0:0:5"/>
+                                        <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Foreground).(SolidColorBrush.Color)" 
+                                                                               ToBrush="{StaticResource SecondaryAccentForegroundBrush}" 
+                                                                               Duration="0:0:5"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+
+                            </MultiDataTrigger.EnterActions>
+                        </MultiDataTrigger>
+
+                        <MultiDataTrigger >
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=IsRecent}" Value="True"/>
+                                <Condition Binding="{Binding  RelativeSource={RelativeSource FindAncestor, AncestorType=tail:FileTailerView},Path=DataContext.HighlightTail.Value}" Value="True"/>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=tail:FileTailerView}, Path=DataContext.UsingDarkTheme.Value}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+
+                            <MultiDataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Foreground).(SolidColorBrush.Color)" 
+                                                                       
+                                                                               FromBrush="{StaticResource SecondaryAccentBrush}"
+                                                                               Duration="0:0:5"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+
+                            </MultiDataTrigger.EnterActions>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListBox.ItemContainerStyle>
+
+        </ListBox>
+
+    </Grid>
+</UserControl>

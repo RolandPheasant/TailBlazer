@@ -2,6 +2,7 @@
 using System.Windows;
 using Dragablz;
 using TailBlazer.Views;
+using TailBlazer.Views.WindowsCreation;
 
 namespace TailBlazer.Infrastucture
 {

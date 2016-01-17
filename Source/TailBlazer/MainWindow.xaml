@@ -7,12 +7,13 @@
         xmlns:dockablz="clr-namespace:Dragablz.Dockablz;assembly=Dragablz"
         xmlns:dragablz="clr-namespace:Dragablz;assembly=Dragablz"
         xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
-        xmlns:views="clr-namespace:TailBlazer.Views"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:settings="clr-namespace:TailBlazer.Settings"
         xmlns:tailBlazer="clr-namespace:TailBlazer"
         xmlns:controls1="clr-namespace:TailBlazer.Controls"
-        mc:Ignorable="d"
+        xmlns:recent="clr-namespace:TailBlazer.Views.Recent"
+                      xmlns:options="clr-namespace:TailBlazer.Views.Options"
+                      xmlns:windowsCreation="clr-namespace:TailBlazer.Views.WindowsCreation"
+                      mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         TextElement.FontWeight="Regular"
@@ -27,7 +28,7 @@
         WindowTransitionsEnabled="False"
         x:Name="Window"
 
-        d:DataContext="{d:DesignInstance views:WindowViewModel, IsDesignTimeCreatable=False}"
+        d:DataContext="{d:DesignInstance windowsCreation:WindowViewModel, IsDesignTimeCreatable=False}"
         Title="Tail Blazer" 
         Height="650"
         Width="850">
@@ -129,11 +130,11 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <settings:GeneralOptionsView
+                    <options:GeneralOptionsView
                             Margin="6 12 6 0"
                             DataContext="{Binding GeneralOptions}"/>
 
-                    <views:RecentFilesView 
+                    <recent:RecentFilesView 
                             Grid.Row="1"
                             Margin="6 12 6 0"
                             DataContext="{Binding RecentFiles}"/>

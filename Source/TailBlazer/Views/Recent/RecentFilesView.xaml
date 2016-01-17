@@ -1,0 +1,85 @@
+﻿<UserControl x:Class="TailBlazer.Views.Recent.RecentFilesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TailBlazer.Views"
+             xmlns:controls="clr-namespace:TailBlazer.Controls"
+             xmlns:recent="clr-namespace:TailBlazer.Views.Recent"
+             mc:Ignorable="d" 
+               d:DataContext="{d:DesignInstance recent:RecentFilesViewModel, IsDesignTimeCreatable=False}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+        </ResourceDictionary>
+        
+    </UserControl.Resources>
+    
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" MaxHeight="250"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock  Text="Recent Files" FontSize="16" FontWeight="SemiBold"/>
+
+        <ItemsControl Grid.Row="1" Margin="8 12 0 0"
+                         ItemsSource="{Binding  Files}">
+            
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type recent:RecentFileProxy}">
+                    <Grid>
+
+                        <Button 
+                            HorizontalAlignment="Left"
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            Margin="2 0 2 2" Height="22" Padding="0"
+                            VerticalAlignment="Center"
+                            Command="{Binding OpenCommand}"
+                            ToolTip="{Binding OpenToolTip}">
+
+                            <StackPanel Orientation="Horizontal">
+
+                                <controls:OpenFileIcon Width="14" Height="14"/>
+
+                                <TextBlock Foreground="{DynamicResource MaterialDesignBody}" 
+                                           FontWeight="Light"
+                                           Margin="5 2 4 2" 
+                                            VerticalAlignment="Center"
+                                           
+                                   Text="{Binding Name}"/>
+                            </StackPanel>
+
+
+
+                        </Button>
+
+                        <!--<Button Grid.Column="1" 
+                                Style="{StaticResource MaterialDesignFlatButton}"
+                                Margin="0 2 2 2" Width="22" Height="22" Padding="0"
+                                VerticalAlignment="Center"
+                                Command="{Binding RemoveCommand}"
+                                ToolTip="{Binding RemoveToolTip}">
+                            <local:RemoveIcon Width="10" Height="10"/>
+                        </Button>-->
+                        
+                        <!--<TextBlock Grid.Column="2" Margin="0 2 4 2" 
+                                   VerticalAlignment="Center"
+                                   Text="{Binding Name}"/>-->
+
+
+
+                    </Grid>
+
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</UserControl>

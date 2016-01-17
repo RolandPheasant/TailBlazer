@@ -11,6 +11,7 @@ using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Views;
+using TailBlazer.Views.Tail;
 
 namespace TailBlazer.Infrastucture
 {

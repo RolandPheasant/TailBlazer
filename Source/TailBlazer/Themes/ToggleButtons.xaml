@@ -82,14 +82,16 @@
                                 Background="{TemplateBinding Background}" 
                                 CornerRadius="2"/>
 
-                        <materialDesign:Ripple   Focusable="True"     
+                        <materialDesign:Ripple   Focusable="True" 
                                                 Feedback="{DynamicResource MaterialDesignBody}"
                                                 HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" 
                                                 VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                                 Padding="{TemplateBinding Padding}" 
                                                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
 
-                            <Grid  Margin="{TemplateBinding Padding}" RenderTransformOrigin="0.5,0.5">
+                            <Grid  Margin="{TemplateBinding Padding}" 
+                                   IsHitTestVisible="False"
+                                   RenderTransformOrigin="0.5,0.5">
                                 <Grid.RenderTransform>
                                     <TransformGroup>
                                         <ScaleTransform/>
@@ -113,10 +115,10 @@
                         </Trigger>
 
                         <Trigger Property="IsChecked" Value="False">
-                            <Setter Property="ToolTip" Value="Search using plain text"/>
+                            <Setter Property="ToolTip" Value="Search using plain text. Click to use regular expressions."/>
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="ToolTip" Value="Search using a regular expression"/>
+                            <Setter Property="ToolTip" Value="Search using a regular expression. Click to use plain text."/>
                         </Trigger>
 
                     </ControlTemplate.Triggers>

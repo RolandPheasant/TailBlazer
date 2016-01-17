@@ -4,6 +4,7 @@ using System.Windows.Threading;
 using StructureMap;
 using TailBlazer.Infrastucture;
 using TailBlazer.Views;
+using TailBlazer.Views.WindowsCreation;
 
 namespace TailBlazer
 {

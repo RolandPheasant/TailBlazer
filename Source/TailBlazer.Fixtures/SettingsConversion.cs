@@ -3,6 +3,7 @@ using FluentAssertions;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Recent;
 using TailBlazer.Settings;
+using TailBlazer.Views.Options;
 using Xunit;
 
 namespace TailBlazer.Fixtures
