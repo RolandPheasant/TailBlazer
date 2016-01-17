@@ -21,7 +21,7 @@ using TailBlazer.Views.Options;
 using TailBlazer.Views.Recent;
 using TailBlazer.Views.Tail;
 
-namespace TailBlazer.Views.WindowsCreation
+namespace TailBlazer.Views.WindowManagement
 {
     public class WindowViewModel: AbstractNotifyPropertyChanged, IDisposable
     {

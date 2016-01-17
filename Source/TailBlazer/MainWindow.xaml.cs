@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows;
 using MahApps.Metro.Controls;
 using TailBlazer.Views;
-using TailBlazer.Views.WindowsCreation;
+using TailBlazer.Views.WindowManagement;
 
 namespace TailBlazer
 {

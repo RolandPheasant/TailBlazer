@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Dragablz;
 using TailBlazer.Domain.Infrastructure;
 
-namespace TailBlazer.Views.WindowsCreation
+namespace TailBlazer.Views.WindowManagement
 {
     public class WindowFactory : IWindowFactory
     {

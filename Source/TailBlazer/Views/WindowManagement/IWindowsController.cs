@@ -2,7 +2,7 @@ using System;
 using DynamicData;
 using TailBlazer.Infrastucture;
 
-namespace TailBlazer.Views.WindowsCreation
+namespace TailBlazer.Views.WindowManagement
 {
     public interface IWindowsController
     {

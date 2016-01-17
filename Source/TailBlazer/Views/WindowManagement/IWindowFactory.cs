@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace TailBlazer.Views.WindowsCreation
+namespace TailBlazer.Views.WindowManagement
 {
     public interface IWindowFactory
     {

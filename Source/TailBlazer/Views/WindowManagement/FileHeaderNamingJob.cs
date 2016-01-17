@@ -4,7 +4,7 @@ using System.Linq;
 using DynamicData;
 using TailBlazer.Infrastucture;
 
-namespace TailBlazer.Views.WindowsCreation
+namespace TailBlazer.Views.WindowManagement
 {
     public class FileHeaderNamingJob: IDisposable
     {

@@ -8,7 +8,7 @@ using TailBlazer.Settings;
 using TailBlazer.Views;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Recent;
-using TailBlazer.Views.WindowsCreation;
+using TailBlazer.Views.WindowManagement;
 
 namespace TailBlazer.Infrastucture
 {

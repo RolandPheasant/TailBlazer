@@ -3,7 +3,7 @@ using DynamicData;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
 
-namespace TailBlazer.Views.WindowsCreation
+namespace TailBlazer.Views.WindowManagement
 {
     public class WindowsController : IWindowsController, IDisposable
     {

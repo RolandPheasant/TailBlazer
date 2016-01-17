@@ -165,7 +165,7 @@
     <Compile Include="Views\Options\Theme.cs" />
     <Compile Include="Views\FileDrop\FileDropContainer.cs" />
     <Compile Include="Views\FileDrop\FileDropMonitor.cs" />
-    <Compile Include="Views\WindowsCreation\FileHeaderNamingJob.cs" />
+    <Compile Include="Views\WindowManagement\FileHeaderNamingJob.cs" />
     <Compile Include="Controls\FileIcon.cs" />
     <Compile Include="Infrastucture\SchedulerProvider.cs" />
     <Compile Include="Infrastucture\SolidColorAnimation.cs" />
@@ -184,7 +184,7 @@
     <Compile Include="Views\Tail\InlineViewerArgs.cs" />
     <Compile Include="Views\Tail\InlineViewerFactory.cs" />
     <Compile Include="Infrastucture\IScrollReceiver.cs" />
-    <Compile Include="Views\WindowsCreation\IWindowsController.cs" />
+    <Compile Include="Views\WindowManagement\IWindowsController.cs" />
     <Compile Include="Views\Tail\LineProxy.cs" />
     <Compile Include="Views\Tail\LineProxyFactory.cs" />
     <Compile Include="Controls\OpenFileIcon.cs" />
@@ -221,13 +221,13 @@
     <Compile Include="Infrastucture\Command.cs" />
     <Compile Include="Infrastucture\DependencyObjectHook.cs" />
     <Compile Include="Infrastucture\IntertabClient.cs" />
-    <Compile Include="Views\WindowsCreation\IWindowFactory.cs" />
+    <Compile Include="Views\WindowManagement\IWindowFactory.cs" />
     <Compile Include="Infrastucture\Log4NetLogger.cs" />
     <Compile Include="Infrastucture\ObjectProvider.cs" />
     <Compile Include="Infrastucture\ViewContainer.cs" />
-    <Compile Include="Views\WindowsCreation\WindowFactory.cs" />
-    <Compile Include="Views\WindowsCreation\WindowsController.cs" />
-    <Compile Include="Views\WindowsCreation\WindowViewModel.cs" />
+    <Compile Include="Views\WindowManagement\WindowFactory.cs" />
+    <Compile Include="Views\WindowManagement\WindowsController.cs" />
+    <Compile Include="Views\WindowManagement\WindowViewModel.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

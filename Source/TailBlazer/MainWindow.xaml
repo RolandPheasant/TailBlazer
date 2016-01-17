@@ -12,7 +12,7 @@
         xmlns:controls1="clr-namespace:TailBlazer.Controls"
         xmlns:recent="clr-namespace:TailBlazer.Views.Recent"
                       xmlns:options="clr-namespace:TailBlazer.Views.Options"
-                      xmlns:windowsCreation="clr-namespace:TailBlazer.Views.WindowsCreation"
+                      xmlns:windowManagement="clr-namespace:TailBlazer.Views.WindowManagement"
                       mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
@@ -28,7 +28,7 @@
         WindowTransitionsEnabled="False"
         x:Name="Window"
 
-        d:DataContext="{d:DesignInstance windowsCreation:WindowViewModel, IsDesignTimeCreatable=False}"
+        d:DataContext="{d:DesignInstance windowManagement:WindowViewModel, IsDesignTimeCreatable=False}"
         Title="Tail Blazer" 
         Height="650"
         Width="850">
