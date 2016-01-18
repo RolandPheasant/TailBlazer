@@ -348,7 +348,7 @@
 
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="18"/> 
+                                    <ColumnDefinition Width="Auto"/> 
                                     <ColumnDefinition Width="*"/> 
                                 </Grid.ColumnDefinitions>
 

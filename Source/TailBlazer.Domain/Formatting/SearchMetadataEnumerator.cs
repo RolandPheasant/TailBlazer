@@ -78,9 +78,9 @@ namespace TailBlazer.Domain.Formatting
                     yield break;
                 }
 
-                if (matches.Count > 5)
+                if (matches.Count > 4)
                 {
-                    yield return new MatchedString(input, false, true);
+                    yield return new MatchedString(input, true, true);
                     yield break;
                 }
 

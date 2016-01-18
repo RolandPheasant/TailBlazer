@@ -92,7 +92,7 @@ namespace TailBlazer.Controls
             {
                 var run = new Run(ft.Text);
 
-                if (ft.Highlight && HighlightEnabled)
+                if (ft.Highlight && !ft.ShowIndicator && HighlightEnabled)
                 {
                     if (HighlightBackground != null) run.Background = HighlightBackground;
                     if (HighlightForeground != null) run.Foreground = HighlightForeground;

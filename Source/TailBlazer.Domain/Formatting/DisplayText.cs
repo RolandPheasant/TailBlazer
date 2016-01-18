@@ -14,7 +14,6 @@ namespace TailBlazer.Domain.Formatting
             Text = matchedString.Part;
             Highlight = matchedString.IsMatch;
             ShowIndicator = matchedString.ShowIndicator;
-            //  Brush = null;
         }
 
     }

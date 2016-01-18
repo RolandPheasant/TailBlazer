@@ -41,9 +41,12 @@ namespace TailBlazer.Views.Tail
             Line = line;
     
 
-            FormattedText = formattedText.ForBinding();
-            ShowIndicator = formattedText.Select(items => items.Any(ft => ft.ShowIndicator))
-                            .DistinctUntilChanged()
+            FormattedText = formattedText
+                       
+                        .ForBinding();
+            ShowIndicator = formattedText
+                            
+                            .Select(items => items.Any(ft => ft.ShowIndicator))
                             .ForBinding();
 
             _cleanUp = new CompositeDisposable(FormattedText, FormattedText);
