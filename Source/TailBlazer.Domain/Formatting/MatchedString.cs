@@ -6,11 +6,13 @@ namespace TailBlazer.Domain.Formatting
     {
         public string Part { get; }
         public bool IsMatch { get; }
+        public bool ShowIndicator { get;  }
 
-        public MatchedString(string part, bool isMatch)
+        public MatchedString(string part, bool isMatch, bool showIndicator=false)
         {
             Part = part;
             IsMatch = isMatch;
+            ShowIndicator = showIndicator;
         }
         
 

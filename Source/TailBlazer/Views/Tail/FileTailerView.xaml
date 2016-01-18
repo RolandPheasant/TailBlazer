@@ -281,13 +281,13 @@
                 </Grid>
 
                 <ListBox 
-                VerticalAlignment="Stretch"
-                Grid.Row="1"
-                ItemsSource="{Binding Lines}" 
-                SelectedItem="{Binding SelectedItem}"
-                FontFamily="Consolas"
-                SelectionMode="Extended"
-                infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}">
+                        VerticalAlignment="Stretch"
+                        Grid.Row="1"
+                        ItemsSource="{Binding Lines}" 
+                        SelectedItem="{Binding SelectedItem}"
+                        FontFamily="Consolas"
+                        SelectionMode="Extended"
+                        infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}">
 
                     <!--<infrastucture:ListBoxHelper.RowAnimationSetter>
                     <local:ListboxRowAnimationSetter
@@ -307,8 +307,7 @@
                                         BorderBrush="Transparent" 
                                         BorderThickness="0" 
                                         KeyboardNavigation.TabNavigation="Cycle"
-                                        KeyboardNavigation.DirectionalNavigation="Cycle"
-                                        KeyboardNavigation.IsTabStop="False"
+                                        IsTabStop="False"
                                         IsHitTestVisible="True">
                                 <ItemsPresenter/>
                             </ScrollViewer>
@@ -346,12 +345,33 @@
 
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type tail:LineProxy}">
-                            <controls:HighlightTextControl
-                                        Margin="6 0 0 0"   
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="18"/> 
+                                    <ColumnDefinition Width="*"/> 
+                                </Grid.ColumnDefinitions>
+
+      
+                            <controls:RegexMatchedIcon 
+                                                    Margin="4 0 0 0"
+                                                    Width="14"
+                                                    Height="14"
+                                                    VerticalAlignment="Center"
+                                                    Visibility="{Binding ShowIndicator.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                    Foreground="{StaticResource SecondaryAccentBrush}"/>
+                                
+
+                                <controls:HighlightTextControl
+                                    Grid.Column="1" Margin="6 0 0 0"   
                                         Text="{Binding Text}" 
+                                        VerticalAlignment="Center"
                                         FormattedText = "{Binding FormattedText.Value}"
                                         HighlightForeground = "{StaticResource SecondaryAccentForegroundBrush}"
                                         HighlightBackground = "{StaticResource SecondaryAccentBrush}"/>
+                            </Grid>
+                            
+
                         </DataTemplate>
                     </ListBox.ItemTemplate>
 
@@ -359,6 +379,7 @@
                         <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
                             <Style.Setters>
                                 <Setter Property="Padding" Value="0"/>
+                                <Setter Property="IsTabStop" Value="False"/>
                                 <Setter Property="Height" Value="22"/>
                             </Style.Setters>
 

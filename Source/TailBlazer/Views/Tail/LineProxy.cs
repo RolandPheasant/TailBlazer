@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using DynamicData.Binding;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
@@ -23,7 +26,11 @@ namespace TailBlazer.Views.Tail
 
         public  IProperty<IEnumerable<DisplayText>> FormattedText { get; }
 
+        public IProperty<bool> ShowIndicator { get; }
+
+
         public bool IsRecent => Line.Timestamp.HasValue && DateTime.Now.Subtract(Line.Timestamp.Value).TotalSeconds < 0.25;
+
 
         public LineProxy([NotNull] Line line, [NotNull] IObservable<IEnumerable<DisplayText>> formattedText)
         {
@@ -35,10 +42,12 @@ namespace TailBlazer.Views.Tail
     
 
             FormattedText = formattedText.ForBinding();
-            _cleanUp = FormattedText;
+            ShowIndicator = formattedText.Select(items => items.Any(ft => ft.ShowIndicator))
+                            .DistinctUntilChanged()
+                            .ForBinding();
+
+            _cleanUp = new CompositeDisposable(FormattedText, FormattedText);
         }
-
-
 
 
         public int CompareTo(LineProxy other)

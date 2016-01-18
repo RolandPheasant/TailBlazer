@@ -127,6 +127,7 @@
     </ApplicationDefinition>
     <Compile Include="Controls\FilterIcon.cs" />
     <Compile Include="Controls\RegexIcon.cs" />
+    <Compile Include="Controls\RegexMatchedIcon.cs" />
     <Compile Include="Controls\SearchIcon.cs" />
     <Compile Include="DialogNames.cs" />
     <Compile Include="Infrastucture\CheckedToLengthConverter.cs" />

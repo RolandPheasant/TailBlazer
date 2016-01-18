@@ -70,12 +70,19 @@ namespace TailBlazer.Domain.Formatting
 
                 var matches = tomatch.RegEx.Value.Matches(input);
 
+
+
                 if (matches.Count == 0)
                 {
                     yield return new MatchedString(input, false);
                     yield break;
                 }
 
+                if (matches.Count > 5)
+                {
+                    yield return new MatchedString(input, false, true);
+                    yield break;
+                }
 
                 var childMatches = new MatchedStringEnumerator(input, matches.Cast<Match>().Select(match => match.Value)
                     .ToArray());
