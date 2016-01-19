@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:TailBlazer.Controls"
              xmlns:fileDrop="clr-namespace:TailBlazer.Views.FileDrop"
-             xmlns:tail="clr-namespace:TailBlazer.Views.Tail">
+             xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
+             xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -12,8 +13,7 @@
             </ResourceDictionary.MergedDictionaries>
 
 
-
-            <DataTemplate DataType="{x:Type tail:FileTailerViewModel}">
+           <DataTemplate DataType="{x:Type tail:FileTailerViewModel}">
                 <tail:FileTailerView />
             </DataTemplate>
             

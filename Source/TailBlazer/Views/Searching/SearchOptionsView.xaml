@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:TailBlazer.Settings"
              xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
+             xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
              mc:Ignorable="d" 
             TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
              Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
@@ -22,6 +23,7 @@
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ToggleButtons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/TextBoxes.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Colours.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Dragable.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
         </ResourceDictionary>
@@ -88,12 +90,21 @@
 
 
 
-            <ScrollViewer Grid.Row="1" Margin="2 8 2 4"
+            <!--<ScrollViewer Grid.Row="1" Margin="2 8 2 4"
                       HorizontalScrollBarVisibility="Hidden"
-                      VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding Data}">
+                      VerticalScrollBarVisibility="Auto">-->
 
-                    <ItemsControl.ItemTemplate>
+                <dragablz:DragablzItemsControl  Grid.Row="1" 
+                                                ItemContainerStyle="{StaticResource DragableItem}"
+                                                ItemsSource="{Binding Data}">
+
+                <dragablz:DragablzItemsControl.ItemsOrganiser>
+                    <dragablz:VerticalOrganiser />
+                </dragablz:DragablzItemsControl.ItemsOrganiser>
+                    
+                    
+
+                <dragablz:DragablzItemsControl.ItemTemplate>
                         <DataTemplate DataType="{x:Type searching:SearchOptionsProxy}">
 
                             <Grid Margin="0 4 4 4">
@@ -143,9 +154,9 @@
                             </Grid>
 
                         </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+                    </dragablz:DragablzItemsControl.ItemTemplate>
+                </dragablz:DragablzItemsControl>
+            <!--</ScrollViewer>-->
 
 
             <Button  Grid.Row="2" IsDefault="True"

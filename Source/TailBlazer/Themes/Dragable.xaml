@@ -1,0 +1,61 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz">
+    
+    <Style  x:Key="DragableItem" TargetType="{x:Type dragablz:DragablzItem}" 
+           BasedOn="{StaticResource {x:Type dragablz:DragablzItem}}">
+        <Style.Setters>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border BorderThickness="{TemplateBinding Border.BorderThickness}" 
+                                        Padding="{TemplateBinding Control.Padding}" 
+                                        BorderBrush="{TemplateBinding Border.BorderBrush}"
+                                        Background="{TemplateBinding Panel.Background}" 
+                                        SnapsToDevicePixels="True">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Border Background="Transparent"  x:Name="PART_DragableElement">
+
+                                    <!--<Path 
+                                                x:Name="Ellipse"
+                                                Data="M10,13V11H18V13H10M10,19V17H14V19H10M10,7V5H22V7H10M6,17H8.5L5,20.5L1.5,17H4V7H1.5L5,3.5L8.5,7H6V17Z" 
+                                                Stretch="Uniform"  
+                                                Fill="{DynamicResource PrimaryHueMidBrush}" />-->
+                                </Border>
+                                <Thumb Grid.Column="1" 
+                                       Width="16" Height="16"
+                                       
+                                       x:Name="PART_Thumb" >
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Path 
+                                                x:Name="Ellipse"
+                                                Data="M10,13V11H18V13H10M10,19V17H14V19H10M10,7V5H22V7H10M6,17H8.5L5,20.5L1.5,17H4V7H1.5L5,3.5L8.5,7H6V17Z" 
+                                                Stretch="Uniform"  
+                                                Fill="{DynamicResource PrimaryHueMidBrush}" />
+
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Ellipse" Property="Opacity" Value="0.56"/>
+                                                    <Setter Property="Cursor" Value="Hand" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                    
+                                </Thumb>
+                                <ContentPresenter Grid.Column="2" Content="{TemplateBinding ContentControl.Content}" ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}" ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}" HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding Control.VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+    </Style>
+
+</ResourceDictionary>
