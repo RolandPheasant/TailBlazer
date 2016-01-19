@@ -32,8 +32,10 @@ namespace TailBlazer.Domain.Formatting
                 else
                 {
                     matches = matches.SelectMany(ms => ms.IsMatch
-                        ? new[] {ms}
-                        : Yield(ms.Part, searchMetadata)).ToArray();
+                        ? new[] { ms }
+                        : Yield(ms.Part, searchMetadata,ms.ShowIndicator)).ToArray();
+
+                  //  matches = matches.SelectMany(ms =>  Yield(ms.Part, searchMetadata)).ToArray();
                 }
             }
 
@@ -51,7 +53,7 @@ namespace TailBlazer.Domain.Formatting
         private const RegexOptions CaseSensitiveOptions = RegexOptions.IgnorePatternWhitespace
                                                           | RegexOptions.Compiled;
 
-        private static IEnumerable<MatchedString> Yield(string input, SearchMetadata tomatch)
+        private static IEnumerable<MatchedString> Yield(string input, SearchMetadata tomatch, bool showHighlight=false)
         {
 
             if (string.IsNullOrEmpty(input)) yield break;
@@ -64,7 +66,8 @@ namespace TailBlazer.Domain.Formatting
 
                 if (!tomatch.RegEx.HasValue)
                 {
-                    yield return new MatchedString(input, false);
+                    yield return new MatchedString(input, false, showHighlight);
+
                     yield break;
                 }
 
@@ -74,17 +77,18 @@ namespace TailBlazer.Domain.Formatting
 
                 if (matches.Count == 0)
                 {
-                    yield return new MatchedString(input, false);
+                    yield return new MatchedString(input, false, showHighlight);
                     yield break;
                 }
 
                 if (matches.Count > 4)
                 {
-                    yield return new MatchedString(input, true, true);
+                    yield return new MatchedString(input, false, true);
                     yield break;
                 }
 
-                var childMatches = new MatchedStringEnumerator(input, matches.Cast<Match>().Select(match => match.Value)
+                var childMatches = new MatchedStringEnumerator(input, matches.Cast<Match>()
+                    .Select(match => match.Value)
                     .ToArray());
 
                 foreach (var item in childMatches)
@@ -97,7 +101,8 @@ namespace TailBlazer.Domain.Formatting
 
                 foreach (var item in Yield(input, tomatch.SearchText, tomatch.IgnoreCase))
                 {
-                    yield return item;
+                    //yield return item;
+                    yield return new MatchedString(item.Part,item.IsMatch,showHighlight);
                 }
                
 

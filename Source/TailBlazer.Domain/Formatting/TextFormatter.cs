@@ -28,7 +28,8 @@ namespace TailBlazer.Domain.Formatting
                 //split into 2 parts. 1) matching text 2) matching regex
                 return inputText
                     .MatchString(meta)
-                    .Select(ms => new DisplayText(ms));
+                    .Select(ms => new DisplayText(ms))
+                    .ToArray();
             });
         }
     }

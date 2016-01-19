@@ -19,6 +19,8 @@ namespace TailBlazer.Infrastucture
 
     public class BooleanToVisibilityConverter : IValueConverter
     {
+    
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo language)
         {
             return (value is bool && (bool)value) ? Visibility.Visible : Visibility.Collapsed;
@@ -28,6 +30,19 @@ namespace TailBlazer.Infrastucture
             return value is Visibility && (Visibility)value == Visibility.Visible;
         }
     }
+
+    public class BooleanToHiddenConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo language)
+        {
+            return (value is bool && (bool)value) ? Visibility.Visible : Visibility.Hidden;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo language)
+        {
+            return value is Visibility && (Visibility)value == Visibility.Hidden;
+        }
+    }
+
 
     public class EqualityToBooleanConverter : IValueConverter
     {

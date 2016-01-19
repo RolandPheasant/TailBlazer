@@ -24,6 +24,7 @@
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Colours.xaml" />-->
 
             </ResourceDictionary.MergedDictionaries>
+            <infrastucture:BooleanToHiddenConverter x:Key="BooleanToHiddenConverter"/>
 
         </ResourceDictionary>
     </Control.Resources>
@@ -90,10 +91,14 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="{Binding Start, Mode=OneWay}" 
-                                   Visibility="Collapsed" 
-                                   Opacity="0.55" 
-                                   MinWidth="25"/>
+                        <controls:RegexMatchedIcon 
+                                                    Margin="4 0 0 0"
+                                                    Width="14"
+                                                    Height="14"
+                                                    VerticalAlignment="Center"
+                                                    Visibility="{Binding ShowIndicator.Value, Converter={StaticResource BooleanToHiddenConverter}}"
+                                                    Foreground="{StaticResource SecondaryAccentBrush}"/>
+
 
                         <!--HighlightEnabled = "{Binding ElementName=Control, Path=DataContext.ShouldHightlightMatchingText.Value}"-->
                         <controls:HighlightTextControl Grid.Column="1"  Margin="6 0 0 0" 

@@ -42,7 +42,6 @@ namespace TailBlazer.Views.Tail
     
 
             FormattedText = formattedText
-                       
                         .ForBinding();
             ShowIndicator = formattedText
                             
