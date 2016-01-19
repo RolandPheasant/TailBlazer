@@ -129,6 +129,7 @@
     <Compile Include="Controls\RegexIcon.cs" />
     <Compile Include="Controls\RegexMatchedIcon.cs" />
     <Compile Include="Controls\SearchIcon.cs" />
+    <Compile Include="Controls\TextMatchedIcon.cs" />
     <Compile Include="DialogNames.cs" />
     <Compile Include="Infrastucture\CheckedToLengthConverter.cs" />
     <Compile Include="Infrastucture\ClipboardHandler.cs" />

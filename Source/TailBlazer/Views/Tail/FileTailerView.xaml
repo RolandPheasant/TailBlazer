@@ -353,8 +353,15 @@
                                     <ColumnDefinition Width="*"/> 
                                 </Grid.ColumnDefinitions>
 
-      
-                            <controls:RegexMatchedIcon 
+                                <!--<controls:TextMatchedIcon 
+                                                    Margin="4 0 0 0"
+                                                    Width="14"
+                                                    Height="14"
+                                                    VerticalAlignment="Center"
+                                                    Visibility="{Binding ShowIndicator.Value, Converter={StaticResource BooleanToHiddenConverter}}"
+                                                    Foreground="{StaticResource SecondaryAccentBrush}"/>-->
+
+                                <controls:RegexMatchedIcon 
                                                     Margin="4 0 0 0"
                                                     Width="14"
                                                     Height="14"

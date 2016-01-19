@@ -22,7 +22,5 @@ namespace TailBlazer.Controls
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(RegexMatchedIcon), new FrameworkPropertyMetadata(typeof(RegexMatchedIcon)));
         }
-
-
     }
 }
