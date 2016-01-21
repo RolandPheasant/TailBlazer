@@ -360,7 +360,10 @@
                                     <ColumnDefinition Width="*"/> 
                                 </Grid.ColumnDefinitions>
 
-             
+
+                                <Border>
+                                    
+                         
                                     <Grid x:Name="Grid" Margin="2" 
                                             Visibility="{Binding  LineMatches.Value.HasMatches, Converter={StaticResource BooleanToVisibilityConverter}}">
                                         <controls:TextMatchedIcon 
@@ -376,17 +379,21 @@
                                                         VerticalAlignment="Center"
                                                         Visibility="{Binding LineMatches.Value.IsRegex, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                         Foreground="{StaticResource SecondaryAccentBrush}"/>
-
-
-
-                                        <!--<Grid.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Opacity" Value="0.56"/>
-                                            </Trigger>
-                                        </Grid.Triggers>-->
-
                                     </Grid>
-  
+
+
+                                    <Border.Style>
+                                        <Style TargetType="{x:Type Border}">
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Opacity" Value="0.56"/>
+                                                </Trigger>
+                                             </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+
+                                </Border>
+
                                 <controls:HighlightTextControl
                                     Grid.Column="1" Margin="6 0 0 0"   
                                         Text="{Binding Text}" 
