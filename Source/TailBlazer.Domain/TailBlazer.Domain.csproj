@@ -114,7 +114,11 @@
     <Compile Include="FileHandling\Search\SearchInfo.cs" />
     <Compile Include="FileHandling\TailInfo.cs" />
     <Compile Include="Formatting\DisplayText.cs" />
+    <Compile Include="Formatting\ILineMatches.cs" />
     <Compile Include="Formatting\ITextFormatter.cs" />
+    <Compile Include="Formatting\LineMatch.cs" />
+    <Compile Include="Formatting\LineMatchCollection.cs" />
+    <Compile Include="Formatting\LineMatches.cs" />
     <Compile Include="Formatting\MatchedString.cs" />
     <Compile Include="Formatting\MatchedStringEnumerator.cs" />
     <Compile Include="Formatting\MatchedStringEx.cs" />

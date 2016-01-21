@@ -2,9 +2,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz">
     
-    <Style  x:Key="DragableItem" TargetType="{x:Type dragablz:DragablzItem}" 
-           BasedOn="{StaticResource {x:Type dragablz:DragablzItem}}">
+    <Style  x:Key="DragableItem" TargetType="{x:Type dragablz:DragablzItem}">
+
         <Style.Setters>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate>
@@ -19,29 +20,22 @@
                                     <ColumnDefinition />
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
-                                <Border Background="Transparent"  x:Name="PART_DragableElement">
 
-                                    <!--<Path 
-                                                x:Name="Ellipse"
-                                                Data="M10,13V11H18V13H10M10,19V17H14V19H10M10,7V5H22V7H10M6,17H8.5L5,20.5L1.5,17H4V7H1.5L5,3.5L8.5,7H6V17Z" 
-                                                Stretch="Uniform"  
-                                                Fill="{DynamicResource PrimaryHueMidBrush}" />-->
-                                </Border>
-                                <Thumb Grid.Column="1" 
-                                       Width="16" Height="16"
-                                       
-                                       x:Name="PART_Thumb" >
+                                <Thumb  x:Name="PART_Thumb" Grid.Column="1" Width="12" Height="12">
                                     <Thumb.Template>
                                         <ControlTemplate TargetType="Thumb">
-                                            <Path 
-                                                x:Name="Ellipse"
+                                            <Border Background="Transparent"  x:Name="PART_DragableElement">
+                                                <Path 
+                                                
                                                 Data="M10,13V11H18V13H10M10,19V17H14V19H10M10,7V5H22V7H10M6,17H8.5L5,20.5L1.5,17H4V7H1.5L5,3.5L8.5,7H6V17Z" 
                                                 Stretch="Uniform"  
                                                 Fill="{DynamicResource PrimaryHueMidBrush}" />
 
+                                            </Border>
+
                                             <ControlTemplate.Triggers>
                                                 <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter TargetName="Ellipse" Property="Opacity" Value="0.56"/>
+                                                    <Setter TargetName="PART_DragableElement" Property="Opacity" Value="0.56"/>
                                                     <Setter Property="Cursor" Value="Hand" />
                                                 </Trigger>
                                             </ControlTemplate.Triggers>
@@ -49,7 +43,13 @@
                                     </Thumb.Template>
                                     
                                 </Thumb>
-                                <ContentPresenter Grid.Column="2" Content="{TemplateBinding ContentControl.Content}" ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}" ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}" HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding Control.VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                                <ContentPresenter Grid.Column="2" 
+                                                  Content="{TemplateBinding ContentControl.Content}"
+                                                  ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}" 
+                                                  ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}" 
+                                                  HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}" 
+                                                  VerticalAlignment="{TemplateBinding Control.VerticalContentAlignment}" 
+                                                  SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
                             </Grid>
                         </Border>
                     </ControlTemplate>

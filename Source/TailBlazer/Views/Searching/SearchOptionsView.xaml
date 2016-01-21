@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:TailBlazer.Settings"
              xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
              xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
@@ -48,7 +47,6 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -56,8 +54,7 @@
                 </Grid.ColumnDefinitions>
 
 
-                <ToggleButton
-                                   Margin="2 0 0 0"
+                <ToggleButton Margin="2 0 0 0"
                                    Padding="2,2,2,-2"
                                    Width="32" 
                                    IsChecked="{Binding SearchHints.UseRegex}">
@@ -88,42 +85,36 @@
 
             </Grid>
 
-
-
-            <!--<ScrollViewer Grid.Row="1" Margin="2 8 2 4"
-                      HorizontalScrollBarVisibility="Hidden"
-                      VerticalScrollBarVisibility="Auto">-->
-
                 <dragablz:DragablzItemsControl  Grid.Row="1" 
                                                 ItemContainerStyle="{StaticResource DragableItem}"
+                                                HorizontalContentAlignment="Stretch"
                                                 ItemsSource="{Binding Data}">
 
                 <dragablz:DragablzItemsControl.ItemsOrganiser>
                     <dragablz:VerticalOrganiser />
                 </dragablz:DragablzItemsControl.ItemsOrganiser>
-                    
-                    
 
                 <dragablz:DragablzItemsControl.ItemTemplate>
                         <DataTemplate DataType="{x:Type searching:SearchOptionsProxy}">
 
-                            <Grid Margin="0 4 4 4">
-                                
-                                <Grid.ColumnDefinitions>
+                        <Grid Margin="4 4 4 4">
+                            <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="22"/>
+                                    <ColumnDefinition Width="75"/>
                                     <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <ToggleButton  Style="{DynamicResource SearchToggleStyle}" 
-                                               Padding="2"
-                                               Width="22"
-                                               Height="22"
-                                               VerticalAlignment="Center"
-                                    IsChecked="{Binding  UseRegex}"/>
+                            <ToggleButton  Margin="4 0 0 0" 
+                                           Style="{DynamicResource SearchToggleStyle}" 
+                                            Padding="2"
+                                            Width="22"
+                                            Height="22"
+                                            VerticalAlignment="Center"
+                                            IsChecked="{Binding  UseRegex}"/>
 
                                 <TextBlock Margin="4 0 0 0"  Grid.Column="1" 
                                            Text="{Binding Text}"
@@ -156,8 +147,6 @@
                         </DataTemplate>
                     </dragablz:DragablzItemsControl.ItemTemplate>
                 </dragablz:DragablzItemsControl>
-            <!--</ScrollViewer>-->
-
 
             <Button  Grid.Row="2" IsDefault="True"
                  HorizontalAlignment="Right"
@@ -165,12 +154,6 @@
                     Command="{x:Static wpf:DialogHost.CloseDialogCommand}">
                 Finished
             </Button>
-
-
-
-
         </Grid>
     </Grid>
-    
-
 </UserControl>

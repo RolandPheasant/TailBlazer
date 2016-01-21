@@ -70,7 +70,6 @@ namespace TailBlazer.Views.Tail
             [NotNull] ISearchInfoCollection searchInfoCollection, 
             [NotNull] IInlineViewerFactory inlineViewerFactory, 
             [NotNull] ISetting<GeneralOptions> generalOptions,
-            [NotNull] IRecentSearchCollection recentSearchCollection, 
             [NotNull] ISearchMetadataCollection searchMetadataCollection,
             [NotNull] SearchOptionsViewModel searchOptionsViewModel,
             [NotNull] SearchHints searchHints,
@@ -139,7 +138,7 @@ namespace TailBlazer.Views.Tail
             var lineScroller = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
 
             //load lines into observable collection
-            var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection));
+            var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection),new LineMatches(searchMetadataCollection));
             var loader = lineScroller.Lines.Connect()
                 .Transform(x=>lineProxyFactory.Create(x), new ParallelisationOptions(ParallelType.Ordered,5))
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))

@@ -11,6 +11,7 @@
              xmlns:controls="clr-namespace:TailBlazer.Controls"
              xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
              xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
+             xmlns:formatting="clr-namespace:TailBlazer.Domain.Formatting;assembly=TailBlazer.Domain"
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
             Background="{DynamicResource MaterialDesignPaper}"
              x:Name="Control"
@@ -49,8 +50,7 @@
                     <Setter.Value>
                         <ControlTemplate  TargetType="{x:Type ListBox}">
 
-                            <Border x:Name="border"
-                        BorderBrush="{TemplateBinding BorderBrush}"
+                            <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}"
           
                         CornerRadius="8" 
                          BorderThickness="4 0 0 0" >
@@ -261,8 +261,8 @@
                     </Button>
 
                     <StackPanel    
-                    VerticalAlignment="Center"
-                    Grid.Column="5" Margin="4 0 4 0" Orientation="Vertical">
+                        VerticalAlignment="Center"
+                        Grid.Column="5" Margin="4 0 4 0" Orientation="Vertical">
 
                         <CheckBox HorizontalAlignment="Left"
                             VerticalAlignment="Center"
@@ -347,29 +347,53 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type tail:LineProxy}">
 
-                            <Grid>
+            
+                                             
+                            <Grid Margin="4 0 0 0"
+                                  >
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/> 
+                                    <ColumnDefinition Width="18"/> 
                                     <ColumnDefinition Width="*"/> 
                                 </Grid.ColumnDefinitions>
 
-                                <!--<controls:TextMatchedIcon 
-                                                    Margin="4 0 0 0"
-                                                    Width="14"
-                                                    Height="14"
-                                                    VerticalAlignment="Center"
-                                                    Visibility="{Binding ShowIndicator.Value, Converter={StaticResource BooleanToHiddenConverter}}"
-                                                    Foreground="{StaticResource SecondaryAccentBrush}"/>-->
+                                <Border >
+                                    <Grid x:Name="Grid" Margin="2" 
+                                            Visibility="{Binding  LineMatches.Value.HasMatches, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <controls:TextMatchedIcon 
+                                                        Width="14"
+                                                        Height="14"
+                                                        VerticalAlignment="Center"
+                                                        Visibility="{Binding  LineMatches.Value.IsFilter, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                        Foreground="{StaticResource SecondaryAccentBrush}"/>
 
-                                <controls:RegexMatchedIcon 
-                                                    Margin="4 0 0 0"
-                                                    Width="14"
-                                                    Height="14"
-                                                    VerticalAlignment="Center"
-                                                    Visibility="{Binding ShowIndicator.Value, Converter={StaticResource BooleanToHiddenConverter}}"
-                                                    Foreground="{StaticResource SecondaryAccentBrush}"/>
-                                
+                                        <controls:RegexMatchedIcon 
+                                                        Width="14"
+                                                        Height="14"
+                                                        VerticalAlignment="Center"
+                                                        Visibility="{Binding LineMatches.Value.IsRegex, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                        Foreground="{StaticResource SecondaryAccentBrush}"/>
 
+
+
+                                        <!--<Grid.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Opacity" Value="0.56"/>
+                                            </Trigger>
+                                        </Grid.Triggers>-->
+
+                                    </Grid>
+                                    <ToolTipService.ToolTip >
+                                        <Grid>
+                                            <ItemsControl ItemsSource="{Binding LineMatches.Value.Matches}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate DataType="{x:Type formatting:LineMatch}">
+                                                        <TextBox Text="{Binding Text}"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </Grid>
+                                    </ToolTipService.ToolTip>
+                                </Border>
                                 <controls:HighlightTextControl
                                     Grid.Column="1" Margin="6 0 0 0"   
                                         Text="{Binding Text}" 
@@ -378,7 +402,10 @@
                                         HighlightForeground = "{StaticResource SecondaryAccentForegroundBrush}"
                                         HighlightBackground = "{StaticResource SecondaryAccentBrush}"/>
                             </Grid>
-                            
+
+
+
+
 
                         </DataTemplate>
                     </ListBox.ItemTemplate>

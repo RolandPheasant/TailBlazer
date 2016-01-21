@@ -13,6 +13,7 @@ namespace TailBlazer.Views.Tail
 {
     public class LineProxy: AbstractNotifyPropertyChanged,IComparable<LineProxy>, IComparable, IEquatable<LineProxy>, IDisposable
     {
+
         private readonly IDisposable _cleanUp;
 
         public static readonly IComparer<LineProxy> DefaultSort = SortExpressionComparer<LineProxy>
@@ -28,27 +29,32 @@ namespace TailBlazer.Views.Tail
 
         public IProperty<bool> ShowIndicator { get; }
 
+        public IProperty<LineMatchCollection> LineMatches { get; }
 
         public bool IsRecent => Line.Timestamp.HasValue && DateTime.Now.Subtract(Line.Timestamp.Value).TotalSeconds < 0.25;
 
 
-        public LineProxy([NotNull] Line line, [NotNull] IObservable<IEnumerable<DisplayText>> formattedText)
+        public LineProxy([NotNull] Line line, 
+            [NotNull] IObservable<IEnumerable<DisplayText>> formattedText, 
+            IObservable<LineMatchCollection> lineMatches)
         {
+       
             if (line == null) throw new ArgumentNullException(nameof(line));
             if (formattedText == null) throw new ArgumentNullException(nameof(formattedText));
             Start = line.LineInfo.Start;
             Index = line.LineInfo.Index;
             Line = line;
     
-
             FormattedText = formattedText
                         .ForBinding();
+
             ShowIndicator = formattedText
-                            
                             .Select(items => items.Any(ft => ft.ShowIndicator))
                             .ForBinding();
 
-            _cleanUp = new CompositeDisposable(FormattedText, FormattedText);
+            LineMatches = lineMatches.ForBinding();
+
+            _cleanUp = new CompositeDisposable(FormattedText, FormattedText, LineMatches);
         }
 
 
