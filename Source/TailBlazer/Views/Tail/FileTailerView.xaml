@@ -92,6 +92,8 @@
 
 
             </Style>
+
+            
         </ResourceDictionary>
     </Control.Resources>
 
@@ -325,6 +327,8 @@
                     </ListBox.ItemsPanel>
 
 
+                    
+
                     <ListBox.InputBindings>
                         <KeyBinding Key="C" Modifiers="Control" Command="{Binding CopyToClipboardCommand}"/>
                     </ListBox.InputBindings>
@@ -356,7 +360,7 @@
                                     <ColumnDefinition Width="*"/> 
                                 </Grid.ColumnDefinitions>
 
-                                <Border >
+             
                                     <Grid x:Name="Grid" Margin="2" 
                                             Visibility="{Binding  LineMatches.Value.HasMatches, Converter={StaticResource BooleanToVisibilityConverter}}">
                                         <controls:TextMatchedIcon 
@@ -382,18 +386,7 @@
                                         </Grid.Triggers>-->
 
                                     </Grid>
-                                    <ToolTipService.ToolTip >
-                                        <Grid>
-                                            <ItemsControl ItemsSource="{Binding LineMatches.Value.Matches}">
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate DataType="{x:Type formatting:LineMatch}">
-                                                        <TextBox Text="{Binding Text}"/>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-                                        </Grid>
-                                    </ToolTipService.ToolTip>
-                                </Border>
+  
                                 <controls:HighlightTextControl
                                     Grid.Column="1" Margin="6 0 0 0"   
                                         Text="{Binding Text}" 
@@ -416,6 +409,7 @@
                                 <Setter Property="Padding" Value="0"/>
                                 <Setter Property="IsTabStop" Value="False"/>
                                 <Setter Property="Height" Value="22"/>
+                                <!--<Setter Property="ToolTip" Value="{Binding  LineMatches.Value.Matches}"/>-->
                             </Style.Setters>
 
                             <Style.Triggers>
