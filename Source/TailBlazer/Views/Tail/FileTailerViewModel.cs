@@ -24,7 +24,7 @@ using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {
-    public class FileTailerViewModel: AbstractNotifyPropertyChanged, IDisposable, IScrollReceiver
+    public class FileTailerViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation
     {
         private readonly IObjectProvider _objectProvider;
         private readonly IDisposable _cleanUp;
@@ -140,7 +140,7 @@ namespace TailBlazer.Views.Tail
             //load lines into observable collection
             var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection),new LineMatches(searchMetadataCollection));
             var loader = lineScroller.Lines.Connect()
-                .Transform(x=>lineProxyFactory.Create(x), new ParallelisationOptions(ParallelType.Ordered,5))
+                .Transform(x=>lineProxyFactory.Create(x), new ParallelisationOptions(ParallelType.Ordered,3))
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)

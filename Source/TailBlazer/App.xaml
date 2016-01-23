@@ -33,7 +33,7 @@
                         <ItemsControl Margin="4" Grid.Column="1" ItemsSource="{Binding Files}"/>
                 </Grid>
             </DataTemplate>
-          
+
 
         </ResourceDictionary>
         

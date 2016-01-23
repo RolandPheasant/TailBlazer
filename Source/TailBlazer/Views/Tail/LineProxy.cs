@@ -48,13 +48,10 @@ namespace TailBlazer.Views.Tail
             FormattedText = formattedText
                         .ForBinding();
 
-            ShowIndicator = formattedText
-                            .Select(items => items.Any(ft => ft.ShowIndicator))
-                            .ForBinding();
 
             LineMatches = lineMatches.ForBinding();
 
-            _cleanUp = new CompositeDisposable(FormattedText, FormattedText, LineMatches);
+            _cleanUp = new CompositeDisposable(FormattedText, LineMatches);
         }
 
 

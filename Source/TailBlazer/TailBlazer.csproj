@@ -44,8 +44,8 @@
     <ApplicationIcon>tailblazer.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dragablz, Version=0.0.3.149, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dragablz.0.0.3.149\lib\net45\Dragablz.dll</HintPath>
+    <Reference Include="Dragablz, Version=0.0.3.150, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dragablz.0.0.3.150\lib\net45\Dragablz.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="DynamicData, Version=4.3.1.1090, Culture=neutral, processorArchitecture=MSIL">
@@ -68,8 +68,8 @@
       <HintPath>..\packages\MaterialDesignColors.1.1.2\lib\net45\MaterialDesignColors.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MaterialDesignThemes.Wpf, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignThemes.1.4.0-ci470\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=1.4.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.1.4.1-ci477\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -167,6 +167,7 @@
     <Compile Include="Views\Options\Theme.cs" />
     <Compile Include="Views\FileDrop\FileDropContainer.cs" />
     <Compile Include="Views\FileDrop\FileDropMonitor.cs" />
+    <Compile Include="Views\Tail\ILinesVisualisation.cs" />
     <Compile Include="Views\WindowManagement\FileHeaderNamingJob.cs" />
     <Compile Include="Controls\FileIcon.cs" />
     <Compile Include="Infrastucture\SchedulerProvider.cs" />
@@ -235,6 +236,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Themes\Dragable.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Lines.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

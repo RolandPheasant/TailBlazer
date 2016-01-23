@@ -6,13 +6,13 @@ namespace TailBlazer.Domain.Formatting
     {
         public string Part { get; }
         public bool IsMatch { get; }
-        public bool ShowIndicator { get;  }
+
 
         public MatchedString(string part, bool isMatch, bool showIndicator=false)
         {
             Part = part;
             IsMatch = isMatch;
-            ShowIndicator = showIndicator;
+
         }
         
 
@@ -22,7 +22,7 @@ namespace TailBlazer.Domain.Formatting
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(Part, other.Part) && IsMatch == other.IsMatch && ShowIndicator == other.ShowIndicator;
+            return string.Equals(Part, other.Part) && IsMatch == other.IsMatch;
         }
 
         public override bool Equals(object obj)
@@ -37,9 +37,8 @@ namespace TailBlazer.Domain.Formatting
         {
             unchecked
             {
-                var hashCode = (Part != null ? Part.GetHashCode() : 0);
+                var hashCode = Part?.GetHashCode() ?? 0;
                 hashCode = (hashCode*397) ^ IsMatch.GetHashCode();
-                hashCode = (hashCode*397) ^ ShowIndicator.GetHashCode();
                 return hashCode;
             }
         }

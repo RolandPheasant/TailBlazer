@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,16 +34,11 @@ namespace TailBlazer.Domain.Formatting
                 {
                     matches = matches.SelectMany(ms => ms.IsMatch
                         ? new[] { ms }
-                        : Yield(ms.Part, searchMetadata,ms.ShowIndicator)).ToArray();
-
-                  //  matches = matches.SelectMany(ms =>  Yield(ms.Part, searchMetadata)).ToArray();
+                        : Yield(ms.Part, searchMetadata)).ToArray();
                 }
             }
 
-            foreach (var matchedString in matches)
-            {
-                yield return matchedString;
-            }
+            return ((IEnumerable<MatchedString>) matches).GetEnumerator();
 
         }
 
@@ -53,7 +49,7 @@ namespace TailBlazer.Domain.Formatting
         private const RegexOptions CaseSensitiveOptions = RegexOptions.IgnorePatternWhitespace
                                                           | RegexOptions.Compiled;
 
-        private static IEnumerable<MatchedString> Yield(string input, SearchMetadata tomatch, bool showHighlight=false)
+        private static IEnumerable<MatchedString> Yield(string input, SearchMetadata tomatch)
         {
 
             if (string.IsNullOrEmpty(input)) yield break;
@@ -61,23 +57,18 @@ namespace TailBlazer.Domain.Formatting
 
             if (tomatch.UseRegex)
             {
-                //get matching text
-                //var matches = Regex.Matches(input, tomatch.SearchText, tomatch.IgnoreCase ? CaseInsensitiveOptions : CaseSensitiveOptions);
 
-                if (!tomatch.RegEx.HasValue)
+                if (!tomatch.RegEx.HasValue || !tomatch.SearchText.IsLongerThanOrEqualTo(3))
                 {
-                    yield return new MatchedString(input, false, showHighlight);
-
+                    yield return new MatchedString(input, false);
                     yield break;
                 }
 
                 var matches = tomatch.RegEx.Value.Matches(input);
-
-
-
+                
                 if (matches.Count == 0)
                 {
-                    yield return new MatchedString(input, false, showHighlight);
+                    yield return new MatchedString(input, false);
                     yield break;
                 }
 
@@ -102,10 +93,8 @@ namespace TailBlazer.Domain.Formatting
                 foreach (var item in Yield(input, tomatch.SearchText, tomatch.IgnoreCase))
                 {
                     //yield return item;
-                    yield return new MatchedString(item.Part,item.IsMatch,showHighlight);
+                    yield return new MatchedString(item.Part,item.IsMatch);
                 }
-               
-
             }
         }
 
@@ -138,9 +127,6 @@ namespace TailBlazer.Domain.Formatting
 
                 if (string.IsNullOrEmpty(current))
                 {
-                    //if (currentLength + tomatch.Length)
-
-
                     //Get original string back as the user may have searched in a different case
                     var originalString = input.Substring(currentLength, tomatch.Length);
                     yield return new MatchedString(originalString, true);

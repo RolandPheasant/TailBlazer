@@ -7,6 +7,7 @@ using System.Reactive.Subjects;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
+using DynamicData.PLinq;
 using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
@@ -15,7 +16,7 @@ using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Views.Tail
 {
-    public class InlineViewer : AbstractNotifyPropertyChanged, IScrollReceiver,IDisposable
+    public class InlineViewer : AbstractNotifyPropertyChanged, ILinesVisualisation
     {
         private readonly IDisposable _cleanUp;
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
@@ -62,7 +63,7 @@ namespace TailBlazer.Views.Tail
             
             //load lines into observable collection
             var loader = lineScroller.Lines.Connect()
-                .Transform(args.LineProxyFactory.Create)
+                .Transform(args.LineProxyFactory.Create,new ParallelisationOptions(ParallelType.Ordered,3))
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)

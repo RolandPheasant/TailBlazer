@@ -31,6 +31,7 @@
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Buttons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ToggleButtons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/TextBoxes.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Lines.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <infrastucture:CheckedToLengthConverter TrueValue="*" FalseValue="*" x:Key="c1" />
@@ -288,34 +289,8 @@
                         Grid.Row="1"
                         ItemsSource="{Binding Lines}" 
                         SelectedItem="{Binding SelectedItem}"
-                        FontFamily="Consolas"
-                        SelectionMode="Extended"
+                        Style="{StaticResource LinesListBoxStyle}"
                         infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}">
-
-                    <!--<infrastucture:ListBoxHelper.RowAnimationSetter>
-                    <local:ListboxRowAnimationSetter
-                        Duration="{Binding HighlightDuration.Value}"
-                        IsEnabled="{Binding HighlightTail.Value}">
-                    </local:ListboxRowAnimationSetter>
-                </infrastucture:ListBoxHelper.RowAnimationSetter>-->
-
-                    <ListBox.Template>
-                        <ControlTemplate TargetType="{x:Type ListBox}">
-                            <ScrollViewer 
-                                        VerticalScrollBarVisibility="Auto"
-                                        HorizontalScrollBarVisibility="Auto"
-                                        CanContentScroll="True"
-                                        Padding="{TemplateBinding Padding}"
-                                        Background="{TemplateBinding Background}" 
-                                        BorderBrush="Transparent" 
-                                        BorderThickness="0" 
-                                        KeyboardNavigation.TabNavigation="Cycle"
-                                        IsTabStop="False"
-                                        IsHitTestVisible="True">
-                                <ItemsPresenter/>
-                            </ScrollViewer>
-                        </ControlTemplate>
-                    </ListBox.Template>
 
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -325,9 +300,6 @@
                                                 TotalItems="{Binding LatestCount.Value}"/>
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
-
-
-                    
 
                     <ListBox.InputBindings>
                         <KeyBinding Key="C" Modifiers="Control" Command="{Binding CopyToClipboardCommand}"/>
@@ -347,125 +319,6 @@
                             </MenuItem>
                         </ContextMenu>
                     </ListBox.ContextMenu>
-
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type tail:LineProxy}">
-
-            
-                                             
-                            <Grid Margin="4 0 0 0"
-                                  >
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="18"/> 
-                                    <ColumnDefinition Width="*"/> 
-                                </Grid.ColumnDefinitions>
-
-
-                                <Border>
-                                    
-                         
-                                    <Grid x:Name="Grid" Margin="2" 
-                                            Visibility="{Binding  LineMatches.Value.HasMatches, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <controls:TextMatchedIcon 
-                                                        Width="14"
-                                                        Height="14"
-                                                        VerticalAlignment="Center"
-                                                        Visibility="{Binding  LineMatches.Value.IsFilter, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                        Foreground="{StaticResource SecondaryAccentBrush}"/>
-
-                                        <controls:RegexMatchedIcon 
-                                                        Width="14"
-                                                        Height="14"
-                                                        VerticalAlignment="Center"
-                                                        Visibility="{Binding LineMatches.Value.IsRegex, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                        Foreground="{StaticResource SecondaryAccentBrush}"/>
-                                    </Grid>
-
-
-                                    <Border.Style>
-                                        <Style TargetType="{x:Type Border}">
-                                            <Style.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Opacity" Value="0.56"/>
-                                                </Trigger>
-                                             </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-
-                                </Border>
-
-                                <controls:HighlightTextControl
-                                    Grid.Column="1" Margin="6 0 0 0"   
-                                        Text="{Binding Text}" 
-                                        VerticalAlignment="Center"
-                                        FormattedText = "{Binding FormattedText.Value}"
-                                        HighlightForeground = "{StaticResource SecondaryAccentForegroundBrush}"
-                                        HighlightBackground = "{StaticResource SecondaryAccentBrush}"/>
-                            </Grid>
-
-
-
-
-
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
-                            <Style.Setters>
-                                <Setter Property="Padding" Value="0"/>
-                                <Setter Property="IsTabStop" Value="False"/>
-                                <Setter Property="Height" Value="22"/>
-                                <!--<Setter Property="ToolTip" Value="{Binding  LineMatches.Value.Matches}"/>-->
-                            </Style.Setters>
-
-                            <Style.Triggers>
-                                <MultiDataTrigger >
-                                    <MultiDataTrigger.Conditions>
-                                        <Condition Binding="{Binding Path=IsRecent}" Value="True"/>
-                                        <Condition Binding="{Binding Path=DataContext.HighlightTail.Value, ElementName=Control}" Value="True"/>
-                                        <Condition Binding="{Binding Path=DataContext.UsingDarkTheme.Value, ElementName=Control}" Value="False"/>
-                                    </MultiDataTrigger.Conditions>
-
-                                    <MultiDataTrigger.EnterActions>
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Background).(SolidColorBrush.Color)" 
-                                                                               FromBrush="{StaticResource SecondaryAccentBrush}" 
-                                                                               Duration="0:0:5"/>
-                                                <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Foreground).(SolidColorBrush.Color)" 
-                                                                               ToBrush="{StaticResource SecondaryAccentForegroundBrush}" 
-                                                                               Duration="0:0:5"/>
-                                            </Storyboard>
-                                        </BeginStoryboard>
-
-                                    </MultiDataTrigger.EnterActions>
-                                </MultiDataTrigger>
-
-                                <MultiDataTrigger >
-
-                                    <MultiDataTrigger.Conditions>
-                                        <Condition Binding="{Binding Path=IsRecent}" Value="True"/>
-                                        <Condition Binding="{Binding Path=DataContext.HighlightTail.Value, ElementName=Control}" Value="True"/>
-                                        <Condition Binding="{Binding Path=DataContext.UsingDarkTheme.Value, ElementName=Control}" Value="True"/>
-                                    </MultiDataTrigger.Conditions>
-
-                                    <MultiDataTrigger.EnterActions>
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Foreground).(SolidColorBrush.Color)" 
-                                                                       
-                                                                               FromBrush="{StaticResource SecondaryAccentBrush}"
-                                                                               Duration="0:0:5"/>
-                                            </Storyboard>
-                                        </BeginStoryboard>
-
-                                    </MultiDataTrigger.EnterActions>
-                                </MultiDataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-
                 </ListBox>
 
                 <GridSplitter Grid.Row="2"
