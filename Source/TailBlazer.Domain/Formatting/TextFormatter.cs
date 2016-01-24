@@ -16,7 +16,7 @@ namespace TailBlazer.Domain.Formatting
             _strings = searchMetadataCollection.Metadata
                 .Connect(meta => meta.Highlight)
                 .IgnoreUpdateWhen((current, previous) => SearchMetadata.EffectsHighlightComparer.Equals(current, previous))
-                .QueryWhenChanged(query => query.Items.Select(si => si))
+                .QueryWhenChanged(query => query.Items.OrderBy(m => m.Position))
                 .Replay(1)
                 .RefCount();
         }

@@ -321,6 +321,11 @@
                     </ListBox.ContextMenu>
                 </ListBox>
 
+                <!--<ContentPresenter Grid.Row="1"
+                    ContentTemplate="{StaticResource LinesDataTemplate}"
+                    Content="{Binding Mode=OneWay}" />-->
+
+
                 <GridSplitter Grid.Row="2"
                           Height="5" 
                           ResizeDirection="Rows"
@@ -328,14 +333,20 @@
                           Background="{StaticResource PrimaryHueMidBrush}"
                           BorderThickness="1" HorizontalAlignment="Stretch"/>
 
-                <local:InlineView 
+
+                <ContentPresenter Grid.Row="3"
+                    ContentTemplate="{StaticResource LinesDataTemplate}"
+                    Content="{Binding InlineViewer,Mode=OneWay}" />
+              
+        
+                
+                <!--<local:InlineView 
                     VerticalAlignment="Stretch"
                     Visibility="{Binding Path=DataContext.InlineViewerVisible.Value, ElementName=Control,Converter={StaticResource BooleanToVisibilityConverter}}"
                     DataContext="{Binding InlineViewer}"
-                    Grid.Row="3" />
+                    Grid.Row="3" />-->
 
-                <Grid    Grid.Row="4"
-              Margin = "0 0 0 -4"       
+                <Grid    Grid.Row="4" Margin = "0 0 0 -4"      
             Background="{StaticResource PrimaryHueMidBrush}">
 
                     <Grid.Resources>

@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using DynamicData.Binding;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
@@ -27,7 +25,6 @@ namespace TailBlazer.Views.Tail
 
         public  IProperty<IEnumerable<DisplayText>> FormattedText { get; }
 
-        public IProperty<bool> ShowIndicator { get; }
 
         public IProperty<LineMatchCollection> LineMatches { get; }
 
@@ -35,20 +32,19 @@ namespace TailBlazer.Views.Tail
 
 
         public LineProxy([NotNull] Line line, 
-            [NotNull] IObservable<IEnumerable<DisplayText>> formattedText, 
-            IObservable<LineMatchCollection> lineMatches)
+            [NotNull] IObservable<IEnumerable<DisplayText>> formattedText,
+            [NotNull] IObservable<LineMatchCollection> lineMatches)
         {
        
             if (line == null) throw new ArgumentNullException(nameof(line));
             if (formattedText == null) throw new ArgumentNullException(nameof(formattedText));
+            if (lineMatches == null) throw new ArgumentNullException(nameof(lineMatches));
+
             Start = line.LineInfo.Start;
             Index = line.LineInfo.Index;
             Line = line;
     
-            FormattedText = formattedText
-                        .ForBinding();
-
-
+            FormattedText = formattedText.ForBinding();
             LineMatches = lineMatches.ForBinding();
 
             _cleanUp = new CompositeDisposable(FormattedText, LineMatches);

@@ -4,7 +4,8 @@
              xmlns:controls="clr-namespace:TailBlazer.Controls"
              xmlns:fileDrop="clr-namespace:TailBlazer.Views.FileDrop"
              xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
-             xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz">
+             xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
+             xmlns:settings="clr-namespace:TailBlazer.Settings">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -12,32 +13,30 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-
-           <DataTemplate DataType="{x:Type tail:FileTailerViewModel}">
-                <tail:FileTailerView />
+            <DataTemplate DataType="{x:Type searching:SearchOptionsViewModel}">
+                <settings:SearchOptionsView/>
             </DataTemplate>
             
+            <DataTemplate DataType="{x:Type tail:FileTailerViewModel}">
+                <tail:FileTailerView />
+            </DataTemplate>
+
             <DataTemplate DataType="{x:Type fileDrop:FileDropContainer}">
                 <Grid TextElement.Foreground="{DynamicResource MaterialDesignBody}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    
+
                     <controls:FileIcon
                             BorderThickness="0"
                             Width="22" 
                             Height="22" 
                             Foreground="{DynamicResource PrimaryHueMidBrush}"/>
 
-                        <ItemsControl Margin="4" Grid.Column="1" ItemsSource="{Binding Files}"/>
+                    <ItemsControl Margin="4" Grid.Column="1" ItemsSource="{Binding Files}"/>
                 </Grid>
             </DataTemplate>
-
-
         </ResourceDictionary>
-        
-
-
     </Application.Resources>
 </Application>

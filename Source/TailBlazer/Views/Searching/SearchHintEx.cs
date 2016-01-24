@@ -23,10 +23,9 @@ namespace TailBlazer.Views.Searching
             {
                 var test = new Regex(source.Text);
             }
-            catch (ArgumentException ex)
+            catch (Exception)
             {
                 return new SearchHintMessage(false, "Invalid regular expression");
-                //return new SearchHintMessage(false, $"Invalid reg ex {ex.Message}");
             }
             
             var message = $"Hit enter to search using {(source.UseRegEx ? "regex" : "plain text")}";

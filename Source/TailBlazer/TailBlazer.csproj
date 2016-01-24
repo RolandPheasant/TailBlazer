@@ -129,6 +129,7 @@
     <Compile Include="Controls\RegexIcon.cs" />
     <Compile Include="Controls\RegexMatchedIcon.cs" />
     <Compile Include="Controls\SearchIcon.cs" />
+    <Compile Include="Controls\SearchResultIndicator.cs" />
     <Compile Include="Controls\TextMatchedIcon.cs" />
     <Compile Include="DialogNames.cs" />
     <Compile Include="Infrastucture\CheckedToLengthConverter.cs" />
@@ -180,9 +181,6 @@
     <Compile Include="Controls\TextBlockFormatter.cs" />
     <Compile Include="Views\Tail\IInlineViewerFactory.cs" />
     <Compile Include="Views\Tail\ILineProxyFactory.cs" />
-    <Compile Include="Views\Tail\InlineView.xaml.cs">
-      <DependentUpon>InlineView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\Tail\InlineViewer.cs" />
     <Compile Include="Views\Tail\InlineViewerArgs.cs" />
     <Compile Include="Views\Tail\InlineViewerFactory.cs" />
@@ -280,10 +278,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Tail\FileTailerView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Tail\InlineView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

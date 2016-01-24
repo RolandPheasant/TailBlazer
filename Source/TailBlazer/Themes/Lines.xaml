@@ -114,8 +114,6 @@
         </Style.Triggers>
     </Style>
 
-    
-
     <Style x:Key="LinesListBoxStyle" TargetType="{x:Type ListBox}" BasedOn="{StaticResource MaterialDesignListBox}">
         
         
@@ -146,5 +144,43 @@
         </Style.Setters>
         
     </Style>
+
+
+    <DataTemplate x:Key="LinesDataTemplate" DataType="{x:Type tail:ILinesVisualisation}">
+
+        <ListBox ItemsSource="{Binding Lines}" 
+                 Style="{StaticResource LinesListBoxStyle}"
+                 infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}" >
+
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <controls:VirtualScrollPanel ItemHeight="22"
+                                                ScrollReceiver="{Binding}"  
+                                                StartIndex="{Binding FirstIndex}"
+                                                TotalItems="{Binding Count.Value}"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+
+
+            <ListBox.InputBindings>
+                <KeyBinding Key="C" Modifiers="Control" Command="{Binding CopyToClipboardCommand}"/>
+            </ListBox.InputBindings>
+
+            <ListBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="_Copy" Command="{Binding CopyToClipboardCommand}">
+                        <MenuItem.Icon>
+                            <Viewbox Width="16" Height="16">
+                                <Canvas Width="24" Height="24">
+                                    <Path Data="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" 
+                                              Fill="{DynamicResource MaterialDesignBody}" />
+                                </Canvas>
+                            </Viewbox>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </ContextMenu>
+            </ListBox.ContextMenu>
+        </ListBox>
+    </DataTemplate>
 
 </ResourceDictionary>

@@ -52,8 +52,7 @@ namespace TailBlazer.Views.Searching
             get { return _filter; }
             set { SetAndRaise(ref _filter, value); }
         }
-
-
+        
         public bool UseRegex
         {
             get { return _useRegex; }
@@ -64,6 +63,13 @@ namespace TailBlazer.Views.Searching
         {
             get { return _ignoreCase; }
             set { SetAndRaise(ref _ignoreCase, value); }
+        }
+
+
+
+        public static explicit operator SearchMetadata(SearchOptionsProxy proxy)
+        {
+            return proxy._searchMetadata;
         }
     }
 }

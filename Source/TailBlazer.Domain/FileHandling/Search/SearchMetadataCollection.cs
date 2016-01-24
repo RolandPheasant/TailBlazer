@@ -2,31 +2,39 @@ using System;
 using System.Reactive.Disposables;
 using DynamicData;
 using TailBlazer.Domain.Annotations;
+using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling.Search
 {
     public sealed class SearchMetadataCollection : ISearchMetadataCollection
     {
+        private readonly ILogger _logger;
         private readonly ISourceCache<SearchMetadata, string> _searches = new SourceCache<SearchMetadata, string>(t => t.SearchText);
         public IObservableCache<SearchMetadata, string> Metadata { get; }
 
         private readonly IDisposable _cleanUp;
 
-        public SearchMetadataCollection()
+        public SearchMetadataCollection([NotNull] ILogger logger)
         {
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+            _logger = logger;
             Metadata = _searches.AsObservableCache();
+
             _cleanUp = new CompositeDisposable(_searches, Metadata);
         }
 
-        public void Add([NotNull] SearchMetadata metadata)
+        public void AddorUpdate([NotNull] SearchMetadata metadata)
         {
             if (metadata == null) throw new ArgumentNullException(nameof(metadata));
             _searches.AddOrUpdate(metadata);
+            _logger.Info("Seatch metadata has changed: {0}", metadata);
+
         }
 
         public void Remove(string searchText)
         {
             _searches.Remove(searchText);
+            _logger.Info("Search metadata has been removed: {0}", searchText);
         }
 
         public void Dispose()

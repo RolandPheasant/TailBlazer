@@ -1,12 +1,15 @@
 using System;
+using System.Collections;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Concurrency;
+using Dragablz;
 using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
-using TailBlazer.Settings;
 using TailBlazer.Views.Options;
 
 namespace TailBlazer.Views.Searching
@@ -19,6 +22,9 @@ namespace TailBlazer.Views.Searching
 
         public ReadOnlyObservableCollection<SearchOptionsProxy> Data { get; }
 
+        // public VerticalOrganiser Organiser { get; } = new VerticalOrganiser();
+
+        public VerticalPositionMonitor PositionMonitor { get; } = new VerticalPositionMonitor();
 
         public SearchHints SearchHints { get;  }
 
@@ -31,6 +37,26 @@ namespace TailBlazer.Views.Searching
 
             var swatches = new SwatchesProvider().Swatches;
             
+            var orderChanged = Observable.FromEventPattern<OrderChangedEventArgs>(
+                                            h => PositionMonitor.OrderChanged += h,
+                                            h => PositionMonitor.OrderChanged -= h)
+                                    .Select(evt => evt.EventArgs)
+                                    .Where(args=>args.PreviousOrder!=null && args.NewOrder.Length == args.PreviousOrder.Length)
+                                    .Select(positionChangedArgs =>
+                                    { 
+                                        //reprioritise filters and highlights
+                                        return positionChangedArgs.NewOrder
+                                            .OfType<SearchOptionsProxy>()
+                                            .Select((item, index) => new {Meta=(SearchMetadata)item, index})
+                                            //.Where(x => x.index != x.Meta.Position)
+                                            .Select(x => new SearchMetadata(x.Meta, x.index))
+                                            .ToArray();
+                                    })
+                                    .Subscribe(positionChangedArgs =>
+                                    {
+                                        positionChangedArgs.ForEach(metadataCollection.AddorUpdate);
+                                    });
+
             ReadOnlyObservableCollection<SearchOptionsProxy> data;
 
             var userOptions = metadataCollection.Metadata.Connect()
@@ -40,25 +66,30 @@ namespace TailBlazer.Views.Searching
                 {
                     //when a value changes, write the original value back to the cache
                     return so.WhenAnyPropertyChanged()
-                        .Subscribe(_ => metadataCollection.Add(new SearchMetadata(so.Text, so.Filter, so.Highlight,so.UseRegex,so.IgnoreCase)));
+                        .Subscribe(_ => metadataCollection.AddorUpdate(new SearchMetadata(metadataCollection.Metadata.Count, so.Text, so.Filter, so.Highlight,so.UseRegex,so.IgnoreCase)));
                 })
                 .Sort(SortExpressionComparer<SearchOptionsProxy>.Ascending(proxy=>proxy.Text))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out data)
                 .Subscribe();
-
+            
             Data = data;
 
             //command to add the current search to the tail collection
             var searchInvoker = SearchHints.SearchRequested.Subscribe(request =>
             {
-                metadataCollection.Add(new SearchMetadata(request.Text, false, true, request.UseRegEx, true));
+                schedulerProvider.Background.Schedule(() =>
+                {
+                    metadataCollection.AddorUpdate(new SearchMetadata(metadataCollection.Metadata.Count, request.Text, false, true, request.UseRegEx, true));
+                });
             });
-
-            
-            _cleanUp = new CompositeDisposable(searchInvoker, userOptions, searchInvoker);
-        }
         
+            
+            _cleanUp = new CompositeDisposable(searchInvoker, 
+                userOptions, 
+                searchInvoker,
+                orderChanged);
+        }
 
         public string SearchText
         {

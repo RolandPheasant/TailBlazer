@@ -8,7 +8,7 @@ namespace TailBlazer.Domain.FileHandling.Search
     {
         IObservableCache<SearchMetadata, string> Metadata { get; }
 
-        void Add(SearchMetadata metadata);
+        void AddorUpdate(SearchMetadata metadata);
         void Remove(string searchText);
     }
 }

@@ -27,8 +27,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             //create a collection with 1 item, which is used to show entire file
             var systemSearches = new SourceCache<SearchInfo, string>(t => t.SearchText);
             systemSearches.AddOrUpdate(new SearchInfo("<All>", All, SearchType.All));
-
-
+            
             //create a collection of all possible user filters
             var userSearches = searchMetadataCollection.Metadata
                 .Connect(meta => meta.Filter)
@@ -53,7 +52,7 @@ namespace TailBlazer.Domain.FileHandling.Search
         public void Add([NotNull] string searchText, bool useRegex)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
-            _metadataCollection.Add(new SearchMetadata(searchText,true,true, useRegex,true));
+            _metadataCollection.AddorUpdate(new SearchMetadata(_metadataCollection.Metadata.Count, searchText,true,true, useRegex,true));
         }
 
         public void Remove(string searchText)

@@ -10,7 +10,6 @@ namespace TailBlazer.Views.Searching
 
         public RegexInspector()
         {
-
             _isPlainText = new Regex("^[a-zA-Z0-9 ]*$");
         }
 

@@ -75,7 +75,6 @@ namespace TailBlazer.Views.Tail
             [NotNull] SearchHints searchHints,
             IObjectProvider objectProvider)
         {
-            _objectProvider = objectProvider;
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (fileWatcher == null) throw new ArgumentNullException(nameof(fileWatcher));
@@ -88,6 +87,7 @@ namespace TailBlazer.Views.Tail
             if (searchOptionsViewModel == null) throw new ArgumentNullException(nameof(searchOptionsViewModel));
             if (searchHints == null) throw new ArgumentNullException(nameof(searchHints));
 
+            _objectProvider = objectProvider;
             SelectionMonitor = selectionMonitor;
             SearchOptions = searchOptionsViewModel;
             SearchHints = searchHints;
@@ -159,7 +159,10 @@ namespace TailBlazer.Views.Tail
                 .ToCollection()
                 .Select(lines => lines.Count == 0 ? 0 : lines.Select(l => l.Index).Max() - lines.Count+1)
                 .ObserveOn(schedulerProvider.MainThread)
-                .Subscribe(first => FirstIndex = first);
+                .Subscribe(first =>
+                {
+                    FirstIndex = first;
+                });
 
             //Create objects required for inline viewing
             var isUserDefinedChanged = SearchCollection.WhenValueChanged(sc => sc.Selected)
@@ -200,23 +203,15 @@ namespace TailBlazer.Views.Tail
                 SelectionMonitor,
                 SearchOptions,
                 searchInvoker,
-                Disposable.Create(_userScrollRequested.OnCompleted));
+                _userScrollRequested.SetAsComplete());
         }
         
 
-
         private async void OpenSearchOptions()
         {
-            var view = new SearchOptionsView
-            {
-                DataContext = SearchOptions
-            };
-
-            //show the dialog
-           await DialogHost.Show(view, Id);
+           await DialogHost.Show(SearchOptions, Id);
         }
-
-
+        
 
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
         {

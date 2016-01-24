@@ -248,8 +248,7 @@ namespace TailBlazer.Controls
 
             _isInMeasure = false;
 
-            return new Size(double.IsInfinity(availableSize.Width) ? 0 : availableSize.Width,
-    double.IsInfinity(availableSize.Height) ? 0 : availableSize.Height);
+            return new Size(double.IsInfinity(availableSize.Width) ? 0 : availableSize.Width,double.IsInfinity(availableSize.Height) ? 0 : availableSize.Height);
             //return availableSize;
         }
 
@@ -393,12 +392,12 @@ namespace TailBlazer.Controls
             InvalidateMeasure();
         }
 
+        private bool _settingVertical;
         public void SetVerticalOffset(double offset)
         {
+            _settingVertical = true;
             if (double.IsInfinity(offset)) return;
-            var diff = (int)((offset - _extentInfo.VerticalOffset) / ItemHeight);
-
-         //   Console.WriteLine($"Scrolling by {diff} lines");
+            var diff = (int) ((offset - _extentInfo.VerticalOffset)/ItemHeight);
             InvokeStartIndexCommand(diff);
         }
 
