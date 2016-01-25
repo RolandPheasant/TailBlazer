@@ -6,6 +6,7 @@
              xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
              xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
+             xmlns:controls="clr-namespace:TailBlazer.Controls"
              mc:Ignorable="d" 
             TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
              Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
@@ -109,15 +110,24 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                            <ToggleButton  Margin="4 0 0 0" 
+                            <!--<ToggleButton  Margin="4 0 0 0" 
                                            Style="{DynamicResource SearchToggleStyle}" 
                                             Padding="2"
                                             Width="22"
                                             Height="22"
                                             VerticalAlignment="Center"
-                                            IsChecked="{Binding  UseRegex}"/>
+                                            IsChecked="{Binding  UseRegex}"/>-->
 
-                                <TextBlock Margin="4 0 0 0"  Grid.Column="1" 
+
+                            <controls:SearchResultIndicator 
+                                    Padding="2" 
+                                    Margin="4 0 0 0" 
+                                    Foreground="{DynamicResource SecondaryAccentBrush}"
+                                    BorderBrush ="{DynamicResource GrayBrush6}"
+                                    Status="{Binding Status}"                
+                                    VerticalAlignment="Center"/>
+
+                            <TextBlock Margin="4 0 0 0"  Grid.Column="1" 
                                            Text="{Binding Text}"
                                             VerticalAlignment="Center"/>
 

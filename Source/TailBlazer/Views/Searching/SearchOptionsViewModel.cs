@@ -36,16 +36,18 @@ namespace TailBlazer.Views.Searching
             //TODO: options for colour
 
             var swatches = new SwatchesProvider().Swatches;
-            
+
+            bool binding = false;
+
             var orderChanged = Observable.FromEventPattern<OrderChangedEventArgs>(
                                             h => PositionMonitor.OrderChanged += h,
                                             h => PositionMonitor.OrderChanged -= h)
                                     .Select(evt => evt.EventArgs)
                                     .Where(args=>args.PreviousOrder!=null && args.NewOrder.Length == args.PreviousOrder.Length)
                                     .Select(positionChangedArgs =>
-                                    { 
-                                        //reprioritise filters and highlights
-                                        return positionChangedArgs.NewOrder
+                                    {
+                                            //reprioritise filters and highlights
+                                            return positionChangedArgs.NewOrder
                                             .OfType<SearchOptionsProxy>()
                                             .Select((item, index) => new {Meta=(SearchMetadata)item, index})
                                             //.Where(x => x.index != x.Meta.Position)
@@ -54,6 +56,7 @@ namespace TailBlazer.Views.Searching
                                     })
                                     .Subscribe(positionChangedArgs =>
                                     {
+                                       
                                         positionChangedArgs.ForEach(metadataCollection.AddorUpdate);
                                     });
 
@@ -61,14 +64,17 @@ namespace TailBlazer.Views.Searching
 
             var userOptions = metadataCollection.Metadata.Connect()
                 .WhereReasonsAre(ChangeReason.Add, ChangeReason.Remove) //ignore updates because we update from here
-                .Transform(meta => new SearchOptionsProxy(meta, swatches,m => metadataCollection.Remove(m.SearchText)))
+                .Transform(meta => new SearchOptionsProxy(meta, swatches, m => metadataCollection.Remove(m.SearchText)))
                 .SubscribeMany(so =>
                 {
                     //when a value changes, write the original value back to the cache
                     return so.WhenAnyPropertyChanged()
-                        .Subscribe(_ => metadataCollection.AddorUpdate(new SearchMetadata(metadataCollection.Metadata.Count, so.Text, so.Filter, so.Highlight,so.UseRegex,so.IgnoreCase)));
+
+                        .Subscribe(_ =>metadataCollection.AddorUpdate(new SearchMetadata(metadataCollection.Metadata.Count,
+                                    so.Text, so.Filter, so.Highlight, so.UseRegex, so.IgnoreCase)));
                 })
-                .Sort(SortExpressionComparer<SearchOptionsProxy>.Ascending(proxy=>proxy.Text))
+                .Sort(SortExpressionComparer<SearchOptionsProxy>.Ascending(proxy => proxy.Position))
+
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out data)
                 .Subscribe();
@@ -80,7 +86,7 @@ namespace TailBlazer.Views.Searching
             {
                 schedulerProvider.Background.Schedule(() =>
                 {
-                    metadataCollection.AddorUpdate(new SearchMetadata(metadataCollection.Metadata.Count, request.Text, false, true, request.UseRegEx, true));
+                    metadataCollection.AddorUpdate(new SearchMetadata(metadataCollection.NextIndex(), request.Text, false, true, request.UseRegEx, true));
                 });
             });
         

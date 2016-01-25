@@ -17,9 +17,18 @@
                 <ColumnDefinition Width="18"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
+            <!--Status=-->
 
-            <Border>
-                <Grid x:Name="Grid" Margin="2" 
+            <controls:SearchResultIndicator 
+                    Padding="2" 
+                    Foreground="{DynamicResource SecondaryAccentBrush}"
+                    BorderBrush ="{DynamicResource GrayBrush6}"
+                    Status="{Binding IndicatorStatus.Value}"                
+                    VerticalAlignment="Center"/>
+            <!-- <Border>
+
+
+               <Grid x:Name="Grid" Margin="2" 
                                             Visibility="{Binding  LineMatches.Value.HasMatches, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <controls:TextMatchedIcon 
                                                         Width="14"
@@ -41,7 +50,7 @@
                                                         Foreground="{StaticResource SecondaryAccentBrush}"/>
                 </Grid>
 
-            </Border>
+            </Border> -->
 
             <controls:HighlightTextControl
                                     Grid.Column="1" Margin="6 0 0 0"   

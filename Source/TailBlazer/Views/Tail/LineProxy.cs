@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using DynamicData.Binding;
+using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Formatting;
@@ -25,6 +27,7 @@ namespace TailBlazer.Views.Tail
 
         public  IProperty<IEnumerable<DisplayText>> FormattedText { get; }
 
+        public IProperty<SearchResultIndicatorStatus> IndicatorStatus { get; }
 
         public IProperty<LineMatchCollection> LineMatches { get; }
 
@@ -43,13 +46,27 @@ namespace TailBlazer.Views.Tail
             Start = line.LineInfo.Start;
             Index = line.LineInfo.Index;
             Line = line;
-    
-            FormattedText = formattedText.ForBinding();
-            LineMatches = lineMatches.ForBinding();
 
-            _cleanUp = new CompositeDisposable(FormattedText, LineMatches);
+            var lineMatchesShared = lineMatches.Publish();
+
+            FormattedText = formattedText.ForBinding();
+            LineMatches = lineMatchesShared.ForBinding();
+            IndicatorStatus = lineMatchesShared.Select(lmc => CalculateStatus(lmc.FirstMatch))
+                //.Do(state=>Console.WriteLine($"UI State =  {state}"))
+                .ForBinding();
+
+            _cleanUp = new CompositeDisposable(FormattedText, IndicatorStatus, LineMatches, lineMatchesShared.Connect());
         }
 
+
+
+        private SearchResultIndicatorStatus CalculateStatus(LineMatch firstMatch)
+        {
+            if (firstMatch == null)
+                return SearchResultIndicatorStatus.None;
+
+            return firstMatch.UseRegex ? SearchResultIndicatorStatus.Regex : SearchResultIndicatorStatus.Text;
+        }
 
         public int CompareTo(LineProxy other)
         {

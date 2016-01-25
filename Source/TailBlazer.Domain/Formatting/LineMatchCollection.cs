@@ -3,6 +3,8 @@ using System.Linq;
 
 namespace TailBlazer.Domain.Formatting
 {
+
+
     public class LineMatchCollection: INotifyPropertyChanged
     {
         public static  readonly LineMatchCollection Empty = new LineMatchCollection(new LineMatch[0]);
@@ -25,7 +27,6 @@ namespace TailBlazer.Domain.Formatting
             Matches = matches;
             FirstMatch = matches.FirstOrDefault();
         }
-
 
     }
 }

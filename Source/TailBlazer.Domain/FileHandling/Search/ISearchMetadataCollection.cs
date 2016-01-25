@@ -10,5 +10,7 @@ namespace TailBlazer.Domain.FileHandling.Search
 
         void AddorUpdate(SearchMetadata metadata);
         void Remove(string searchText);
+
+        int NextIndex();
     }
 }

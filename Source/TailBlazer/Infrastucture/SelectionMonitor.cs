@@ -220,8 +220,23 @@ namespace TailBlazer.Infrastucture
                     
                     else
                     {
+                        if (_lastSelected == null)
+                        {
+
+                            foreach (var lineProxy in toAdd)
+                            {
+                                if (innerList.Contains(lineProxy)) continue;
+                                _lastSelected = lineProxy;
+                                innerList.Add(lineProxy);
+                            }
+                            args.Handled = true;
+                            return;
+                        }
+
                         //if shift down we need to override selected and manually select our selves
                         var last = _lastSelected.Index;
+
+
                         var allSelectedItems = _selector.SelectedItems.OfType<LineProxy>().ToArray();
                         var currentPage = _selector.Items.OfType<LineProxy>().ToArray();
 
@@ -238,6 +253,8 @@ namespace TailBlazer.Infrastucture
 
                         args.Handled = true;
                         var maxOfRecent = toAdd.Max(lp => lp.Index);
+
+
 
                         int min;
                         int max;

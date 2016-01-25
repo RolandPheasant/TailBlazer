@@ -19,7 +19,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             if (!source.UseRegex)
             {
                 var stringComparison = source.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-                predicate = s => s.Contains(source.SearchText, stringComparison);
+                predicate = s => !string.IsNullOrEmpty(s) && s.Contains(source.SearchText, stringComparison);
             }
             else
             {

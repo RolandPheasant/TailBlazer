@@ -52,7 +52,7 @@ namespace TailBlazer.Domain.FileHandling.Search
         public void Add([NotNull] string searchText, bool useRegex)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
-            _metadataCollection.AddorUpdate(new SearchMetadata(_metadataCollection.Metadata.Count, searchText,true,true, useRegex,true));
+            _metadataCollection.AddorUpdate(new SearchMetadata(_metadataCollection.NextIndex(), searchText,true,true, useRegex,true));
         }
 
         public void Remove(string searchText)

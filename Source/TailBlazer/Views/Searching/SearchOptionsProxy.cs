@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Input;
 using DynamicData.Binding;
 using MaterialDesignColors;
+using TailBlazer.Controls;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Infrastucture;
 
@@ -25,6 +26,10 @@ namespace TailBlazer.Views.Searching
 
         public IEnumerable<Swatch> Swatches { get; }
 
+        public SearchResultIndicatorStatus Status { get; }
+
+        public int Position => _searchMetadata.Position;
+
         public SearchOptionsProxy(SearchMetadata searchMetadata, IEnumerable<Swatch> swatches, Action<SearchMetadata> removeAction)
         {
             Swatches = swatches;
@@ -38,8 +43,12 @@ namespace TailBlazer.Views.Searching
             UseRegex = searchMetadata.UseRegex;
             IgnoreCase = searchMetadata.IgnoreCase;
 
+            Status = searchMetadata.UseRegex ? SearchResultIndicatorStatus.Regex : SearchResultIndicatorStatus.Text;
+
             RemoveCommand = new Command(() => removeAction(searchMetadata));
         }
+
+
 
         public bool Highlight
         {

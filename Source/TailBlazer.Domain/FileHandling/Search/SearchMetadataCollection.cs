@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reactive.Disposables;
 using DynamicData;
 using TailBlazer.Domain.Annotations;
@@ -23,11 +24,19 @@ namespace TailBlazer.Domain.FileHandling.Search
             _cleanUp = new CompositeDisposable(_searches, Metadata);
         }
 
+        public int NextIndex()
+        {
+            if (_searches.Count == 0)
+                return 0;
+
+            return _searches.Items.Select(m => m.Position).Max() + 1;
+        }
+
         public void AddorUpdate([NotNull] SearchMetadata metadata)
         {
             if (metadata == null) throw new ArgumentNullException(nameof(metadata));
             _searches.AddOrUpdate(metadata);
-            _logger.Info("Seatch metadata has changed: {0}", metadata);
+            _logger.Info("Search metadata has changed: {0}", metadata);
 
         }
 
@@ -36,6 +45,8 @@ namespace TailBlazer.Domain.FileHandling.Search
             _searches.Remove(searchText);
             _logger.Info("Search metadata has been removed: {0}", searchText);
         }
+
+
 
         public void Dispose()
         {

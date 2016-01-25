@@ -1,6 +1,8 @@
 ﻿
+using System;
 using System.Windows;
 using System.Windows.Controls;
+using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Controls
 {
@@ -9,14 +11,83 @@ namespace TailBlazer.Controls
     {
         None,
         Regex,
-        Filter
+        Text
     }
 
+    [TemplatePart(Name = TemplateParts.Regex, Type = typeof(RegexMatchedIcon))]
+    [TemplatePart(Name = TemplateParts.Text, Type = typeof(TextMatchedIcon))]
+    [TemplateVisualState(Name = SearchResultIndicatorStates.None, GroupName = "Indicator")]
+    [TemplateVisualState(Name = SearchResultIndicatorStates.Regex, GroupName = "Indicator")]
+    [TemplateVisualState(Name = SearchResultIndicatorStates.Text, GroupName = "Indicator")]
     public class SearchResultIndicator : Control
     {
+        [UsedImplicitly]
+        private class SearchResultIndicatorStates
+        {
+            public const string None = "None";
+            public const string Regex = "Regex";
+            public const string Text = "Text";
+        }
+
+        [UsedImplicitly]
+        private class TemplateParts
+        {
+            public const string Regex = "PART_RegexImage";
+            public const string Text = "PART_TextImage";
+        }
+
+        public static readonly DependencyProperty StatusProperty = DependencyProperty.Register("Status", typeof (SearchResultIndicatorStatus), typeof (SearchResultIndicator), new PropertyMetadata(SearchResultIndicatorStatus.None, OnStatusPropertyChanged));
+
+        public SearchResultIndicatorStatus Status
+        {
+            get { return (SearchResultIndicatorStatus) GetValue(StatusProperty); }
+            set { SetValue(StatusProperty, value); }
+        }
+
         static SearchResultIndicator()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(SearchResultIndicator), new FrameworkPropertyMetadata(typeof(SearchResultIndicator)));
         }
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            UpdateVisualState(false);
+        }
+
+        private static void OnStatusPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
+        {
+            var indicator = (SearchResultIndicator)sender;
+            var newStatus = (SearchResultIndicatorStatus) args.NewValue;
+            var oldStatus = (SearchResultIndicatorStatus)args.OldValue;
+
+
+            if (newStatus != oldStatus)
+
+                indicator.UpdateVisualState(true);
+        }
+
+
+        private void UpdateVisualState(bool useTransitions)
+        {
+            switch (this.Status)
+            {
+                case SearchResultIndicatorStatus.Regex:
+                    var x = VisualStateManager.GoToElementState(this, SearchResultIndicatorStates.Regex, useTransitions);
+                    break;
+                case SearchResultIndicatorStatus.Text:
+                    VisualStateManager.GoToElementState(this, SearchResultIndicatorStates.Text, useTransitions);
+                    break;
+                default:
+                    VisualStateManager.GoToElementState(this, SearchResultIndicatorStates.None, useTransitions);
+                    break;
+            }
+        }
+
+        //private void UpdateVisualState(SearchResultIndicatorStatus status)
+        //{
+
+
+        //}
     }
 }
