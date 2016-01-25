@@ -8,6 +8,7 @@
         <Setter Property="Width" Value="18"/>
         <Setter Property="Height" Value="18"/>
         <Setter Property="Padding" Value="4"/>
+        <Setter Property="IsHitTestVisible" Value="True"/>
         <Setter Property="Template">
 
             <Setter.Value>
@@ -15,11 +16,6 @@
                     <Grid Margin="{TemplateBinding Padding}" Background="{TemplateBinding Background}" >
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="Indicator">
-                                <!--   <VisualStateGroup.Transitions>
-                                    <VisualTransition GeneratedDuration="0" To="None"/>
-                                    <VisualTransition GeneratedDuration="0" To="Regex"/>
-                                    <VisualTransition GeneratedDuration="0" To="Text"/>
-                                </VisualStateGroup.Transitions>-->
                                 <VisualState x:Name="None"/>
                                 <VisualState x:Name="Regex">
                                     <Storyboard>
@@ -46,6 +42,7 @@
                         <controls:TextMatchedIcon x:Name="PART_TextImage"
                                 Visibility="Collapsed"                      
                 				VerticalAlignment="Center"
+                                ToolTip="Match using plain text"
                 				BorderThickness ="{TemplateBinding BorderThickness}"
                 				BorderBrush ="{TemplateBinding BorderBrush}"
                 				Foreground="{TemplateBinding Foreground}" />
@@ -53,6 +50,7 @@
                         <controls:RegexMatchedIcon  x:Name="PART_RegexImage"
                                 Visibility="Collapsed"  
                 				VerticalAlignment="Center"
+                                ToolTip="Match using regex"
                 				BorderThickness ="{TemplateBinding BorderThickness}"
                 				BorderBrush ="{TemplateBinding BorderBrush}"
                 				Foreground="{TemplateBinding Foreground}" />

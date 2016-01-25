@@ -17,41 +17,20 @@
                 <ColumnDefinition Width="18"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <!--Status=-->
 
             <controls:SearchResultIndicator 
-                    Padding="2" 
-                    Foreground="{DynamicResource SecondaryAccentBrush}"
-                    BorderBrush ="{DynamicResource GrayBrush6}"
-                    Status="{Binding IndicatorStatus.Value}"                
-                    VerticalAlignment="Center"/>
-            <!-- <Border>
+                Padding="2" 
+                Foreground="{DynamicResource SecondaryAccentBrush}"
+                BorderBrush ="{DynamicResource GrayBrush6}"
+                Status="{Binding IndicatorStatus.Value}" >
 
+                <!--<controls:SearchResultIndicator.Triggers>
+                    <Trigger Property="Mos"></Trigger>
+                </controls:SearchResultIndicator.Triggers>-->
 
-               <Grid x:Name="Grid" Margin="2" 
-                                            Visibility="{Binding  LineMatches.Value.HasMatches, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <controls:TextMatchedIcon 
-                                                        Width="14"
-                                                        Height="14"
-                                                        VerticalAlignment="Center"
-                                                        BorderThickness="1"
-                                                        BorderBrush ="{DynamicResource GrayBrush6}"
-                                                        Visibility="{Binding  LineMatches.Value.IsFilter, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                        Foreground="{StaticResource SecondaryAccentBrush}"/>
-
-                    <controls:RegexMatchedIcon 
-                                                        Width="16"
-                                                        Height="16"
-                                                        Margin ="-2 0 0 0"
-                                                        VerticalAlignment="Center"
-                                                        BorderThickness="1"
-                                                        BorderBrush ="{DynamicResource GrayBrush6}"
-                                                        Visibility="{Binding LineMatches.Value.IsRegex, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                        Foreground="{StaticResource SecondaryAccentBrush}"/>
-                </Grid>
-
-            </Border> -->
-
+                
+            </controls:SearchResultIndicator>
+  
             <controls:HighlightTextControl
                                     Grid.Column="1" Margin="6 0 0 0"   
                                         Text="{Binding Text}" 

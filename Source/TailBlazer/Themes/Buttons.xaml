@@ -14,8 +14,9 @@
                     <Grid>
                         <Ellipse Width="{TemplateBinding Width}"
                                  Height="{TemplateBinding Height}"
+
                                  Fill="{TemplateBinding Background}"/>
-                        <controls:SettingsIcon  Width="12" Height="12"/>
+                        <controls:SettingsIcon  Width="13" Height="13"/>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -45,21 +46,22 @@
 
                         <Path x:Name="Path"
                                       Data="M0.5,71 L70,0.5 M0.5,1 L70,70.5" 
-                                      Width="6" Height="6"
+                                      Width="7" Height="7"
                                       Stretch="Uniform"
                                       Stroke="{TemplateBinding Foreground}"
                                       StrokeThickness="1.5"
                                       StrokeStartLineCap="Square" 
                                       StrokeEndLineCap="Square"
-                                        SnapsToDevicePixels="False"/>
+                                        SnapsToDevicePixels="False"
+                                        UseLayoutRounding="True"/>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
         <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
-        <Setter Property="Width" Value="12" />
-        <Setter Property="Height" Value="12" />
-        <Setter Property="Margin" Value="4 0 2 0" />
+        <Setter Property="Width" Value="13" />
+        <Setter Property="Height" Value="13" />
+        <Setter Property="Margin" Value="3 0 1 0" />
 
         <Setter Property="Opacity" Value=".75" />
         <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
