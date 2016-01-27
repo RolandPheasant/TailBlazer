@@ -407,7 +407,9 @@ namespace TailBlazer.Controls
                 .ObserveOn(Dispatcher)
                 .Subscribe(_ =>
                 {
-                    var index = diff < 0 ? 0 : this._itemsControl.Items.Count - 1;
+                    if (_itemsControl.Items.Count==0) return;
+
+                    var index = diff < 0 ? 0 : _itemsControl.Items.Count - 1;
                     var generator = (ItemContainerGenerator)_itemsGenerator;
                     _itemsControl?.Focus();
                     var item = generator.ContainerFromIndex(index) as UIElement;
