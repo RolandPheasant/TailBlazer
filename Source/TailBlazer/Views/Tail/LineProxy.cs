@@ -51,9 +51,9 @@ namespace TailBlazer.Views.Tail
 
             FormattedText = formattedText.ForBinding();
             LineMatches = lineMatchesShared.ForBinding();
-            IndicatorStatus = lineMatchesShared.Select(lmc => CalculateStatus(lmc.FirstMatch))
-                //.Do(state=>Console.WriteLine($"UI State =  {state}"))
-                .ForBinding();
+            IndicatorStatus = lineMatchesShared
+                                .Select(lmc => CalculateStatus(lmc.FirstMatch))
+                                .ForBinding();
 
             _cleanUp = new CompositeDisposable(FormattedText, IndicatorStatus, LineMatches, lineMatchesShared.Connect());
         }

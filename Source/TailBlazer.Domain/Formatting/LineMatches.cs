@@ -14,7 +14,7 @@ namespace TailBlazer.Domain.Formatting
         public LineMatches(ISearchMetadataCollection searchMetadataCollection)
         {
             _strings = searchMetadataCollection.Metadata
-                .Connect(meta => meta.Filter)
+                .Connect()
                 .IgnoreUpdateWhen((current, previous) => SearchMetadata.EffectsHighlightComparer.Equals(current, previous))
                 .QueryWhenChanged(query => query.Items.OrderBy(si => si.Position))
                 .Replay(1)

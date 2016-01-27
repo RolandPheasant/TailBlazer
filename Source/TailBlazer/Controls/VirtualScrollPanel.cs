@@ -345,13 +345,8 @@ namespace TailBlazer.Controls
 
             var lastRealizedIndex = Math.Min(firstRealizedIndex + completeRealizedLines  + 2, _itemsControl.Items.Count - 1);
 
-            return new ItemLayoutInfo
-            {
-                FirstRealizedItemIndex = firstRealizedIndex,
-                FirstRealizedItemLeft = firstRealizedItemLeft,
-                FirstRealizedLineTop = firstRealizedItemTop,
-                LastRealizedItemIndex = lastRealizedIndex
-            };
+            return new ItemLayoutInfo(firstRealizedIndex, firstRealizedItemTop, firstRealizedItemLeft, lastRealizedIndex);
+
         }
         
         private ExtentInfo GetVerticalExtentInfo(Size viewPortSize)
@@ -363,19 +358,9 @@ namespace TailBlazer.Controls
             var maxVerticalOffset = extentHeight;// extentHeight - viewPortSize.Height;
             var verticalOffset = (StartIndex /(double) TotalItems)*maxVerticalOffset;
 
-            var info = new ExtentInfo
-            {
-                VirtualCount = _itemsControl.Items.Count,
-                TotalCount = TotalItems,
-                Height = extentHeight,
-                VerticalOffset = verticalOffset,
-                MaxVerticalOffset = maxVerticalOffset
-            };
-            return info;
+            return new ExtentInfo(TotalItems, _itemsControl.Items.Count, verticalOffset, maxVerticalOffset, extentHeight);
         }
-
-
-
+        
         public void SetHorizontalOffset(double offset)
         {
             offset = Clamp(offset, 0, ExtentWidth - ViewportWidth);
@@ -548,23 +533,44 @@ namespace TailBlazer.Controls
             return new Rect();
         }
 
-        private class ItemLayoutInfo
+
+        private struct ItemLayoutInfo
         {
-            public int FirstRealizedItemIndex;
-            public double FirstRealizedLineTop;
-            public double FirstRealizedItemLeft;
-            public int LastRealizedItemIndex;
+            public int FirstRealizedItemIndex { get; }
+            public double FirstRealizedLineTop { get; }
+            public double FirstRealizedItemLeft { get; }
+            public int LastRealizedItemIndex { get; }
+
+            public ItemLayoutInfo(int firstRealizedItemIndex, double firstRealizedLineTop, double firstRealizedItemLeft, int lastRealizedItemIndex)
+                : this()
+            {
+                FirstRealizedItemIndex = firstRealizedItemIndex;
+                FirstRealizedLineTop = firstRealizedLineTop;
+                FirstRealizedItemLeft = firstRealizedItemLeft;
+                LastRealizedItemIndex = lastRealizedItemIndex;
+            }
         }
 
 
-        private class ExtentInfo
-        {
-            public int TotalCount;
-            public int VirtualCount;
-            public double VerticalOffset;
-            public double MaxVerticalOffset;
-            public double Height;
 
+        private struct ExtentInfo
+        {
+             
+            public int TotalCount { get; }
+            public int VirtualCount { get; }
+            public double VerticalOffset { get; }
+            public double MaxVerticalOffset { get; }
+            public double Height { get; }
+
+            public ExtentInfo(int totalCount, int virtualCount, double verticalOffset, double maxVerticalOffset, double height)
+                    :this()
+            {
+                TotalCount = totalCount;
+                VirtualCount = virtualCount;
+                VerticalOffset = verticalOffset;
+                MaxVerticalOffset = maxVerticalOffset;
+                Height = height;
+            }
         }
     }
 
