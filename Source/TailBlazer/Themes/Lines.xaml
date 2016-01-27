@@ -6,8 +6,6 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
-
-
     </ResourceDictionary.MergedDictionaries>
 
 
@@ -46,12 +44,12 @@
 
     </DataTemplate>
 
-    <Style x:Key="LinesItemContainerStyle" 
-           TargetType="{x:Type ListBoxItem}" 
+    <Style x:Key="LinesItemContainerStyle" TargetType="{x:Type ListBoxItem}" 
            BasedOn="{StaticResource  MaterialDesignListBoxItem}">
         <Style.Setters>
             <Setter Property="Padding" Value="0"/>
-            <Setter Property="IsTabStop" Value="True"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="IsTabStop" Value="False"/>
             <Setter Property="Height" Value="22"/>
             <!--<Setter Property="ToolTip" Value="{Binding  LineMatches.Value.Matches}"/>-->
         </Style.Setters>
@@ -102,9 +100,49 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="LinesListBoxStyle" TargetType="{x:Type ListBox}" BasedOn="{StaticResource MaterialDesignListBox}">
-        
-        
+    <Style x:Key="LinesListBoxStyle" TargetType="{x:Type ListBox}">
+        <Setter Property="IsTextSearchEnabled" Value="False" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+        <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+        <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
+        <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="FontFamily" Value="Consolas"/>
+        <Setter Property="SelectionMode" Value="Extended"/>
+        <!--<Setter Property="KeyboardNavigation.TabNavigation" Value="Cycle"/>-->
+        <Setter Property="ItemContainerStyle" Value="{StaticResource LinesItemContainerStyle}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListBox}">
+                    <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                        <ScrollViewer Focusable="false" 
+                                      Padding="{TemplateBinding Padding}"
+                                       
+                                        IsTabStop="False">
+                            <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        </ScrollViewer>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsGrouping" Value="true"/>
+                                <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="false"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="LinesListBoxStyle2" TargetType="{x:Type ListBox}" BasedOn="{StaticResource MaterialDesignListBox}">
         <Style.Setters>
             <Setter Property="FontFamily" Value="Consolas"/>
             <Setter Property="SelectionMode" Value="Extended"/>
@@ -113,18 +151,27 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ListBox}">
-                        <ScrollViewer 
-                                        VerticalScrollBarVisibility="Auto"
-                                        HorizontalScrollBarVisibility="Auto"
-                                        CanContentScroll="True"
-                                        Padding="{TemplateBinding Padding}"
-                                        Background="{TemplateBinding Background}" 
-                                        BorderBrush="Transparent" 
-                                        BorderThickness="0" 
-                                        KeyboardNavigation.TabNavigation="Cycle"
-                                        IsTabStop="True">
-                            <ItemsPresenter/>
-                        </ScrollViewer>
+                        <Border CornerRadius="2" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                                        <!-- We set the TabNavigation to Cycle on this ScrollViewer to work around a bug which causes the ListBox to loose focus when navigating down (with Down Arrow or Page Down) from the last visible item
+                                    (or even when navigating Up/Down on an item that is only partially visible at the bottom of the screen) -->
+                                    <ScrollViewer 
+                                                    VerticalScrollBarVisibility="Auto"
+                                                    HorizontalScrollBarVisibility="Auto"
+                                                    CanContentScroll="True"
+                                                    Padding="{TemplateBinding Padding}"
+                                                    Background="{TemplateBinding Background}" 
+                                                    BorderBrush="Transparent" 
+                                                    BorderThickness="0" 
+                                                    KeyboardNavigation.TabNavigation="Cycle"
+                                                    KeyboardNavigation.ControlTabNavigation="Cycle"
+                                                    KeyboardNavigation.DirectionalNavigation="Cycle"
+                                     
+                                                    IsTabStop="False">
+                                        <ItemsPresenter/>
+                                    </ScrollViewer>
+                            </Border>
                     </ControlTemplate>
                 </Setter.Value>
                 
@@ -132,6 +179,7 @@
         </Style.Setters>
         
     </Style>
+
 
 
     <DataTemplate x:Key="LinesDataTemplate" DataType="{x:Type tail:ILinesVisualisation}">

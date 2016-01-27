@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:TailBlazer.Views"
              xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
@@ -11,9 +10,7 @@
              xmlns:controls="clr-namespace:TailBlazer.Controls"
              xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
              xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
-             xmlns:formatting="clr-namespace:TailBlazer.Domain.Formatting;assembly=TailBlazer.Domain"
-             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-            Background="{DynamicResource MaterialDesignPaper}"
+        
              x:Name="Control"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance tail:FileTailerViewModel, IsDesignTimeCreatable=False}"
@@ -37,7 +34,6 @@
             <infrastucture:CheckedToLengthConverter TrueValue="*" FalseValue="*" x:Key="c1" />
             <infrastucture:CheckedToLengthConverter TrueValue="175" FalseValue="0" x:Key="c2" />
 
-            <infrastucture:BooleanToHiddenConverter x:Key="BooleanToHiddenConverter"/>
             <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"/>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <infrastucture:NotEqualsToVisibilityConverter x:Key="NotEqualsToVisibilityConverter"/>
@@ -89,19 +85,12 @@
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
-
-
-
             </Style>
-
-            
         </ResourceDictionary>
     </Control.Resources>
 
     <wpf:DialogHost Identifier="{Binding Id}">
-        <Grid Margin="4" 
-              KeyboardNavigation.TabNavigation="Cycle"
-              FocusManager.FocusedElement="{Binding ElementName=SearchTextBox}">
+        <Grid Margin="4" >
             <ProgressBar
                 Visibility="{Binding IsLoading.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
                 Style="{StaticResource TailBlazerCircularProgressBar}" 
@@ -151,7 +140,6 @@
                     </ToggleButton>
 
                     <TextBox Grid.Column="1" 
-                            x:Name="SearchTextBox"
                             Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                             wpf:TextFieldAssist.Hint="{Binding SearchHints.IsValid.Value.Message}" 
                             VerticalAlignment="Center"
@@ -284,9 +272,9 @@
                     </StackPanel>
                 </Grid>
 
-                <ListBox 
-                        VerticalAlignment="Stretch"
-                        Grid.Row="1"
+                <ListBox
+                    Grid.Row="1" 
+                    VerticalAlignment="Stretch"
                         ItemsSource="{Binding Lines}" 
                         SelectedItem="{Binding SelectedItem}"
                         Style="{StaticResource LinesListBoxStyle}"

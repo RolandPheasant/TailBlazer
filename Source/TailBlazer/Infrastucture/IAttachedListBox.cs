@@ -13,12 +13,6 @@ namespace TailBlazer.Infrastucture
     }
 
 
-    public class LineViewer: ListBox 
-    {
-        
-    }
-
-
     public interface ISelectionMonitor: IDisposable
     {
         string GetSelectedText();

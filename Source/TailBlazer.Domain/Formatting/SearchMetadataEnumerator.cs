@@ -74,7 +74,7 @@ namespace TailBlazer.Domain.Formatting
 
                 if (matches.Count > 4)
                 {
-                    yield return new MatchedString(input, false, true);
+                    yield return new MatchedString(input, false);
                     yield break;
                 }
 
@@ -142,8 +142,7 @@ namespace TailBlazer.Domain.Formatting
 
                     //Get original string back as the user may have searched in a different case
                     var originalString = input.Substring(currentLength, tomatch.Length);
-
-
+                    
                     yield return new MatchedString(originalString, true);
                     yield return new MatchedString(current, false);
 

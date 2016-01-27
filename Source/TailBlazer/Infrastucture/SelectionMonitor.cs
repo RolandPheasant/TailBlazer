@@ -79,6 +79,7 @@ namespace TailBlazer.Infrastucture
         {
             _selector = selector;
 
+         //   var generator = (ItemContainerGenerator)selector.ItemContainerGenerator;
 
             _selector.SelectionChanged += _selector_SelectionChanged;
 

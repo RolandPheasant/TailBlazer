@@ -61,9 +61,7 @@ namespace TailBlazer.Controls
             var newStatus = (SearchResultIndicatorStatus) args.NewValue;
             var oldStatus = (SearchResultIndicatorStatus)args.OldValue;
 
-
             if (newStatus != oldStatus)
-
                 indicator.UpdateVisualState(true);
         }
 
@@ -73,13 +71,13 @@ namespace TailBlazer.Controls
             switch (this.Status)
             {
                 case SearchResultIndicatorStatus.Regex:
-                    var x = VisualStateManager.GoToElementState(this, SearchResultIndicatorStates.Regex, useTransitions);
+                    var x = VisualStateManager.GoToState(this, SearchResultIndicatorStates.Regex, useTransitions);
                     break;
                 case SearchResultIndicatorStatus.Text:
-                    VisualStateManager.GoToElementState(this, SearchResultIndicatorStates.Text, useTransitions);
+                    VisualStateManager.GoToState(this, SearchResultIndicatorStates.Text, useTransitions);
                     break;
                 default:
-                    VisualStateManager.GoToElementState(this, SearchResultIndicatorStates.None, useTransitions);
+                    VisualStateManager.GoToState(this, SearchResultIndicatorStates.None, useTransitions);
                     break;
             }
         }

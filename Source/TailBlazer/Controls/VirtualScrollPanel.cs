@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using System.Windows.Threading;
 using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Controls
@@ -392,13 +394,25 @@ namespace TailBlazer.Controls
             InvalidateMeasure();
         }
 
-        private bool _settingVertical;
+
         public void SetVerticalOffset(double offset)
         {
-            _settingVertical = true;
             if (double.IsInfinity(offset)) return;
             var diff = (int) ((offset - _extentInfo.VerticalOffset)/ItemHeight);
             InvokeStartIndexCommand(diff);
+
+
+            //stop the control from losing focus on page up / down
+            Observable.Timer(TimeSpan.FromMilliseconds(150))
+                .ObserveOn(Dispatcher)
+                .Subscribe(_ =>
+                {
+                    var index = diff < 0 ? 0 : this._itemsControl.Items.Count - 1;
+                    var generator = (ItemContainerGenerator)_itemsGenerator;
+                    _itemsControl?.Focus();
+                    var item = generator.ContainerFromIndex(index) as UIElement;
+                    item?.Focus();
+                });
         }
 
         

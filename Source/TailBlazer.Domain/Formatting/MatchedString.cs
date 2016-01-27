@@ -8,11 +8,10 @@ namespace TailBlazer.Domain.Formatting
         public bool IsMatch { get; }
 
 
-        public MatchedString(string part, bool isMatch, bool showIndicator=false)
+        public MatchedString(string part, bool isMatch)
         {
             Part = part;
             IsMatch = isMatch;
-
         }
         
 
