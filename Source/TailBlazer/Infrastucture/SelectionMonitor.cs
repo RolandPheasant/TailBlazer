@@ -34,6 +34,7 @@ namespace TailBlazer.Infrastucture
         public IObservableList<LineProxy> Selected { get; }
 
         private readonly ILogger _logger;
+        private readonly ISchedulerProvider _schedulerProvider;
         private readonly ISourceList<LineProxy> _selected = new SourceList<LineProxy>();
         private readonly ISourceList<LineProxy> _recentlyRemovedFromVisibleRange = new SourceList<LineProxy>();
         private readonly IDisposable _cleanUp;
@@ -43,24 +44,25 @@ namespace TailBlazer.Infrastucture
         private ListBox _selector;
         private LineProxy _lastSelected = null;
 
-        public SelectionMonitor(ILogger logger)
+        public SelectionMonitor(ILogger logger, ISchedulerProvider schedulerProvider)
         {
             _logger = logger;
+            _schedulerProvider = schedulerProvider;
             Selected = _selected.AsObservableList();
 
-            var selectionLogger = _selected.Connect()
-                .ToCollection()
-                .Subscribe(collection =>
-                {
-                    logger.Debug($"{collection.Count} selected: {collection.Select(l=>l.Text).ToDelimited(Environment.NewLine)} ");
-                });
+            //var selectionLogger = _selected.Connect()
+            //    .ToCollection()
+            //    .Subscribe(collection =>
+            //    {
+            //        logger.Debug($"{collection.Count} selected: {collection.Select(l=>l.Text).ToDelimited(Environment.NewLine)} ");
+            //    });
 
             _cleanUp = new CompositeDisposable(
                 _selected, 
                 _recentlyRemovedFromVisibleRange,
                 _controlSubscriber,
                 Selected,
-                selectionLogger,
+                //sselectionLogger,
                 //keep recent items only up to a certain number
                 _recentlyRemovedFromVisibleRange.LimitSizeTo(100).Subscribe());
         }
@@ -78,12 +80,14 @@ namespace TailBlazer.Infrastucture
         void IAttachedListBox.Receive(ListBox selector)
         {
             _selector = selector;
+           return;
 
-         //   var generator = (ItemContainerGenerator)selector.ItemContainerGenerator;
+            //_selector.SelectionChanged += _selector_SelectionChanged;
 
-            _selector.SelectionChanged += _selector_SelectionChanged;
+            //return;
 
             var dataSource = ((ReadOnlyObservableCollection<LineProxy>) selector.ItemsSource)
+
                 .ToObservableChangeSet()
                 .Publish();
 
@@ -193,6 +197,7 @@ namespace TailBlazer.Infrastucture
             //this is because the panel is virtualised and and automatically unselected due
             //to the control thinking that the item is not longer part of the overall collection
             if (_isSelecting) return;
+
             try
             {
                 _isSelecting = true;

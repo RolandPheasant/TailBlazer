@@ -6,5 +6,7 @@ namespace TailBlazer.Infrastucture
     {
         void ScrollBoundsChanged(ScrollBoundsArgs boundsArgs);
         void ScrollChanged(ScrollChangedArgs scrollChangedArgs);
+
+        void ScrollDiff(int lineChanged);
     }
 }

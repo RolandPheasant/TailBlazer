@@ -1,16 +1,40 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
+using TailBlazer.Domain.Infrastructure;
 
 // ReSharper disable once CheckNamespace
 namespace DynamicData.Binding
 {
     public static class DynamicDataEx
     {
+        public static IObservable<IChangeSet<T>> RecordChanges<T>(this IObservable<IChangeSet<T>> source, ILogger logger,string label)
+        {
+            if (!Debugger.IsAttached)
+                return source;
+
+            return source.Do(changes =>
+            {
+                logger.Info($"{label}: {changes.TotalChanges}");
+            });
+        }
+
+        public static IObservable<IChangeSet<TObject,TKey>> RecordChanges<TObject, TKey>(this IObservable<IChangeSet<TObject, TKey>> source, ILogger logger, string label)
+        {
+            if (!Debugger.IsAttached)
+                return source;
+
+            return source.Do(changes =>
+            {
+                logger.Info($"{label}: {changes.Count}");
+            });
+        }
+
         public static IObservable<IChangeSet<T>> ToObservableChangeSet<T>(this ReadOnlyObservableCollection<T> source)
         {
             return Observable.Create<IChangeSet<T>>

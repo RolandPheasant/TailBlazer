@@ -74,6 +74,9 @@ namespace TailBlazer.Domain.FileHandling
                 {
                     try
                     {
+                        if (scroll.PageSize == 0 || currentLines.Count == 0)
+                            return new Line[0];
+
                         var x = currentLines.ReadLines(scroll).ToArray();
                         return x;
                     }

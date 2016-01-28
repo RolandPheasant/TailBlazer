@@ -126,7 +126,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Controls\FilterIcon.cs" />
-    <Compile Include="Controls\LinesListBox.cs" />
     <Compile Include="Controls\RegexIcon.cs" />
     <Compile Include="Controls\RegexMatchedIcon.cs" />
     <Compile Include="Controls\SearchIcon.cs" />

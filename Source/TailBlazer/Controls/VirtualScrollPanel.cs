@@ -108,20 +108,7 @@ namespace TailBlazer.Controls
             _itemsControl = ItemsControl.GetItemsOwner(this);
             _itemsGenerator = (IRecyclingItemContainerGenerator)ItemContainerGenerator;
 
-
-            _itemsControl.LostFocus += _itemsControl_LostFocus;
-            _itemsControl.LostKeyboardFocus += _itemsControl_LostKeyboardFocus;
             InvalidateMeasure();
-        }
-
-        private void _itemsControl_LostKeyboardFocus(object sender, System.Windows.Input.KeyboardFocusChangedEventArgs e)
-        {
-         //   _itemsControl.Focus();
-        }
-
-        private void _itemsControl_LostFocus(object sender, RoutedEventArgs e)
-        {
-            //_itemsControl.Focus();
         }
 
         private static void OnStartIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -384,11 +371,10 @@ namespace TailBlazer.Controls
         {
             if (double.IsInfinity(offset)) return;
             var diff = (int) ((offset - _extentInfo.VerticalOffset)/ItemHeight);
+
             InvokeStartIndexCommand(diff);
-
-
             //stop the control from losing focus on page up / down
-            Observable.Timer(TimeSpan.FromMilliseconds(150))
+            Observable.Timer(TimeSpan.FromMilliseconds(125))
                 .ObserveOn(Dispatcher)
                 .Subscribe(_ =>
                 {
@@ -471,12 +457,15 @@ namespace TailBlazer.Controls
 
         public void LineUp()
         {
-           // InvokeStartIndexCommand(-1);
+            // InvokeStartIndexCommand(-1);
+            ScrollReceiver?.ScrollDiff(-1);
         }
 
         public void LineDown()
         {
-          //  InvokeStartIndexCommand(1);
+            //  InvokeStartIndexCommand(1);
+
+            ScrollReceiver?.ScrollDiff(1);
         }
 
         public void LineLeft()
@@ -492,11 +481,13 @@ namespace TailBlazer.Controls
         public void PageUp()
         {
             SetVerticalOffset(VerticalOffset - ViewportHeight);
+         
         }
 
         public void PageDown()
         {
             SetVerticalOffset(VerticalOffset + ViewportHeight);
+
         }
 
         public void PageLeft()

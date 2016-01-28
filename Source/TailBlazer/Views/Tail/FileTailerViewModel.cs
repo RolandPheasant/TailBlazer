@@ -117,7 +117,8 @@ namespace TailBlazer.Views.Tail
                             var mode = AutoTail ? ScrollReason.Tail : ScrollReason.User;
                             return  new ScrollRequest(mode, user.PageSize, user.FirstIndex);
                         })
-                        .ObserveOn(schedulerProvider.Background)
+                        .Do(x=>logger.Info("Scrolling to {0}/{1}", x.FirstIndex,x.PageSize))
+                        //  .ObserveOn(schedulerProvider.Background)
                         .DistinctUntilChanged();
 
             IsLoading = searchInfoCollection.All.Take(1).Select(_ => false).StartWith(true).ForBinding();
@@ -140,25 +141,26 @@ namespace TailBlazer.Views.Tail
             //load lines into observable collection
             var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection),new LineMatches(searchMetadataCollection));
             var loader = lineScroller.Lines.Connect()
-                .Transform(x=>lineProxyFactory.Create(x), new ParallelisationOptions(ParallelType.Ordered,3))
+                .RecordChanges(logger, "Received")
+                .Transform(lineProxyFactory.Create, new ParallelisationOptions(ParallelType.Ordered, 3))
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
                 .ObserveOn(schedulerProvider.MainThread)
-                .Bind(out _data)
+                .Bind(out _data,100)
                 .DisposeMany()
                 .Subscribe();
-                //.Subscribe(changes => logger.Info($"Rows changed. {changes.Adds} adds, {changes.Removes} removed"), 
-                //            ex => logger.Error(ex, "There is a problem with bind data"));
-            
+            //.Subscribe(changes => logger.Info($"Rows changed. {changes.Adds} adds, {changes.Removes} removed"), 
+            //            ex => logger.Error(ex, "There is a problem with bind data"));
+
             //monitor matching lines and start index,
             Count = searchInfoCollection.All.Select(latest=>latest.Count).ForBinding();
             CountText = searchInfoCollection.All.Select(latest => $"{latest.Count.ToString("##,###")} lines").ForBinding();
             LatestCount = SearchCollection.Latest.Select(latest => latest.Count).ForBinding();
-            
-            //track first visible index
+
+            ////track first visible index
             var firstIndexMonitor = lineScroller.Lines.Connect()
-                .Buffer(TimeSpan.FromMilliseconds(250)).FlattenBufferResult()
+                .Buffer(TimeSpan.FromMilliseconds(25)).FlattenBufferResult()
                 .ToCollection()
-                .Select(lines => lines.Count == 0 ? 0 : lines.Select(l => l.Index).Max() - lines.Count+1)
+                .Select(lines => lines.Count == 0 ? 0 : lines.Select(l => l.Index).Max() - lines.Count + 1)
                 .ObserveOn(schedulerProvider.MainThread)
                 .Subscribe(first =>
                 {
@@ -235,6 +237,11 @@ namespace TailBlazer.Views.Tail
         {
             if (scrollChangedArgs.Direction == ScrollDirection.Up)
                 AutoTail = false;
+        }
+
+        public void ScrollDiff(int linesChanged)
+        {
+            _userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User, PageSize, FirstIndex+ linesChanged));
         }
 
         public LineProxy SelectedItem

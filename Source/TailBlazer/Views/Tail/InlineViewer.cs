@@ -33,7 +33,8 @@ namespace TailBlazer.Views.Tail
         public InlineViewer([NotNull] InlineViewerArgs args,
             [NotNull] IClipboardHandler clipboardHandler,
             [NotNull] ISchedulerProvider schedulerProvider, 
-            [NotNull] ISelectionMonitor selectionMonitor)
+            [NotNull] ISelectionMonitor selectionMonitor,
+            [NotNull] ILogger logger)
         {
             if (args == null) throw new ArgumentNullException(nameof(args));
             if (clipboardHandler == null) throw new ArgumentNullException(nameof(clipboardHandler));
@@ -48,7 +49,8 @@ namespace TailBlazer.Views.Tail
             var selectedChanged = args.SelectedChanged;
             var pageSize = this.WhenValueChanged(vm=>vm.PageSize);
             var scrollSelected = selectedChanged.Where(proxy => proxy != null)
-                    .CombineLatest(lineProvider, pageSize,(proxy, lp,pge) => new ScrollRequest(pge,  proxy.Start));
+                    .CombineLatest(lineProvider, pageSize,(proxy, lp,pge) => new ScrollRequest(pge,  proxy.Start))
+                    .Where(scroll=>scroll.PageSize!=0);
 
             var scrollUser = _userScrollRequested
                 .Where(x=>!_isSettingScrollPosition)
@@ -70,7 +72,7 @@ namespace TailBlazer.Views.Tail
                 .DisposeMany()
                 .Subscribe();
 
-            // track first visible index[required to set scroll extent]
+            // track first visible index [required to set scroll extent]
             var firstIndexMonitor = lineScroller.Lines.Connect()
                 .Buffer(TimeSpan.FromMilliseconds(250)).FlattenBufferResult()
                 .ToCollection()
@@ -111,6 +113,11 @@ namespace TailBlazer.Views.Tail
 
         void IScrollReceiver.ScrollChanged(ScrollChangedArgs scrollChangedArgs)
         {
+        }
+
+        public void ScrollDiff(int lineChanged)
+        {
+         //  throw new NotImplementedException();
         }
 
         public int PageSize
