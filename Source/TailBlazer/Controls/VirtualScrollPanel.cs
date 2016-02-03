@@ -373,6 +373,7 @@ namespace TailBlazer.Controls
             var diff = (int) ((offset - _extentInfo.VerticalOffset)/ItemHeight);
 
             InvokeStartIndexCommand(diff);
+           
             //stop the control from losing focus on page up / down
             Observable.Timer(TimeSpan.FromMilliseconds(125))
                 .ObserveOn(Dispatcher)
@@ -399,7 +400,6 @@ namespace TailBlazer.Controls
 
         private void InvokeStartIndexCommand(int lines)
         {
-
             if (_isInMeasure) return;
 
             var firstIndex = StartIndex + lines;

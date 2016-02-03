@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Windows.Input;
 using DynamicData.Binding;
 using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
@@ -24,8 +25,9 @@ namespace TailBlazer.Views.Tail
         public long Start { get; }
         public int Index { get; }
         public string Text => Line.Text;
+        public LineKey Key { get; }
 
-        public  IProperty<IEnumerable<DisplayText>> FormattedText { get; }
+        public IProperty<IEnumerable<DisplayText>> FormattedText { get; }
 
         public IProperty<SearchResultIndicatorStatus> IndicatorStatus { get; }
 
@@ -46,6 +48,7 @@ namespace TailBlazer.Views.Tail
             Start = line.LineInfo.Start;
             Index = line.LineInfo.Index;
             Line = line;
+            Key = Line.Key;
 
             var lineMatchesShared = lineMatches.Publish();
 
@@ -57,7 +60,6 @@ namespace TailBlazer.Views.Tail
 
             _cleanUp = new CompositeDisposable(FormattedText, IndicatorStatus, LineMatches, lineMatchesShared.Connect());
         }
-
 
 
         private SearchResultIndicatorStatus CalculateStatus(LineMatch firstMatch)
@@ -84,7 +86,7 @@ namespace TailBlazer.Views.Tail
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Start == other.Start && Equals(Line, other.Line);
+            return Key.Equals(other.Key);
         }
 
         public override bool Equals(object obj)
@@ -97,10 +99,7 @@ namespace TailBlazer.Views.Tail
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                return (Start.GetHashCode()*397) ^ (Line?.GetHashCode() ?? 0);
-            }
+            return Key.GetHashCode();
         }
 
 

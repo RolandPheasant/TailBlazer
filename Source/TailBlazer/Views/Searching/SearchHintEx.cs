@@ -19,6 +19,9 @@ namespace TailBlazer.Views.Searching
             if (!source.UseRegEx && !source.Text.IsLongerThanOrEqualTo(3))
                 return new SearchHintMessage(false, "Text must be at least 3 characters");
 
+            if (!source.UseRegEx && source.Text.Contains(@"\"))
+                return new SearchHintMessage(false, "Text contains illegal characters");
+
             try
             {
                 var test = new Regex(source.Text);

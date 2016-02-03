@@ -63,7 +63,36 @@
 
     <controls:MetroWindow.RightWindowCommands>
         <controls:WindowCommands>
-            <TextBlock Text="{Binding Version}" Opacity="0.6"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock 
+                    VerticalAlignment="Center"
+                    Text="{Binding Version}" Opacity="0.6"/>
+
+                <materialDesign:PopupBox 
+                    VerticalAlignment="Center" Height="22" Margin="0 0 -6 0">
+                    <StackPanel  Orientation="Vertical" Margin="2">
+
+                        <Button Margin="6 0 0 0"
+                                Command ="{Binding SaveLayoutCommand}"
+                                ToolTip="Save Layout">
+                            <StackPanel Orientation="Horizontal">
+                                <controls1:SaveLayoutIcon Width="18" Height="18"/>
+                                <TextBlock Margin="8 0 8 0" VerticalAlignment="Center" Text="Save layout"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Margin="6 0 0 0"
+                                Command ="{Binding ExitCommmand}"
+                                ToolTip="Exit Tail Blazer">
+                            <StackPanel Orientation="Horizontal">
+                                <controls1:ExitIcon Width="18" Height="18"/>
+                                <TextBlock Margin="8 0 0 0" VerticalAlignment="Center" Text="Exit"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                </materialDesign:PopupBox>
+            </StackPanel>
         </controls:WindowCommands>
     </controls:MetroWindow.RightWindowCommands>
 
@@ -108,7 +137,8 @@
         </controls:WindowCommands>
     </controls:MetroWindow.LeftWindowCommands>
 
-    <AdornerDecorator>
+
+        <AdornerDecorator>
         <materialDesign:DialogHost Identifier="{x:Static tailBlazer:DialogNames.EntireWindow}">
          
             <Grid infrastucture:DependencyObjectHook.Receiver="{Binding DropMonitor}">
@@ -144,7 +174,7 @@
             </materialDesign:DrawerHost.LeftDrawerContent>
 
             <Grid>
-                <dockablz:Layout >
+                <dockablz:Layout   x:Name="Layout" >
                     <dragablz:TabablzControl 
                         x:Name="InitialTabablzControl"
                             HeaderMemberPath="Header" 

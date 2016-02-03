@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using DynamicData;
 
 namespace TailBlazer.Domain.Infrastructure
 {
@@ -69,6 +70,13 @@ namespace TailBlazer.Domain.Infrastructure
             if (!list.Remove(value))
                 return this;
 
+            return new ImmutableList<T>(list);
+        }
+
+        public ImmutableList<T> Remove(IEnumerable<T> oldItems)
+        {
+            var list = new List<T>(_data);
+            list.RemoveMany(oldItems);
             return new ImmutableList<T>(list);
         }
 

@@ -48,7 +48,6 @@ namespace TailBlazer.Views.Tail
         public SearchHints SearchHints { get;  }
         public SearchCollection SearchCollection { get; }
         public InlineViewer InlineViewer { get; }
-        public IProperty<int> SelectedItemsCount { get; }
         public IProperty<int> Count { get; }
         public IProperty<string> CountText { get; }
         public IProperty<int> LatestCount { get; }
@@ -92,8 +91,7 @@ namespace TailBlazer.Views.Tail
             SearchOptions = searchOptionsViewModel;
             SearchHints = searchHints;
             CopyToClipboardCommand = new Command(()=> clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
-            SelectedItemsCount = selectionMonitor.Selected.Connect().QueryWhenChanged(collection=> collection.Count).ForBinding();
-            SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
+           SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
 
             UsingDarkTheme = generalOptions.Value
                     .ObserveOn(schedulerProvider.MainThread)
@@ -192,7 +190,6 @@ namespace TailBlazer.Views.Tail
                 Count,
                 LatestCount,
                 FileSizeText,
-                SelectedItemsCount,
                 CanViewInline,
                 InlineViewer,
                 InlineViewerVisible,

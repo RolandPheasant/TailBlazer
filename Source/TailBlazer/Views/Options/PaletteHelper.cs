@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using MaterialDesignColors;
-using SwatchesProvider = TailBlazer.Views.Options.SwatchesProvider;
+
 
 namespace TailBlazer.Views.Options
 {

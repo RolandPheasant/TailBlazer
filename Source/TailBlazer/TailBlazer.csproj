@@ -125,9 +125,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\ExitIcon.cs" />
     <Compile Include="Controls\FilterIcon.cs" />
     <Compile Include="Controls\RegexIcon.cs" />
     <Compile Include="Controls\RegexMatchedIcon.cs" />
+    <Compile Include="Controls\SaveLayoutIcon.cs" />
     <Compile Include="Controls\SearchIcon.cs" />
     <Compile Include="Controls\SearchResultIndicator.cs" />
     <Compile Include="Controls\TextMatchedIcon.cs" />
@@ -145,6 +147,8 @@
     <Compile Include="Infrastucture\SelectionMonitor.cs" />
     <Compile Include="Infrastucture\StartupController.cs" />
     <Compile Include="Infrastucture\UhandledExceptionHandler.cs" />
+    <Compile Include="Views\Layout\LayoutAnalyser.cs" />
+    <Compile Include="Views\Layout\TreeNode.cs" />
     <Compile Include="Views\Options\GeneralOptionsConverter.cs" />
     <Compile Include="Views\Options\GeneralOptionsView.xaml.cs">
       <DependentUpon>GeneralOptionsView.xaml</DependentUpon>
@@ -164,7 +168,6 @@
     <Compile Include="Views\Searching\SearchOptionsViewModel.cs" />
     <Compile Include="Views\Searching\SearchOptions.cs" />
     <Compile Include="Views\Searching\SearchOptionsConverter.cs" />
-    <Compile Include="Views\Options\SwatchesProvider.cs" />
     <Compile Include="Views\Options\Theme.cs" />
     <Compile Include="Views\FileDrop\FileDropContainer.cs" />
     <Compile Include="Views\FileDrop\FileDropMonitor.cs" />

@@ -8,6 +8,7 @@ using System.Reactive.Concurrency;
 using Dragablz;
 using DynamicData;
 using DynamicData.Binding;
+using MaterialDesignColors;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Views.Options;

@@ -9,6 +9,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reflection;
+using System.Windows;
 using System.Windows.Input;
 using Dragablz;
 using DynamicData;
@@ -17,6 +18,7 @@ using Microsoft.Win32;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
 using TailBlazer.Views.FileDrop;
+using TailBlazer.Views.Layout;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Recent;
 using TailBlazer.Views.Tail;
@@ -40,7 +42,8 @@ namespace TailBlazer.Views.WindowManagement
         public ICommand OpenFileCommand { get; }
         public Command ShowInGitHubCommand { get; }
         public string Version { get; }
-
+        public ICommand SaveLayoutCommand { get; }
+        public ICommand ExitCommmand { get; }
         public ICommand ZoomInCommand { get; }
         public ICommand ZoomOutCommand { get; }
         
@@ -66,6 +69,8 @@ namespace TailBlazer.Views.WindowManagement
 
             ZoomOutCommand= new Command(()=> { GeneralOptions.Scale = GeneralOptions.Scale + 5; });
             ZoomInCommand = new Command(() => { GeneralOptions.Scale = GeneralOptions.Scale - 5; });
+            SaveLayoutCommand = new Command(WalkTheLayout);
+            ExitCommmand = new Command(() => Application.Current.Shutdown());
 
             Version = $"v{Assembly.GetEntryAssembly().GetName().Version.ToString(3)}";
 
@@ -95,6 +100,13 @@ namespace TailBlazer.Views.WindowManagement
                             .OfType<IDisposable>()
                             .ForEach(d=>d.Dispose());
                 }));
+        }
+
+        private void WalkTheLayout()
+        {
+            var analyser = new LayoutAnalyser();
+            var root = analyser.QueryLayouts();
+            Console.WriteLine(root);
         }
 
         private void OpenFile()
