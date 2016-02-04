@@ -16,12 +16,13 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             
-            
 
             <controls:SearchResultIndicator 
-                Padding="2" 
+                Padding="1" 
                 Foreground="{DynamicResource SecondaryAccentBrush}"
-                BorderBrush ="{DynamicResource GrayBrush6}"
+                Background="{DynamicResource TransparentWhiteBrush}"
+                BorderBrush ="{x:Null}"
+                BorderThickness="0"
                 Status="{Binding IndicatorStatus.Value}" >
 
                

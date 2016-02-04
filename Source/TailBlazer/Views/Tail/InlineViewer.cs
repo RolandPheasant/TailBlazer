@@ -113,11 +113,12 @@ namespace TailBlazer.Views.Tail
 
         void IScrollReceiver.ScrollChanged(ScrollChangedArgs scrollChangedArgs)
         {
+
         }
 
         public void ScrollDiff(int lineChanged)
         {
-         //  throw new NotImplementedException();
+            _userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User, PageSize, FirstIndex + lineChanged));
         }
 
         public int PageSize

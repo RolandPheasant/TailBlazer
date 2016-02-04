@@ -3,11 +3,11 @@
 namespace TailBlazer.Views.Tail
 {
     /// <summary>
-    /// Interaction logic for FileTailerView.xaml
+    /// Interaction logic for TailView.xaml
     /// </summary>
-    public partial class FileTailerView : UserControl
+    public partial class TailView : UserControl
     {
-        public FileTailerView()
+        public TailView()
         {
             InitializeComponent();
         }

@@ -44,8 +44,8 @@
     <ApplicationIcon>tailblazer.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dragablz, Version=0.0.3.150, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dragablz.0.0.3.150\lib\net45\Dragablz.dll</HintPath>
+    <Reference Include="Dragablz, Version=0.0.3.151, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dragablz.0.0.3.151\lib\net45\Dragablz.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="DynamicData, Version=4.3.1.1090, Culture=neutral, processorArchitecture=MSIL">
@@ -68,8 +68,8 @@
       <HintPath>..\packages\MaterialDesignColors.1.1.2\lib\net45\MaterialDesignColors.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MaterialDesignThemes.Wpf, Version=1.4.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignThemes.1.4.1-ci477\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=1.4.1.485, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.1.4.1.485\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -148,6 +148,8 @@
     <Compile Include="Infrastucture\StartupController.cs" />
     <Compile Include="Infrastucture\UhandledExceptionHandler.cs" />
     <Compile Include="Views\Layout\LayoutAnalyser.cs" />
+    <Compile Include="Views\Layout\LayoutContent.cs" />
+    <Compile Include="Views\Layout\ShellState.cs" />
     <Compile Include="Views\Layout\TreeNode.cs" />
     <Compile Include="Views\Options\GeneralOptionsConverter.cs" />
     <Compile Include="Views\Options\GeneralOptionsView.xaml.cs">
@@ -155,7 +157,6 @@
     </Compile>
     <Compile Include="Views\Options\GeneralOptionsViewModel.cs" />
     <Compile Include="Views\Searching\IRecentSearchCollection.cs" />
-    <Compile Include="Views\Options\PaletteHelper.cs" />
     <Compile Include="Views\Recent\RecentSearch.cs" />
     <Compile Include="Views\Recent\RecentSearchCollection.cs" />
     <Compile Include="Views\Recent\RecentFilesToStateConverter.cs" />
@@ -172,15 +173,17 @@
     <Compile Include="Views\FileDrop\FileDropContainer.cs" />
     <Compile Include="Views\FileDrop\FileDropMonitor.cs" />
     <Compile Include="Views\Tail\ILinesVisualisation.cs" />
+    <Compile Include="Views\Tail\TailViewPersister.cs" />
+    <Compile Include="Views\Tail\TailViewState.cs" />
     <Compile Include="Views\WindowManagement\FileHeaderNamingJob.cs" />
     <Compile Include="Controls\FileIcon.cs" />
     <Compile Include="Infrastucture\SchedulerProvider.cs" />
     <Compile Include="Infrastucture\SolidColorAnimation.cs" />
-    <Compile Include="Views\Tail\FileTailerView.xaml.cs">
-      <DependentUpon>FileTailerView.xaml</DependentUpon>
+    <Compile Include="Views\Tail\TailView.xaml.cs">
+      <DependentUpon>TailView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Tail\FileTailerViewModel.cs" />
-    <Compile Include="Views\Tail\FileTailerViewModelFactory.cs" />
+    <Compile Include="Views\Tail\TailViewModel.cs" />
+    <Compile Include="Views\Tail\TailViewModelFactory.cs" />
     <Compile Include="Controls\TextBlockFormatter.cs" />
     <Compile Include="Views\Tail\IInlineViewerFactory.cs" />
     <Compile Include="Views\Tail\ILineProxyFactory.cs" />
@@ -284,7 +287,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Tail\FileTailerView.xaml">
+    <Page Include="Views\Tail\TailView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -2,6 +2,7 @@ using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData.Binding;
+using MaterialDesignThemes.Wpf;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 

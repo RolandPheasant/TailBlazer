@@ -18,33 +18,30 @@ using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Infrastucture;
-using TailBlazer.Settings;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {
-    public class FileTailerViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation
+    public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentStateProvider
     {
-        private readonly IObjectProvider _objectProvider;
         private readonly IDisposable _cleanUp;
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
         private readonly ISubject<ScrollRequest> _userScrollRequested = new ReplaySubject<ScrollRequest>(1);
+        private readonly IPersistentStateProvider _stateProvider;
 
         private bool _autoTail=true;
         private int _firstIndex;
         private int _pageSize;
         private LineProxy _selectedLine;
         private bool _showInline;
-        private bool _isSettingScrollPosition;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
 
         public Guid Id { get; }= Guid.NewGuid();
         public ICommand CopyToClipboardCommand { get; }
-
         public ISelectionMonitor SelectionMonitor { get; }
-        private SearchOptionsViewModel SearchOptions { get;  }
+        public SearchOptionsViewModel SearchOptions { get;  }
         public SearchHints SearchHints { get;  }
         public SearchCollection SearchCollection { get; }
         public InlineViewer InlineViewer { get; }
@@ -61,7 +58,9 @@ namespace TailBlazer.Views.Tail
 
         public ICommand OpenSearchOptionsCommand => new Command(OpenSearchOptions);
 
-        public FileTailerViewModel([NotNull] ILogger logger,
+        public string Name { get; }
+
+        public TailViewModel([NotNull] ILogger logger,
             [NotNull] ISchedulerProvider schedulerProvider,
             [NotNull] IFileWatcher fileWatcher,
             [NotNull] ISelectionMonitor selectionMonitor, 
@@ -86,12 +85,13 @@ namespace TailBlazer.Views.Tail
             if (searchOptionsViewModel == null) throw new ArgumentNullException(nameof(searchOptionsViewModel));
             if (searchHints == null) throw new ArgumentNullException(nameof(searchHints));
 
-            _objectProvider = objectProvider;
+            _stateProvider = new TailViewPersister(this);
+            Name = fileWatcher.FullName;
             SelectionMonitor = selectionMonitor;
             SearchOptions = searchOptionsViewModel;
             SearchHints = searchHints;
             CopyToClipboardCommand = new Command(()=> clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
-           SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
+            SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
 
             UsingDarkTheme = generalOptions.Value
                     .ObserveOn(schedulerProvider.MainThread)
@@ -116,7 +116,6 @@ namespace TailBlazer.Views.Tail
                             return  new ScrollRequest(mode, user.PageSize, user.FirstIndex);
                         })
                         .Do(x=>logger.Info("Scrolling to {0}/{1}", x.FirstIndex,x.PageSize))
-                        //  .ObserveOn(schedulerProvider.Background)
                         .DistinctUntilChanged();
 
             IsLoading = searchInfoCollection.All.Take(1).Select(_ => false).StartWith(true).ForBinding();
@@ -212,35 +211,6 @@ namespace TailBlazer.Views.Tail
            await DialogHost.Show(SearchOptions, Id);
         }
         
-
-        void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
-        {
-            if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));
-            var mode = AutoTail ? ScrollReason.Tail : ScrollReason.User;
-
-            PageSize = boundsArgs.PageSize;
-            FirstIndex = boundsArgs.FirstIndex;
-
-            /*
-                I need to get rid of this subject as I prefer functional over imperative. 
-                However due to complexities int the interactions with the VirtualScrollPanel,
-                each time I have tried to remove it all hell has broken loose
-            */
-            _userScrollRequested.OnNext(new ScrollRequest(mode, boundsArgs.PageSize, boundsArgs.FirstIndex));
-
-        }
-
-        void IScrollReceiver.ScrollChanged(ScrollChangedArgs scrollChangedArgs)
-        {
-            if (scrollChangedArgs.Direction == ScrollDirection.Up)
-                AutoTail = false;
-        }
-
-        public void ScrollDiff(int linesChanged)
-        {
-            _userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User, PageSize, FirstIndex+ linesChanged));
-        }
-
         public LineProxy SelectedItem
         {
             get { return _selectedLine; }
@@ -270,6 +240,54 @@ namespace TailBlazer.Views.Tail
             get { return _showInline; }
             set { SetAndRaise(ref _showInline, value); }
         }
+
+        #region Interact with scroll panel
+
+
+        void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
+        {
+            if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));
+            var mode = AutoTail ? ScrollReason.Tail : ScrollReason.User;
+
+            PageSize = boundsArgs.PageSize;
+            FirstIndex = boundsArgs.FirstIndex;
+
+            /*
+                I need to get rid of this subject as I prefer functional over imperative. 
+                However due to complexities int the interactions with the VirtualScrollPanel,
+                each time I have tried to remove it all hell has broken loose
+            */
+            _userScrollRequested.OnNext(new ScrollRequest(mode, boundsArgs.PageSize, boundsArgs.FirstIndex));
+
+        }
+
+        void IScrollReceiver.ScrollChanged(ScrollChangedArgs scrollChangedArgs)
+        {
+            if (scrollChangedArgs.Direction == ScrollDirection.Up)
+                AutoTail = false;
+        }
+
+        void IScrollReceiver.ScrollDiff(int linesChanged)
+        {
+            _userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User, PageSize, FirstIndex + linesChanged));
+        }
+
+        #endregion
+
+        #region Persist state 
+
+        State IPersistentStateProvider.CaptureState()
+        {
+            return _stateProvider.CaptureState();
+        }
+
+        void IPersistentStateProvider.Restore(State state)
+        {
+            _stateProvider.Restore(state);
+        }
+
+        #endregion
+
 
         public void Dispose()
         {

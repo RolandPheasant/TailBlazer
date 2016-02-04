@@ -1,8 +1,7 @@
 using System.Xml.Linq;
 using TailBlazer.Domain.Settings;
-using TailBlazer.Views.Searching;
 
-namespace TailBlazer.Settings
+namespace TailBlazer.Views.Searching
 {
     public class SearchOptionsConverter : IConverter<SearchOptions>
     {

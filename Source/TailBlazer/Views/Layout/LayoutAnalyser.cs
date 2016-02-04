@@ -6,7 +6,8 @@ using System.Windows;
 using System.Windows.Input;
 using Dragablz;
 using Dragablz.Dockablz;
-
+using TailBlazer.Domain.Settings;
+using TailBlazer.Infrastucture;
 
 
 namespace TailBlazer.Views.Layout
@@ -86,9 +87,17 @@ namespace TailBlazer.Views.Layout
         {
             _rootNode.Children.Clear();
 
-            foreach (var layout in Application.Current.Windows.OfType<MainWindow>().Select(w => w.Layout))
+            foreach (var w in Application.Current.Windows.OfType<MainWindow>())
             {
-                var layoutAccessor = layout.Query();
+                var bounds = w.RestoreBounds;
+               
+                var shellState = new ShellState(bounds.Top, 
+                            bounds.Left, 
+                            bounds.Right- bounds.Left,
+                            bounds.Top - bounds.Bottom, 
+                            w.WindowState);
+
+                var layoutAccessor = w.Layout.Query();
                 var layoutNode = new TreeNode
                 {
                     Content = "Layout"
@@ -99,44 +108,52 @@ namespace TailBlazer.Views.Layout
                 layoutAccessor.Visit(layoutNode, BranchAccessorVisitor, TabablzControlVisitor);
             }
 
-            return new[] { _rootNode };
+            return new[] {_rootNode};
         }
+
 
         private static void FloatingItemsVisitor(TreeNode layoutNode, LayoutAccessor layoutAccessor)
         {
             var floatingItems = layoutAccessor.FloatingItems.ToList();
-            var floatingItemsNode = new TreeNode { Content = "Floating Items " + floatingItems.Count };
+            var floatingItemsNode = new TreeNode {Content = "Floating Items " + floatingItems.Count};
             foreach (var floatingItemNode in floatingItems.Select(floatingItem => new TreeNode
             {
                 Content = $"Floating Item {floatingItem.X}, {floatingItem.Y} : {floatingItem.ActualWidth}, {floatingItem.ActualHeight}"
             }))
 
             {
-                    floatingItemsNode.Children.Add(floatingItemNode);
+                floatingItemsNode.Children.Add(floatingItemNode);
             }
 
-            if (floatingItemsNode.Children.Count!=0)
+            if (floatingItemsNode.Children.Count != 0)
                 layoutNode.Children.Add(floatingItemsNode);
         }
 
         private static void TabablzControlVisitor(TreeNode treeNode, TabablzControl tabablzControl)
         {
-            treeNode.Children.Add(new TreeNode { Content = new TabablzControlProxy(tabablzControl) });
+            var tabablzNode = new TreeNode {Content = new TabablzControlProxy(tabablzControl)};
+            treeNode.Children.Add(tabablzNode);
+
+            foreach (var item in tabablzControl.Items.OfType<ViewContainer>())
+            {
+                var provider = item.Content as IPersistentStateProvider;
+                if (provider == null) continue;
+                var state = provider.CaptureState();
+                Console.WriteLine(state);
+            }
         }
 
         private static void BranchAccessorVisitor(TreeNode treeNode, BranchAccessor branchAccessor)
         {
-            var branchNode = new TreeNode { Content = "Branch " + branchAccessor.Branch.Orientation };
+            var branchNode = new TreeNode {Content = "Branch " + branchAccessor.Branch.Orientation};
             treeNode.Children.Add(branchNode);
 
-            var firstBranchNode = new TreeNode { Content = "Branch Item 1. Ratio=" + branchAccessor.Branch.GetFirstProportion() };
+            var firstBranchNode = new TreeNode {Content = "Branch Item 1. Ratio=" + branchAccessor.Branch.GetFirstProportion()};
             branchNode.Children.Add(firstBranchNode);
-            var secondBranchNode = new TreeNode { Content = "Branch Item 2. Ratio=" + (1 - branchAccessor.Branch.GetFirstProportion()) };
+            var secondBranchNode = new TreeNode {Content = "Branch Item 2. Ratio=" + (1 - branchAccessor.Branch.GetFirstProportion())};
             branchNode.Children.Add(secondBranchNode);
 
-            branchAccessor
-                .Visit(firstBranchNode, BranchItem.First, BranchAccessorVisitor, TabablzControlVisitor)
-                .Visit(secondBranchNode, BranchItem.Second, BranchAccessorVisitor, TabablzControlVisitor);
+            branchAccessor.Visit(firstBranchNode, BranchItem.First, BranchAccessorVisitor, TabablzControlVisitor).Visit(secondBranchNode, BranchItem.Second, BranchAccessorVisitor, TabablzControlVisitor);
         }
     }
 }

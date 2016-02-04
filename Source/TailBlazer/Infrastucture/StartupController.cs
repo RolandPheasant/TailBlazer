@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Reflection;
-using System.Windows.Threading;
 using TailBlazer.Domain.FileHandling.Recent;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
-using TailBlazer.Settings;
-using TailBlazer.Views;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Recent;
+using TailBlazer.Views.Searching;
 using TailBlazer.Views.WindowManagement;
 
 namespace TailBlazer.Infrastucture

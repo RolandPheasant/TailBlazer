@@ -138,7 +138,7 @@ namespace TailBlazer.Views.WindowManagement
                     RecentFiles.Add(file);
 
                     //1. resolve TailViewModel
-                    var factory = _objectProvider.Get<FileTailerViewModelFactory>();
+                    var factory = _objectProvider.Get<TailViewModelFactory>();
                     var viewModel = factory.Create(file);
 
                     //2. Display it

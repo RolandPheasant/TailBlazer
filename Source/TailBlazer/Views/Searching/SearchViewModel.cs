@@ -11,7 +11,7 @@ namespace TailBlazer.Views.Searching
 {
     public class SearchViewModel : AbstractNotifyPropertyChanged, IDisposable
     {
-        private readonly SearchInfo _tail;
+        private readonly SearchInfo _info;
         private readonly IDisposable _cleanUp;
         private int _count;
         private bool _searching;
@@ -21,25 +21,25 @@ namespace TailBlazer.Views.Searching
 
         public ICommand  RemoveCommand { get; }
 
-        public string Text => _tail.SearchText;
+        public string Text => _info.SearchText;
 
         public string RemoveTooltip => $"Get rid of {Text}?";
 
-        public bool IsUserDefined => _tail.SearchType == SearchType.User ;
+        public bool IsUserDefined => _info.SearchType == SearchType.User ;
 
-        public SearchType SearchType => _tail.SearchType ;
+        public SearchType SearchType => _info.SearchType ;
 
-        public IObservable<ILineProvider> Latest => _tail.Latest;
+        public IObservable<ILineProvider> Latest => _info.Latest;
 
-        public SearchViewModel(SearchInfo tail, Action<SearchViewModel> removeAction)
+        public SearchViewModel(SearchInfo info, Action<SearchViewModel> removeAction)
         {
-            _tail = tail;
+            _info = info;
             RemoveCommand = new Command(()=> removeAction(this));
-            var counter = _tail.Latest
+            var counter = _info.Latest
                 .Select(lp => lp.Count)
                 .Subscribe(count => Count = count);
 
-            var counterTextFormatter = _tail.Latest
+            var counterTextFormatter = _info.Latest
                 .Select(lp =>
                 {
                     var limited = lp as IHasLimitationOfLines;
@@ -51,7 +51,7 @@ namespace TailBlazer.Views.Searching
                  .Subscribe(countText => CountText = countText); ;
 
 
-            var progressMonitor = _tail.Latest.OfType<IProgressInfo>().Subscribe(result =>
+            var progressMonitor = _info.Latest.OfType<IProgressInfo>().Subscribe(result =>
             {
                 Searching = result.IsSearching;
                 Segments = result.Segments;

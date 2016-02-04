@@ -1,4 +1,4 @@
-<UserControl x:Class="TailBlazer.Views.Tail.FileTailerView"
+<UserControl x:Class="TailBlazer.Views.Tail.TailView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -10,10 +10,11 @@
              xmlns:controls="clr-namespace:TailBlazer.Controls"
              xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
              xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
-        
+                TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
+                Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
              x:Name="Control"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance tail:FileTailerViewModel, IsDesignTimeCreatable=False}"
+             d:DataContext="{d:DesignInstance tail:TailViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="400" d:DesignWidth="400">
 
     <Control.Resources>
@@ -259,7 +260,7 @@
                             VerticalAlignment="Center"
                             IsChecked="{Binding AutoTail}"
                             Margin="4 0 4 0"
-                            Content="Follow tail"/>
+                            Content="Follow info"/>
 
                         <CheckBox Visibility="{Binding CanViewInline.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
                             HorizontalAlignment="Left"
