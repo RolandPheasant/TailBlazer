@@ -42,7 +42,7 @@
                         <controls:TextMatchedIcon x:Name="PART_TextImage"
                                 Visibility="Collapsed"                      
                 				VerticalAlignment="Center"
-                                ToolTip="Match using plain text"
+                                ToolTip="Matched using plain text"
                 				BorderThickness ="{TemplateBinding BorderThickness}"
                 				BorderBrush ="{TemplateBinding BorderBrush}"
                 				Foreground="{TemplateBinding Foreground}" />
@@ -50,7 +50,7 @@
                         <controls:RegexMatchedIcon  x:Name="PART_RegexImage"
                                 Visibility="Collapsed"  
                 				VerticalAlignment="Center"
-                                ToolTip="Match using regex"
+                                ToolTip="Matched using regex"
                 				BorderThickness ="{TemplateBinding BorderThickness}"
                 				BorderBrush ="{TemplateBinding BorderBrush}"
                 				Foreground="{TemplateBinding Foreground}" />

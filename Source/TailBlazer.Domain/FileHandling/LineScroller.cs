@@ -72,19 +72,10 @@ namespace TailBlazer.Domain.FileHandling
             var aggregator = latest
                 .CombineLatest(scrollRequest, (currentLines, scroll) =>
                 {
-                    try
-                    {
-                        if (scroll.PageSize == 0 || currentLines.Count == 0)
-                            return new Line[0];
+                    if (scroll.PageSize == 0 || currentLines.Count == 0)
+                        return new Line[0];
 
-                        var x = currentLines.ReadLines(scroll).ToArray();
-                        return x;
-                    }
-                    catch (Exception ex)
-                    {
-                        throw ex;
-                    }
-
+                    return currentLines.ReadLines(scroll).ToArray();
                 })
                 .Subscribe(currentPage =>
                 {
@@ -96,8 +87,10 @@ namespace TailBlazer.Domain.FileHandling
 
                     lines.Edit(innerCache =>
                     {
-                        if (removed.Any()) innerCache.Remove(removed);
-                        if (added.Any()) innerCache.AddOrUpdate(added);
+                        if (removed.Any())
+                            innerCache.Remove(removed);
+                        if (added.Any())
+                            innerCache.AddOrUpdate(added);
                     });
                 });
 
