@@ -87,10 +87,8 @@ namespace TailBlazer.Domain.FileHandling
 
                     lines.Edit(innerCache =>
                     {
-                        if (removed.Any())
-                            innerCache.Remove(removed);
-                        if (added.Any())
-                            innerCache.AddOrUpdate(added);
+                        if (removed.Any()) innerCache.Remove(removed);
+                        if (added.Any()) innerCache.AddOrUpdate(added);
                     });
                 });
 
