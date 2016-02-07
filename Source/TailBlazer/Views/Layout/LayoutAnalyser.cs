@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using System.Windows.Input;
 using Dragablz;
 using Dragablz.Dockablz;
 using TailBlazer.Domain.Settings;
@@ -12,78 +10,19 @@ using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Views.Layout
 {
-    public class TabablzControlProxy : INotifyPropertyChanged
-    {
-        private readonly TabablzControl _tabablzControl;
-        private readonly ICommand _splitHorizontallyCommand;
-        private readonly ICommand _splitVerticallyCommand;
-        private double _splitRatio;
-
-        public TabablzControlProxy(TabablzControl tabablzControl)
-        {
-            _tabablzControl = tabablzControl;
-
-            //_splitHorizontallyCommand = new AnotherCommandImplementation(_ => Branch(Orientation.Horizontal));
-            //_splitVerticallyCommand = new AnotherCommandImplementation(_ => Branch(Orientation.Vertical));
-            SplitRatio = 5;
-        }
-
-        public ICommand SplitHorizontallyCommand
-        {
-            get { return _splitHorizontallyCommand; }
-        }
-
-        public ICommand SplitVerticallyCommand
-        {
-            get { return _splitVerticallyCommand; }
-        }
-
-        public double SplitRatio
-        {
-            get { return _splitRatio; }
-            set
-            {
-                _splitRatio = value;
-                OnPropertyChanged("SplitRatio");
-            }
-        }
-
-        //private void Branch(Orientation orientation)
-        //{
-        //    var branchResult = Layout.Branch(_tabablzControl, orientation, false, SplitRatio / 10);
-
-        //    var newItem = new HeaderedItemViewModel
-        //    {
-        //        Header = "Code-Wise",
-        //        Content = "This item was added in via code, using Layout.Branch, and TabablzControl.AddToSource"
-        //    };
-
-        //    branchResult.TabablzControl.AddToSource(newItem);
-        //    branchResult.TabablzControl.SelectedItem = newItem;
-        //}
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            var handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-
     public class LayoutAnalyser
     {
-        private readonly TreeNode _rootNode;
+        private readonly StateNode _rootNode;
 
         public LayoutAnalyser()
         {
-            _rootNode = new TreeNode
+            _rootNode = new StateNode
             {
                 Content = "Application"
             };
         }
 
-        public IEnumerable<TreeNode> QueryLayouts()
+        public IEnumerable<StateNode> QueryLayouts()
         {
             _rootNode.Children.Clear();
 
@@ -98,9 +37,9 @@ namespace TailBlazer.Views.Layout
                             w.WindowState);
 
                 var layoutAccessor = w.Layout.Query();
-                var layoutNode = new TreeNode
+                var layoutNode = new StateNode
                 {
-                    Content = "Layout"
+                    Content = shellState
                 };
                 _rootNode.Children.Add(layoutNode);
 
@@ -112,11 +51,11 @@ namespace TailBlazer.Views.Layout
         }
 
 
-        private static void FloatingItemsVisitor(TreeNode layoutNode, LayoutAccessor layoutAccessor)
+        private static void FloatingItemsVisitor(StateNode layoutNode, LayoutAccessor layoutAccessor)
         {
             var floatingItems = layoutAccessor.FloatingItems.ToList();
-            var floatingItemsNode = new TreeNode {Content = "Floating Items " + floatingItems.Count};
-            foreach (var floatingItemNode in floatingItems.Select(floatingItem => new TreeNode
+            var floatingItemsNode = new StateNode {Content = "Floating Items " + floatingItems.Count};
+            foreach (var floatingItemNode in floatingItems.Select(floatingItem => new StateNode
             {
                 Content = $"Floating Item {floatingItem.X}, {floatingItem.Y} : {floatingItem.ActualWidth}, {floatingItem.ActualHeight}"
             }))
@@ -129,28 +68,30 @@ namespace TailBlazer.Views.Layout
                 layoutNode.Children.Add(floatingItemsNode);
         }
 
-        private static void TabablzControlVisitor(TreeNode treeNode, TabablzControl tabablzControl)
+        private static void TabablzControlVisitor(StateNode stateNode, TabablzControl tabablzControl)
         {
-            var tabablzNode = new TreeNode {Content = new TabablzControlProxy(tabablzControl)};
-            treeNode.Children.Add(tabablzNode);
+            var tabStates = tabablzControl.Items.OfType<ViewContainer>()
+                .Select(item => item.Content).OfType<IPersistentStateProvider>()
+                .Select(provider => provider.CaptureState())
+                .ToList();
 
-            foreach (var item in tabablzControl.Items.OfType<ViewContainer>())
+            Console.WriteLine(tabStates.Count);
+
+            var tabablzNode = new StateNode
             {
-                var provider = item.Content as IPersistentStateProvider;
-                if (provider == null) continue;
-                var state = provider.CaptureState();
-                Console.WriteLine(state);
-            }
+                Content = tabStates
+            };
+            stateNode.Children.Add(tabablzNode);
         }
 
-        private static void BranchAccessorVisitor(TreeNode treeNode, BranchAccessor branchAccessor)
+        private static void BranchAccessorVisitor(StateNode stateNode, BranchAccessor branchAccessor)
         {
-            var branchNode = new TreeNode {Content = "Branch " + branchAccessor.Branch.Orientation};
-            treeNode.Children.Add(branchNode);
+            var branchNode = new StateNode {Content = "Branch " + branchAccessor.Branch.Orientation};
+            stateNode.Children.Add(branchNode);
 
-            var firstBranchNode = new TreeNode {Content = "Branch Item 1. Ratio=" + branchAccessor.Branch.GetFirstProportion()};
+            var firstBranchNode = new StateNode {Content = "Branch Item 1. Ratio=" + branchAccessor.Branch.GetFirstProportion()};
             branchNode.Children.Add(firstBranchNode);
-            var secondBranchNode = new TreeNode {Content = "Branch Item 2. Ratio=" + (1 - branchAccessor.Branch.GetFirstProportion())};
+            var secondBranchNode = new StateNode {Content = "Branch Item 2. Ratio=" + (1 - branchAccessor.Branch.GetFirstProportion())};
             branchNode.Children.Add(secondBranchNode);
 
             branchAccessor.Visit(firstBranchNode, BranchItem.First, BranchAccessorVisitor, TabablzControlVisitor).Visit(secondBranchNode, BranchItem.Second, BranchAccessorVisitor, TabablzControlVisitor);

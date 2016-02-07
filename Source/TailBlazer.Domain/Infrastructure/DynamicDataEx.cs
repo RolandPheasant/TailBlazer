@@ -24,6 +24,12 @@ namespace DynamicData.Binding
             });
         }
 
+        public static IObservable<IChangeSet<TObject, TKey>> RecordErrors<TObject, TKey>(this IObservable<IChangeSet<TObject, TKey>> source, ILogger logger)
+        {
+            return source.Do(changes =>{}, ex => logger.Error(ex, "There has been an error "));
+        }
+
+
         public static IObservable<IChangeSet<TObject,TKey>> RecordChanges<TObject, TKey>(this IObservable<IChangeSet<TObject, TKey>> source, ILogger logger, string label)
         {
             if (!Debugger.IsAttached)

@@ -150,7 +150,7 @@
     <Compile Include="Views\Layout\LayoutAnalyser.cs" />
     <Compile Include="Views\Layout\LayoutContent.cs" />
     <Compile Include="Views\Layout\ShellState.cs" />
-    <Compile Include="Views\Layout\TreeNode.cs" />
+    <Compile Include="Views\Layout\StateNode.cs" />
     <Compile Include="Views\Options\GeneralOptionsConverter.cs" />
     <Compile Include="Views\Options\GeneralOptionsView.xaml.cs">
       <DependentUpon>GeneralOptionsView.xaml</DependentUpon>

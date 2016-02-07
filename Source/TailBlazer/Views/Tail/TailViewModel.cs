@@ -144,9 +144,9 @@ namespace TailBlazer.Views.Tail
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data,100)
                 .DisposeMany()
+                .RecordErrors(logger)
                 .Subscribe();
-            //.Subscribe(changes => logger.Info($"Rows changed. {changes.Adds} adds, {changes.Removes} removed"), 
-            //            ex => logger.Error(ex, "There is a problem with bind data"));
+
 
             //monitor matching lines and start index,
             Count = searchInfoCollection.All.Select(latest=>latest.Count).ForBinding();
