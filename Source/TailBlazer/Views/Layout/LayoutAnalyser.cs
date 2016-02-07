@@ -10,16 +10,47 @@ using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Views.Layout
 {
+
+    public class StateNodeInterpreter
+    {
+       
+    }
+
+   
+
+    public class BranchNode
+    {
+        public string Orientation { get; }
+        public double Ratio { get; }
+
+        public BranchNode(double ratio)
+        {
+            Ratio = ratio;
+        }
+
+        public BranchNode(string orientation)
+        {
+            Orientation = orientation;
+        }
+
+        public override string ToString()
+        {
+            if (string.IsNullOrEmpty(Orientation))
+                return $"Branch {Orientation}";
+
+            return $"Proportion {Ratio}";
+        }
+    }
+
+
+    
     public class LayoutAnalyser
     {
         private readonly StateNode _rootNode;
 
         public LayoutAnalyser()
-        {
-            _rootNode = new StateNode
-            {
-                Content = "Application"
-            };
+        {;
+            _rootNode = new StateNode("Application");
         }
 
         public IEnumerable<StateNode> QueryLayouts()
@@ -30,20 +61,17 @@ namespace TailBlazer.Views.Layout
             {
                 var bounds = w.RestoreBounds;
                
-                var shellState = new ShellState(bounds.Top, 
+                var shellState = new ShellSettings(bounds.Top, 
                             bounds.Left, 
                             bounds.Right- bounds.Left,
                             bounds.Top - bounds.Bottom, 
                             w.WindowState);
 
                 var layoutAccessor = w.Layout.Query();
-                var layoutNode = new StateNode
-                {
-                    Content = shellState
-                };
+                var layoutNode = new StateNode(shellState);
                 _rootNode.Children.Add(layoutNode);
 
-                FloatingItemsVisitor(layoutNode, layoutAccessor);
+             //   FloatingItemsVisitor(layoutNode, layoutAccessor);
                 layoutAccessor.Visit(layoutNode, BranchAccessorVisitor, TabablzControlVisitor);
             }
 
@@ -54,12 +82,11 @@ namespace TailBlazer.Views.Layout
         private static void FloatingItemsVisitor(StateNode layoutNode, LayoutAccessor layoutAccessor)
         {
             var floatingItems = layoutAccessor.FloatingItems.ToList();
-            var floatingItemsNode = new StateNode {Content = "Floating Items " + floatingItems.Count};
+            var floatingItemsNode = new StateNode("Floating Items " + floatingItems.Count);
             foreach (var floatingItemNode in floatingItems.Select(floatingItem => new StateNode
-            {
-                Content = $"Floating Item {floatingItem.X}, {floatingItem.Y} : {floatingItem.ActualWidth}, {floatingItem.ActualHeight}"
-            }))
-
+            (
+                $"Floating Item {floatingItem.X}, {floatingItem.Y} : {floatingItem.ActualWidth}, {floatingItem.ActualHeight}"
+            )))
             {
                 floatingItemsNode.Children.Add(floatingItemNode);
             }
@@ -75,26 +102,26 @@ namespace TailBlazer.Views.Layout
                 .Select(provider => provider.CaptureState())
                 .ToList();
 
-            Console.WriteLine(tabStates.Count);
-
-            var tabablzNode = new StateNode
-            {
-                Content = tabStates
-            };
+            var tabablzNode = new StateNode(tabStates);
             stateNode.Children.Add(tabablzNode);
         }
 
         private static void BranchAccessorVisitor(StateNode stateNode, BranchAccessor branchAccessor)
         {
-            var branchNode = new StateNode {Content = "Branch " + branchAccessor.Branch.Orientation};
+            
+            var branchNode = new StateNode( new BranchNode(branchAccessor.Branch.Orientation.ToString()) );
             stateNode.Children.Add(branchNode);
 
-            var firstBranchNode = new StateNode {Content = "Branch Item 1. Ratio=" + branchAccessor.Branch.GetFirstProportion()};
+            var proportion = branchAccessor.Branch.GetFirstProportion();
+
+            var firstBranchNode = new StateNode(new BranchNode(proportion));
             branchNode.Children.Add(firstBranchNode);
-            var secondBranchNode = new StateNode {Content = "Branch Item 2. Ratio=" + (1 - branchAccessor.Branch.GetFirstProportion())};
+            var secondBranchNode = new StateNode(new BranchNode(1-proportion));
             branchNode.Children.Add(secondBranchNode);
 
-            branchAccessor.Visit(firstBranchNode, BranchItem.First, BranchAccessorVisitor, TabablzControlVisitor).Visit(secondBranchNode, BranchItem.Second, BranchAccessorVisitor, TabablzControlVisitor);
+            branchAccessor
+                .Visit(firstBranchNode, BranchItem.First, BranchAccessorVisitor, TabablzControlVisitor)
+                .Visit(secondBranchNode, BranchItem.Second, BranchAccessorVisitor, TabablzControlVisitor);
         }
     }
 }

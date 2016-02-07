@@ -36,8 +36,13 @@ namespace TailBlazer.Domain.Settings
 
             _logger.Info($"Creating setting for {key}");
 
+
+            //var value = XDocument.Parse(state.Value);
+
             var root = new XElement(new XElement(Structure.Root, new XAttribute(Structure.Version,state.Version)));
             root.Add(new XElement(Structure.State, state.Value));
+
+
             var doc = new XDocument(root);
             var fileText = doc.ToString();
 
