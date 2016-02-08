@@ -120,7 +120,7 @@
                     Foreground="{DynamicResource ValidationErrorBrush}"
                     Width="48"
                     Height="48"/>
-                <TextBlock FontSize="26" Margin="0 4 0 0" Text="When possible the file will open" HorizontalAlignment="Center"/>
+                <TextBlock FontSize="26" Margin="0 4 0 0" Text="When possible business will resume" HorizontalAlignment="Center"/>
 
             </StackPanel>
 
@@ -351,16 +351,7 @@
                     ContentTemplate="{StaticResource LinesDataTemplate}"
                     Content="{Binding InlineViewer,Mode=OneWay}" />
               
-        
-                
-                <!--<local:InlineView 
-                    VerticalAlignment="Stretch"
-                    Visibility="{Binding Path=DataContext.InlineViewerVisible.Value, ElementName=Control,Converter={StaticResource BooleanToVisibilityConverter}}"
-                    DataContext="{Binding InlineViewer}"
-                    Grid.Row="3" />-->
-
-                <Grid    Grid.Row="4" Margin = "0 0 0 -4"      
-            Background="{StaticResource PrimaryHueMidBrush}">
+                <Grid    Grid.Row="4" Margin = "0 0 0 -4"   Background="{StaticResource PrimaryHueMidBrush}">
 
                     <Grid.Resources>
                         <Style TargetType="{x:Type TextBlock}">
