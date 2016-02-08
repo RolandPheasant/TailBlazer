@@ -22,7 +22,7 @@ But that's not all, as you can choose whether any text can be used for a filter 
 
 And there's more to come. In subsequent releases I will introduce the ability to choose different highlight colours as well as adding alert options when a tail line matches some search text.
 
-## What else is in this release
+## Better failure handline
 
 Tail Blazer now gives a clear indication when for any reason a file cannot be opened or tailed.
 
@@ -33,11 +33,11 @@ Tail Blazer now gives a clear indication when for any reason a file cannot be op
 
 I am building up to v1.0 which will be the point at which I regard Tail Blazer as being rock solid and error free, as well as fulfilling some of the missing functions which I would expect from any good system.  
 
-There missing functions include better keyboard navigation and saving of layout.  After that I have two major options for what version 2 would include. These are:
+These missing functions include better keyboard navigation and saving of layout.  After that I have two major options for what version 2 would include. These are:
 
  1. Handle external  sources such as unix file system, event viewer
     or tx (see [issue #51](https://github.com/RolandPheasant/TailBlazer/issues/51))
     
  2. Multi-file handle such as folder tailing of collating result from multiple files.
- 3. 
+
 What it will be I do not know yet. But before I start on that I will write some blog posts about how I built Tail Blazer using the uber cool Rx extensions.
