@@ -11,7 +11,7 @@ using DynamicData.Binding;
 using MaterialDesignColors;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
-using TailBlazer.Views.Options;
+
 
 namespace TailBlazer.Views.Searching
 {
@@ -43,6 +43,7 @@ namespace TailBlazer.Views.Searching
             var orderChanged = Observable.FromEventPattern<OrderChangedEventArgs>(
                                             h => PositionMonitor.OrderChanged += h,
                                             h => PositionMonitor.OrderChanged -= h)
+                                    .Throttle(TimeSpan.FromMilliseconds(125))
                                     .Select(evt => evt.EventArgs)
                                     .Where(args=>args.PreviousOrder!=null && args.NewOrder.Length == args.PreviousOrder.Length)
                                     .Select(positionChangedArgs =>
@@ -57,7 +58,6 @@ namespace TailBlazer.Views.Searching
                                     })
                                     .Subscribe(positionChangedArgs =>
                                     {
-                                       
                                         positionChangedArgs.ForEach(metadataCollection.AddorUpdate);
                                     });
 
@@ -70,9 +70,8 @@ namespace TailBlazer.Views.Searching
                 {
                     //when a value changes, write the original value back to the cache
                     return so.WhenAnyPropertyChanged()
-
-                        .Subscribe(_ =>metadataCollection.AddorUpdate(new SearchMetadata(metadataCollection.Metadata.Count,
-                                    so.Text, so.Filter, so.Highlight, so.UseRegex, so.IgnoreCase)));
+                    .Select(_=> new SearchMetadata(so.Position,so.Text, so.Filter, so.Highlight, so.UseRegex, so.IgnoreCase))
+                    .Subscribe(metadataCollection.AddorUpdate);
                 })
                 .Sort(SortExpressionComparer<SearchOptionsProxy>.Ascending(proxy => proxy.Position))
 

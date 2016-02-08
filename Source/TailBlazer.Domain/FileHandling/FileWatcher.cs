@@ -6,10 +6,16 @@ using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
 {
-
+    public enum FileStatus
+    {
+        Loading,
+        Error,
+        Loaded
+    }
 
     public class FileWatcher : IFileWatcher
     {
+        public IObservable<FileStatus> Status { get; }
 
         public IObservable<FileNotification> Latest { get; }
 
@@ -25,10 +31,23 @@ namespace TailBlazer.Domain.FileHandling
         {
             FileInfo = fileInfo;
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
-            Latest = fileInfo.WatchFile(scheduler: scheduler ?? Scheduler.Default)
-                .DistinctUntilChanged()
-                .TakeWhile(notification => notification.Exists).Repeat()
-                ;//.Replay(1).RefCount();
+
+            var shared = fileInfo.WatchFile(scheduler: scheduler ?? Scheduler.Default);//.Replay(1).RefCount();
+
+            Latest = shared.TakeWhile(notification => notification.Exists).Repeat();
+
+            Status = shared.Select(notificiation =>
+            {
+                if (!notificiation.Exists || notificiation.Error != null)
+                    return FileStatus.Error;
+
+                return FileStatus.Loaded;
+            })
+            .StartWith(FileStatus.Loading)
+            .DistinctUntilChanged();
         }
+
+
+
     }
 }

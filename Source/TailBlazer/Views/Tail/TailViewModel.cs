@@ -23,6 +23,9 @@ using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {
+
+
+
     public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentStateProvider
     {
         private readonly IDisposable _cleanUp;
@@ -49,7 +52,7 @@ namespace TailBlazer.Views.Tail
         public IProperty<string> CountText { get; }
         public IProperty<int> LatestCount { get; }
         public IProperty<string> FileSizeText { get; }
-        public IProperty<bool> IsLoading { get; }
+        public IProperty<FileStatus> FileStatus { get; }
         public IProperty<bool> InlineViewerVisible { get; }
         public IProperty<bool> CanViewInline { get; }
         public IProperty<bool> HighlightTail { get; }
@@ -118,7 +121,9 @@ namespace TailBlazer.Views.Tail
                         .Do(x=>logger.Info("Scrolling to {0}/{1}", x.FirstIndex,x.PageSize))
                         .DistinctUntilChanged();
 
-            IsLoading = searchInfoCollection.All.Take(1).Select(_ => false).StartWith(true).ForBinding();
+            //IsLoading = searchInfoCollection.All.Take(1).Select(_ => false).StartWith(true).ForBinding();
+            
+            FileStatus = fileWatcher.Status.Throttle(TimeSpan.FromMilliseconds(250)).ForBinding();
 
             //command to add the current search to the tail collection
             var searchInvoker = SearchHints.SearchRequested.Subscribe(request =>
@@ -185,7 +190,7 @@ namespace TailBlazer.Views.Tail
             _cleanUp = new CompositeDisposable(lineScroller,
                 loader,
                 firstIndexMonitor,
-                IsLoading,
+                FileStatus,
                 Count,
                 LatestCount,
                 FileSizeText,

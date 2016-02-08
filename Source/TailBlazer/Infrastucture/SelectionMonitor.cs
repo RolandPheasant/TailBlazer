@@ -118,9 +118,6 @@ namespace TailBlazer.Infrastucture
 
                 });
 
-            _selector.PreviewKeyDown += _selector_KeyDown;
-
-
             //clear selection when the mouse is clicked and no other key is pressed
             var mouseDownHandler = Observable.FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(
                                     h => selector.PreviewMouseDown += h,
@@ -175,6 +172,10 @@ namespace TailBlazer.Infrastucture
                     .Where(selection => selection.Length > 0)
                     .Subscribe(selection =>
                     {
+
+                        //DISABLE FOR NOW AT IT IS CAUSING ISSUES WITH MULTI-SELECTION
+                        return;
+
                         if (_isSelecting)
                             return;
                         try
@@ -212,15 +213,6 @@ namespace TailBlazer.Infrastucture
                 dataSource.Connect());
         }
 
-
-        private void _selector_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.IsDown && (e.Key == Key.Down || e.Key == Key.Up || e.Key == Key.PageUp || e.Key == Key.PageUp))
-            {
-                ClearAllSelections();
-            }
-
-        }
 
         private void ClearAllSelections()
         {

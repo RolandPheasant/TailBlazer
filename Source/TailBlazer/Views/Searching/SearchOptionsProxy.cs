@@ -78,7 +78,7 @@ namespace TailBlazer.Views.Searching
 
         public static explicit operator SearchMetadata(SearchOptionsProxy proxy)
         {
-            return proxy._searchMetadata;
+            return new SearchMetadata(proxy.Position, proxy.Text, proxy.Filter,proxy.Highlight,proxy.UseRegex,proxy.IgnoreCase);
         }
     }
 }

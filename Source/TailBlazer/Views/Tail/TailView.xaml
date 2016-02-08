@@ -10,7 +10,9 @@
              xmlns:controls="clr-namespace:TailBlazer.Controls"
              xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
              xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
-                TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
+             xmlns:fileHandling="clr-namespace:TailBlazer.Domain.FileHandling;assembly=TailBlazer.Domain"
+             xmlns:converters="clr-namespace:Dragablz.Converters;assembly=Dragablz"
+             TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
                 Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
              x:Name="Control"
              mc:Ignorable="d" 
@@ -37,6 +39,7 @@
 
             <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"/>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converters:EqualityToVisibilityConverter x:Key="EqualityToVisibilityConverter"/>
             <infrastucture:NotEqualsToVisibilityConverter x:Key="NotEqualsToVisibilityConverter"/>
             <system:Int32 x:Key="Zero">0</system:Int32>
             <system:Int32 x:Key="One">1</system:Int32>
@@ -93,16 +96,37 @@
     <wpf:DialogHost Identifier="{Binding Id}">
         <Grid Margin="4" >
             <ProgressBar
-                Visibility="{Binding IsLoading.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
+               Visibility="{Binding FileStatus.Value, Converter={StaticResource EqualityToVisibilityConverter},ConverterParameter={x:Static fileHandling:FileStatus.Loading}}"
+  
                 Style="{StaticResource TailBlazerCircularProgressBar}" 
                 MinWidth="75"
                 MinHeight="75"
                 Value="50"
                 IsIndeterminate="True"/>
 
+  
+
+
+            <StackPanel
+                    Visibility="{Binding FileStatus.Value, Converter={StaticResource EqualityToVisibilityConverter},ConverterParameter={x:Static fileHandling:FileStatus.Error}}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Orientation="Vertical"
+                    IsHitTestVisible="False">
+
+                <TextBlock  FontSize="26" HorizontalAlignment="Center" Margin="0 0 0 4" Text="Cannot blaze this tail"/>
+                <controls:TailBlazerIcon
+
+                    Foreground="{DynamicResource ValidationErrorBrush}"
+                    Width="48"
+                    Height="48"/>
+                <TextBlock FontSize="26" Margin="0 4 0 0" Text="When possible the file will open" HorizontalAlignment="Center"/>
+
+            </StackPanel>
+
             <Grid  
-            Visibility="{Binding IsLoading.Value, Converter={StaticResource InvertedBooleanToVisibilityConverter}}" 
-            Margin="-4 0 -4 0">
+                Visibility="{Binding FileStatus.Value, Converter={StaticResource EqualityToVisibilityConverter},ConverterParameter={x:Static fileHandling:FileStatus.Loaded}}"
+                Margin="-4 0 -4 0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="{Binding  Path=InlineViewerVisible.Value, Mode=TwoWay, Converter={StaticResource c1}}"/>
