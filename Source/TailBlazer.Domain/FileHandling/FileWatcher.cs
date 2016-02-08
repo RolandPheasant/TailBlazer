@@ -32,7 +32,7 @@ namespace TailBlazer.Domain.FileHandling
             FileInfo = fileInfo;
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
 
-            var shared = fileInfo.WatchFile(scheduler: scheduler ?? Scheduler.Default);//.Replay(1).RefCount();
+            var shared = fileInfo.WatchFile(scheduler: scheduler ?? Scheduler.Default);
 
             Latest = shared.TakeWhile(notification => notification.Exists).Repeat();
 

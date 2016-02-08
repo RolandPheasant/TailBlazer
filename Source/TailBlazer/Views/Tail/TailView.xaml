@@ -104,10 +104,7 @@
                 Value="50"
                 IsIndeterminate="True"/>
 
-  
-
-
-            <StackPanel
+              <StackPanel
                     Visibility="{Binding FileStatus.Value, Converter={StaticResource EqualityToVisibilityConverter},ConverterParameter={x:Static fileHandling:FileStatus.Error}}"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center"
