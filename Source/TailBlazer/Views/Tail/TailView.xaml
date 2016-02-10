@@ -281,7 +281,7 @@
                             VerticalAlignment="Center"
                             IsChecked="{Binding AutoTail}"
                             Margin="4 0 4 0"
-                            Content="Follow info"/>
+                            Content="Follow Tail"/>
 
                         <CheckBox Visibility="{Binding CanViewInline.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
                             HorizontalAlignment="Left"
