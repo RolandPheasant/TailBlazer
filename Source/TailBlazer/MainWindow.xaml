@@ -69,7 +69,7 @@
                     Text="{Binding Version}" Opacity="0.6"/>
 
                 <materialDesign:PopupBox 
-                    Visibility="Collapsed"
+                    Visibility="Visible"
                     VerticalAlignment="Center" Height="22" Margin="0 0 -6 0">
                     <StackPanel  Orientation="Vertical" Margin="2">
 

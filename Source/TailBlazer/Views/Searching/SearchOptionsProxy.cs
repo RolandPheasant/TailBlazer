@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
 using DynamicData.Binding;
 using MaterialDesignColors;
@@ -24,6 +25,8 @@ namespace TailBlazer.Views.Searching
 
         public ICommand RemoveCommand { get; }
 
+        public ICommand HighlightCommand { get; }
+
         public IEnumerable<Swatch> Swatches { get; }
 
         public SearchResultIndicatorStatus Status { get; }
@@ -42,12 +45,22 @@ namespace TailBlazer.Views.Searching
             Filter = _searchMetadata.Filter;
             UseRegex = searchMetadata.UseRegex;
             IgnoreCase = searchMetadata.IgnoreCase;
+            Hues = swatches.SelectMany(s => s.AccentHues).ToArray();
 
             Status = searchMetadata.UseRegex ? SearchResultIndicatorStatus.Regex : SearchResultIndicatorStatus.Text;
 
             RemoveCommand = new Command(() => removeAction(searchMetadata));
+            HighlightCommand = new Command<Swatch>(x =>
+            {
+                Console.WriteLine(x);
+            });
         }
 
+        public Hue[] Hues
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
 
 
         public bool Highlight
