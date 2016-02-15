@@ -2,6 +2,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Controls
@@ -43,6 +44,16 @@ namespace TailBlazer.Controls
             get { return (SearchResultIndicatorStatus) GetValue(StatusProperty); }
             set { SetValue(StatusProperty, value); }
         }
+
+
+        //public static readonly DependencyProperty ForegroundProperty = DependencyProperty.Register(
+        //    "Foreground", typeof (Brush), typeof (SearchResultIndicator), new PropertyMetadata(default(Brush)));
+
+        //public Brush Foreground
+        //{
+        //    get { return (Brush) GetValue(ForegroundProperty); }
+        //    set { SetValue(ForegroundProperty, value); }
+        //}
 
         static SearchResultIndicator()
         {

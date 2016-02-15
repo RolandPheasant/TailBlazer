@@ -14,5 +14,7 @@ namespace TailBlazer.Domain.Formatting
         public string Text => _searchMetadata.SearchText;
 
         public bool UseRegex => _searchMetadata.UseRegex;
+        
+        public Hue Hue => _searchMetadata.HighlightHue;
     }
 }

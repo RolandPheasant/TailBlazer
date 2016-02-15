@@ -8,10 +8,22 @@ namespace TailBlazer.Domain.Formatting
         public Color Foreground { get;  }
         public Color Background { get;  }
 
+        public Brush ForegroundBrush { get; }
+        public Brush BackgroundBrush { get; }
+
+
         public Hue(Color foreground, Color background)
         {
             Foreground = foreground;
             Background = background;
+
+            ForegroundBrush = new SolidColorBrush(foreground);
+            ForegroundBrush.Freeze();
+
+
+            BackgroundBrush = new SolidColorBrush(background);
+            BackgroundBrush.Freeze();
+
         }
 
         #region Equality

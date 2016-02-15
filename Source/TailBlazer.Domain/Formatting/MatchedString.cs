@@ -5,15 +5,32 @@ namespace TailBlazer.Domain.Formatting
     public class MatchedString : IEquatable<MatchedString>
     {
         public string Part { get; }
+
         public bool IsMatch { get; }
 
+        public Hue Hue { get; }
+
+
+        public MatchedString(string part)
+        {
+            Part = part;
+            IsMatch = false;
+            Hue = null;
+        }
 
         public MatchedString(string part, bool isMatch)
         {
             Part = part;
             IsMatch = isMatch;
+            Hue = null;
         }
-        
+        public MatchedString(string part, Hue hue)
+        {
+            Part = part;
+            Hue = hue;
+            IsMatch = true;
+        }
+
 
         #region Equality
 

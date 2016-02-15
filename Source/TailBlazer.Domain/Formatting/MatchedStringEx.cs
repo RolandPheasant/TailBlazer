@@ -15,10 +15,10 @@ namespace TailBlazer.Domain.Formatting
             return new MatchedStringEnumerator(source, itemsToMatch);
         }
 
-        public static IEnumerable<MatchedString> MatchString(this string source, SearchMetadata itemsToMatch)
-        {
-            return new SearchMetadataEnumerator(source, new []{ itemsToMatch });
-        }
+        //public static IEnumerable<MatchedString> MatchString(this string source, SearchMetadata itemsToMatch)
+        //{
+        //    return new SearchMetadataEnumerator(source, new []{ itemsToMatch });
+        //}
 
         public static IEnumerable<MatchedString> MatchString(this string source, IEnumerable<SearchMetadata> itemsToMatch)
         {

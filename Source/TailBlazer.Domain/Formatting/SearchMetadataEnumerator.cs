@@ -60,7 +60,7 @@ namespace TailBlazer.Domain.Formatting
 
                 if (!tomatch.RegEx.HasValue || !tomatch.SearchText.IsLongerThanOrEqualTo(3))
                 {
-                    yield return new MatchedString(input, false);
+                    yield return new MatchedString(input);
                     yield break;
                 }
 
@@ -68,19 +68,20 @@ namespace TailBlazer.Domain.Formatting
                 
                 if (matches.Count == 0)
                 {
-                    yield return new MatchedString(input, false);
+                    yield return new MatchedString(input);
                     yield break;
                 }
 
                 if (matches.Count > 4)
                 {
-                    yield return new MatchedString(input, false);
+                    yield return new MatchedString(input);
                     yield break;
                 }
 
-                var childMatches = new MatchedStringEnumerator(input, matches.Cast<Match>()
+                var childMatches = new MatchedStringEnumerator2(input, matches.Cast<Match>()
                     .Select(match => match.Value)
-                    .ToArray());
+                    .ToArray(),
+                    tomatch);
 
                 foreach (var item in childMatches)
                 {
@@ -90,16 +91,28 @@ namespace TailBlazer.Domain.Formatting
             else
             {
 
-                foreach (var item in Yield(input, tomatch.SearchText, tomatch.IgnoreCase))
+                foreach (var item in Yield2(input, tomatch))
                 {
-                    //yield return item;
-                    yield return new MatchedString(item.Part,item.IsMatch);
+
+                    if (!item.IsMatch)
+                    {
+                        yield return new MatchedString(item.Part);
+                    }
+                    else
+                    {
+
+                        //yield return item;
+                        yield return new MatchedString(item.Part, tomatch.HighlightHue);
+                    }
+
                 }
             }
         }
 
-        private static IEnumerable<MatchedString> Yield(string input, string tomatch, bool ignoreCase)
+        private static IEnumerable<MatchedString> Yield2(string input, SearchMetadata meta)
         {
+            var tomatch = meta.SearchText;
+            var ignoreCase = meta.IgnoreCase;
 
             if (string.IsNullOrEmpty(input))
                 yield break;
@@ -114,7 +127,7 @@ namespace TailBlazer.Domain.Formatting
 
             if (length == 1)
             {
-                yield return new MatchedString(input, false);
+                yield return new MatchedString(input);
                 yield break;
             }
 
@@ -129,7 +142,7 @@ namespace TailBlazer.Domain.Formatting
                 {
                     //Get original string back as the user may have searched in a different case
                     var originalString = input.Substring(currentLength, tomatch.Length);
-                    yield return new MatchedString(originalString, true);
+                    yield return new MatchedString(originalString, meta.HighlightHue);
 
                     currentLength = current.Length + currentLength + tomatch.Length;
                     if (currentLength + tomatch.Length > input.Length)
@@ -143,14 +156,14 @@ namespace TailBlazer.Domain.Formatting
                     //Get original string back as the user may have searched in a different case
                     var originalString = input.Substring(currentLength, tomatch.Length);
                     
-                    yield return new MatchedString(originalString, true);
-                    yield return new MatchedString(current, false);
+                    yield return new MatchedString(originalString, meta.HighlightHue);
+                    yield return new MatchedString(current);
 
                     currentLength = current.Length + currentLength + tomatch.Length;
                 }
                 else
                 {
-                    yield return new MatchedString(current, false);
+                    yield return new MatchedString(current);
                     currentLength = current.Length + currentLength;
                 }
 

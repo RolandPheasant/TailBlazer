@@ -113,15 +113,17 @@
                             <controls:SearchResultIndicator 
                                     Padding="2" 
                                     Margin="4 0 0 0" 
-                                    Foreground="{DynamicResource SecondaryAccentBrush}"
+                                    Foreground="{Binding HighlightHue.BackgroundBrush}"
                                     BorderBrush ="{DynamicResource GrayBrush6}"
                                     Status="{Binding Status}"                
                                     VerticalAlignment="Center"/>
 
-
-                            <TextBlock Margin="4 0 0 0" x:Name="Label" Grid.Column="1" 
-                                           Text="{Binding Text}"
+                                <TextBlock Padding="2" Margin="4 0 0 0" x:Name="Label" Grid.Column="1" 
+                                       Foreground="{Binding HighlightHue.ForegroundBrush}"
+                                       Background="{Binding HighlightHue.BackgroundBrush}"
+                                       Text="{Binding Text}"
                                             VerticalAlignment="Center"/>
+                        
 
                             <wpf:PopupBox Grid.Column="2"
                                     Background="{DynamicResource MaterialDesignPaper}"
@@ -131,36 +133,6 @@
                                             Margin="4 0 4 0" Width="14" Height="14"
                                             Foreground="{DynamicResource PrimaryHueMidBrush}" />
                                 </wpf:PopupBox.ToggleContent>
-
-                                <!--<ItemsControl ItemsSource="{Binding Hues}" 
-                                               Background="{DynamicResource MaterialDesignPaper}">
-
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Button Style="{StaticResource MaterialDesignFlatButton}"
-                                                    Command="{Binding ElementName=Row,Path=DataContext.HighlightCommand}"
-                                                    CommandParameter="{Binding}"
-                                                    Padding="1"
-                                                    Margin="4 2 2 2">
-                                                <Button.Background>
-                                                    <SolidColorBrush Color="{Binding Color, Mode=OneTime}" />
-                                                </Button.Background>
-
-                                                <TextBlock Text="{Binding ElementName=Label,Path=Text}" Margin="2">
-                                                    <TextBlock.Foreground>
-                                                        <SolidColorBrush Color="{Binding Foreground, Mode=OneTime}" />
-                                                    </TextBlock.Foreground>
-                                                </TextBlock>
-                                            </Button>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <UniformGrid Columns="8"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>-->
 
                                 <ItemsControl ItemsSource="{Binding Hues}" 
                                                Background="{DynamicResource MaterialDesignPaper}">

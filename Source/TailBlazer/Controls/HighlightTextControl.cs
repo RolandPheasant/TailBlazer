@@ -94,8 +94,8 @@ namespace TailBlazer.Controls
 
                 if (ft.Highlight && HighlightEnabled)
                 {
-                    if (HighlightBackground != null) run.Background = HighlightBackground;
-                    if (HighlightForeground != null) run.Foreground = HighlightForeground;
+                    run.Background = ft.Hue.BackgroundBrush;
+                    run.Foreground = ft.Hue.ForegroundBrush;
 
                     run.FontWeight = FontWeights.Bold;
                 }

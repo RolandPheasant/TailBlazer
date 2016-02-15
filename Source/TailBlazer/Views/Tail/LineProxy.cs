@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Windows.Input;
+using System.Windows.Media;
 using DynamicData.Binding;
 using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
@@ -33,6 +33,8 @@ namespace TailBlazer.Views.Tail
 
         public IProperty<LineMatchCollection> LineMatches { get; }
 
+        public IProperty<Brush> IndicatorColour { get; }
+
         public bool IsRecent => Line.Timestamp.HasValue && DateTime.Now.Subtract(Line.Timestamp.Value).TotalSeconds < 0.25;
 
 
@@ -57,9 +59,14 @@ namespace TailBlazer.Views.Tail
             IndicatorStatus = lineMatchesShared
                                 .Select(lmc => CalculateStatus(lmc.FirstMatch))
                                 .ForBinding();
+            IndicatorColour = lineMatchesShared
+                                .Select(lmc => lmc.FirstMatch?.Hue?.BackgroundBrush)
+                                .ForBinding();
 
-            _cleanUp = new CompositeDisposable(FormattedText, IndicatorStatus, LineMatches, lineMatchesShared.Connect());
+            _cleanUp = new CompositeDisposable(FormattedText, IndicatorStatus, LineMatches, IndicatorColour, lineMatchesShared.Connect());
         }
+
+
 
 
         private SearchResultIndicatorStatus CalculateStatus(LineMatch firstMatch)

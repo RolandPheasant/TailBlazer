@@ -19,7 +19,7 @@
 
             <controls:SearchResultIndicator 
                 Padding="1" 
-                Foreground="{DynamicResource SecondaryAccentBrush}"
+                Foreground="{Binding IndicatorColour.Value}"
                 Background="{DynamicResource TransparentWhiteBrush}"
                 BorderBrush ="{x:Null}"
                 BorderThickness="0"
