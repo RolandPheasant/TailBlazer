@@ -123,7 +123,7 @@ namespace TailBlazer.Views.Tail
 
             //IsLoading = searchInfoCollection.All.Take(1).Select(_ => false).StartWith(true).ForBinding();
             
-            FileStatus = fileWatcher.Status.Throttle(TimeSpan.FromMilliseconds(250)).ForBinding();
+            FileStatus = fileWatcher.Status.ForBinding();
 
             //command to add the current search to the tail collection
             var searchInvoker = SearchHints.SearchRequested.Subscribe(request =>
