@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Search;
+using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Views.Searching;
 
@@ -11,11 +12,15 @@ namespace TailBlazer.Views.Tail
     {
         private readonly IObjectProvider _objectProvider;
         private readonly ISchedulerProvider _schedulerProvider;
+        private readonly IAccentColourProvider _accentColourProvider;
 
-        public TailViewModelFactory(IObjectProvider objectProvider, ISchedulerProvider schedulerProvider)
+        public TailViewModelFactory(IObjectProvider objectProvider, 
+            ISchedulerProvider schedulerProvider,
+            IAccentColourProvider accentColourProvider)
         {
             _objectProvider = objectProvider;
             _schedulerProvider = schedulerProvider;
+            _accentColourProvider = accentColourProvider;
         }
 
         public TailViewModel Create(FileInfo fileInfo)
@@ -31,7 +36,7 @@ namespace TailBlazer.Views.Tail
 
             var searchMetadataCollection = _objectProvider.Get<ISearchMetadataCollection>();
             var searchHints = _objectProvider.Get<SearchHints>();
-            var searchOptionsViewModel = new SearchOptionsViewModel(searchMetadataCollection, _schedulerProvider, searchHints);
+            var searchOptionsViewModel = new SearchOptionsViewModel(searchMetadataCollection, _schedulerProvider, _accentColourProvider, searchHints);
 
 
             var searchInfo = _objectProvider.Get<ISearchInfoCollection>

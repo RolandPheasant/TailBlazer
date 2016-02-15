@@ -131,8 +131,38 @@
                                             Margin="4 0 4 0" Width="14" Height="14"
                                             Foreground="{DynamicResource PrimaryHueMidBrush}" />
                                 </wpf:PopupBox.ToggleContent>
-                               
-                                <ItemsControl ItemsSource="{Binding Swatches}" 
+
+                                <!--<ItemsControl ItemsSource="{Binding Hues}" 
+                                               Background="{DynamicResource MaterialDesignPaper}">
+
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                                    Command="{Binding ElementName=Row,Path=DataContext.HighlightCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    Padding="1"
+                                                    Margin="4 2 2 2">
+                                                <Button.Background>
+                                                    <SolidColorBrush Color="{Binding Color, Mode=OneTime}" />
+                                                </Button.Background>
+
+                                                <TextBlock Text="{Binding ElementName=Label,Path=Text}" Margin="2">
+                                                    <TextBlock.Foreground>
+                                                        <SolidColorBrush Color="{Binding Foreground, Mode=OneTime}" />
+                                                    </TextBlock.Foreground>
+                                                </TextBlock>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <UniformGrid Columns="8"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>-->
+
+                                <ItemsControl ItemsSource="{Binding Hues}" 
                                                Background="{DynamicResource MaterialDesignPaper}">
                                     
                                     <ItemsControl.ItemTemplate>
@@ -142,12 +172,12 @@
                                                     CommandParameter="{Binding}"
                                                     Margin="4">
                                                 <Button.Background>
-                                                    <SolidColorBrush Color="{Binding ExemplarHue.Color, Mode=OneTime}" />
+                                                    <SolidColorBrush Color="{Binding Background, Mode=OneTime}" />
                                                 </Button.Background>
 
                                                 <TextBlock Text="{Binding ElementName=Label,Path=Text}" Margin="2">
                                                     <TextBlock.Foreground>
-                                                        <SolidColorBrush Color="{Binding ExemplarHue.Foreground, Mode=OneTime}" />
+                                                        <SolidColorBrush Color="{Binding Foreground, Mode=OneTime}" />
                                                     </TextBlock.Foreground>
                                                 </TextBlock>
                                             </Button>
@@ -156,7 +186,7 @@
 
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <UniformGrid Columns="5"/>
+                                            <UniformGrid Columns="4"/>
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                 </ItemsControl>

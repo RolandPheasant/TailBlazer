@@ -156,6 +156,7 @@
       <DependentUpon>GeneralOptionsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Options\GeneralOptionsViewModel.cs" />
+    <Compile Include="Views\Searching\AccentColourProvider.cs" />
     <Compile Include="Views\Searching\IRecentSearchCollection.cs" />
     <Compile Include="Views\Recent\RecentSearch.cs" />
     <Compile Include="Views\Recent\RecentSearchCollection.cs" />

@@ -10,6 +10,7 @@ using DynamicData;
 using DynamicData.Binding;
 using MaterialDesignColors;
 using TailBlazer.Domain.FileHandling.Search;
+using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 
 
@@ -31,12 +32,10 @@ namespace TailBlazer.Views.Searching
 
         public SearchOptionsViewModel(ISearchMetadataCollection metadataCollection, 
             ISchedulerProvider schedulerProvider,
+            IAccentColourProvider accentColourProvider,
             SearchHints searchHints)
         {
             SearchHints = searchHints;
-            //TODO: options for colour
-
-            var swatches = new SwatchesProvider().Swatches;
 
             bool binding = false;
 
@@ -65,12 +64,12 @@ namespace TailBlazer.Views.Searching
 
             var userOptions = metadataCollection.Metadata.Connect()
                 .WhereReasonsAre(ChangeReason.Add, ChangeReason.Remove) //ignore updates because we update from here
-                .Transform(meta => new SearchOptionsProxy(meta, swatches, m => metadataCollection.Remove(m.SearchText)))
+                .Transform(meta => new SearchOptionsProxy(meta, accentColourProvider, m => metadataCollection.Remove(m.SearchText)))
                 .SubscribeMany(so =>
                 {
                     //when a value changes, write the original value back to the cache
                     return so.WhenAnyPropertyChanged()
-                    .Select(_=> new SearchMetadata(so.Position,so.Text, so.Filter, so.Highlight, so.UseRegex, so.IgnoreCase))
+                    .Select(_=> new SearchMetadata(so.Position,so.Text, so.Filter, so.Highlight, so.UseRegex, so.IgnoreCase,so.HighlightHue))
                     .Subscribe(metadataCollection.AddorUpdate);
                 })
                 .Sort(SortExpressionComparer<SearchOptionsProxy>.Ascending(proxy => proxy.Position))
@@ -86,7 +85,7 @@ namespace TailBlazer.Views.Searching
             {
                 schedulerProvider.Background.Schedule(() =>
                 {
-                    metadataCollection.AddorUpdate(new SearchMetadata(metadataCollection.NextIndex(), request.Text, false, true, request.UseRegEx, true));
+                    metadataCollection.AddorUpdate(new SearchMetadata(metadataCollection.NextIndex(), request.Text, false, true, request.UseRegEx, true, accentColourProvider.DefaultHighlight));
                 });
             });
         

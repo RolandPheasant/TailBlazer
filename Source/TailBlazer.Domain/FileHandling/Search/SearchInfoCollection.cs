@@ -3,12 +3,14 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
 using TailBlazer.Domain.Annotations;
+using TailBlazer.Domain.Formatting;
 
 namespace TailBlazer.Domain.FileHandling.Search
 {
     public sealed class SearchInfoCollection : ISearchInfoCollection
     {
         private readonly ISearchMetadataCollection _metadataCollection;
+        private readonly IAccentColourProvider _accentColourProvider;
         private readonly IFileWatcher _fileWatcher;
         private readonly IDisposable _cleanUp;
 
@@ -16,9 +18,12 @@ namespace TailBlazer.Domain.FileHandling.Search
         
         public IObservable<ILineProvider> All { get; }
         
-        public SearchInfoCollection(ISearchMetadataCollection searchMetadataCollection, IFileWatcher fileWatcher)
+        public SearchInfoCollection(ISearchMetadataCollection searchMetadataCollection, 
+            IAccentColourProvider accentColourProvider,
+            IFileWatcher fileWatcher)
         {
             _metadataCollection = searchMetadataCollection;
+            _accentColourProvider = accentColourProvider;
             _fileWatcher = fileWatcher;
 
             //Add a complete file display
@@ -52,7 +57,7 @@ namespace TailBlazer.Domain.FileHandling.Search
         public void Add([NotNull] string searchText, bool useRegex)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
-            _metadataCollection.AddorUpdate(new SearchMetadata(_metadataCollection.NextIndex(), searchText,true,true, useRegex,true));
+            _metadataCollection.AddorUpdate(new SearchMetadata(_metadataCollection.NextIndex(), searchText,true,true, useRegex,true, _accentColourProvider.DefaultHighlight));
         }
 
         public void Remove(string searchText)

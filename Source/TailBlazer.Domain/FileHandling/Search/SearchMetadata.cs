@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using DynamicData.Kernel;
 using TailBlazer.Domain.Annotations;
+using TailBlazer.Domain.Formatting;
 
 namespace TailBlazer.Domain.FileHandling.Search
 {
@@ -20,6 +21,8 @@ namespace TailBlazer.Domain.FileHandling.Search
 
         public Func<string, bool> Predicate { get; }
 
+        public Hue HighlightHue { get; }
+
         public SearchMetadata([NotNull] SearchMetadata searchMetadata, int newPosition)
         {
             if (searchMetadata == null) throw new ArgumentNullException(nameof(searchMetadata));
@@ -32,9 +35,14 @@ namespace TailBlazer.Domain.FileHandling.Search
             IgnoreCase = searchMetadata.IgnoreCase;
             RegEx = searchMetadata.RegEx;
             Predicate = searchMetadata.Predicate;
+            HighlightHue = searchMetadata.HighlightHue;
         }
 
-        public SearchMetadata(int position, [NotNull] string searchText, bool filter, bool highlight, bool useRegex, bool ignoreCase)
+        public SearchMetadata(int position, [NotNull] string searchText, bool filter, 
+            bool highlight, 
+            bool useRegex, 
+            bool ignoreCase,
+            Hue highlightHue)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
 
@@ -44,7 +52,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             Highlight = highlight;
             UseRegex = useRegex;
             IgnoreCase = ignoreCase;
-
+            HighlightHue = highlightHue;
             RegEx = this.BuildRegEx();
             Predicate = this.BuildPredicate();
         }
@@ -73,9 +81,10 @@ namespace TailBlazer.Domain.FileHandling.Search
             unchecked
             {
                 var hashCode = Position;
-                hashCode = (hashCode*397) ^ (SearchText != null ? SearchText.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (SearchText?.GetHashCode() ?? 0);
                 hashCode = (hashCode*397) ^ Filter.GetHashCode();
                 hashCode = (hashCode*397) ^ Highlight.GetHashCode();
+                hashCode = (hashCode * 397) ^ HighlightHue.GetHashCode();
                 hashCode = (hashCode*397) ^ UseRegex.GetHashCode();
                 hashCode = (hashCode*397) ^ IgnoreCase.GetHashCode();
                 return hashCode;
@@ -103,7 +112,8 @@ namespace TailBlazer.Domain.FileHandling.Search
 
                 var stringComparison = x.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
                 return string.Equals(x.SearchText, y.SearchText, stringComparison)
-                    && x.Highlight == y.Highlight 
+                    && x.Highlight == y.Highlight
+                    && x.HighlightHue == y.HighlightHue
                     && x.UseRegex == y.UseRegex
                     && x.Position == y.Position
                     && x.IgnoreCase == y.IgnoreCase;
@@ -116,6 +126,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                     var comparer = obj.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
                     var hashCode = (obj.SearchText != null ? comparer.GetHashCode(obj.SearchText) : 0);
                     hashCode = (hashCode*397) ^ obj.Highlight.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.HighlightHue.GetHashCode();
                     hashCode = (hashCode*397) ^ obj.UseRegex.GetHashCode();
                     hashCode = (hashCode*397) ^ obj.IgnoreCase.GetHashCode();
                     hashCode = (hashCode * 397) ^ obj.Position.GetHashCode();

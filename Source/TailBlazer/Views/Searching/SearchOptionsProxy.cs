@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Input;
 using DynamicData.Binding;
 using MaterialDesignColors;
 using TailBlazer.Controls;
 using TailBlazer.Domain.FileHandling.Search;
+using TailBlazer.Domain.Formatting;
 using TailBlazer.Infrastucture;
+using Hue = TailBlazer.Domain.Formatting.Hue;
 
 namespace TailBlazer.Views.Searching
 {
@@ -18,6 +19,7 @@ namespace TailBlazer.Views.Searching
         private bool _filter;
         private bool _useRegex;
         private bool _ignoreCase;
+        private Hue _highlightHue;
 
         public string Text => _searchMetadata.SearchText;
 
@@ -27,17 +29,17 @@ namespace TailBlazer.Views.Searching
 
         public ICommand HighlightCommand { get; }
 
-        public IEnumerable<Swatch> Swatches { get; }
-
+        public IEnumerable<Hue> Hues { get; }
+        
         public SearchResultIndicatorStatus Status { get; }
 
         public int Position => _searchMetadata.Position;
 
-        public SearchOptionsProxy(SearchMetadata searchMetadata, IEnumerable<Swatch> swatches, Action<SearchMetadata> removeAction)
+        public SearchOptionsProxy(SearchMetadata searchMetadata,IAccentColourProvider accentColourProvider, Action<SearchMetadata> removeAction)
         {
-            Swatches = swatches;
+
             if (searchMetadata == null) throw new ArgumentNullException(nameof(searchMetadata));
-            if (swatches == null) throw new ArgumentNullException(nameof(swatches));
+            if (accentColourProvider == null) throw new ArgumentNullException(nameof(accentColourProvider));
             if (removeAction == null) throw new ArgumentNullException(nameof(removeAction));
 
             _searchMetadata = searchMetadata;
@@ -45,28 +47,27 @@ namespace TailBlazer.Views.Searching
             Filter = _searchMetadata.Filter;
             UseRegex = searchMetadata.UseRegex;
             IgnoreCase = searchMetadata.IgnoreCase;
-            Hues = swatches.SelectMany(s => s.AccentHues).ToArray();
-
+            Hues = accentColourProvider.Hues;
+            HighlightHue = searchMetadata.HighlightHue;
             Status = searchMetadata.UseRegex ? SearchResultIndicatorStatus.Regex : SearchResultIndicatorStatus.Text;
 
             RemoveCommand = new Command(() => removeAction(searchMetadata));
-            HighlightCommand = new Command<Swatch>(x =>
+            HighlightCommand = new Command<Hue>(newHue =>
             {
-                Console.WriteLine(x);
+                HighlightHue = newHue;
             });
         }
-
-        public Hue[] Hues
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-
-
+        
         public bool Highlight
         {
             get { return _highlight; }
             set { SetAndRaise(ref _highlight, value); }
+        }
+
+        public Hue HighlightHue
+        {
+            get { return _highlightHue; }
+            set { SetAndRaise(ref _highlightHue, value); }
         }
 
         public bool Filter
@@ -91,7 +92,7 @@ namespace TailBlazer.Views.Searching
 
         public static explicit operator SearchMetadata(SearchOptionsProxy proxy)
         {
-            return new SearchMetadata(proxy.Position, proxy.Text, proxy.Filter,proxy.Highlight,proxy.UseRegex,proxy.IgnoreCase);
+            return new SearchMetadata(proxy.Position, proxy.Text, proxy.Filter,proxy.Highlight,proxy.UseRegex,proxy.IgnoreCase,proxy.HighlightHue);
         }
     }
 }

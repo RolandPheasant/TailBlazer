@@ -39,9 +39,9 @@
       <HintPath>..\packages\DynamicData.Plinq.4.4.0.1110-beta\lib\net45\DynamicData.Plinq.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
       <Private>True</Private>
@@ -54,6 +54,7 @@
       <HintPath>..\packages\Rx-Linq.2.2.5\lib\net45\System.Reactive.Linq.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Windows" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -115,6 +116,8 @@
     <Compile Include="FileHandling\Search\SearchInfo.cs" />
     <Compile Include="FileHandling\TailInfo.cs" />
     <Compile Include="Formatting\DisplayText.cs" />
+    <Compile Include="Formatting\Hue.cs" />
+    <Compile Include="Formatting\IAccentColourProvider.cs" />
     <Compile Include="Formatting\ILineMatches.cs" />
     <Compile Include="Formatting\ITextFormatter.cs" />
     <Compile Include="Formatting\LineMatch.cs" />
