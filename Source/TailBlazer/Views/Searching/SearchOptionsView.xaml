@@ -19,6 +19,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.checkbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.popupbox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Buttons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ToggleButtons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/TextBoxes.xaml" />
@@ -114,7 +115,8 @@
                                     Padding="2" 
                                     Margin="4 0 0 0" 
                                     Foreground="{Binding HighlightHue.BackgroundBrush}"
-                                    BorderBrush ="{DynamicResource GrayBrush6}"
+                                    BorderBrush ="{x:Null}"
+                                    BorderThickness="0"
                                     Status="{Binding Status}"                
                                     VerticalAlignment="Center"/>
 
@@ -122,46 +124,47 @@
                                        Foreground="{Binding HighlightHue.ForegroundBrush}"
                                        Background="{Binding HighlightHue.BackgroundBrush}"
                                        Text="{Binding Text}"
-                                            VerticalAlignment="Center"/>
+                                        VerticalAlignment="Center"/>
                         
 
-                            <wpf:PopupBox Grid.Column="2"
-                                    Background="{DynamicResource MaterialDesignPaper}"
-                                          >
+                            <wpf:PopupBox Grid.Column="2" >
+                                
                                 <wpf:PopupBox.ToggleContent>
                                     <wpf:PackIcon Kind="FormatPaint" 
                                             Margin="4 0 4 0" Width="14" Height="14"
                                             Foreground="{DynamicResource PrimaryHueMidBrush}" />
                                 </wpf:PopupBox.ToggleContent>
 
-                                <ItemsControl ItemsSource="{Binding Hues}" 
-                                               Background="{DynamicResource MaterialDesignPaper}">
-                                    
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Button Style="{StaticResource MaterialDesignFlatButton}"
-                                                    Command="{Binding ElementName=Row,Path=DataContext.HighlightCommand}"
-                                                    CommandParameter="{Binding}"
-                                                    Margin="4">
-                                                <Button.Background>
-                                                    <SolidColorBrush Color="{Binding Background, Mode=OneTime}" />
-                                                </Button.Background>
+                                    <ItemsControl ItemsSource="{Binding Hues}" 
+                                               Background="Transparent">
 
-                                                <TextBlock Text="{Binding ElementName=Label,Path=Text}" Margin="2">
-                                                    <TextBlock.Foreground>
-                                                        <SolidColorBrush Color="{Binding Foreground, Mode=OneTime}" />
-                                                    </TextBlock.Foreground>
-                                                </TextBlock>
-                                            </Button>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                                        
+                                                        wpf:ShadowAssist.ShadowDepth="Depth2"
+                                                        Command="{Binding ElementName=Row,Path=DataContext.HighlightCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        Margin="4">
+                                                    <Button.Background>
+                                                        <SolidColorBrush Color="{Binding Background, Mode=OneTime}" />
+                                                    </Button.Background>
 
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <UniformGrid Columns="4"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>
+                                                    <TextBlock Text="{Binding ElementName=Label,Path=Text}" Margin="2">
+                                                        <TextBlock.Foreground>
+                                                            <SolidColorBrush Color="{Binding Foreground, Mode=OneTime}" />
+                                                        </TextBlock.Foreground>
+                                                    </TextBlock>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Columns="4"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
 
                             </wpf:PopupBox>
 
