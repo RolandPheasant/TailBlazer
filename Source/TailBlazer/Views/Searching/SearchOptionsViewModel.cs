@@ -24,8 +24,6 @@ namespace TailBlazer.Views.Searching
 
         public ReadOnlyObservableCollection<SearchOptionsProxy> Data { get; }
 
-        // public VerticalOrganiser Organiser { get; } = new VerticalOrganiser();
-
         public VerticalPositionMonitor PositionMonitor { get; } = new VerticalPositionMonitor();
 
         public SearchHints SearchHints { get;  }

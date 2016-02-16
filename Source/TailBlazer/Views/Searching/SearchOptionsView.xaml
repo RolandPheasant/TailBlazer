@@ -71,6 +71,20 @@
                     </ToggleButton.Style>
                 </ToggleButton>
 
+                <!--<TextBox Grid.Column="1" 
+                            Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                             wpf:TextFieldAssist.Hint="{Binding SearchHints.IsValid.Value.Message}" 
+                            VerticalAlignment="Center"
+                            wpf:ValidationAssist.UsePopup="False"
+                            Style="{StaticResource FloatingHintAndErrorTextBox}"
+                            Validation.ErrorTemplate="{StaticResource BorderOnlyValidationErrorTemplate}" 
+                            MinWidth="180">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding SearchHints.AddSearchCommand}"/>
+                    </TextBox.InputBindings>
+                </TextBox>-->
+
+
                 <TextBox Grid.Column="1" 
                             Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                              wpf:TextFieldAssist.Hint="{Binding SearchHints.IsValid.Value.Message}" 
@@ -85,15 +99,15 @@
                 </TextBox>
 
             </Grid>
-
-                <dragablz:DragablzItemsControl  Grid.Row="1" 
+            
+            <dragablz:DragablzItemsControl  Grid.Row="1" 
                                                 ItemContainerStyle="{StaticResource DragableItem}"
                                                 HorizontalContentAlignment="Stretch"
                                                 PositionMonitor="{Binding PositionMonitor}"
                                                 ItemsSource="{Binding Data}">
 
                 <dragablz:DragablzItemsControl.ItemsOrganiser>
-                    <dragablz:VerticalOrganiser  />
+                    <dragablz:VerticalOrganiser />
                 </dragablz:DragablzItemsControl.ItemsOrganiser>
 
                 <dragablz:DragablzItemsControl.ItemTemplate>
@@ -125,10 +139,8 @@
                                        Background="{Binding HighlightHue.BackgroundBrush}"
                                        Text="{Binding Text}"
                                         VerticalAlignment="Center"/>
-                        
 
-                            <wpf:PopupBox Grid.Column="2" >
-                                
+                            <wpf:PopupBox Grid.Column="2">
                                 <wpf:PopupBox.ToggleContent>
                                     <wpf:PackIcon Kind="FormatPaint" 
                                             Margin="4 0 4 0" Width="14" Height="14"
@@ -136,16 +148,17 @@
                                 </wpf:PopupBox.ToggleContent>
 
                                     <ItemsControl ItemsSource="{Binding Hues}" 
-                                               Background="Transparent">
-
+                                                  Margin="4"
+                                                  Background="Transparent">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <Button Style="{StaticResource MaterialDesignRaisedButton}"
-                                                        
+                                                        BorderBrush="{DynamicResource GrayBrush2}"
+                                                        BorderThickness="0"
                                                         wpf:ShadowAssist.ShadowDepth="Depth2"
                                                         Command="{Binding ElementName=Row,Path=DataContext.HighlightCommand}"
                                                         CommandParameter="{Binding}"
-                                                        Margin="4">
+                                                        Margin="2">
                                                     <Button.Background>
                                                         <SolidColorBrush Color="{Binding Background, Mode=OneTime}" />
                                                     </Button.Background>

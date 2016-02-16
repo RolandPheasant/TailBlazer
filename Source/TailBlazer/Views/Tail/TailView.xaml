@@ -26,11 +26,12 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
-
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.combobox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ProgressBar.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Buttons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ToggleButtons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/TextBoxes.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ComboBox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Lines.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
@@ -177,6 +178,42 @@
                             <KeyBinding Key="Enter" Command="{Binding SearchHints.AddSearchCommand}"/>
                         </TextBox.InputBindings>
                     </TextBox>
+
+                    <!--<ComboBox Grid.Column="1" 
+                              wpf:TextFieldAssist.Hint="{Binding SearchHints.IsValid.Value.Message}"
+                              Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                              IsEditable="True" 
+                              MinWidth="200"
+                              Margin="4 0 0 0"
+                              Validation.ErrorTemplate="{StaticResource BorderOnlyValidationErrorTemplate}" 
+                              Style="{StaticResource FloatingHintAndErrorComboBox}"
+                              wpf:TextFieldAssist.HintOpacity=".26"
+                              ItemsSource="{Binding SearchHints.Hints}">
+                                 
+                        <ComboBox.InputBindings>
+                            <KeyBinding Key="Enter" Command="{Binding SearchHints.AddSearchCommand}"/>
+                        </ComboBox.InputBindings>
+                        
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel Orientation="Vertical"/>
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>-->
+
+                    <!--<TextBox Grid.Column="1" 
+                            Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                            wpf:TextFieldAssist.Hint="{Binding SearchHints.IsValid.Value.Message}" 
+                            VerticalAlignment="Center"
+                          
+                            wpf:ValidationAssist.UsePopup="False"
+                            Style="{StaticResource FloatingHintAndErrorTextBox}"
+                            Validation.ErrorTemplate="{StaticResource BorderOnlyValidationErrorTemplate}" 
+                            MinWidth="200">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter" Command="{Binding SearchHints.AddSearchCommand}"/>
+                        </TextBox.InputBindings>
+                    </TextBox>-->
 
                     <TextBlock     
                             Margin="8 0 0 0" 
