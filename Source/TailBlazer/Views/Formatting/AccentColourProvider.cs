@@ -5,7 +5,7 @@ using MaterialDesignColors;
 using TailBlazer.Domain.Formatting;
 using Hue = TailBlazer.Domain.Formatting.Hue;
 
-namespace TailBlazer.Views.Searching
+namespace TailBlazer.Views.Formatting
 {
     public class AccentColourProvider : IAccentColourProvider
     {

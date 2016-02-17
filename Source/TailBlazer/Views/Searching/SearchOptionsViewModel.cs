@@ -8,16 +8,17 @@ using System.Reactive.Concurrency;
 using Dragablz;
 using DynamicData;
 using DynamicData.Binding;
-using MaterialDesignColors;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
+using TailBlazer.Views.Formatting;
 
 
 namespace TailBlazer.Views.Searching
 {
     public class SearchOptionsViewModel: AbstractNotifyPropertyChanged, IDisposable
     {
+        public Guid Id { get; } = Guid.NewGuid();
         //create text to add new option - default to highlight without search
         private readonly IDisposable _cleanUp;
         private string _searchText;
@@ -31,6 +32,7 @@ namespace TailBlazer.Views.Searching
         public SearchOptionsViewModel(ISearchMetadataCollection metadataCollection, 
             ISchedulerProvider schedulerProvider,
             IAccentColourProvider accentColourProvider,
+            IIconProvider iconsProvider,
             SearchHints searchHints)
         {
             SearchHints = searchHints;
@@ -62,7 +64,15 @@ namespace TailBlazer.Views.Searching
 
             var userOptions = metadataCollection.Metadata.Connect()
                 .WhereReasonsAre(ChangeReason.Add, ChangeReason.Remove) //ignore updates because we update from here
-                .Transform(meta => new SearchOptionsProxy(meta, accentColourProvider, m => metadataCollection.Remove(m.SearchText)))
+                .Transform(meta =>
+                {
+                    var iconSelector= new IconSelector(iconsProvider,schedulerProvider);
+                    return new SearchOptionsProxy(meta, 
+                        accentColourProvider, 
+                        iconSelector,
+                        m => metadataCollection.Remove(m.SearchText),
+                        Id);
+                })
                 .SubscribeMany(so =>
                 {
                     //when a value changes, write the original value back to the cache
@@ -71,9 +81,9 @@ namespace TailBlazer.Views.Searching
                     .Subscribe(metadataCollection.AddorUpdate);
                 })
                 .Sort(SortExpressionComparer<SearchOptionsProxy>.Ascending(proxy => proxy.Position))
-
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out data)
+                .DisposeMany()
                 .Subscribe();
             
             Data = data;

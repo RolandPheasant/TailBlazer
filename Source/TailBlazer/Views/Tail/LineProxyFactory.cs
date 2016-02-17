@@ -18,6 +18,5 @@ namespace TailBlazer.Views.Tail
         {
             return new LineProxy(line, _textFormatter.GetFormatter(line.Text), _lineMatches.GetMatches(line.Text));
         }
-
     }
 }

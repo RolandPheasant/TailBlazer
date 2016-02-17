@@ -1,19 +1,25 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Disposables;
 using System.Windows.Input;
+using DynamicData;
 using DynamicData.Binding;
-using MaterialDesignColors;
+using MaterialDesignThemes.Wpf;
 using TailBlazer.Controls;
+using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Infrastucture;
+using TailBlazer.Views.Formatting;
 using Hue = TailBlazer.Domain.Formatting.Hue;
 
 namespace TailBlazer.Views.Searching
 {
-    public class SearchOptionsProxy: AbstractNotifyPropertyChanged
+    public class SearchOptionsProxy: AbstractNotifyPropertyChanged, IDisposable
     {
-
+     
+        private readonly IDisposable _cleanUp;
         private readonly SearchMetadata _searchMetadata;
         private bool _highlight;
         private bool _filter;
@@ -30,19 +36,33 @@ namespace TailBlazer.Views.Searching
         public ICommand HighlightCommand { get; }
 
         public IEnumerable<Hue> Hues { get; }
-        
+
         public SearchResultIndicatorStatus Status { get; }
+
+        public ICommand ShowIconSelectorCommand { get; }
+
+        public IconSelector IconSelector { get; }
+
+        public Guid Id { get; } 
 
         public int Position => _searchMetadata.Position;
 
-        public SearchOptionsProxy(SearchMetadata searchMetadata,IAccentColourProvider accentColourProvider, Action<SearchMetadata> removeAction)
+        public SearchOptionsProxy([NotNull] SearchMetadata searchMetadata, 
+            [NotNull] IAccentColourProvider accentColourProvider, 
+            [NotNull] IconSelector iconSelector,
+            [NotNull] Action<SearchMetadata> removeAction, 
+            Guid id)
         {
+            IconSelector = iconSelector;
 
             if (searchMetadata == null) throw new ArgumentNullException(nameof(searchMetadata));
             if (accentColourProvider == null) throw new ArgumentNullException(nameof(accentColourProvider));
+            if (iconSelector == null) throw new ArgumentNullException(nameof(iconSelector));
             if (removeAction == null) throw new ArgumentNullException(nameof(removeAction));
-
             _searchMetadata = searchMetadata;
+
+            ShowIconSelectorCommand = new Command(ShowIconSelector);
+            Id = id;
             Highlight = _searchMetadata.Highlight;
             Filter = _searchMetadata.Filter;
             UseRegex = searchMetadata.UseRegex;
@@ -56,8 +76,16 @@ namespace TailBlazer.Views.Searching
             {
                 HighlightHue = newHue;
             });
+
+            _cleanUp = new CompositeDisposable(IconSelector);
         }
-        
+
+
+        private async void ShowIconSelector()
+        {
+            var result = await DialogHost.Show(IconSelector, Id);
+        }
+
         public bool Highlight
         {
             get { return _highlight; }
@@ -88,11 +116,14 @@ namespace TailBlazer.Views.Searching
             set { SetAndRaise(ref _ignoreCase, value); }
         }
 
-
-
         public static explicit operator SearchMetadata(SearchOptionsProxy proxy)
         {
             return new SearchMetadata(proxy.Position, proxy.Text, proxy.Filter,proxy.Highlight,proxy.UseRegex,proxy.IgnoreCase,proxy.HighlightHue);
+        }
+
+        public void Dispose()
+        {
+            _cleanUp.Dispose();
         }
     }
 }

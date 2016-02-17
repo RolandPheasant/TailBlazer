@@ -16,7 +16,11 @@
             <DataTemplate DataType="{x:Type searching:SearchOptionsViewModel}">
                 <settings:SearchOptionsView/>
             </DataTemplate>
-            
+
+            <DataTemplate DataType="{x:Type searching:IconSelector}">
+                <searching:IconSelectorView/>
+            </DataTemplate>
+
             <DataTemplate DataType="{x:Type tail:TailViewModel}">
                 <tail:TailView />
             </DataTemplate>

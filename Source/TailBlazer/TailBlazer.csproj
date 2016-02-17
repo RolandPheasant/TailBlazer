@@ -56,6 +56,10 @@
       <HintPath>..\packages\DynamicData.Plinq.4.4.0.1110-beta\lib\net45\DynamicData.Plinq.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Humanizer, Version=2.0.1.0, Culture=neutral, PublicKeyToken=979442b78dfc278e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Humanizer.Core.2.0.1\lib\portable-win+net45+wp8+wpa81\Humanizer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
       <Private>True</Private>
@@ -147,6 +151,9 @@
     <Compile Include="Infrastucture\SelectionMonitor.cs" />
     <Compile Include="Infrastucture\StartupController.cs" />
     <Compile Include="Infrastucture\UhandledExceptionHandler.cs" />
+    <Compile Include="Infrastucture\VirtualizingWrapPanel.cs" />
+    <Compile Include="Views\Formatting\IconDescription.cs" />
+    <Compile Include="Views\Formatting\IIconProvider.cs" />
     <Compile Include="Views\Layout\LayoutAnalyser.cs" />
     <Compile Include="Views\Layout\LayoutContent.cs" />
     <Compile Include="Views\Layout\ShellSettings.cs" />
@@ -156,7 +163,12 @@
       <DependentUpon>GeneralOptionsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Options\GeneralOptionsViewModel.cs" />
-    <Compile Include="Views\Searching\AccentColourProvider.cs" />
+    <Compile Include="Views\Formatting\AccentColourProvider.cs" />
+    <Compile Include="Views\Formatting\IconProvider.cs" />
+    <Compile Include="Views\Searching\IconSelector.cs" />
+    <Compile Include="Views\Searching\IconSelectorView.xaml.cs">
+      <DependentUpon>IconSelectorView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Searching\IRecentSearchCollection.cs" />
     <Compile Include="Views\Recent\RecentSearch.cs" />
     <Compile Include="Views\Recent\RecentSearchCollection.cs" />
@@ -257,6 +269,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Options\GeneralOptionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Searching\IconSelectorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

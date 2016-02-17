@@ -7,6 +7,7 @@
              xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
              xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
              xmlns:controls="clr-namespace:TailBlazer.Controls"
+             xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              mc:Ignorable="d" 
             TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
              Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
@@ -29,7 +30,8 @@
         </ResourceDictionary>
     </Control.Resources>
 
-    <Grid>
+    <wpf:DialogHost Identifier="{Binding Id}">
+        <Grid>
         <Grid.RowDefinitions>
             <RowDefinition  Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -125,16 +127,26 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                            <controls:SearchResultIndicator 
-                                    Padding="2" 
-                                    Margin="4 0 0 0" 
-                                    Foreground="{Binding HighlightHue.BackgroundBrush}"
-                                    BorderBrush ="{x:Null}"
-                                    BorderThickness="0"
-                                    Status="{Binding Status}"                
-                                    VerticalAlignment="Center"/>
 
-                                <TextBlock Padding="2" Margin="4 0 0 0" x:Name="Label" Grid.Column="1" 
+                                <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                        Command="{Binding ShowIconSelectorCommand}"
+                                        ToolTip="Change icon"
+                                        Padding="0"
+                                        Width="24" Height="24"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center">
+
+                                    <controls:SearchResultIndicator 
+                                        Padding="2" 
+                                        Margin="0" 
+                                        Foreground="{Binding HighlightHue.BackgroundBrush}"
+                                        BorderBrush ="{x:Null}"
+                                        BorderThickness="0"
+                                        Status="{Binding Status}"                
+                                        VerticalAlignment="Center"/>
+                                </Button>
+                            
+                                <TextBlock Padding="2" Margin="6 0 0 0" x:Name="Label" Grid.Column="1" 
                                        Foreground="{Binding HighlightHue.ForegroundBrush}"
                                        Background="{Binding HighlightHue.BackgroundBrush}"
                                        Text="{Binding Text}"
@@ -217,4 +229,6 @@
             </Button>
         </Grid>
     </Grid>
+
+    </wpf:DialogHost>
 </UserControl>

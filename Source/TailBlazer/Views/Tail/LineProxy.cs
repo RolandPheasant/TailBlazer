@@ -56,6 +56,7 @@ namespace TailBlazer.Views.Tail
 
             FormattedText = formattedText.ForBinding();
             LineMatches = lineMatchesShared.ForBinding();
+
             IndicatorStatus = lineMatchesShared
                                 .Select(lmc => CalculateStatus(lmc.FirstMatch))
                                 .ForBinding();
@@ -65,10 +66,7 @@ namespace TailBlazer.Views.Tail
 
             _cleanUp = new CompositeDisposable(FormattedText, IndicatorStatus, LineMatches, IndicatorColour, lineMatchesShared.Connect());
         }
-
-
-
-
+        
         private SearchResultIndicatorStatus CalculateStatus(LineMatch firstMatch)
         {
             if (firstMatch == null)
