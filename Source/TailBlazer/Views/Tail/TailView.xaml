@@ -371,11 +371,6 @@
                     </ListBox.ContextMenu>
                 </ListBox>
 
-                <!--<ContentPresenter Grid.Row="1"
-                    ContentTemplate="{StaticResource LinesDataTemplate}"
-                    Content="{Binding Mode=OneWay}" />-->
-
-
                 <GridSplitter Grid.Row="2"
                           Height="5" 
                           ResizeDirection="Rows"

@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using System.Windows.Input;
+using System.Windows.Media;
 using DynamicData;
 using DynamicData.Binding;
 using MaterialDesignThemes.Wpf;
@@ -10,6 +13,7 @@ using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
+using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
 using TailBlazer.Views.Formatting;
 using Hue = TailBlazer.Domain.Formatting.Hue;
@@ -26,26 +30,21 @@ namespace TailBlazer.Views.Searching
         private bool _useRegex;
         private bool _ignoreCase;
         private Hue _highlightHue;
+        private PackIconKind? _iconKind;
 
         public string Text => _searchMetadata.SearchText;
-
         public string RemoveTooltip => $"Get rid of {Text}?";
-
         public ICommand RemoveCommand { get; }
-
         public ICommand HighlightCommand { get; }
-
         public IEnumerable<Hue> Hues { get; }
-
         public SearchResultIndicatorStatus Status { get; }
-
         public ICommand ShowIconSelectorCommand { get; }
-
         public IconSelector IconSelector { get; }
-
-        public Guid Id { get; } 
-
+        public Guid Id { get; }
+        public IProperty<bool> UsingCustomIcon { get; }
         public int Position => _searchMetadata.Position;
+        public IProperty<Brush> Background { get; }
+        public IProperty<Brush> Foreground { get; }
 
         public SearchOptionsProxy([NotNull] SearchMetadata searchMetadata, 
             [NotNull] IAccentColourProvider accentColourProvider, 
@@ -62,6 +61,12 @@ namespace TailBlazer.Views.Searching
             _searchMetadata = searchMetadata;
 
             ShowIconSelectorCommand = new Command(ShowIconSelector);
+            RemoveCommand = new Command(() => removeAction(searchMetadata));
+            HighlightCommand = new Command<Hue>(newHue =>
+            {
+                HighlightHue = newHue;
+            });
+            
             Id = id;
             Highlight = _searchMetadata.Highlight;
             Filter = _searchMetadata.Filter;
@@ -71,19 +76,41 @@ namespace TailBlazer.Views.Searching
             HighlightHue = searchMetadata.HighlightHue;
             Status = searchMetadata.UseRegex ? SearchResultIndicatorStatus.Regex : SearchResultIndicatorStatus.Text;
 
-            RemoveCommand = new Command(() => removeAction(searchMetadata));
-            HighlightCommand = new Command<Hue>(newHue =>
-            {
-                HighlightHue = newHue;
-            });
+            UsingCustomIcon = this.WhenValueChanged(proxy => proxy.IconKind)
+                .Select(kind => kind.HasValue)
+                .ForBinding();
 
-            _cleanUp = new CompositeDisposable(IconSelector);
+            Foreground = this.WhenValueChanged(vm => vm.HighlightHue)
+                .Select(h => h.ForegroundBrush)
+                .ForBinding();
+
+            Background = this.WhenValueChanged(vm => vm.HighlightHue)
+               .Select(h => h.BackgroundBrush)
+               .ForBinding();
+
+            _cleanUp = new CompositeDisposable(IconSelector, UsingCustomIcon, Foreground, Background);
         }
+
 
 
         private async void ShowIconSelector()
         {
             var result = await DialogHost.Show(IconSelector, Id);
+            var accept = (bool?) result;
+            if (accept.HasValue && accept == true)
+            {
+                IconKind = IconSelector.Selected.Type;
+            }
+            else
+            {
+                IconKind = null;
+            }
+         }
+        
+        public PackIconKind? IconKind
+        {
+            get { return _iconKind; }
+            set { SetAndRaise(ref _iconKind, value); }
         }
 
         public bool Highlight

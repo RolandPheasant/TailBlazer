@@ -45,8 +45,7 @@ namespace TailBlazer.Views.Searching
 
             _cleanUp = new CompositeDisposable(userOptions);
         }
-
-
+        
         public string SearchText
         {
             get { return _iconSearchText; }

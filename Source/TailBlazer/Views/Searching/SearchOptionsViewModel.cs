@@ -13,7 +13,6 @@ using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Views.Formatting;
 
-
 namespace TailBlazer.Views.Searching
 {
     public class SearchOptionsViewModel: AbstractNotifyPropertyChanged, IDisposable

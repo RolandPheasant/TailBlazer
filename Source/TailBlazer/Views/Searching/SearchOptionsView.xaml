@@ -27,6 +27,8 @@
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Colours.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Dragable.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"/>
         </ResourceDictionary>
     </Control.Resources>
 
@@ -135,20 +137,30 @@
                                         Width="24" Height="24"
                                         HorizontalAlignment="Left"
                                         VerticalAlignment="Center">
+                                    <Grid>
+                                        <wpf:PackIcon 
+                                            Visibility="{Binding UsingCustomIcon.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                            Padding="2" 
+                                            Foreground="{Binding Background.Value}"
+                                            Margin="0"
+                                            VerticalAlignment="Center"
+                                            Kind="{Binding IconKind}"/>
 
-                                    <controls:SearchResultIndicator 
-                                        Padding="2" 
-                                        Margin="0" 
-                                        Foreground="{Binding HighlightHue.BackgroundBrush}"
-                                        BorderBrush ="{x:Null}"
-                                        BorderThickness="0"
-                                        Status="{Binding Status}"                
-                                        VerticalAlignment="Center"/>
+                                        <controls:SearchResultIndicator
+                                            Visibility="{Binding UsingCustomIcon.Value, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
+                                            Padding="2" 
+                                            Margin="0" 
+                                            Foreground="{Binding Background.Value}"
+                                            BorderBrush ="{x:Null}"
+                                            BorderThickness="0"
+                                            Status="{Binding Status}"                
+                                            VerticalAlignment="Center"/>
+                                    </Grid>
                                 </Button>
                             
                                 <TextBlock Padding="2" Margin="6 0 0 0" x:Name="Label" Grid.Column="1" 
-                                       Foreground="{Binding HighlightHue.ForegroundBrush}"
-                                       Background="{Binding HighlightHue.BackgroundBrush}"
+                                       Foreground="{Binding Foreground.Value}"
+                                       Background="{Binding Background.Value}"
                                        Text="{Binding Text}"
                                         VerticalAlignment="Center"/>
 
@@ -156,7 +168,7 @@
                                 <wpf:PopupBox.ToggleContent>
                                     <wpf:PackIcon Kind="FormatPaint" 
                                             Margin="4 0 4 0" Width="14" Height="14"
-                                            Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                                            Foreground="{Binding Background.Value}" />
                                 </wpf:PopupBox.ToggleContent>
 
                                     <ItemsControl ItemsSource="{Binding Hues}" 
