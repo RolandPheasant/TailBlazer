@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
                     xmlns:controls="clr-namespace:TailBlazer.Controls"
-                    xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture">
+                    xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
@@ -15,18 +16,12 @@
                 <ColumnDefinition Width="18"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            
 
-            <controls:SearchResultIndicator 
-                Padding="1" 
-                Foreground="{Binding IndicatorColour.Value}"
-                Background="{DynamicResource TransparentWhiteBrush}"
-                BorderBrush ="{x:Null}"
-                BorderThickness="0"
-                Status="{Binding IndicatorStatus.Value}" >
-
-               
-            </controls:SearchResultIndicator>
+            <materialDesign:PackIcon  Foreground="{Binding IndicatorColour.Value}"
+                                      Padding="4" 
+                                      Kind="{Binding IndicatorIcon.Value}">
+                
+            </materialDesign:PackIcon>
   
             <controls:HighlightTextControl
                                     Grid.Column="1" Margin="6 0 0 0"   

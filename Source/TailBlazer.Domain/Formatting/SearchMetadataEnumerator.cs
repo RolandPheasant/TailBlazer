@@ -102,7 +102,7 @@ namespace TailBlazer.Domain.Formatting
                     {
 
                         //yield return item;
-                        yield return new MatchedString(item.Part, tomatch.HighlightHue);
+                        yield return new MatchedString(item.Part, tomatch);
                     }
 
                 }
@@ -142,7 +142,7 @@ namespace TailBlazer.Domain.Formatting
                 {
                     //Get original string back as the user may have searched in a different case
                     var originalString = input.Substring(currentLength, tomatch.Length);
-                    yield return new MatchedString(originalString, meta.HighlightHue);
+                    yield return new MatchedString(originalString, meta);
 
                     currentLength = current.Length + currentLength + tomatch.Length;
                     if (currentLength + tomatch.Length > input.Length)
@@ -156,7 +156,7 @@ namespace TailBlazer.Domain.Formatting
                     //Get original string back as the user may have searched in a different case
                     var originalString = input.Substring(currentLength, tomatch.Length);
                     
-                    yield return new MatchedString(originalString, meta.HighlightHue);
+                    yield return new MatchedString(originalString, meta);
                     yield return new MatchedString(current);
 
                     currentLength = current.Length + currentLength + tomatch.Length;

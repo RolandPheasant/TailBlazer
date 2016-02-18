@@ -17,6 +17,7 @@ namespace TailBlazer.Views.Searching
 {
     public class SearchOptionsViewModel: AbstractNotifyPropertyChanged, IDisposable
     {
+        private readonly IIconProvider _iconsProvider;
         public Guid Id { get; } = Guid.NewGuid();
         //create text to add new option - default to highlight without search
         private readonly IDisposable _cleanUp;
@@ -28,63 +29,69 @@ namespace TailBlazer.Views.Searching
 
         public SearchHints SearchHints { get;  }
 
-        public SearchOptionsViewModel(ISearchMetadataCollection metadataCollection, 
+        public SearchOptionsViewModel(ISearchMetadataCollection metadataCollection,
             ISchedulerProvider schedulerProvider,
             IAccentColourProvider accentColourProvider,
             IIconProvider iconsProvider,
+
             SearchHints searchHints)
         {
+            _iconsProvider = iconsProvider;
             SearchHints = searchHints;
 
             bool binding = false;
 
             var orderChanged = Observable.FromEventPattern<OrderChangedEventArgs>(
-                                            h => PositionMonitor.OrderChanged += h,
-                                            h => PositionMonitor.OrderChanged -= h)
-                                    .Throttle(TimeSpan.FromMilliseconds(125))
-                                    .Select(evt => evt.EventArgs)
-                                    .Where(args=>args.PreviousOrder!=null && args.NewOrder.Length == args.PreviousOrder.Length)
-                                    .Select(positionChangedArgs =>
-                                    {
-                                            //reprioritise filters and highlights
-                                            return positionChangedArgs.NewOrder
-                                            .OfType<SearchOptionsProxy>()
-                                            .Select((item, index) => new {Meta=(SearchMetadata)item, index})
-                                            //.Where(x => x.index != x.Meta.Position)
-                                            .Select(x => new SearchMetadata(x.Meta, x.index))
-                                            .ToArray();
-                                    })
-                                    .Subscribe(positionChangedArgs =>
-                                    {
-                                        positionChangedArgs.ForEach(metadataCollection.AddorUpdate);
-                                    });
+                h => PositionMonitor.OrderChanged += h,
+                h => PositionMonitor.OrderChanged -= h)
+                .Throttle(TimeSpan.FromMilliseconds(125))
+                .Select(evt => evt.EventArgs)
+                .Where(args => args.PreviousOrder != null && args.NewOrder.Length == args.PreviousOrder.Length)
+                .Select(positionChangedArgs =>
+                {
+                    //reprioritise filters and highlights
+                    return positionChangedArgs.NewOrder
+                        .OfType<SearchOptionsProxy>()
+                        .Select((item, index) => new {Meta = (SearchMetadata) item, index})
+                        //.Where(x => x.index != x.Meta.Position)
+                        .Select(x => new SearchMetadata(x.Meta, x.index))
+                        .ToArray();
+                })
+                .Subscribe(positionChangedArgs =>
+                {
+                    positionChangedArgs.ForEach(metadataCollection.AddorUpdate);
+                });
 
             ReadOnlyObservableCollection<SearchOptionsProxy> data;
-
+            
             var userOptions = metadataCollection.Metadata.Connect()
                 .WhereReasonsAre(ChangeReason.Add, ChangeReason.Remove) //ignore updates because we update from here
                 .Transform(meta =>
                 {
-                    var iconSelector= new IconSelector(iconsProvider,schedulerProvider);
-                    return new SearchOptionsProxy(meta, 
-                        accentColourProvider, 
+                    var iconSelector = new IconSelector(iconsProvider, schedulerProvider);
+                    return new SearchOptionsProxy(meta,
+                        accentColourProvider,
                         iconSelector,
                         m => metadataCollection.Remove(m.SearchText),
+                        iconsProvider.KnownIconNames,
                         Id);
                 })
                 .SubscribeMany(so =>
                 {
                     //when a value changes, write the original value back to the cache
                     return so.WhenAnyPropertyChanged()
-                    .Select(_=> new SearchMetadata(so.Position,so.Text, so.Filter, so.Highlight, so.UseRegex, so.IgnoreCase,so.HighlightHue))
-                    .Subscribe(metadataCollection.AddorUpdate);
+                        .Select(
+                            _ =>
+                                new SearchMetadata(so.Position, so.Text, so.Filter, so.Highlight, so.UseRegex,
+                                    so.IgnoreCase, so.HighlightHue, so.IconKind.ToString()))
+                        .Subscribe(metadataCollection.AddorUpdate);
                 })
                 .Sort(SortExpressionComparer<SearchOptionsProxy>.Ascending(proxy => proxy.Position))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out data)
                 .DisposeMany()
                 .Subscribe();
-            
+
             Data = data;
 
             //command to add the current search to the tail collection
@@ -92,13 +99,20 @@ namespace TailBlazer.Views.Searching
             {
                 schedulerProvider.Background.Schedule(() =>
                 {
-                    metadataCollection.AddorUpdate(new SearchMetadata(metadataCollection.NextIndex(), request.Text, false, true, request.UseRegEx, true, accentColourProvider.DefaultHighlight));
+                    var icon = request.UseRegEx
+                        ? _iconsProvider.KnownIconNames.RegEx
+                        : _iconsProvider.KnownIconNames.Search;
+                    metadataCollection.AddorUpdate(new SearchMetadata(metadataCollection.NextIndex(),
+                        request.Text, false, true,
+                        request.UseRegEx, true,
+                        accentColourProvider.DefaultHighlight,
+                        icon));
                 });
             });
-        
-            
-            _cleanUp = new CompositeDisposable(searchInvoker, 
-                userOptions, 
+
+
+            _cleanUp = new CompositeDisposable(searchInvoker,
+                userOptions,
                 searchInvoker,
                 orderChanged);
         }

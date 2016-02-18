@@ -82,7 +82,7 @@ namespace TailBlazer.Domain.Formatting
                     var originalString = input.Substring(currentLength, tomatch.Length);
 
                     //TODO: MAKE THIS WORK
-                    yield return new MatchedString(originalString, _tomatch.HighlightHue);
+                    yield return new MatchedString(originalString, _tomatch);
 
                     currentLength = current.Length + currentLength + tomatch.Length;
                     if (currentLength + tomatch.Length > input.Length)
@@ -96,7 +96,7 @@ namespace TailBlazer.Domain.Formatting
                     //Get original string back as the user may have searched in a different case
                     var originalString = input.Substring(currentLength, tomatch.Length);
 
-                    yield return new MatchedString(originalString, _tomatch.HighlightHue);
+                    yield return new MatchedString(originalString, _tomatch);
                     yield return new MatchedString(current);
 
                     currentLength = current.Length + currentLength + tomatch.Length;

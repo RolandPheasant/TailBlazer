@@ -9,7 +9,10 @@ namespace TailBlazer.Domain.Formatting
         public LineMatch(SearchMetadata searchMetadata)
         {
             _searchMetadata = searchMetadata;
+
         }
+
+        public string Icon => _searchMetadata.IconKind;
 
         public string Text => _searchMetadata.SearchText;
 

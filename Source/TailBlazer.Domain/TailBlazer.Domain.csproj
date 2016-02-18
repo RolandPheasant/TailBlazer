@@ -93,6 +93,7 @@
     <Compile Include="FileHandling\IndexEx.cs" />
     <Compile Include="FileHandling\IndexType.cs" />
     <Compile Include="FileHandling\LineKey.cs" />
+    <Compile Include="FileHandling\Search\IKnownIconNames.cs" />
     <Compile Include="FileHandling\Search\ISearchInfoCollection.cs" />
     <Compile Include="FileHandling\LineIndexType.cs" />
     <Compile Include="FileHandling\FileNotification.cs" />

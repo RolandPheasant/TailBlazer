@@ -4,6 +4,8 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Media;
 using DynamicData.Binding;
+using DynamicData.Kernel;
+using MaterialDesignThemes.Wpf;
 using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
@@ -35,6 +37,8 @@ namespace TailBlazer.Views.Tail
 
         public IProperty<Brush> IndicatorColour { get; }
 
+        public IProperty<PackIconKind> IndicatorIcon { get; }
+
         public bool IsRecent => Line.Timestamp.HasValue && DateTime.Now.Subtract(Line.Timestamp.Value).TotalSeconds < 0.25;
 
 
@@ -60,13 +64,24 @@ namespace TailBlazer.Views.Tail
             IndicatorStatus = lineMatchesShared
                                 .Select(lmc => CalculateStatus(lmc.FirstMatch))
                                 .ForBinding();
+
             IndicatorColour = lineMatchesShared
                                 .Select(lmc => lmc.FirstMatch?.Hue?.BackgroundBrush)
                                 .ForBinding();
 
-            _cleanUp = new CompositeDisposable(FormattedText, IndicatorStatus, LineMatches, IndicatorColour, lineMatchesShared.Connect());
+            IndicatorIcon = lineMatchesShared
+                                .Select(lmc =>
+                                {
+                                    var icon = lmc.FirstMatch?.Icon;
+                                    return icon.ParseEnum<PackIconKind>()
+                                        .ValueOr(() => PackIconKind.ArrowRightBold);
+                                }).ForBinding();
+
+            _cleanUp = new CompositeDisposable(FormattedText, IndicatorStatus, LineMatches, IndicatorColour, IndicatorIcon,lineMatchesShared.Connect());
         }
-        
+
+
+
         private SearchResultIndicatorStatus CalculateStatus(LineMatch firstMatch)
         {
             if (firstMatch == null)

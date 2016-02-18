@@ -1,33 +1,33 @@
 using System;
+using TailBlazer.Domain.FileHandling.Search;
 
 namespace TailBlazer.Domain.Formatting
 {
     public class MatchedString : IEquatable<MatchedString>
     {
+        private readonly SearchMetadata _metadata;
         public string Part { get; }
 
         public bool IsMatch { get; }
 
-        public Hue Hue { get; }
-
+        public Hue Hue => _metadata?.HighlightHue;
 
         public MatchedString(string part)
         {
             Part = part;
             IsMatch = false;
-            Hue = null;
         }
 
         public MatchedString(string part, bool isMatch)
         {
             Part = part;
             IsMatch = isMatch;
-            Hue = null;
         }
-        public MatchedString(string part, Hue hue)
+
+        public MatchedString(string part, SearchMetadata metadata)
         {
+            _metadata = metadata;
             Part = part;
-            Hue = hue;
             IsMatch = true;
         }
 

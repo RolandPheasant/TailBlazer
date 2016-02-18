@@ -129,7 +129,6 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-
                                 <Button Style="{StaticResource MaterialDesignFlatButton}"
                                         Command="{Binding ShowIconSelectorCommand}"
                                         ToolTip="Change icon"
@@ -137,25 +136,10 @@
                                         Width="24" Height="24"
                                         HorizontalAlignment="Left"
                                         VerticalAlignment="Center">
-                                    <Grid>
-                                        <wpf:PackIcon 
-                                            Visibility="{Binding UsingCustomIcon.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                            Padding="2" 
-                                            Foreground="{Binding Background.Value}"
-                                            Margin="0"
-                                            VerticalAlignment="Center"
-                                            Kind="{Binding IconKind}"/>
-
-                                        <controls:SearchResultIndicator
-                                            Visibility="{Binding UsingCustomIcon.Value, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
-                                            Padding="2" 
-                                            Margin="0" 
-                                            Foreground="{Binding Background.Value}"
-                                            BorderBrush ="{x:Null}"
-                                            BorderThickness="0"
-                                            Status="{Binding Status}"                
-                                            VerticalAlignment="Center"/>
-                                    </Grid>
+                                    <wpf:PackIcon  
+                                        Padding="4" 
+                                        Foreground="{Binding Background.Value}"
+                                        Kind="{Binding IconKind}"/>
                                 </Button>
                             
                                 <TextBlock Padding="2" Margin="6 0 0 0" x:Name="Label" Grid.Column="1" 

@@ -7,6 +7,8 @@ using TailBlazer.Domain.Formatting;
 
 namespace TailBlazer.Domain.FileHandling.Search
 {
+    //public static class K
+
     public class SearchMetadata : IEquatable<SearchMetadata>
     {
         public int Position { get;  }
@@ -14,14 +16,11 @@ namespace TailBlazer.Domain.FileHandling.Search
         public bool Filter { get; }
         public bool Highlight { get; }
         public bool UseRegex { get; }
-
         public bool IgnoreCase { get; }
-
         public Optional<Regex> RegEx { get; }
-
         public Func<string, bool> Predicate { get; }
-
         public Hue HighlightHue { get; }
+        public string IconKind { get; }
 
         public SearchMetadata([NotNull] SearchMetadata searchMetadata, int newPosition)
         {
@@ -36,13 +35,15 @@ namespace TailBlazer.Domain.FileHandling.Search
             RegEx = searchMetadata.RegEx;
             Predicate = searchMetadata.Predicate;
             HighlightHue = searchMetadata.HighlightHue;
+            IconKind = searchMetadata.IconKind;
         }
 
         public SearchMetadata(int position, [NotNull] string searchText, bool filter, 
             bool highlight, 
             bool useRegex, 
             bool ignoreCase,
-            Hue highlightHue)
+            Hue highlightHue,
+            string iconKind)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
 
@@ -53,6 +54,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             UseRegex = useRegex;
             IgnoreCase = ignoreCase;
             HighlightHue = highlightHue;
+            IconKind = iconKind;
             RegEx = this.BuildRegEx();
             Predicate = this.BuildPredicate();
         }
@@ -65,7 +67,14 @@ namespace TailBlazer.Domain.FileHandling.Search
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Position == other.Position && string.Equals(SearchText, other.SearchText) && Filter == other.Filter && Highlight == other.Highlight && UseRegex == other.UseRegex && IgnoreCase == other.IgnoreCase;
+            return Position == other.Position 
+                && string.Equals(SearchText, other.SearchText) 
+                && Filter == other.Filter 
+                && Highlight == other.Highlight 
+                && UseRegex == other.UseRegex
+                && HighlightHue == other.HighlightHue
+                && IconKind == other.IconKind
+                && IgnoreCase == other.IgnoreCase;
         }
 
         public override bool Equals(object obj)
@@ -87,6 +96,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                 hashCode = (hashCode * 397) ^ HighlightHue.GetHashCode();
                 hashCode = (hashCode*397) ^ UseRegex.GetHashCode();
                 hashCode = (hashCode*397) ^ IgnoreCase.GetHashCode();
+                hashCode = (hashCode * 397) ^ IconKind.GetHashCode();
                 return hashCode;
             }
         }
@@ -114,6 +124,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                 return string.Equals(x.SearchText, y.SearchText, stringComparison)
                     && x.Highlight == y.Highlight
                     && x.HighlightHue == y.HighlightHue
+                      && x.IconKind == y.IconKind
                     && x.UseRegex == y.UseRegex
                     && x.Position == y.Position
                     && x.IgnoreCase == y.IgnoreCase;
@@ -127,6 +138,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                     var hashCode = (obj.SearchText != null ? comparer.GetHashCode(obj.SearchText) : 0);
                     hashCode = (hashCode*397) ^ obj.Highlight.GetHashCode();
                     hashCode = (hashCode * 397) ^ obj.HighlightHue.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.IconKind.GetHashCode();
                     hashCode = (hashCode*397) ^ obj.UseRegex.GetHashCode();
                     hashCode = (hashCode*397) ^ obj.IgnoreCase.GetHashCode();
                     hashCode = (hashCode * 397) ^ obj.Position.GetHashCode();

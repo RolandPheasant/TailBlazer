@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using System.Windows.Input;
 using System.Windows.Media;
-using DynamicData;
 using DynamicData.Binding;
+using DynamicData.Kernel;
 using MaterialDesignThemes.Wpf;
 using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
@@ -15,22 +13,21 @@ using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
-using TailBlazer.Views.Formatting;
 using Hue = TailBlazer.Domain.Formatting.Hue;
 
 namespace TailBlazer.Views.Searching
 {
     public class SearchOptionsProxy: AbstractNotifyPropertyChanged, IDisposable
     {
-     
         private readonly IDisposable _cleanUp;
         private readonly SearchMetadata _searchMetadata;
+        private readonly IKnownIconNames _knownIconNames;
         private bool _highlight;
         private bool _filter;
         private bool _useRegex;
         private bool _ignoreCase;
         private Hue _highlightHue;
-        private PackIconKind? _iconKind;
+        private PackIconKind _iconKind;
 
         public string Text => _searchMetadata.SearchText;
         public string RemoveTooltip => $"Get rid of {Text}?";
@@ -40,8 +37,7 @@ namespace TailBlazer.Views.Searching
         public SearchResultIndicatorStatus Status { get; }
         public ICommand ShowIconSelectorCommand { get; }
         public IconSelector IconSelector { get; }
-        public Guid Id { get; }
-        public IProperty<bool> UsingCustomIcon { get; }
+        public Guid ParentId { get; }
         public int Position => _searchMetadata.Position;
         public IProperty<Brush> Background { get; }
         public IProperty<Brush> Foreground { get; }
@@ -49,17 +45,18 @@ namespace TailBlazer.Views.Searching
         public SearchOptionsProxy([NotNull] SearchMetadata searchMetadata, 
             [NotNull] IAccentColourProvider accentColourProvider, 
             [NotNull] IconSelector iconSelector,
-            [NotNull] Action<SearchMetadata> removeAction, 
-            Guid id)
+            [NotNull] Action<SearchMetadata> removeAction,
+            [NotNull] IKnownIconNames knownIconNames,
+            Guid parentId)
         {
-            IconSelector = iconSelector;
-
             if (searchMetadata == null) throw new ArgumentNullException(nameof(searchMetadata));
             if (accentColourProvider == null) throw new ArgumentNullException(nameof(accentColourProvider));
             if (iconSelector == null) throw new ArgumentNullException(nameof(iconSelector));
             if (removeAction == null) throw new ArgumentNullException(nameof(removeAction));
-            _searchMetadata = searchMetadata;
 
+            _searchMetadata = searchMetadata;
+            _knownIconNames = knownIconNames;
+            IconSelector = iconSelector;
             ShowIconSelectorCommand = new Command(ShowIconSelector);
             RemoveCommand = new Command(() => removeAction(searchMetadata));
             HighlightCommand = new Command<Hue>(newHue =>
@@ -67,7 +64,7 @@ namespace TailBlazer.Views.Searching
                 HighlightHue = newHue;
             });
             
-            Id = id;
+            ParentId = parentId;
             Highlight = _searchMetadata.Highlight;
             Filter = _searchMetadata.Filter;
             UseRegex = searchMetadata.UseRegex;
@@ -76,9 +73,17 @@ namespace TailBlazer.Views.Searching
             HighlightHue = searchMetadata.HighlightHue;
             Status = searchMetadata.UseRegex ? SearchResultIndicatorStatus.Regex : SearchResultIndicatorStatus.Text;
 
-            UsingCustomIcon = this.WhenValueChanged(proxy => proxy.IconKind)
-                .Select(kind => kind.HasValue)
-                .ForBinding();
+            PackIconKind icon;
+            if (Enum.TryParse(_searchMetadata.IconKind, out icon))
+            {
+                IconKind = icon;
+            }
+            else
+            {
+                IconKind = knownIconNames.Selected
+                            .ParseEnum<PackIconKind>()
+                            .ValueOr(() => PackIconKind.ArrowRightBold);
+            }
 
             Foreground = this.WhenValueChanged(vm => vm.HighlightHue)
                 .Select(h => h.ForegroundBrush)
@@ -88,26 +93,20 @@ namespace TailBlazer.Views.Searching
                .Select(h => h.BackgroundBrush)
                .ForBinding();
 
-            _cleanUp = new CompositeDisposable(IconSelector, UsingCustomIcon, Foreground, Background);
+            _cleanUp = new CompositeDisposable(IconSelector,  Foreground, Background);
         }
-
-
-
+        
         private async void ShowIconSelector()
         {
-            var result = await DialogHost.Show(IconSelector, Id);
+            var result = await DialogHost.Show(IconSelector, ParentId);
             var accept = (bool?) result;
             if (accept.HasValue && accept == true)
             {
                 IconKind = IconSelector.Selected.Type;
             }
-            else
-            {
-                IconKind = null;
-            }
          }
         
-        public PackIconKind? IconKind
+        public PackIconKind IconKind
         {
             get { return _iconKind; }
             set { SetAndRaise(ref _iconKind, value); }
@@ -145,7 +144,14 @@ namespace TailBlazer.Views.Searching
 
         public static explicit operator SearchMetadata(SearchOptionsProxy proxy)
         {
-            return new SearchMetadata(proxy.Position, proxy.Text, proxy.Filter,proxy.Highlight,proxy.UseRegex,proxy.IgnoreCase,proxy.HighlightHue);
+            return new SearchMetadata(proxy.Position, 
+                proxy.Text, proxy.
+                Filter,
+                proxy.Highlight,
+                proxy.UseRegex,
+                proxy.IgnoreCase,
+                proxy.HighlightHue, 
+                proxy.IconKind.ToString());
         }
 
         public void Dispose()
