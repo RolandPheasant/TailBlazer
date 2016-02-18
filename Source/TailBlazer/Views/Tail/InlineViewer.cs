@@ -62,7 +62,8 @@ namespace TailBlazer.Views.Tail
             
             var lineScroller = new LineScroller(lineProvider, scroller);
             Count = lineProvider.Select(lp=>lp.Count).ForBinding();
-            
+
+
             //load lines into observable collection
             var loader = lineScroller.Lines.Connect()
                 .Transform(args.LineProxyFactory.Create,new ParallelisationOptions(ParallelType.Ordered,3))

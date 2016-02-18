@@ -3,10 +3,13 @@
                     xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
                     xmlns:controls="clr-namespace:TailBlazer.Controls"
                     xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
-                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:formatting="clr-namespace:TailBlazer.Domain.Formatting;assembly=TailBlazer.Domain">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.font.xaml" />
+
     </ResourceDictionary.MergedDictionaries>
 
 
@@ -17,13 +20,74 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <materialDesign:PackIcon  Foreground="{Binding IndicatorColour.Value}"
+            <materialDesign:PopupBox 
+                FontFamily="{StaticResource MaterialDesignFont}"
+                Visibility="Visible">
+                <materialDesign:PopupBox.ToggleContent>
+                    <materialDesign:PackIcon  
+                        Width="18"
+                        Height="18"
+                        Foreground="{Binding IndicatorColour.Value}"
                                       Padding="4" 
-                                      Kind="{Binding IndicatorIcon.Value}">
+                                      Kind="{Binding IndicatorIcon.Value}"/>
+                </materialDesign:PopupBox.ToggleContent>
+
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock FontSize="14"
+                        FontWeight="DemiBold"
+                        Text="This line is highlighted because:"/>
+                    
+                    <ItemsControl 
+                        Margin="0 8 0 0"
+                        Grid.Row="1" 
+                        ItemsSource="{Binding IndicatorMatches.Value}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type tail:LineMatchProxy}">
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition MinWidth="50"/>
+                                    </Grid.ColumnDefinitions>
+                                    <materialDesign:PackIcon Width="18" Height="18"  
+                                                         Foreground="{Binding Background}"
+                                                          Padding="4" 
+                                                          Kind="{Binding IconKind}"/>
+
+                                    <StackPanel  Grid.Column="1"
+                                                 Margin="4 0 4 4"
+                                                 Orientation="Horizontal">
+                                        <TextBlock  FontSize="12"
+                                                  Text="It matches"  
+                                                   VerticalAlignment="Center"/>
+
+                                        <TextBlock  
+                                            Margin="3 0 0 0"
+                                            FontSize="12"
+                                                    Text="{Binding Text}"  
+                                                    Foreground="{Binding Foreground}"
+                                                    Background="{Binding Background}"
+                                                    VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+
+                    </ItemsControl>
+                </Grid>
                 
-            </materialDesign:PackIcon>
-  
-            <controls:HighlightTextControl
+
+                
+            </materialDesign:PopupBox>
+
+
+                    <controls:HighlightTextControl
                                     Grid.Column="1" Margin="6 0 0 0"   
                                         Text="{Binding Text}" 
                                         VerticalAlignment="Center"
@@ -71,8 +135,7 @@
                 </MultiDataTrigger.EnterActions>
             </MultiDataTrigger>
 
-            <MultiDataTrigger >
-
+            <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding Path=IsRecent}" Value="True"/>
                     <Condition Binding="{Binding Path=DataContext.HighlightTail.Value, ElementName=Control}" Value="True"/>
@@ -83,9 +146,8 @@
                     <BeginStoryboard>
                         <Storyboard>
                             <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Foreground).(SolidColorBrush.Color)" 
-                                                                       
-                                                                               FromBrush="{StaticResource SecondaryAccentBrush}"
-                                                                               Duration="0:0:5"/>
+                                                                        FromBrush="{StaticResource SecondaryAccentBrush}"
+                                                                        Duration="0:0:5"/>
                         </Storyboard>
                     </BeginStoryboard>
 
@@ -136,10 +198,7 @@
         </Setter>
     </Style>
 
-
-
     <DataTemplate x:Key="LinesDataTemplate" DataType="{x:Type tail:ILinesVisualisation}">
-
         <ListBox ItemsSource="{Binding Lines}" 
                  Style="{StaticResource LinesListBoxStyle}"
                  infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}" >
@@ -152,7 +211,6 @@
                                                 TotalItems="{Binding Count.Value}"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
-
 
             <ListBox.InputBindings>
                 <KeyBinding Key="C" Modifiers="Control" Command="{Binding CopyToClipboardCommand}"/>

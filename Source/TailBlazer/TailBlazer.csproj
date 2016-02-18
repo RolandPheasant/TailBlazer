@@ -187,6 +187,7 @@
     <Compile Include="Views\FileDrop\FileDropContainer.cs" />
     <Compile Include="Views\FileDrop\FileDropMonitor.cs" />
     <Compile Include="Views\Tail\ILinesVisualisation.cs" />
+    <Compile Include="Views\Tail\LineMatchProxy.cs" />
     <Compile Include="Views\Tail\TailViewPersister.cs" />
     <Compile Include="Views\Tail\TailViewState.cs" />
     <Compile Include="Views\WindowManagement\FileHeaderNamingJob.cs" />

@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Media;
 using DynamicData.Binding;
 using DynamicData.Kernel;
 using MaterialDesignThemes.Wpf;
-using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Formatting;
@@ -16,7 +16,6 @@ namespace TailBlazer.Views.Tail
 {
     public class LineProxy: AbstractNotifyPropertyChanged,IComparable<LineProxy>, IComparable, IEquatable<LineProxy>, IDisposable
     {
-
         private readonly IDisposable _cleanUp;
 
         public static readonly IComparer<LineProxy> DefaultSort = SortExpressionComparer<LineProxy>
@@ -30,14 +29,9 @@ namespace TailBlazer.Views.Tail
         public LineKey Key { get; }
 
         public IProperty<IEnumerable<DisplayText>> FormattedText { get; }
-
-        public IProperty<SearchResultIndicatorStatus> IndicatorStatus { get; }
-
-        public IProperty<LineMatchCollection> LineMatches { get; }
-
         public IProperty<Brush> IndicatorColour { get; }
-
         public IProperty<PackIconKind> IndicatorIcon { get; }
+        public IProperty<IEnumerable<LineMatchProxy>> IndicatorMatches { get; }
 
         public bool IsRecent => Line.Timestamp.HasValue && DateTime.Now.Subtract(Line.Timestamp.Value).TotalSeconds < 0.25;
 
@@ -59,11 +53,6 @@ namespace TailBlazer.Views.Tail
             var lineMatchesShared = lineMatches.Publish();
 
             FormattedText = formattedText.ForBinding();
-            LineMatches = lineMatchesShared.ForBinding();
-
-            IndicatorStatus = lineMatchesShared
-                                .Select(lmc => CalculateStatus(lmc.FirstMatch))
-                                .ForBinding();
 
             IndicatorColour = lineMatchesShared
                                 .Select(lmc => lmc.FirstMatch?.Hue?.BackgroundBrush)
@@ -77,18 +66,22 @@ namespace TailBlazer.Views.Tail
                                         .ValueOr(() => PackIconKind.ArrowRightBold);
                                 }).ForBinding();
 
-            _cleanUp = new CompositeDisposable(FormattedText, IndicatorStatus, LineMatches, IndicatorColour, IndicatorIcon,lineMatchesShared.Connect());
+            IndicatorMatches = lineMatchesShared
+                    .Select(lmc =>
+                    {
+                        return lmc.Matches.Select(m => new LineMatchProxy(m)).ToList();
+                    }).ForBinding();
+
+
+            _cleanUp = new CompositeDisposable(FormattedText, 
+                FormattedText, 
+                IndicatorColour,
+                IndicatorMatches,
+                IndicatorIcon,
+                lineMatchesShared.Connect());
         }
 
 
-
-        private SearchResultIndicatorStatus CalculateStatus(LineMatch firstMatch)
-        {
-            if (firstMatch == null)
-                return SearchResultIndicatorStatus.None;
-
-            return firstMatch.UseRegex ? SearchResultIndicatorStatus.Regex : SearchResultIndicatorStatus.Text;
-        }
 
         public int CompareTo(LineProxy other)
         {
