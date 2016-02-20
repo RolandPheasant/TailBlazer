@@ -3,8 +3,7 @@
                     xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
                     xmlns:controls="clr-namespace:TailBlazer.Controls"
                     xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
-                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                    xmlns:formatting="clr-namespace:TailBlazer.Domain.Formatting;assembly=TailBlazer.Domain">
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
@@ -41,8 +40,9 @@
                         </Grid.RowDefinitions>
 
                         <TextBlock FontSize="14"
-                        FontWeight="DemiBold"
-                        Text="This line is highlighted because:"/>
+                                   
+                            FontWeight="DemiBold"
+                            Text="This line is highlighted because:"/>
 
                         <ItemsControl 
                         Margin="0 8 0 0"
@@ -107,9 +107,7 @@
         <Style.Setters>
             <Setter Property="Padding" Value="0"/>
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-            <!--<Setter Property="IsTabStop" Value="False"/>-->
             <Setter Property="Height" Value="22"/>
-            <!--<Setter Property="ToolTip" Value="{Binding  LineMatches.Value.Matches}"/>-->
         </Style.Setters>
 
         <Style.Triggers>
@@ -158,7 +156,7 @@
 
     <Style x:Key="LinesListBoxStyle" TargetType="{x:Type ListBox}">
         <Setter Property="IsTextSearchEnabled" Value="False" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <!--<Setter Property="FocusVisualStyle" Value="{x:Null}" />-->
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>

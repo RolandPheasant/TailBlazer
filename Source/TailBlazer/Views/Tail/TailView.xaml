@@ -27,6 +27,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.togglebutton.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.combobox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.Font.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ProgressBar.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Buttons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ToggleButtons.xaml" />
@@ -148,10 +149,11 @@
 
 
                     <ToggleButton
-                      
+                                   VerticalAlignment="Bottom" 
                                    Margin="2 0 0 0"
-                                   Padding="2,2,2,-2"
+                                   Padding="2"
                                    Width="32" 
+                                   Height="32" 
                                    IsChecked="{Binding SearchHints.UseRegex}">
 
                         <ToggleButton.Style>
@@ -387,7 +389,7 @@
 
                     <Grid.Resources>
                         <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="Opacity" Value="0.8"/>
+                            <Setter Property="Opacity" Value="0.76"/>
                             <Setter Property="VerticalAlignment" Value="Center"/>
                             <Setter Property="Foreground" Value="{StaticResource PrimaryHueMidForegroundBrush}"/>
                         </Style>
@@ -403,25 +405,74 @@
 
                     <StackPanel Grid.Column="1" Margin="4 2 6 2"
                          Orientation="Horizontal" 
-                         Visibility="Collapsed"       
+                         Visibility="Visible"       
+                                
                          HorizontalAlignment="Left">
 
-                        <TextBlock Text="DEBUGGING INFO:"/>
+                        <wpf:PopupBox 
+                                Foreground="{DynamicResource MaterialDesignBody}"
+                                PopupMode="Click"
+                                PlacementMode="TopAndAlignLeftEdges">
+                            <wpf:PopupBox.ToggleContent>
+                                <TextBlock FontSize="10" 
+                                   Text="{Binding Name}"/>
+                            </wpf:PopupBox.ToggleContent>
+                            
+                            
+                            <Grid Margin="6 0 6 0"
+                                  
+                                  HorizontalAlignment="Left">
+                                <Grid.Resources>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                 
+                                        <Setter Property="Margin" Value="5 0 0 0"/>
+                                        <Setter Property="FontWeight" Value="Light"/>
+                                        <Setter Property="FontSize" Value="10"/>
+                                        <Setter Property="FontFamily" Value="{StaticResource MaterialDesignFont}"/>
+                                    </Style>
 
-                        <TextBlock  
-                        Margin="4 0 0 0"
-                        Text="{Binding SelectedItemsCount.Value,StringFormat='\Selected Items={0} '}"
-                        VerticalAlignment="Center"/>
+                                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                                        <!--<Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>-->
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                                        <Setter Property="Margin" Value="4 0 0 0"/>
+                                        <Setter Property="FontWeight" Value="Light"/>
+                                        <Setter Property="FontSize" Value="10"/>
+                                        <Setter Property="FontFamily" Value="{StaticResource MaterialDesignFont}"/>
+                                    </Style>
 
-                        <TextBlock  
-                        Margin="4 0 0 0"
-                       Text="{Binding FirstIndex,StringFormat='\First Index={0}'}"
-                        VerticalAlignment="Center"/>
+                                </Grid.Resources>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
 
-                        <TextBlock  
-                        Margin="4 0 0 0"
-                        Text="{Binding PageSize,StringFormat='\Page Size={0}'}"
-                        VerticalAlignment="Center"/>
+                                <Button Command="{Binding OpenFileCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <wpf:PackIcon 
+                                                VerticalAlignment="Center"
+                                                Kind="FileOutline" 
+                                                Width="14" Height="14"/>
+                                        <TextBlock  Text="Open file"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Button Grid.Row="1" Command="{Binding OpenFolderCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <wpf:PackIcon 
+                                            VerticalAlignment="Center"
+                                            Kind="Folder" 
+                                            Width="14" Height="14"/>
+                                        <TextBlock  Text="Open folder"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+
+
+                        </wpf:PopupBox>
 
                     </StackPanel>
 

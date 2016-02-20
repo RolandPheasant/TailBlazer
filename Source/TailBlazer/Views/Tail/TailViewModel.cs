@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -23,9 +24,6 @@ using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {
-
-
-
     public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentStateProvider
     {
         private readonly IDisposable _cleanUp;
@@ -43,6 +41,9 @@ namespace TailBlazer.Views.Tail
 
         public Guid Id { get; }= Guid.NewGuid();
         public ICommand CopyToClipboardCommand { get; }
+        public ICommand OpenFileCommand { get; }
+        public ICommand OpenFolderCommand { get; }
+
         public ISelectionMonitor SelectionMonitor { get; }
         public SearchOptionsViewModel SearchOptions { get;  }
         public SearchHints SearchHints { get;  }
@@ -73,8 +74,7 @@ namespace TailBlazer.Views.Tail
             [NotNull] ISetting<GeneralOptions> generalOptions,
             [NotNull] ISearchMetadataCollection searchMetadataCollection,
             [NotNull] SearchOptionsViewModel searchOptionsViewModel,
-            [NotNull] SearchHints searchHints,
-            IObjectProvider objectProvider)
+            [NotNull] SearchHints searchHints)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
@@ -93,9 +93,12 @@ namespace TailBlazer.Views.Tail
             SelectionMonitor = selectionMonitor;
             SearchOptions = searchOptionsViewModel;
             SearchHints = searchHints;
-            CopyToClipboardCommand = new Command(()=> clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
             SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
 
+            CopyToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
+            OpenFileCommand = new Command(() => Process.Start(fileWatcher.FullName));
+            OpenFolderCommand = new Command(() => Process.Start(fileWatcher.Folder));
+            
             UsingDarkTheme = generalOptions.Value
                     .ObserveOn(schedulerProvider.MainThread)
                     .Select(options => options.Theme== Theme.Dark)
@@ -121,8 +124,6 @@ namespace TailBlazer.Views.Tail
                         .Do(x=>logger.Info("Scrolling to {0}/{1}", x.FirstIndex,x.PageSize))
                         .DistinctUntilChanged();
 
-            //IsLoading = searchInfoCollection.All.Take(1).Select(_ => false).StartWith(true).ForBinding();
-            
             FileStatus = fileWatcher.Status.ForBinding();
 
             //command to add the current search to the tail collection
