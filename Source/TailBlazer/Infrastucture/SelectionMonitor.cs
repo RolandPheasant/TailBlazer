@@ -67,7 +67,7 @@ namespace TailBlazer.Infrastucture
 
         public IEnumerable<string> GetSelectedItems()
         {
-            return _selected.Items.OrderBy(proxy=> proxy.Index).Select(proxy => proxy.Line.Text);
+            return _selected.Items.OrderBy(proxy=> proxy.Start).Select(proxy => proxy.Line.Text);
         } 
         
         void IAttachedListBox.Receive(ListBox selector)
@@ -123,6 +123,7 @@ namespace TailBlazer.Infrastucture
                                     h => selector.PreviewMouseDown += h,
                                     h => selector.PreviewMouseDown -= h)
                                     .Select(evt => evt.EventArgs)
+                                    .Where(mouseArgs=> mouseArgs.ChangedButton==MouseButton.Left)
                                     .Subscribe(mouseArgs =>
                                     {
                                         var isKeyDown = (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)
@@ -174,7 +175,7 @@ namespace TailBlazer.Infrastucture
                     {
 
                         //DISABLE FOR NOW AT IT IS CAUSING ISSUES WITH MULTI-SELECTION
-                        return;
+                        //return;
 
                         if (_isSelecting)
                             return;

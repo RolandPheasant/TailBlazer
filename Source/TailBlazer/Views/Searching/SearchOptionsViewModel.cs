@@ -36,12 +36,7 @@ namespace TailBlazer.Views.Searching
         {
 
             SearchHints = searchHints;
-
-            bool binding = false;
-
             var positionMonitor = new SerialDisposable();
-
-            ReadOnlyObservableCollection<SearchOptionsProxy> data;
 
             var proxyItems = metadataCollection.Metadata.Connect()
                 .WhereReasonsAre(ChangeReason.Add, ChangeReason.Remove) //ignore updates because we update from here
@@ -74,6 +69,8 @@ namespace TailBlazer.Views.Searching
                                                                 }));
 
             //load data onto grid
+            ReadOnlyObservableCollection<SearchOptionsProxy> data;
+
             var userOptions = proxyItems.Connect()
                 .Sort(SortExpressionComparer<SearchOptionsProxy>.Ascending(proxy => proxy.Position))
                 .ObserveOn(schedulerProvider.MainThread)
@@ -95,13 +92,13 @@ namespace TailBlazer.Views.Searching
                     metadataCollection.AddorUpdate(meta);
                 });
             });
-
-
+            
             _cleanUp = new CompositeDisposable(searchInvoker,
                 positionMonitor,
                 userOptions,
                 searchInvoker,
-                monitor);
+                monitor,
+                SearchHints);
         }
 
         private IObservable<IEnumerable<SearchMetadata>> MonitorPositionalChanges()
