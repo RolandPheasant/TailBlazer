@@ -7,6 +7,7 @@ using System.Reactive.Subjects;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
+using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
 using TailBlazer.Views.Recent;

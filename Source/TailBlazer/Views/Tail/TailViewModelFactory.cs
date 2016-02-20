@@ -14,16 +14,19 @@ namespace TailBlazer.Views.Tail
         private readonly IObjectProvider _objectProvider;
         private readonly ISchedulerProvider _schedulerProvider;
         private readonly IAccentColourProvider _accentColourProvider;
+        private readonly ISearchMetadataFactory _searchMetadataFactory;
         private readonly IIconProvider _iconProvider;
 
         public TailViewModelFactory(IObjectProvider objectProvider, 
             ISchedulerProvider schedulerProvider,
             IAccentColourProvider accentColourProvider,
+            ISearchMetadataFactory searchMetadataFactory,
             IIconProvider iconProvider)
         {
             _objectProvider = objectProvider;
             _schedulerProvider = schedulerProvider;
             _accentColourProvider = accentColourProvider;
+            _searchMetadataFactory = searchMetadataFactory;
             _iconProvider = iconProvider;
         }
 
@@ -40,9 +43,8 @@ namespace TailBlazer.Views.Tail
 
             var searchMetadataCollection = _objectProvider.Get<ISearchMetadataCollection>();
             var searchHints = _objectProvider.Get<SearchHints>();
-            var searchOptionsViewModel = new SearchOptionsViewModel(searchMetadataCollection, _schedulerProvider, _accentColourProvider, _iconProvider, searchHints);
-
-
+            var searchOptionsViewModel = new SearchOptionsViewModel(searchMetadataCollection, _searchMetadataFactory, _schedulerProvider, _accentColourProvider, _iconProvider, searchHints);
+            
             var searchInfo = _objectProvider.Get<ISearchInfoCollection>
                 (
                     new[]

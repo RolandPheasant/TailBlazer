@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.FileHandling.Search
 {
@@ -8,18 +9,24 @@ namespace TailBlazer.Domain.FileHandling.Search
         string Search { get; }
         string Selected { get; }
 
-        IEnumerable<DefaultIcons> DefaultIcons();
+        string SelectIconFor(string text, bool useRegex);
+
     }
+
+
 
     public class DefaultIcons
     {
         public string Text { get; }
         public string IconName { get; }
+        public bool MatchTextOnCase { get;  }
 
-        public DefaultIcons(string text, string iconName)
+
+        public DefaultIcons(string text, string iconName, bool matchTextOnCase=true)
         {
             Text = text;
             IconName = iconName;
+            MatchTextOnCase = matchTextOnCase;
         }
 
     }

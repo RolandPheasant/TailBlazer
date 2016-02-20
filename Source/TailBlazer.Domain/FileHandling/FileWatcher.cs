@@ -33,8 +33,12 @@ namespace TailBlazer.Domain.FileHandling
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
 
             var shared = fileInfo.WatchFile(scheduler: scheduler ?? Scheduler.Default);
+                        //.Replay(1)
+                        //.RefCount();
 
-            Latest = shared.TakeWhile(notification => notification.Exists).Repeat();
+            Latest = shared
+                        .TakeWhile(notification => notification.Exists)
+                        .Repeat();
 
             Status = shared.Select(notificiation =>
             {
@@ -46,8 +50,5 @@ namespace TailBlazer.Domain.FileHandling
             .StartWith(FileStatus.Loading)
             .DistinctUntilChanged();
         }
-
-
-
     }
 }

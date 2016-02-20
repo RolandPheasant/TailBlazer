@@ -10,6 +10,7 @@ namespace TailBlazer.Domain.FileHandling.Search
     public sealed class SearchInfoCollection : ISearchInfoCollection
     {
         private readonly ISearchMetadataCollection _metadataCollection;
+        private readonly ISearchMetadataFactory _searchMetadataFactory;
         private readonly IAccentColourProvider _accentColourProvider;
         private readonly IFileWatcher _fileWatcher;
         private readonly IKnownIconNames _knownIconNames;
@@ -19,12 +20,14 @@ namespace TailBlazer.Domain.FileHandling.Search
         
         public IObservable<ILineProvider> All { get; }
         
-        public SearchInfoCollection(ISearchMetadataCollection searchMetadataCollection, 
+        public SearchInfoCollection(ISearchMetadataCollection searchMetadataCollection,
+            ISearchMetadataFactory searchMetadataFactory,
             IAccentColourProvider accentColourProvider,
             IFileWatcher fileWatcher,
             IKnownIconNames knownIconNames)
         {
             _metadataCollection = searchMetadataCollection;
+            _searchMetadataFactory = searchMetadataFactory;
             _accentColourProvider = accentColourProvider;
             _fileWatcher = fileWatcher;
             _knownIconNames = knownIconNames;
@@ -60,8 +63,10 @@ namespace TailBlazer.Domain.FileHandling.Search
         public void Add([NotNull] string searchText, bool useRegex)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
-            var icon = useRegex ? _knownIconNames.RegEx : _knownIconNames.Search;
-            _metadataCollection.AddorUpdate(new SearchMetadata(_metadataCollection.NextIndex(), searchText,true,true, useRegex,true, _accentColourProvider.DefaultHighlight, icon));
+
+            var index = _metadataCollection.NextIndex();
+            var metatdata = _searchMetadataFactory.Create(searchText, useRegex, index,true);
+            _metadataCollection.AddorUpdate(metatdata);
         }
 
         public void Remove(string searchText)

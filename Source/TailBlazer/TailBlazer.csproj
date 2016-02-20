@@ -174,7 +174,6 @@
     <Compile Include="Views\Recent\RecentSearch.cs" />
     <Compile Include="Views\Recent\RecentSearchCollection.cs" />
     <Compile Include="Views\Recent\RecentFilesToStateConverter.cs" />
-    <Compile Include="Views\Searching\RegexInspector.cs" />
     <Compile Include="Views\Searching\SearchHintMessage.cs" />
     <Compile Include="Views\Searching\SearchOptionsProxy.cs" />
     <Compile Include="Views\Searching\SearchOptionsView.xaml.cs">

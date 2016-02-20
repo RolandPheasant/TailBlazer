@@ -10,6 +10,13 @@ using TailBlazer.Views.Formatting;
 
 namespace TailBlazer.Views.Searching
 {
+    public enum IconSelectorResult
+    {
+        UseSelected,
+        UseDefault,
+        None
+    }
+
     public class IconSelector : AbstractNotifyPropertyChanged, IDisposable
     {
         private readonly IDisposable _cleanUp;

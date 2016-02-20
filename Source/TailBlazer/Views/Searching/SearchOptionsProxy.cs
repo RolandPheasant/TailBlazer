@@ -17,6 +17,8 @@ using Hue = TailBlazer.Domain.Formatting.Hue;
 
 namespace TailBlazer.Views.Searching
 {
+
+
     public class SearchOptionsProxy: AbstractNotifyPropertyChanged, IDisposable
     {
         private readonly IDisposable _cleanUp;
@@ -45,7 +47,7 @@ namespace TailBlazer.Views.Searching
         public SearchOptionsProxy([NotNull] SearchMetadata searchMetadata, 
             [NotNull] IAccentColourProvider accentColourProvider, 
             [NotNull] IconSelector iconSelector,
-            [NotNull] Action<SearchMetadata> removeAction,
+            [NotNull] Action<SearchMetadata> removeAction, 
             [NotNull] IKnownIconNames knownIconNames,
             Guid parentId)
         {
@@ -53,10 +55,12 @@ namespace TailBlazer.Views.Searching
             if (accentColourProvider == null) throw new ArgumentNullException(nameof(accentColourProvider));
             if (iconSelector == null) throw new ArgumentNullException(nameof(iconSelector));
             if (removeAction == null) throw new ArgumentNullException(nameof(removeAction));
+            if (knownIconNames == null) throw new ArgumentNullException(nameof(knownIconNames));
 
             _searchMetadata = searchMetadata;
             _knownIconNames = knownIconNames;
             IconSelector = iconSelector;
+
             ShowIconSelectorCommand = new Command(ShowIconSelector);
             RemoveCommand = new Command(() => removeAction(searchMetadata));
             HighlightCommand = new Command<Hue>(newHue =>
@@ -73,17 +77,13 @@ namespace TailBlazer.Views.Searching
             HighlightHue = searchMetadata.HighlightHue;
             Status = searchMetadata.UseRegex ? SearchResultIndicatorStatus.Regex : SearchResultIndicatorStatus.Text;
 
-            PackIconKind icon;
-            if (Enum.TryParse(_searchMetadata.IconKind, out icon))
-            {
-                IconKind = icon;
-            }
-            else
-            {
-                IconKind = knownIconNames.Selected
-                            .ParseEnum<PackIconKind>()
-                            .ValueOr(() => PackIconKind.ArrowRightBold);
-            }
+            IconKind = _searchMetadata.IconKind.ParseEnum<PackIconKind>()
+                            .ValueOr(() =>
+                            {
+                                return knownIconNames.Selected
+                                    .ParseEnum<PackIconKind>()
+                                    .ValueOr(() => PackIconKind.ArrowRightBold);
+                            });
 
             Foreground = this.WhenValueChanged(vm => vm.HighlightHue)
                 .Select(h => h.ForegroundBrush)
@@ -98,9 +98,15 @@ namespace TailBlazer.Views.Searching
         
         private async void ShowIconSelector()
         {
-            var result = await DialogHost.Show(IconSelector, ParentId);
-            var accept = (bool?) result;
-            if (accept.HasValue && accept == true)
+            var dialogResult = await DialogHost.Show(IconSelector, ParentId);
+            var result = (IconSelectorResult)dialogResult;
+            if (result == IconSelectorResult.UseDefault)
+            {
+                //Use default
+                var icon = _knownIconNames.SelectIconFor(Text, UseRegex);
+                IconKind = icon.ParseEnum<PackIconKind>().ValueOr(() => PackIconKind.ArrowRightBold);
+            }
+            else if (result == IconSelectorResult.UseSelected)
             {
                 IconKind = IconSelector.Selected.Type;
             }

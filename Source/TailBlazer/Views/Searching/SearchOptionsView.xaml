@@ -148,10 +148,14 @@
                                        Text="{Binding Text}"
                                         VerticalAlignment="Center"/>
 
-                            <wpf:PopupBox Grid.Column="2">
+                            <wpf:PopupBox Grid.Column="2"
+                            
+                                            FontFamily="{StaticResource MaterialDesignFont}"
+                                          PopupMode="Click">
                                 <wpf:PopupBox.ToggleContent>
                                     <wpf:PackIcon Kind="FormatPaint" 
                                             Margin="4 0 4 0" Width="14" Height="14"
+  
                                             Foreground="{Binding Background.Value}" />
                                 </wpf:PopupBox.ToggleContent>
 

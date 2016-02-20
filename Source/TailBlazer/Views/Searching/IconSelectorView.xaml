@@ -16,10 +16,10 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Buttons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ToggleButtons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/TextBoxes.xaml" />
-                <!--<ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Colours.xaml" />-->
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Control.Resources>
@@ -28,15 +28,26 @@
 
         <Grid Margin="4">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Margin="0 6 0 6">
-                <TextBox 
+        <TextBlock FontSize="14"
+                        FontWeight="DemiBold"
+                        Text="Select an icon to use as a row indicator:"/>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0 6 0 6">
+                <materialDesign:PackIcon Kind="Magnify" Width="22" Height="22"
+                                         Foreground="{Binding ElementName= SearchBox, Path=BorderBrush}"
+                                         VerticalAlignment="Bottom">
+                    
+                </materialDesign:PackIcon>
+            
+                <TextBox x:Name="SearchBox"
                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                    materialDesign:TextFieldAssist.Hint="Search for icon" 
+                    materialDesign:TextFieldAssist.Hint="Enter text to find icon" 
                     VerticalAlignment="Center"
                     materialDesign:ValidationAssist.UsePopup="False"                   
                     MinWidth="200">
@@ -44,7 +55,7 @@
 
             </StackPanel>
 
-            <ListBox Grid.Row="1" Height="225" Width="375" 
+            <ListBox Grid.Row="2" Height="225" Width="375" 
                      SelectedItem="{Binding Selected}"
                      ItemsSource="{Binding Icons}">
 
@@ -52,48 +63,62 @@
                     <DataTemplate DataType="{x:Type local:IconDescription}">
                         <materialDesign:PackIcon
                             Padding="2"
-                            Kind="{Binding Type}" 
-                                ToolTip="{Binding Description}"
-                                VerticalAlignment="Center" 
-                                HorizontalAlignment="Center"/>
+                            Kind="{Binding Type,FallbackValue={x:Static materialDesign:PackIconKind.Information}}"   
+                          
+                            VerticalAlignment="Center" 
+                            HorizontalAlignment="Center"/>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
 
-                <ListBox.ItemsPanel>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                        <Setter Property="ToolTip">
+                            <Setter.Value>
+                            <TextBlock Text="{Binding Description}" />
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+
+            <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                     <infrastucture:VirtualizingWrapPanel ItemHeight="32" ItemWidth="32" />
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
             </ListBox>
 
-        <Grid Grid.Row="2" Margin="0 6 0 6">
+        <Grid Grid.Row="3" Margin="0 6 0 6">
 
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-          
             <Button  Grid.Column="0" IsDefault="False"
-                 HorizontalAlignment="Right"
-                 Style="{DynamicResource MaterialDesignFlatButton}"
-                 Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
-                Use Default
-                <Button.CommandParameter>
-                    <system:Boolean>False</system:Boolean>
-                </Button.CommandParameter>
-            </Button>
+                HorizontalAlignment="Right"
+                Style="{DynamicResource MaterialDesignFlatButton}"
+                Content="Close"
+                ToolTip="Close and do nothing"     
+                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                CommandParameter="{x:Static local:IconSelectorResult.None}"/>
 
-            <Button  Grid.Column="1" IsDefault="True"
-                 HorizontalAlignment="Right"
-                 Style="{DynamicResource MaterialDesignFlatButton}"
-                 IsEnabled="{Binding HasSelection.Value}"
-                 Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
-                Use Selected Icon
 
-                <Button.CommandParameter>
-                    <system:Boolean>True</system:Boolean>
-                </Button.CommandParameter>
-            </Button>
+            <Button  Grid.Column="1" IsDefault="False"
+                HorizontalAlignment="Right"
+                Style="{DynamicResource MaterialDesignFlatButton}"
+                ToolTip="Allow Tail Blazer to choose you icon" 
+                Content="Use Default"
+                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                CommandParameter="{x:Static local:IconSelectorResult.UseDefault}"/>
+            
+            <Button  Grid.Column="2" IsDefault="True"
+                HorizontalAlignment="Right"
+                Style="{DynamicResource MaterialDesignFlatButton}"
+                ToolTip="Use the selected icon" 
+                Content="Use Selected"
+                IsEnabled="{Binding HasSelection.Value}"
+                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                CommandParameter="{x:Static local:IconSelectorResult.UseSelected}"/>
         </Grid>
 
     </Grid>

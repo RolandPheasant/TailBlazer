@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Windows;
 using System.Windows.Media;
 using DynamicData.Binding;
 using DynamicData.Kernel;
@@ -32,6 +33,7 @@ namespace TailBlazer.Views.Tail
         public IProperty<Brush> IndicatorColour { get; }
         public IProperty<PackIconKind> IndicatorIcon { get; }
         public IProperty<IEnumerable<LineMatchProxy>> IndicatorMatches { get; }
+        public IProperty<Visibility> ShowIndicator { get; }
 
         public bool IsRecent => Line.Timestamp.HasValue && DateTime.Now.Subtract(Line.Timestamp.Value).TotalSeconds < 0.25;
 
@@ -54,6 +56,10 @@ namespace TailBlazer.Views.Tail
 
             FormattedText = formattedText.ForBinding();
 
+            ShowIndicator = lineMatchesShared
+                    .Select(lmc => lmc.HasMatches ? Visibility.Visible: Visibility.Collapsed)
+                    .ForBinding();
+            
             IndicatorColour = lineMatchesShared
                                 .Select(lmc => lmc.FirstMatch?.Hue?.BackgroundBrush)
                                 .ForBinding();
@@ -64,23 +70,22 @@ namespace TailBlazer.Views.Tail
                                     var icon = lmc.FirstMatch?.Icon;
                                     return icon.ParseEnum<PackIconKind>()
                                         .ValueOr(() => PackIconKind.ArrowRightBold);
-                                }).ForBinding();
+                                }).StartWith(PackIconKind.ArrowRightBold).ForBinding();
 
             IndicatorMatches = lineMatchesShared
                     .Select(lmc =>
                     {
                         return lmc.Matches.Select(m => new LineMatchProxy(m)).ToList();
                     }).ForBinding();
-
+        
 
             _cleanUp = new CompositeDisposable(FormattedText, 
-                FormattedText, 
                 IndicatorColour,
                 IndicatorMatches,
                 IndicatorIcon,
+                ShowIndicator,
                 lineMatchesShared.Connect());
         }
-
 
 
         public int CompareTo(LineProxy other)

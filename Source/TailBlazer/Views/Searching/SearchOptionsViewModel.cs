@@ -30,6 +30,7 @@ namespace TailBlazer.Views.Searching
         public SearchHints SearchHints { get;  }
 
         public SearchOptionsViewModel(ISearchMetadataCollection metadataCollection,
+            ISearchMetadataFactory searchMetadataFactory,
             ISchedulerProvider schedulerProvider,
             IAccentColourProvider accentColourProvider,
             IIconProvider iconsProvider,
@@ -49,11 +50,10 @@ namespace TailBlazer.Views.Searching
                 .Where(args => args.PreviousOrder != null && args.NewOrder.Length == args.PreviousOrder.Length)
                 .Select(positionChangedArgs =>
                 {
-                    //reprioritise filters and highlights
+                  //reprioritise filters and highlights
                     return positionChangedArgs.NewOrder
                         .OfType<SearchOptionsProxy>()
                         .Select((item, index) => new {Meta = (SearchMetadata) item, index})
-                        //.Where(x => x.index != x.Meta.Position)
                         .Select(x => new SearchMetadata(x.Meta, x.index))
                         .ToArray();
                 })
@@ -65,6 +65,7 @@ namespace TailBlazer.Views.Searching
             ReadOnlyObservableCollection<SearchOptionsProxy> data;
             
             var userOptions = metadataCollection.Metadata.Connect()
+
                 .WhereReasonsAre(ChangeReason.Add, ChangeReason.Remove) //ignore updates because we update from here
                 .Transform(meta =>
                 {
@@ -80,10 +81,7 @@ namespace TailBlazer.Views.Searching
                 {
                     //when a value changes, write the original value back to the cache
                     return so.WhenAnyPropertyChanged()
-                        .Select(
-                            _ =>
-                                new SearchMetadata(so.Position, so.Text, so.Filter, so.Highlight, so.UseRegex,
-                                    so.IgnoreCase, so.HighlightHue, so.IconKind.ToString()))
+                        .Select(_ => (SearchMetadata)so)
                         .Subscribe(metadataCollection.AddorUpdate);
                 })
                 .Sort(SortExpressionComparer<SearchOptionsProxy>.Ascending(proxy => proxy.Position))
@@ -99,14 +97,11 @@ namespace TailBlazer.Views.Searching
             {
                 schedulerProvider.Background.Schedule(() =>
                 {
-                    var icon = request.UseRegEx
-                        ? _iconsProvider.KnownIconNames.RegEx
-                        : _iconsProvider.KnownIconNames.Search;
-                    metadataCollection.AddorUpdate(new SearchMetadata(metadataCollection.NextIndex(),
-                        request.Text, false, true,
-                        request.UseRegEx, true,
-                        accentColourProvider.DefaultHighlight,
-                        icon));
+                    var meta = searchMetadataFactory.Create(request.Text, 
+                            request.UseRegEx,
+                            metadataCollection.NextIndex(), 
+                            false);
+                    metadataCollection.AddorUpdate(meta);
                 });
             });
 
@@ -117,11 +112,11 @@ namespace TailBlazer.Views.Searching
                 orderChanged);
         }
 
-        public string SearchText
-        {
-            get { return _searchText; }
-            set { SetAndRaise(ref _searchText, value); }
-        }
+        //public string SearchText
+        //{
+        //    get { return _searchText; }
+        //    set { SetAndRaise(ref _searchText, value); }
+        //}
 
         public void Dispose()
         {

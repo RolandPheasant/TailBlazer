@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
+using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.Infrastructure;
 
 // ReSharper disable once CheckNamespace
@@ -24,11 +25,19 @@ namespace DynamicData.Binding
             });
         }
 
-        public static IObservable<IChangeSet<TObject, TKey>> RecordErrors<TObject, TKey>(this IObservable<IChangeSet<TObject, TKey>> source, ILogger logger)
+
+        public static IObservable<T> RecordErrors<T>(this IObservable<T> source, ILogger logger)
         {
-            return source.Do(changes =>{}, ex => logger.Error(ex, "There has been an error "));
+            return source.Do(changes => { }, ex => logger.Error(ex, "There has been an error "));
         }
 
+        public static IObservable<T> LogValueAndErrors<T>([NotNull] this IObservable<T> source, [NotNull] ILogger logger, [NotNull] Func<T, string> formatter)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+            if (formatter == null) throw new ArgumentNullException(nameof(formatter));
+            return source.Do(t =>  logger.Info(formatter(t)), ex => logger.Error(ex, "There has been an error "));
+        }
 
         public static IObservable<IChangeSet<TObject,TKey>> RecordChanges<TObject, TKey>(this IObservable<IChangeSet<TObject, TKey>> source, ILogger logger, string label)
         {
