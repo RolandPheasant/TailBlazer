@@ -33,41 +33,39 @@
     </Control.Resources>
 
     <wpf:DialogHost Identifier="{Binding Id}">
-        <Grid>
+        <Grid Width="435" Height="325">
         <Grid.RowDefinitions>
             <RowDefinition  Height="Auto"/>
+            <RowDefinition  Height="Auto"/>
             <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+             <RowDefinition  Height="Auto"/>
+            </Grid.RowDefinitions>
         
         <TextBlock 
-                Margin="6,8,0,0"
+                Margin="6 8 6 0"
                 FontSize="16"
                 FontWeight="DemiBold"
                 Text="Search and Highlight Options"/>
 
-        <Grid Grid.Row="1" Height="250" Width="405" Margin="8">
-            <Grid.RowDefinitions>
-                <RowDefinition  Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
-            <Grid Grid.Row="0">
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
 
-                <ToggleButton Margin="2 0 0 0"
-                                   Padding="2,2,2,-2"
+                <ToggleButton
+                                   VerticalAlignment="Bottom" 
+                                   Margin="2 0 0 0"
+                                   Padding="2"
                                    Width="32" 
+                                   Height="32" 
                                    IsChecked="{Binding SearchHints.UseRegex}">
 
                     <ToggleButton.Style>
                         <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource  SearchToggleStyle}">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding SearchHints.IsValid.Value.IsValid}" Value="False">
+                                <DataTrigger Binding="{Binding SearchHints.IsValid.Value}" Value="False">
                                     <Setter Property="Foreground" Value="{DynamicResource ValidationErrorBrush}"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -75,36 +73,24 @@
                     </ToggleButton.Style>
                 </ToggleButton>
 
-                <!--<TextBox Grid.Column="1" 
-                            Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                             wpf:TextFieldAssist.Hint="{Binding SearchHints.IsValid.Value.Message}" 
-                            VerticalAlignment="Center"
-                            wpf:ValidationAssist.UsePopup="False"
-                            Style="{StaticResource FloatingHintAndErrorTextBox}"
-                            Validation.ErrorTemplate="{StaticResource BorderOnlyValidationErrorTemplate}" 
-                            MinWidth="180">
-                    <TextBox.InputBindings>
-                        <KeyBinding Key="Enter" Command="{Binding SearchHints.AddSearchCommand}"/>
-                    </TextBox.InputBindings>
-                </TextBox>-->
-
-
                 <TextBox Grid.Column="1" 
-                            Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                             wpf:TextFieldAssist.Hint="{Binding SearchHints.IsValid.Value.Message}" 
-                            VerticalAlignment="Center"
-                            wpf:ValidationAssist.UsePopup="False"
-                            Style="{StaticResource FloatingHintAndErrorTextBox}"
-                            Validation.ErrorTemplate="{StaticResource BorderOnlyValidationErrorTemplate}" 
-                            MinWidth="180">
+                        Margin="0 4 0 0"
+                        Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                        wpf:TextFieldAssist.Hint="{Binding SearchHints.Message.Value}" 
+                        VerticalAlignment="Center"
+                        wpf:ValidationAssist.UsePopup="False"
+                        Style="{StaticResource FloatingHintAndErrorTextBox}"
+                        Validation.ErrorTemplate="{StaticResource BorderOnlyValidationErrorTemplate}" 
+                        MinWidth="180">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding SearchHints.AddSearchCommand}"/>
                     </TextBox.InputBindings>
                 </TextBox>
-
             </Grid>
-            
-            <dragablz:DragablzItemsControl  Grid.Row="1" 
+
+
+            <dragablz:DragablzItemsControl  Grid.Row="2" 
+                                             Margin="6 0 6 0"
                                                 ItemContainerStyle="{StaticResource DragableItem}"
                                                 HorizontalContentAlignment="Stretch"
                                                 PositionMonitor="{Binding PositionMonitor}"
@@ -115,120 +101,122 @@
                 </dragablz:DragablzItemsControl.ItemsOrganiser>
 
                 <dragablz:DragablzItemsControl.ItemTemplate>
-                        <DataTemplate DataType="{x:Type searching:SearchOptionsProxy}">
+                    <DataTemplate DataType="{x:Type searching:SearchOptionsProxy}">
 
                         <Grid Margin="4 4 4 4" x:Name="Row">
                             <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="22"/>
-                                    <ColumnDefinition Width="75"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="22"/>
+                                <ColumnDefinition Width="75"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
 
-                                <Button Style="{StaticResource MaterialDesignFlatButton}"
+                            <Button Style="{StaticResource MaterialDesignFlatButton}"
                                         Command="{Binding ShowIconSelectorCommand}"
                                         ToolTip="Change icon"
                                         Padding="0"
                                         Width="24" Height="24"
                                         HorizontalAlignment="Left"
                                         VerticalAlignment="Center">
-                                    <wpf:PackIcon  
+                                <wpf:PackIcon  
                                         Padding="4" 
                                         Foreground="{Binding Background.Value}"
-                                        Kind="{Binding IconKind}"/>
-                                </Button>
-                            
-                                <TextBlock Padding="2" Margin="6 0 0 0" x:Name="Label" Grid.Column="1" 
+                                        Kind="{Binding IconKind,FallbackValue={x:Static wpf:PackIconKind.ArrowRightBold}}"/>
+                            </Button>
+
+                            <TextBlock Padding="2" Margin="6 0 0 0" x:Name="Label" Grid.Column="1" 
                                        Foreground="{Binding Foreground.Value}"
                                        Background="{Binding Background.Value}"
                                        Text="{Binding Text}"
                                         VerticalAlignment="Center"/>
 
-                            <wpf:PopupBox Grid.Column="2"
-                            
-                                            FontFamily="{StaticResource MaterialDesignFont}"
-                                          PopupMode="Click">
+                            <wpf:PopupBox
+                                    ToolTip="Change colour"
+                                    Grid.Column="2"
+                                    FontFamily="{StaticResource MaterialDesignFont}"
+                                    PopupMode="Click">
                                 <wpf:PopupBox.ToggleContent>
                                     <wpf:PackIcon Kind="FormatPaint" 
                                             Margin="4 0 4 0" Width="14" Height="14"
-  
                                             Foreground="{Binding Background.Value}" />
                                 </wpf:PopupBox.ToggleContent>
 
-                                    <ItemsControl ItemsSource="{Binding Hues}" 
+                                <ItemsControl ItemsSource="{Binding Hues}" 
                                                   Margin="4"
                                                   Background="Transparent">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
                                                         BorderBrush="{DynamicResource GrayBrush2}"
                                                         BorderThickness="0"
                                                         wpf:ShadowAssist.ShadowDepth="Depth2"
                                                         Command="{Binding ElementName=Row,Path=DataContext.HighlightCommand}"
                                                         CommandParameter="{Binding}"
                                                         Margin="2">
-                                                    <Button.Background>
-                                                        <SolidColorBrush Color="{Binding Background, Mode=OneTime}" />
-                                                    </Button.Background>
+                                                <Button.Background>
+                                                    <SolidColorBrush Color="{Binding Background, Mode=OneTime}" />
+                                                </Button.Background>
 
-                                                    <TextBlock Text="{Binding ElementName=Label,Path=Text}" Margin="2">
-                                                        <TextBlock.Foreground>
-                                                            <SolidColorBrush Color="{Binding Foreground, Mode=OneTime}" />
-                                                        </TextBlock.Foreground>
-                                                    </TextBlock>
-                                                </Button>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
+                                                <TextBlock Text="{Binding ElementName=Label,Path=Text}" Margin="2">
+                                                    <TextBlock.Foreground>
+                                                        <SolidColorBrush Color="{Binding Foreground, Mode=OneTime}" />
+                                                    </TextBlock.Foreground>
+                                                </TextBlock>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
 
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <UniformGrid Columns="4"/>
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                    </ItemsControl>
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <UniformGrid Columns="4"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
 
                             </wpf:PopupBox>
 
                             <CheckBox Margin="4 0 0 0" Grid.Column="3" 
                                       VerticalAlignment="Center"
                                       IsChecked="{Binding Filter}" 
+                                      ToolTip="Filter lines this value"
                                       Content="Filter"/>
-                                
-                                <CheckBox Margin="4 0 0 0" Grid.Column="4" 
+
+                            <CheckBox Margin="4 0 0 0" Grid.Column="4" 
                                       VerticalAlignment="Center"
                                       IsChecked="{Binding Highlight}" 
+                                      ToolTip="Highlight text within the line"
                                       Content="Highlight"/>
 
-                                <CheckBox Margin="4 0 0 0" Grid.Column="5" 
+                            <CheckBox Margin="4 0 0 0" Grid.Column="5" 
                                       VerticalAlignment="Center"
                                       IsChecked="{Binding IgnoreCase}" 
                                       Content="Ignore Case"/>
 
 
-                                <Button Margin="8 0 6 0"
+                            <Button Margin="8 0 6 0"
                                         Grid.Column="6" 
                                         ToolTip="{Binding RemoveTooltip}"
                                         VerticalAlignment="Center"
                                         Command="{Binding RemoveCommand}"
                                         Style="{StaticResource CloseButtonStyle}"/>
-                            </Grid>
+                        </Grid>
 
-                        </DataTemplate>
-                    </dragablz:DragablzItemsControl.ItemTemplate>
-                </dragablz:DragablzItemsControl>
-
-            <Button  Grid.Row="2" IsDefault="True"
+                    </DataTemplate>
+                </dragablz:DragablzItemsControl.ItemTemplate>
+            </dragablz:DragablzItemsControl>
+            
+            <Button  Grid.Row="3" IsDefault="True"
+                     Margin="0 0 6 0"
                  HorizontalAlignment="Right"
                  Style="{DynamicResource MaterialDesignFlatButton}"
                     Command="{x:Static wpf:DialogHost.CloseDialogCommand}">
                 Finished
             </Button>
         </Grid>
-    </Grid>
 
     </wpf:DialogHost>
 </UserControl>

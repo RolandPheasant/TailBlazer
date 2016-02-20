@@ -25,11 +25,13 @@ namespace TailBlazer.Views.Searching
 
         public ReadOnlyObservableCollection<string> Hints => _hints;
 
-        public IProperty<SearchHintMessage> IsValid { get; }
-
         public ICommand AddSearchCommand { get; }
 
-        public IObservable<SearchRequest> SearchRequested { get; } 
+        public IObservable<SearchRequest> SearchRequested { get; }
+
+        public IProperty<bool> IsValid { get; }
+
+        public IProperty<string> Message { get; }
 
 
         public SearchHints(IRecentSearchCollection recentSearchCollection, ISchedulerProvider schedulerProvider)
@@ -46,10 +48,13 @@ namespace TailBlazer.Views.Searching
             //if regex then validate
 
             var combined = searchText.CombineLatest(useRegEx, (text, regex) => new SearchRequest(text, regex))
+                .Select(searchRequest => searchRequest.BuildMessage())
                 .Publish();
 
-            IsValid = combined.Select(searchRequest => searchRequest.BuildMessage()).ForBinding();
-            
+           // SearchHintMessage = combined.ForBinding();
+
+            IsValid = combined.Select(shm => shm.IsValid).ForBinding();
+            Message = combined.Select(shm => shm.Message).ForBinding();
 
             var predictRegex = this.WhenValueChanged(vm => vm.SearchText)
                                         .Select(text=>_regexInspector.DoesThisLookLikeRegEx(text))
@@ -65,7 +70,7 @@ namespace TailBlazer.Views.Searching
                 SearchText = string.Empty;
                 UseRegex = false;
 
-            }, () => IsValid.Value.IsValid && SearchText.Length>0);
+            }, () => IsValid.Value && SearchText.Length>0);
 
 
             var dataLoader = recentSearchCollection.Items.Connect()
@@ -76,11 +81,9 @@ namespace TailBlazer.Views.Searching
                 .Bind(out _hints)
                 .Subscribe();
 
-            _cleanUp = new CompositeDisposable( IsValid, predictRegex, dataLoader, searchRequested.SetAsComplete(), combined.Connect());
+            _cleanUp = new CompositeDisposable( IsValid,Message, predictRegex, dataLoader, searchRequested.SetAsComplete(), combined.Connect());
         }
-
-
-
+        
         private Func<RecentSearch, bool> BuildFilter(string searchText)
         {
             if (string.IsNullOrEmpty(searchText)) return trade => true;
@@ -88,8 +91,7 @@ namespace TailBlazer.Views.Searching
             return recentSearch => recentSearch.Text.StartsWith(searchText, StringComparison.OrdinalIgnoreCase) ||
                                    recentSearch.Text.StartsWith(searchText, StringComparison.OrdinalIgnoreCase);
         }
-
-
+        
         public string SearchText
         {
             get { return _searchText; }
@@ -102,12 +104,9 @@ namespace TailBlazer.Views.Searching
             set { SetAndRaise(ref _useRegex, value); }
         }
 
-        //public ReadOnlyObservableCollection<string> Hints => _hints;
-
-
         #region Data error 
         
-        string IDataErrorInfo.this[string columnName] => IsValid.Value.IsValid ? null : IsValid.Value.Message;
+        string IDataErrorInfo.this[string columnName] => IsValid.Value ? null : Message.Value;
 
         string IDataErrorInfo.Error => null;
 

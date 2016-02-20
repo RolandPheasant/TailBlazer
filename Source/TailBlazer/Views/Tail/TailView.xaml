@@ -39,7 +39,6 @@
             <infrastucture:CheckedToLengthConverter TrueValue="*" FalseValue="*" x:Key="c1" />
             <infrastucture:CheckedToLengthConverter TrueValue="175" FalseValue="0" x:Key="c2" />
 
-            <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"/>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:EqualityToVisibilityConverter x:Key="EqualityToVisibilityConverter"/>
             <infrastucture:NotEqualsToVisibilityConverter x:Key="NotEqualsToVisibilityConverter"/>
@@ -118,7 +117,6 @@
 
                 <TextBlock  FontSize="26" HorizontalAlignment="Center" Margin="0 0 0 4" Text="Cannot blaze this tail"/>
                 <controls:TailBlazerIcon
-
                     Foreground="{DynamicResource ValidationErrorBrush}"
                     Width="48"
                     Height="48"/>
@@ -159,7 +157,7 @@
                         <ToggleButton.Style>
                             <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource  SearchToggleStyle}">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SearchHints.IsValid.Value.IsValid}" Value="False">
+                                    <DataTrigger Binding="{Binding SearchHints.IsValid.Value}" Value="False">
                                         <Setter Property="Foreground" Value="{DynamicResource ValidationErrorBrush}"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -169,9 +167,8 @@
 
                     <TextBox Grid.Column="1" 
                             Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                            wpf:TextFieldAssist.Hint="{Binding SearchHints.IsValid.Value.Message}" 
+                            wpf:TextFieldAssist.Hint="{Binding SearchHints.Message.Value}" 
                             VerticalAlignment="Center"
-                          
                             wpf:ValidationAssist.UsePopup="False"
                             Style="{StaticResource FloatingHintAndErrorTextBox}"
                             Validation.ErrorTemplate="{StaticResource BorderOnlyValidationErrorTemplate}" 
@@ -180,42 +177,6 @@
                             <KeyBinding Key="Enter" Command="{Binding SearchHints.AddSearchCommand}"/>
                         </TextBox.InputBindings>
                     </TextBox>
-
-                    <!--<ComboBox Grid.Column="1" 
-                              wpf:TextFieldAssist.Hint="{Binding SearchHints.IsValid.Value.Message}"
-                              Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                              IsEditable="True" 
-                              MinWidth="200"
-                              Margin="4 0 0 0"
-                              Validation.ErrorTemplate="{StaticResource BorderOnlyValidationErrorTemplate}" 
-                              Style="{StaticResource FloatingHintAndErrorComboBox}"
-                              wpf:TextFieldAssist.HintOpacity=".26"
-                              ItemsSource="{Binding SearchHints.Hints}">
-                                 
-                        <ComboBox.InputBindings>
-                            <KeyBinding Key="Enter" Command="{Binding SearchHints.AddSearchCommand}"/>
-                        </ComboBox.InputBindings>
-                        
-                        <ComboBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel Orientation="Vertical"/>
-                            </ItemsPanelTemplate>
-                        </ComboBox.ItemsPanel>
-                    </ComboBox>-->
-
-                    <!--<TextBox Grid.Column="1" 
-                            Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                            wpf:TextFieldAssist.Hint="{Binding SearchHints.IsValid.Value.Message}" 
-                            VerticalAlignment="Center"
-                          
-                            wpf:ValidationAssist.UsePopup="False"
-                            Style="{StaticResource FloatingHintAndErrorTextBox}"
-                            Validation.ErrorTemplate="{StaticResource BorderOnlyValidationErrorTemplate}" 
-                            MinWidth="200">
-                        <TextBox.InputBindings>
-                            <KeyBinding Key="Enter" Command="{Binding SearchHints.AddSearchCommand}"/>
-                        </TextBox.InputBindings>
-                    </TextBox>-->
 
                     <TextBlock     
                             Margin="8 0 0 0" 
@@ -426,7 +387,6 @@
                                     <Style TargetType="{x:Type TextBlock}">
                                         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
-                                 
                                         <Setter Property="Margin" Value="5 0 0 0"/>
                                         <Setter Property="FontWeight" Value="Light"/>
                                         <Setter Property="FontSize" Value="10"/>
@@ -434,11 +394,11 @@
                                     </Style>
 
                                     <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatButton}">
-                                        <!--<Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>-->
+                                        <Setter Property="Padding" Value="4 2 4 0"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                         <Setter Property="HorizontalAlignment" Value="Stretch"/>
                                         <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                                        <Setter Property="Margin" Value="4 0 0 0"/>
+                                        <Setter Property="Margin" Value="4 0 4 0"/>
                                         <Setter Property="FontWeight" Value="Light"/>
                                         <Setter Property="FontSize" Value="10"/>
                                         <Setter Property="FontFamily" Value="{StaticResource MaterialDesignFont}"/>

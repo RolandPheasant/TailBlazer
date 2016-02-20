@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -17,11 +18,8 @@ namespace TailBlazer.Views.Searching
 {
     public class SearchOptionsViewModel: AbstractNotifyPropertyChanged, IDisposable
     {
-        private readonly IIconProvider _iconsProvider;
         public Guid Id { get; } = Guid.NewGuid();
-        //create text to add new option - default to highlight without search
         private readonly IDisposable _cleanUp;
-        private string _searchText;
 
         public ReadOnlyObservableCollection<SearchOptionsProxy> Data { get; }
 
@@ -34,45 +32,25 @@ namespace TailBlazer.Views.Searching
             ISchedulerProvider schedulerProvider,
             IAccentColourProvider accentColourProvider,
             IIconProvider iconsProvider,
-
             SearchHints searchHints)
         {
-            _iconsProvider = iconsProvider;
+
             SearchHints = searchHints;
 
             bool binding = false;
 
-            var orderChanged = Observable.FromEventPattern<OrderChangedEventArgs>(
-                h => PositionMonitor.OrderChanged += h,
-                h => PositionMonitor.OrderChanged -= h)
-                .Throttle(TimeSpan.FromMilliseconds(125))
-                .Select(evt => evt.EventArgs)
-                .Where(args => args.PreviousOrder != null && args.NewOrder.Length == args.PreviousOrder.Length)
-                .Select(positionChangedArgs =>
-                {
-                  //reprioritise filters and highlights
-                    return positionChangedArgs.NewOrder
-                        .OfType<SearchOptionsProxy>()
-                        .Select((item, index) => new {Meta = (SearchMetadata) item, index})
-                        .Select(x => new SearchMetadata(x.Meta, x.index))
-                        .ToArray();
-                })
-                .Subscribe(positionChangedArgs =>
-                {
-                    positionChangedArgs.ForEach(metadataCollection.AddorUpdate);
-                });
+            var positionMonitor = new SerialDisposable();
 
             ReadOnlyObservableCollection<SearchOptionsProxy> data;
-            
-            var userOptions = metadataCollection.Metadata.Connect()
 
+            var proxyItems = metadataCollection.Metadata.Connect()
                 .WhereReasonsAre(ChangeReason.Add, ChangeReason.Remove) //ignore updates because we update from here
+                .Do(_ => positionMonitor.Disposable=Disposable.Empty)
                 .Transform(meta =>
                 {
-                    var iconSelector = new IconSelector(iconsProvider, schedulerProvider);
                     return new SearchOptionsProxy(meta,
                         accentColourProvider,
-                        iconSelector,
+                        new IconSelector(iconsProvider, schedulerProvider),
                         m => metadataCollection.Remove(m.SearchText),
                         iconsProvider.KnownIconNames,
                         Id);
@@ -84,6 +62,19 @@ namespace TailBlazer.Views.Searching
                         .Select(_ => (SearchMetadata)so)
                         .Subscribe(metadataCollection.AddorUpdate);
                 })
+                .AsObservableCache();
+
+            var monitor = proxyItems
+                .Connect()
+                .Throttle(TimeSpan.FromMilliseconds(125))
+                .Subscribe(_ => positionMonitor.Disposable = MonitorPositionalChanges()
+                                                                .Subscribe(positionChangedArgs =>
+                                                                {
+                                                                    positionChangedArgs.ForEach(metadataCollection.AddorUpdate);
+                                                                }));
+
+            //load data onto grid
+            var userOptions = proxyItems.Connect()
                 .Sort(SortExpressionComparer<SearchOptionsProxy>.Ascending(proxy => proxy.Position))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out data)
@@ -107,16 +98,30 @@ namespace TailBlazer.Views.Searching
 
 
             _cleanUp = new CompositeDisposable(searchInvoker,
+                positionMonitor,
                 userOptions,
                 searchInvoker,
-                orderChanged);
+                monitor);
         }
 
-        //public string SearchText
-        //{
-        //    get { return _searchText; }
-        //    set { SetAndRaise(ref _searchText, value); }
-        //}
+        private IObservable<IEnumerable<SearchMetadata>> MonitorPositionalChanges()
+        {
+            return Observable.FromEventPattern<OrderChangedEventArgs>(
+                h => PositionMonitor.OrderChanged += h,
+                h => PositionMonitor.OrderChanged -= h)
+                //.Throttle(TimeSpan.FromMilliseconds(125))
+                .Select(evt => evt.EventArgs)
+                .Where(args => args.PreviousOrder != null && args.NewOrder.Length == args.PreviousOrder.Length)
+                .Select(positionChangedArgs =>
+                {
+                    //reprioritise filters and highlights
+                    return positionChangedArgs.NewOrder
+                        .OfType<SearchOptionsProxy>()
+                        .Select((item, index) => new {Meta = (SearchMetadata) item, index})
+                        .Select(x => new SearchMetadata(x.Meta, x.index))
+                        .ToArray();
+                });
+        }
 
         public void Dispose()
         {

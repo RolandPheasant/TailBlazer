@@ -124,7 +124,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                 return string.Equals(x.SearchText, y.SearchText, stringComparison)
                     && x.Highlight == y.Highlight
                     && x.HighlightHue == y.HighlightHue
-                      && x.IconKind == y.IconKind
+                    && x.IconKind == y.IconKind
                     && x.UseRegex == y.UseRegex
                     && x.Position == y.Position
                     && x.IgnoreCase == y.IgnoreCase;
@@ -172,6 +172,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                     hashCode = (hashCode*397) ^ obj.Filter.GetHashCode();
                     hashCode = (hashCode*397) ^ obj.UseRegex.GetHashCode();
                     hashCode = (hashCode*397) ^ obj.IgnoreCase.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.IgnoreCase.GetHashCode();
                     return hashCode;
                 }
             }

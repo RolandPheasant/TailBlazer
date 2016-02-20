@@ -17,8 +17,6 @@ using Hue = TailBlazer.Domain.Formatting.Hue;
 
 namespace TailBlazer.Views.Searching
 {
-
-
     public class SearchOptionsProxy: AbstractNotifyPropertyChanged, IDisposable
     {
         private readonly IDisposable _cleanUp;
@@ -36,9 +34,11 @@ namespace TailBlazer.Views.Searching
         public ICommand RemoveCommand { get; }
         public ICommand HighlightCommand { get; }
         public IEnumerable<Hue> Hues { get; }
-        public SearchResultIndicatorStatus Status { get; }
+
         public ICommand ShowIconSelectorCommand { get; }
-        public IconSelector IconSelector { get; }
+
+        private IconSelector IconSelector { get; }
+
         public Guid ParentId { get; }
         public int Position => _searchMetadata.Position;
         public IProperty<Brush> Background { get; }
@@ -75,7 +75,6 @@ namespace TailBlazer.Views.Searching
             IgnoreCase = searchMetadata.IgnoreCase;
             Hues = accentColourProvider.Hues;
             HighlightHue = searchMetadata.HighlightHue;
-            Status = searchMetadata.UseRegex ? SearchResultIndicatorStatus.Regex : SearchResultIndicatorStatus.Text;
 
             IconKind = _searchMetadata.IconKind.ParseEnum<PackIconKind>()
                             .ValueOr(() =>
@@ -124,7 +123,7 @@ namespace TailBlazer.Views.Searching
             set { SetAndRaise(ref _highlight, value); }
         }
 
-        public Hue HighlightHue
+        private Hue HighlightHue
         {
             get { return _highlightHue; }
             set { SetAndRaise(ref _highlightHue, value); }
@@ -139,7 +138,7 @@ namespace TailBlazer.Views.Searching
         public bool UseRegex
         {
             get { return _useRegex; }
-            set { SetAndRaise(ref _useRegex, value); }
+            private set { SetAndRaise(ref _useRegex, value); }
         }
 
         public bool IgnoreCase

@@ -39,43 +39,46 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <TextBlock FontSize="14"
-                                   
+                        <TextBlock 
+                            FontSize="14"
                             FontWeight="DemiBold"
                             Text="This line is highlighted because:"/>
 
                         <ItemsControl 
-                        Margin="0 8 0 0"
-                        Grid.Row="1" 
-                        ItemsSource="{Binding IndicatorMatches.Value}">
+                                Margin="0 8 0 0"
+                                Grid.Row="1" 
+                                ItemsSource="{Binding IndicatorMatches.Value}">
+                            
                             <ItemsControl.ItemTemplate>
-                                <DataTemplate DataType="{x:Type tail:LineMatchProxy}">
-
-                                    <Grid Margin="4">
+                            <DataTemplate DataType="{x:Type tail:LineMatchProxy}">
+                                <Grid Margin="6">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="28"/>
-                                            <ColumnDefinition MinWidth="50"/>
+                                            <ColumnDefinition Width="22"/>
+                                            <ColumnDefinition MinWidth="75"/>
                                         </Grid.ColumnDefinitions>
-                                        <materialDesign:PackIcon Width="18" Height="18"  
+                                    
+                                        <materialDesign:PackIcon Width="14" Height="14"  
                                                          Foreground="{Binding Background}"
-                                                          Padding="4" 
-                                                             VerticalAlignment="Center"
-                                                          Kind="{Binding IconKind}"/>
+                                                         Padding="4" 
+                                                         VerticalAlignment="Center"
+                                                         Kind="{Binding IconKind}"/>
 
                                         <StackPanel  Grid.Column="1"
-                                                 Margin="4 0 4 4"
+                                                 Margin="4 0 0 0"
+                                                 VerticalAlignment="Center"
                                                  Orientation="Horizontal">
+                                           
                                             <TextBlock  FontSize="12"
                                                   Text="It matches"  
                                                    VerticalAlignment="Center"/>
 
                                             <TextBlock  
-                                            Margin="3 0 0 0"
-                                            FontSize="12"
-                                                    Text="{Binding Text}"  
-                                                    Foreground="{Binding Foreground}"
-                                                    Background="{Binding Background}"
-                                                    VerticalAlignment="Center"/>
+                                                Margin="4 0 0 0"
+                                                FontSize="12"
+                                                Text="{Binding Text}"  
+                                                Foreground="{Binding Foreground}"
+                                                Background="{Binding Background}"
+                                                VerticalAlignment="Center"/>
                                         </StackPanel>
 
                                     </Grid>
