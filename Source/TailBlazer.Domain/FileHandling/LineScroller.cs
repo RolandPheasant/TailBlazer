@@ -62,7 +62,7 @@ namespace TailBlazer.Domain.FileHandling
 
 
             var lines = new SourceCache<Line, LineKey>(l => l.Key);
-            Lines = lines.AsObservableCache();
+            Lines = lines.Connect().IgnoreUpdateWhen((current,previous)=> current.Key==previous.Key).AsObservableCache();
 
             var locker = new object();
 
@@ -74,7 +74,7 @@ namespace TailBlazer.Domain.FileHandling
                 .Sample(TimeSpan.FromMilliseconds(50))
                 .Select(x =>
                 {
-                    if (x.scroll.PageSize == 0 || x.currentLines.Count == 0)
+                    if (x.scroll== ScrollRequest.None ||  x.scroll.PageSize == 0 || x.currentLines.Count == 0)
                         return new Line[0];
 
                     return x.currentLines.ReadLines(x.scroll).ToArray();

@@ -375,8 +375,7 @@
                                 PopupMode="Click"
                                 PlacementMode="TopAndAlignLeftEdges">
                             <wpf:PopupBox.ToggleContent>
-                                <TextBlock FontSize="10" 
-                                   Text="{Binding Name}"/>
+                                <TextBlock FontSize="10" Text="{Binding Name}"/>
                             </wpf:PopupBox.ToggleContent>
                             
                             

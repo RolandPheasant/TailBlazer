@@ -144,6 +144,7 @@ namespace TailBlazer.Views.Tail
             //load lines into observable collection
             var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection),new LineMatches(searchMetadataCollection));
             var loader = lineScroller.Lines.Connect()
+              
                 .RecordChanges(logger, "Received")
                 .Transform(lineProxyFactory.Create, new ParallelisationOptions(ParallelType.Ordered, 3))
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
@@ -186,7 +187,14 @@ namespace TailBlazer.Views.Tail
 
             //return an empty line provider unless user is viewing inline - this saves needless trips to the file
             var inline = searchInfoCollection.All.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : new EmptyLineProvider());
-            InlineViewer = inlineViewerFactory.Create(inline, this.WhenValueChanged(vm => vm.SelectedItem),lineProxyFactory);
+
+            var firstVisibleRow = this._data.ToObservableChangeSet().ToCollection()
+                                            .Select(collection => collection.FirstOrDefault());
+
+            //var itemToSelect = this.WhenValueChanged(vm => vm.SelectedItem)
+            //    .CombineLatest(firstVisibleRow, (selected, first) => selected ?? first);
+            ////
+            InlineViewer = inlineViewerFactory.Create(inline, this.WhenValueChanged(vm => vm.SelectedItem), lineProxyFactory);
 
             _cleanUp = new CompositeDisposable(lineScroller,
                 loader,

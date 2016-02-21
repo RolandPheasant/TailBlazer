@@ -48,22 +48,24 @@ namespace TailBlazer.Views.Tail
             var lineProvider = args.LineProvider;
             var selectedChanged = args.SelectedChanged;
             var pageSize = this.WhenValueChanged(vm=>vm.PageSize);
-            var scrollSelected = selectedChanged.Where(proxy => proxy != null)
-                    .CombineLatest(lineProvider, pageSize,(proxy, lp,pge) => new ScrollRequest(pge,  proxy.Start))
-                    .Where(scroll=>scroll.PageSize!=0);
 
-            var scrollUser = _userScrollRequested
-                .Where(x=>!_isSettingScrollPosition)
-                .Select(request => new ScrollRequest(ScrollReason.User, request.PageSize, request.FirstIndex));
-            
-            var scroller= scrollSelected.Merge(scrollUser)
-                .ObserveOn(schedulerProvider.Background)
+            //if use selection is null, tail the file
+            var scrollSelected = selectedChanged
+                .CombineLatest(lineProvider, pageSize, (proxy, lp, pge) => proxy==null ? new ScrollRequest(pge) : new ScrollRequest(pge, proxy.Start))
                 .DistinctUntilChanged();
             
+
+            var scrollUser = _userScrollRequested
+                .Where(x => !_isSettingScrollPosition)
+                .Select(request => new ScrollRequest(ScrollReason.User, request.PageSize, request.FirstIndex));
+
+            var scroller = scrollSelected.Merge(scrollUser)
+                .ObserveOn(schedulerProvider.Background)
+                .DistinctUntilChanged();
+
             var lineScroller = new LineScroller(lineProvider, scroller);
             Count = lineProvider.Select(lp=>lp.Count).ForBinding();
-
-
+            
             //load lines into observable collection
             var loader = lineScroller.Lines.Connect()
                 .Transform(args.LineProxyFactory.Create,new ParallelisationOptions(ParallelType.Ordered,3))

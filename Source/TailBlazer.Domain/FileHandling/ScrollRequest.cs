@@ -5,6 +5,8 @@ namespace TailBlazer.Domain.FileHandling
 {
     public class ScrollRequest : IEquatable<ScrollRequest>
     {
+        public static readonly ScrollRequest None= new ScrollRequest();
+
         public int PageSize { get;  }
         public int FirstIndex { get;  }
 
@@ -18,6 +20,10 @@ namespace TailBlazer.Domain.FileHandling
         {
             PageSize = pageSize;
             Mode = ScrollReason.Tail;
+        }
+
+        private ScrollRequest()
+        {
         }
 
         public ScrollRequest(int pageSize, long position)

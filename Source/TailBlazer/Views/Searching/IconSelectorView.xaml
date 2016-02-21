@@ -34,9 +34,12 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-        <TextBlock FontSize="14"
-                        FontWeight="DemiBold"
-                        Text="Select an icon to use as a row indicator:"/>
+
+        <TextBlock 
+                Margin="4 8 6 0"
+                FontSize="16"
+                FontWeight="DemiBold"
+                Text="Select a row indicator"/>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0 6 0 6">
                 <materialDesign:PackIcon Kind="Magnify" Width="22" Height="22"

@@ -17,7 +17,7 @@ using Hue = TailBlazer.Domain.Formatting.Hue;
 
 namespace TailBlazer.Views.Searching
 {
-    public class SearchOptionsProxy: AbstractNotifyPropertyChanged, IDisposable
+    public class SearchOptionsProxy: AbstractNotifyPropertyChanged, IDisposable, IEquatable<SearchOptionsProxy>
     {
         private readonly IDisposable _cleanUp;
         private readonly SearchMetadata _searchMetadata;
@@ -56,6 +56,7 @@ namespace TailBlazer.Views.Searching
             if (iconSelector == null) throw new ArgumentNullException(nameof(iconSelector));
             if (removeAction == null) throw new ArgumentNullException(nameof(removeAction));
             if (knownIconNames == null) throw new ArgumentNullException(nameof(knownIconNames));
+
 
             _searchMetadata = searchMetadata;
             _knownIconNames = knownIconNames;
@@ -157,6 +158,45 @@ namespace TailBlazer.Views.Searching
                 proxy.IgnoreCase,
                 proxy.HighlightHue, 
                 proxy.IconKind.ToString());
+        }
+
+        #region Equality
+
+        public bool Equals(SearchOptionsProxy other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Equals(_searchMetadata, other._searchMetadata);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((SearchOptionsProxy) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return (_searchMetadata != null ? _searchMetadata.GetHashCode() : 0);
+        }
+
+        public static bool operator ==(SearchOptionsProxy left, SearchOptionsProxy right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(SearchOptionsProxy left, SearchOptionsProxy right)
+        {
+            return !Equals(left, right);
+        }
+
+        #endregion
+
+        public override string ToString()
+        {
+            return $"SearchMetadata: {_searchMetadata}";
         }
 
         public void Dispose()

@@ -29,6 +29,122 @@
             </ResourceDictionary.MergedDictionaries>
 
             <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"/>
+
+            <DataTemplate DataType="{x:Type searching:SearchOptionsProxy}">
+
+                <Grid Margin="4 4 4 4" x:Name="Row">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="22"/>
+                        <ColumnDefinition Width="75"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                        Command="{Binding ShowIconSelectorCommand}"
+                                        ToolTip="Change icon"
+                                        Padding="0"
+                                        Width="24" Height="24"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center">
+                        <wpf:PackIcon  
+                                        Padding="4" 
+                                        Foreground="{Binding Background.Value}"
+                                        Kind="{Binding IconKind,FallbackValue={x:Static wpf:PackIconKind.ArrowRightBold}}"/>
+                    </Button>
+
+                    <TextBlock Padding="2" Margin="6 0 0 0" x:Name="Label" Grid.Column="1" 
+                                       Foreground="{Binding Foreground.Value}"
+                                       Background="{Binding Background.Value}"
+                                       Text="{Binding Text}"
+                                        VerticalAlignment="Center"/>
+
+                    <wpf:PopupBox
+                                    ToolTip="Change colour"
+                                    Grid.Column="2"
+                                    FontFamily="{StaticResource MaterialDesignFont}"
+                                    PopupMode="Click">
+                        <wpf:PopupBox.ToggleContent>
+                            <wpf:PackIcon Kind="FormatPaint" 
+                                            Margin="4 0 4 0" Width="14" Height="14"
+                                            Foreground="{Binding Background.Value}" />
+                        </wpf:PopupBox.ToggleContent>
+
+                        <ItemsControl ItemsSource="{Binding Hues}" 
+                                                  Margin="4"
+                                                  Background="Transparent">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Style="{StaticResource MaterialDesignFloatingActionButton}"
+                                                        BorderBrush="{DynamicResource GrayBrush2}"
+                                                        BorderThickness="0"
+                                                        Width="22" Height="22"
+                                                        wpf:ShadowAssist.ShadowDepth="Depth2"
+                                                        Command="{Binding ElementName=Row,Path=DataContext.HighlightCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        Margin="2">
+                                        <Button.Background>
+                                            <SolidColorBrush Color="{Binding Background, Mode=OneTime}" />
+                                        </Button.Background>
+
+
+                                        <!--<Button.ToolTip>
+                                            <Grid>
+                                                <Grid.Background>
+                                                    <SolidColorBrush Color="{Binding Background, Mode=OneTime}" />
+                                                </Grid.Background>
+                                                <TextBlock Text="{Binding ElementName=Label,Path=Text}" Margin="2">
+                                                    <TextBlock.Foreground>
+                                                        <SolidColorBrush Color="{Binding Foreground, Mode=OneTime}" />
+                                                    </TextBlock.Foreground>
+                                                </TextBlock>
+                                            </Grid>
+                                        </Button.ToolTip>-->
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+
+
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="8"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+
+                    </wpf:PopupBox>
+
+                    <CheckBox Margin="4 0 0 0" Grid.Column="3" 
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding Filter}" 
+                                      ToolTip="Filter lines this value"
+                                      Content="Filter"/>
+
+                    <CheckBox Margin="4 0 0 0" Grid.Column="4" 
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding Highlight}" 
+                                      ToolTip="Highlight text within the line"
+                                      Content="Highlight"/>
+
+                    <CheckBox Margin="4 0 0 0" Grid.Column="5" 
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding IgnoreCase}" 
+                                      Content="Ignore Case"/>
+
+
+                    <Button Margin="8 0 6 0"
+                                        Grid.Column="6" 
+                                        ToolTip="{Binding RemoveTooltip}"
+                                        VerticalAlignment="Center"
+                                        Command="{Binding RemoveCommand}"
+                                        Style="{StaticResource CloseButtonStyle}"/>
+                </Grid>
+
+            </DataTemplate>
         </ResourceDictionary>
     </Control.Resources>
 
@@ -45,7 +161,7 @@
                 Margin="6 8 6 0"
                 FontSize="16"
                 FontWeight="DemiBold"
-                Text="Search and Highlight Options"/>
+                Text="Search and highlight options"/>
 
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
@@ -99,123 +215,16 @@
                 <dragablz:DragablzItemsControl.ItemsOrganiser>
                     <dragablz:VerticalOrganiser />
                 </dragablz:DragablzItemsControl.ItemsOrganiser>
-
-                <dragablz:DragablzItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type searching:SearchOptionsProxy}">
-
-                        <Grid Margin="4 4 4 4" x:Name="Row">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="22"/>
-                                <ColumnDefinition Width="75"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <Button Style="{StaticResource MaterialDesignFlatButton}"
-                                        Command="{Binding ShowIconSelectorCommand}"
-                                        ToolTip="Change icon"
-                                        Padding="0"
-                                        Width="24" Height="24"
-                                        HorizontalAlignment="Left"
-                                        VerticalAlignment="Center">
-                                <wpf:PackIcon  
-                                        Padding="4" 
-                                        Foreground="{Binding Background.Value}"
-                                        Kind="{Binding IconKind,FallbackValue={x:Static wpf:PackIconKind.ArrowRightBold}}"/>
-                            </Button>
-
-                            <TextBlock Padding="2" Margin="6 0 0 0" x:Name="Label" Grid.Column="1" 
-                                       Foreground="{Binding Foreground.Value}"
-                                       Background="{Binding Background.Value}"
-                                       Text="{Binding Text}"
-                                        VerticalAlignment="Center"/>
-
-                            <wpf:PopupBox
-                                    ToolTip="Change colour"
-                                    Grid.Column="2"
-                                    FontFamily="{StaticResource MaterialDesignFont}"
-                                    PopupMode="Click">
-                                <wpf:PopupBox.ToggleContent>
-                                    <wpf:PackIcon Kind="FormatPaint" 
-                                            Margin="4 0 4 0" Width="14" Height="14"
-                                            Foreground="{Binding Background.Value}" />
-                                </wpf:PopupBox.ToggleContent>
-
-                                <ItemsControl ItemsSource="{Binding Hues}" 
-                                                  Margin="4"
-                                                  Background="Transparent">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
-                                                        BorderBrush="{DynamicResource GrayBrush2}"
-                                                        BorderThickness="0"
-                                                        wpf:ShadowAssist.ShadowDepth="Depth2"
-                                                        Command="{Binding ElementName=Row,Path=DataContext.HighlightCommand}"
-                                                        CommandParameter="{Binding}"
-                                                        Margin="2">
-                                                <Button.Background>
-                                                    <SolidColorBrush Color="{Binding Background, Mode=OneTime}" />
-                                                </Button.Background>
-
-                                                <TextBlock Text="{Binding ElementName=Label,Path=Text}" Margin="2">
-                                                    <TextBlock.Foreground>
-                                                        <SolidColorBrush Color="{Binding Foreground, Mode=OneTime}" />
-                                                    </TextBlock.Foreground>
-                                                </TextBlock>
-                                            </Button>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <UniformGrid Columns="4"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>
-
-                            </wpf:PopupBox>
-
-                            <CheckBox Margin="4 0 0 0" Grid.Column="3" 
-                                      VerticalAlignment="Center"
-                                      IsChecked="{Binding Filter}" 
-                                      ToolTip="Filter lines this value"
-                                      Content="Filter"/>
-
-                            <CheckBox Margin="4 0 0 0" Grid.Column="4" 
-                                      VerticalAlignment="Center"
-                                      IsChecked="{Binding Highlight}" 
-                                      ToolTip="Highlight text within the line"
-                                      Content="Highlight"/>
-
-                            <CheckBox Margin="4 0 0 0" Grid.Column="5" 
-                                      VerticalAlignment="Center"
-                                      IsChecked="{Binding IgnoreCase}" 
-                                      Content="Ignore Case"/>
-
-
-                            <Button Margin="8 0 6 0"
-                                        Grid.Column="6" 
-                                        ToolTip="{Binding RemoveTooltip}"
-                                        VerticalAlignment="Center"
-                                        Command="{Binding RemoveCommand}"
-                                        Style="{StaticResource CloseButtonStyle}"/>
-                        </Grid>
-
-                    </DataTemplate>
-                </dragablz:DragablzItemsControl.ItemTemplate>
             </dragablz:DragablzItemsControl>
-            
+
             <Button  Grid.Row="3" IsDefault="True"
-                     Margin="0 0 6 0"
-                 HorizontalAlignment="Right"
-                 Style="{DynamicResource MaterialDesignFlatButton}"
-                    Command="{x:Static wpf:DialogHost.CloseDialogCommand}">
-                Finished
-            </Button>
+                Margin="0 0 6 0"
+                HorizontalAlignment="Right"
+                Style="{DynamicResource MaterialDesignFlatButton}"
+                Content="Finished"     
+                Command="{x:Static wpf:DialogHost.CloseDialogCommand}"/>
+     
+            
         </Grid>
 
     </wpf:DialogHost>
