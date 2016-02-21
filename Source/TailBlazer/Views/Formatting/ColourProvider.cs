@@ -14,25 +14,24 @@ namespace TailBlazer.Views.Formatting
         public IEnumerable<Hue> Hues { get; }
         public Hue DefaultHighlight { get; }
 
-        private readonly string[] _order = new[]
-        {
-            "yellow",
-            "amber",
-            "lightgreen",
-            "green",
-            "lime",
-            "teal",
-            "cyan",
-            "lightblue",
-            "blue",
-            "indigo",
-            "orange",
-            "deeporange",
-            "pink",
-            "red",
-            "purple",
-            "deeppurple",
-        };
+        private readonly string[] _order = {
+                                            "yellow",
+                                            "amber",
+                                            "lightgreen",
+                                            "green",
+                                            "lime",
+                                            "teal",
+                                            "cyan",
+                                            "lightblue",
+                                            "blue",
+                                            "indigo",
+                                            "orange",
+                                            "deeporange",
+                                            "pink",
+                                            "red",
+                                            "purple",
+                                            "deeppurple",
+                                        };
 
         public ColourProvider()
         {
@@ -58,8 +57,5 @@ namespace TailBlazer.Views.Formatting
                 .Last(s => s.Swatch.Equals("amber",StringComparison.OrdinalIgnoreCase));
     
         }
-
-
-
     }
 }

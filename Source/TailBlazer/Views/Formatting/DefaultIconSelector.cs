@@ -36,17 +36,14 @@ namespace TailBlazer.Views.Formatting
             yield return new DefaultIcons("WARNING", PackIconKind.AlertOutline.ToString());
             yield return new DefaultIcons("ERROR", PackIconKind.SquareInc.ToString());
             yield return new DefaultIcons("FATAL", PackIconKind.ExitToApp.ToString());
-            //yield return new DefaultIcons("CLOSE", PackIconKind.CloseCircleOutline.ToString(), false);
-            //yield return new DefaultIcons("CLOSED", PackIconKind.CloseCircleOutline.ToString(), false);
 
             yield return new DefaultIcons("BANK", PackIconKind.Bank.ToString(), false);
             yield return new DefaultIcons("PERSON", PackIconKind.Account.ToString(), false);
             yield return new DefaultIcons("PEOPLE", PackIconKind.AccountMultiple.ToString(), false);
-
             yield return new DefaultIcons("USD", PackIconKind.CurrencyUsd.ToString(), false);
             yield return new DefaultIcons("GBP", PackIconKind.CurrencyGbp.ToString(), false);
             yield return new DefaultIcons("EUR", PackIconKind.CurrencyEur.ToString(), false);
-            
+
             yield return new DefaultIcons("FUCK", PackIconKind.EmoticonDevil.ToString(), false);
             yield return new DefaultIcons("SHIT", PackIconKind.EmoticonPoop.ToString(), false);
             yield return new DefaultIcons("POOP", PackIconKind.EmoticonPoop.ToString(), false);
@@ -59,17 +56,13 @@ namespace TailBlazer.Views.Formatting
             public string Text { get; }
             public string IconName { get; }
             public bool MatchTextOnCase { get; }
-
-
+            
             public DefaultIcons(string text, string iconName, bool matchTextOnCase = false)
             {
                 Text = text;
                 IconName = iconName;
                 MatchTextOnCase = matchTextOnCase;
             }
-
         }
     }
-
-
 }

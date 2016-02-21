@@ -9,11 +9,6 @@ using TailBlazer.Domain.Formatting;
 
 namespace TailBlazer.Views.Formatting
 {
-    //public static class KnownTerms
-    //{
-    //    publ
-    //}
-
     public sealed class DefaultColourSelector : IDefaultColourSelector
     {
         private readonly Dictionary<HueKey, Hue> _hues;
@@ -28,9 +23,7 @@ namespace TailBlazer.Views.Formatting
 
             _defaults = Load().ToArray();
         }
-
-      
-
+        
         public Hue Select(string text)
         {
             var match = _defaults
@@ -44,8 +37,6 @@ namespace TailBlazer.Views.Formatting
         private IEnumerable<DefaultHue> Load()
         {
             yield return new DefaultHue("DEBUG", Lookup("blue", "Accent400"));
-            //yield return new DefaultHue("INFO", Lookup("yellow", "Accent400"));
-           // yield return new DefaultHue("INFO", Lookup("orange", "Accent200"));
             yield return new DefaultHue("INFO", Lookup("deeppurple", "Accent200"));
             yield return new DefaultHue("WARN", Lookup("orange", "Accent700"));
             yield return new DefaultHue("WARNING", Lookup("orange", "Accent700"));
