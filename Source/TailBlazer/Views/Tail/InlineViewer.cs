@@ -74,7 +74,7 @@ namespace TailBlazer.Views.Tail
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)
                 .DisposeMany()
-                .RecordErrors(logger)
+                .LogErrors(logger)
                 .Subscribe();
 
             // track first visible index [required to set scroll extent]

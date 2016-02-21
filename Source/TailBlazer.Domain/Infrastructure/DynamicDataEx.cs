@@ -26,7 +26,7 @@ namespace DynamicData.Binding
         }
 
 
-        public static IObservable<T> RecordErrors<T>(this IObservable<T> source, ILogger logger)
+        public static IObservable<T> LogErrors<T>(this IObservable<T> source, ILogger logger)
         {
             return source.Do(changes => { }, ex => logger.Error(ex, "There has been an error "));
         }
@@ -49,6 +49,9 @@ namespace DynamicData.Binding
                 logger.Info($"{label}: {changes.Count}");
             });
         }
+
+
+
 
         public static IObservable<IChangeSet<T>> ToObservableChangeSet<T>(this ReadOnlyObservableCollection<T> source)
         {

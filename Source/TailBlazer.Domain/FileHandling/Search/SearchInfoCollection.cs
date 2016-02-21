@@ -13,7 +13,7 @@ namespace TailBlazer.Domain.FileHandling.Search
         private readonly ISearchMetadataFactory _searchMetadataFactory;
         private readonly IAccentColourProvider _accentColourProvider;
         private readonly IFileWatcher _fileWatcher;
-        private readonly IKnownIconNames _knownIconNames;
+        private readonly IKnownIcons _knownIcons;
         private readonly IDisposable _cleanUp;
 
         public IObservableCache<SearchInfo, string> Searches { get; }
@@ -24,13 +24,13 @@ namespace TailBlazer.Domain.FileHandling.Search
             ISearchMetadataFactory searchMetadataFactory,
             IAccentColourProvider accentColourProvider,
             IFileWatcher fileWatcher,
-            IKnownIconNames knownIconNames)
+            IKnownIcons knownIcons)
         {
             _metadataCollection = searchMetadataCollection;
             _searchMetadataFactory = searchMetadataFactory;
             _accentColourProvider = accentColourProvider;
             _fileWatcher = fileWatcher;
-            _knownIconNames = knownIconNames;
+            _knownIcons = knownIcons;
 
             //Add a complete file display
             All = fileWatcher.Latest.Index().Replay(1).RefCount();

@@ -151,7 +151,7 @@ namespace TailBlazer.Views.Tail
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data,100)
                 .DisposeMany()
-                .RecordErrors(logger)
+                .LogErrors(logger)
                 .Subscribe();
 
 

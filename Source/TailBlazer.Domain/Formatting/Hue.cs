@@ -5,15 +5,18 @@ namespace TailBlazer.Domain.Formatting
 {
     public class Hue : IEquatable<Hue>
     {
+        public string Swatch { get; set; }
+        public string Name { get; set; }
         public Color Foreground { get;  }
         public Color Background { get;  }
 
         public Brush ForegroundBrush { get; }
         public Brush BackgroundBrush { get; }
-
-
-        public Hue(Color foreground, Color background)
+        
+        public Hue(string swatch, string name, Color foreground, Color background)
         {
+            Swatch = swatch;
+            Name = name;
             Foreground = foreground;
             Background = background;
 
@@ -25,14 +28,14 @@ namespace TailBlazer.Domain.Formatting
             BackgroundBrush.Freeze();
 
         }
-
+        
         #region Equality
 
         public bool Equals(Hue other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Foreground.Equals(other.Foreground) && Background.Equals(other.Background);
+            return string.Equals(Swatch, other.Swatch) && string.Equals(Name, other.Name);
         }
 
         public override bool Equals(object obj)
@@ -47,7 +50,7 @@ namespace TailBlazer.Domain.Formatting
         {
             unchecked
             {
-                return (Foreground.GetHashCode()*397) ^ Background.GetHashCode();
+                return ((Swatch != null ? Swatch.GetHashCode() : 0)*397) ^ (Name != null ? Name.GetHashCode() : 0);
             }
         }
 
@@ -62,5 +65,10 @@ namespace TailBlazer.Domain.Formatting
         }
 
         #endregion
+
+        public override string ToString()
+        {
+            return $"{Swatch} ({Name})";
+        }
     }
 }

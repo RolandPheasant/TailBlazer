@@ -21,13 +21,14 @@ namespace TailBlazer.Views.Searching
     {
         private readonly IDisposable _cleanUp;
         private readonly SearchMetadata _searchMetadata;
-        private readonly IKnownIconNames _knownIconNames;
+        private readonly IKnownIcons _knownIcons;
         private bool _highlight;
         private bool _filter;
         private bool _useRegex;
         private bool _ignoreCase;
         private Hue _highlightHue;
         private PackIconKind _iconKind;
+        private int _position;
 
         public string Text => _searchMetadata.SearchText;
         public string RemoveTooltip => $"Get rid of {Text}?";
@@ -40,7 +41,7 @@ namespace TailBlazer.Views.Searching
         private IconSelector IconSelector { get; }
 
         public Guid ParentId { get; }
-        public int Position => _searchMetadata.Position;
+
         public IProperty<Brush> Background { get; }
         public IProperty<Brush> Foreground { get; }
 
@@ -48,18 +49,18 @@ namespace TailBlazer.Views.Searching
             [NotNull] IAccentColourProvider accentColourProvider, 
             [NotNull] IconSelector iconSelector,
             [NotNull] Action<SearchMetadata> removeAction, 
-            [NotNull] IKnownIconNames knownIconNames,
+            [NotNull] IKnownIcons knownIcons,
             Guid parentId)
         {
             if (searchMetadata == null) throw new ArgumentNullException(nameof(searchMetadata));
             if (accentColourProvider == null) throw new ArgumentNullException(nameof(accentColourProvider));
             if (iconSelector == null) throw new ArgumentNullException(nameof(iconSelector));
             if (removeAction == null) throw new ArgumentNullException(nameof(removeAction));
-            if (knownIconNames == null) throw new ArgumentNullException(nameof(knownIconNames));
+            if (knownIcons == null) throw new ArgumentNullException(nameof(knownIcons));
 
 
             _searchMetadata = searchMetadata;
-            _knownIconNames = knownIconNames;
+            _knownIcons = knownIcons;
             IconSelector = iconSelector;
 
             ShowIconSelectorCommand = new Command(ShowIconSelector);
@@ -74,16 +75,12 @@ namespace TailBlazer.Views.Searching
             Filter = _searchMetadata.Filter;
             UseRegex = searchMetadata.UseRegex;
             IgnoreCase = searchMetadata.IgnoreCase;
+            Position = searchMetadata.Position;
             Hues = accentColourProvider.Hues;
             HighlightHue = searchMetadata.HighlightHue;
 
             IconKind = _searchMetadata.IconKind.ParseEnum<PackIconKind>()
-                            .ValueOr(() =>
-                            {
-                                return knownIconNames.Selected
-                                    .ParseEnum<PackIconKind>()
-                                    .ValueOr(() => PackIconKind.ArrowRightBold);
-                            });
+                            .ValueOr(() => PackIconKind.ArrowRightBold);
 
             Foreground = this.WhenValueChanged(vm => vm.HighlightHue)
                 .Select(h => h.ForegroundBrush)
@@ -103,7 +100,7 @@ namespace TailBlazer.Views.Searching
             if (result == IconSelectorResult.UseDefault)
             {
                 //Use default
-                var icon = _knownIconNames.SelectIconFor(Text, UseRegex);
+                var icon = _knownIcons.GetIconFor(Text, UseRegex);
                 IconKind = icon.ParseEnum<PackIconKind>().ValueOr(() => PackIconKind.ArrowRightBold);
             }
             else if (result == IconSelectorResult.UseSelected)
@@ -146,6 +143,12 @@ namespace TailBlazer.Views.Searching
         {
             get { return _ignoreCase; }
             set { SetAndRaise(ref _ignoreCase, value); }
+        }
+
+        public int Position
+        {
+            get { return _position; }
+            set { SetAndRaise(ref _position, value); }
         }
 
         public static explicit operator SearchMetadata(SearchOptionsProxy proxy)

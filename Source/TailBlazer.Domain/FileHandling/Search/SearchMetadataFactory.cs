@@ -6,12 +6,12 @@ namespace TailBlazer.Domain.FileHandling.Search
 {
     public class SearchMetadataFactory : ISearchMetadataFactory
     {
-        private readonly IKnownIconNames _knownIconNames;
+        private readonly IKnownIcons _knownIcons;
         private readonly IAccentColourProvider _accentColourProvider;
 
-        public SearchMetadataFactory(IKnownIconNames knownIconNames, IAccentColourProvider accentColourProvider)
+        public SearchMetadataFactory(IKnownIcons knownIcons, IAccentColourProvider accentColourProvider)
         {
-            _knownIconNames = knownIconNames;
+            _knownIcons = knownIcons;
             _accentColourProvider = accentColourProvider;
         }
 
@@ -19,7 +19,7 @@ namespace TailBlazer.Domain.FileHandling.Search
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
 
-            var icon = _knownIconNames.SelectIconFor(searchText, useRegex);
+            var icon = _knownIcons.GetIconFor(searchText, useRegex);
 
 
             return new SearchMetadata(index, searchText,

@@ -8,6 +8,6 @@ namespace TailBlazer.Views.Formatting
     {
         IObservableList<IconDescription> Icons { get; }
 
-        IKnownIconNames KnownIconNames { get; }
+        IKnownIcons KnownIcons { get; }
     }
 }

@@ -154,7 +154,7 @@
     <Compile Include="Infrastucture\VirtualizingWrapPanel.cs" />
     <Compile Include="Views\Formatting\IconDescription.cs" />
     <Compile Include="Views\Formatting\IIconProvider.cs" />
-    <Compile Include="Views\Formatting\KnownIconNames.cs" />
+    <Compile Include="Views\Formatting\KnownIcons.cs" />
     <Compile Include="Views\Layout\LayoutAnalyser.cs" />
     <Compile Include="Views\Layout\LayoutContent.cs" />
     <Compile Include="Views\Layout\ShellSettings.cs" />

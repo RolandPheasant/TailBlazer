@@ -3,16 +3,17 @@ using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.FileHandling.Search
 {
-    public interface IKnownIconNames
+    public interface IKnownIcons
     {
-        string RegEx { get; }
-        string Search { get; }
-        string Selected { get; }
-
-        string SelectIconFor(string text, bool useRegex);
+        string GetIconFor(string text, bool useRegex);
 
     }
 
+    public interface IColourSelector
+    {
+
+        string SelectFor(string text, bool useRegex);
+    }
 
 
     public class DefaultIcons

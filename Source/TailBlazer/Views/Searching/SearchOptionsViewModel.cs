@@ -6,9 +6,6 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media.Animation;
 using Dragablz;
 using DynamicData;
 using DynamicData.Binding;
@@ -19,80 +16,15 @@ using TailBlazer.Views.Formatting;
 
 namespace TailBlazer.Views.Searching
 {
-    public class MyVerticalPositionMonitor: MyStackPositionMonitor
-    {
-        public MyVerticalPositionMonitor() : base(Orientation.Vertical)
-        {
-        }
-    }
-
-    public abstract class MyStackPositionMonitor : PositionMonitor
-    {
-        private readonly Func<DragablzItem, double> _getLocation;
-
-        protected MyStackPositionMonitor(Orientation orientation)
-        {
-            switch (orientation)
-            {
-                case Orientation.Horizontal:
-                    _getLocation = item => item.X;
-                    break;
-                case Orientation.Vertical:
-                    _getLocation = item => item.Y;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException("orientation");
-            }
-        }
-
-        public event EventHandler<OrderChangedEventArgs> OrderChanged;
-
-        internal virtual void OnOrderChanged(OrderChangedEventArgs e)
-        {
-            var handler = OrderChanged;
-            if (handler != null) handler(this, e);
-        }
-
-
-        internal IEnumerable<DragablzItem> Sort(IEnumerable<DragablzItem> items)
-        {
-            if (items == null) throw new ArgumentNullException("items");
-
-            return items.OrderBy(i => _getLocation(i));
-        }
-
-
-    }
-
-
-    public class MyVerticalOrganiser : StackOrganiser
-    {
-        public MyVerticalOrganiser() : base(Orientation.Vertical)
-        {
-        }
-
-   
-
-        public override IEnumerable<DragablzItem> Sort(IEnumerable<DragablzItem> items)
-        {
-            return base.Sort(items);
-        }
-    }
 
     public class SearchOptionsViewModel: AbstractNotifyPropertyChanged, IDisposable
     {
         public Guid Id { get; } = Guid.NewGuid();
         private readonly IDisposable _cleanUp;
-        private  ReadOnlyObservableCollection<SearchOptionsProxy> _data;
 
-        public ReadOnlyObservableCollection<SearchOptionsProxy> Data
-        {
-            get { return _data; }
-            set { SetAndRaise(ref _data,value);}
-  
-        }
+        public ReadOnlyObservableCollection<SearchOptionsProxy> Data { get; }
 
-        public MyVerticalPositionMonitor PositionMonitor { get; } = new MyVerticalPositionMonitor();
+        public VerticalPositionMonitor PositionMonitor { get; } = new VerticalPositionMonitor();
         public SearchHints SearchHints { get;  }
 
         public SearchOptionsViewModel(ISearchMetadataCollection metadataCollection,
@@ -104,18 +36,16 @@ namespace TailBlazer.Views.Searching
         {
 
             SearchHints = searchHints;
-            var positionMonitor = new SerialDisposable();
 
             var proxyItems = metadataCollection.Metadata.Connect()
                 .WhereReasonsAre(ChangeReason.Add, ChangeReason.Remove) //ignore updates because we update from here
-                .Do(_ => positionMonitor.Disposable=Disposable.Empty)
                 .Transform(meta =>
                 {
                     return new SearchOptionsProxy(meta,
                         accentColourProvider,
                         new IconSelector(iconsProvider, schedulerProvider),
                         m => metadataCollection.Remove(m.SearchText),
-                        iconsProvider.KnownIconNames,
+                        iconsProvider.KnownIcons,
                         Id);
                 })
                 .SubscribeMany(so =>
@@ -127,24 +57,20 @@ namespace TailBlazer.Views.Searching
                 })
                 .AsObservableCache();
 
-            var monitor = proxyItems
-                .Connect()
-                //.Throttle(TimeSpan.FromMilliseconds(125))
-                .Subscribe(_ => positionMonitor.Disposable = MonitorPositionalChanges()
-                                                                .Subscribe(positionChangedArgs =>
-                                                                {
-                                                                    positionChangedArgs.ForEach(metadataCollection.AddorUpdate);
-                                                                }));
+            var monitor = MonitorPositionalChanges()
+                            .Subscribe(positionChangedArgs =>
+                            {
+                                positionChangedArgs.ForEach(metadataCollection.AddorUpdate);
+                            });
 
-
-
+            
             //load data onto grid
             var collection = new ObservableCollectionExtended<SearchOptionsProxy>();
-           ReadOnlyObservableCollection<SearchOptionsProxy> data;
 
             var userOptions = proxyItems.Connect()
                 .Sort(SortExpressionComparer<SearchOptionsProxy>.Ascending(proxy => proxy.Position))
                 .ObserveOn(schedulerProvider.MainThread)
+                //force reset for each new or removed item dues to a bug in the underlying dragablz control which inserts in an incorrect position
                 .Bind(collection,new ObservableCollectionAdaptor<SearchOptionsProxy, string>(0))
                 .DisposeMany()
                 .Subscribe();
@@ -156,27 +82,16 @@ namespace TailBlazer.Views.Searching
             {
                 schedulerProvider.Background.Schedule(() =>
                 {
-                  //  Data = new ReadOnlyObservableCollection<SearchOptionsProxy>(new ObservableCollection<SearchOptionsProxy>());
-
-  
-                    //var xxx = collection.Clear();
                     var meta = searchMetadataFactory.Create(request.Text, 
                             request.UseRegEx,
                             metadataCollection.NextIndex(), 
                             false);
                     metadataCollection.AddorUpdate(meta);
-
-                    //Observable.Timer(TimeSpan.FromMilliseconds(25))
-                    //    .Subscribe(_ =>
-                    //    {
-                    //        Data = collection;
-                    //    });
                    
                 });
             });
             
             _cleanUp = new CompositeDisposable(searchInvoker,
-                positionMonitor,
                 userOptions,
                 searchInvoker,
                 monitor,
@@ -188,15 +103,23 @@ namespace TailBlazer.Views.Searching
             return Observable.FromEventPattern<OrderChangedEventArgs>(
                 h => PositionMonitor.OrderChanged += h,
                 h => PositionMonitor.OrderChanged -= h)
-                //.Throttle(TimeSpan.FromMilliseconds(125))
+                .Throttle(TimeSpan.FromMilliseconds(125))
                 .Select(evt => evt.EventArgs)
-                .Where(args => args.PreviousOrder != null && args.NewOrder.Length == args.PreviousOrder.Length)
+                .Where(args => args.PreviousOrder != null && !args.PreviousOrder.SequenceEqual(args.NewOrder))
                 .Select(positionChangedArgs =>
                 {
-                    //reprioritise filters and highlights
-                    return positionChangedArgs.NewOrder
+                    var newOrder = positionChangedArgs.NewOrder
                         .OfType<SearchOptionsProxy>()
-                        .Select((item, index) => new {Meta = (SearchMetadata) item, index})
+                        .Select((item, index) =>
+                        {
+                            item.Position = index;
+                            return new {Meta = (SearchMetadata) item, index};
+                        })
+                        .ToArray();
+
+
+                    //reprioritise filters and highlights
+                    return newOrder
                         .Select(x => new SearchMetadata(x.Meta, x.index))
                         .ToArray();
                 });

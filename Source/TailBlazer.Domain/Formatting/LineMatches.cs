@@ -27,8 +27,9 @@ namespace TailBlazer.Domain.Formatting
             {
                 //build list of matching filters
                 return new LineMatchCollection(meta
+                    .OrderBy(m => m.Position)
                     .Where(m => m.Predicate(inputText))
-                    .OrderBy(m=>m.Position)
+                   
                     .Select(m => new LineMatch(m))
                     .ToArray());
             }).StartWith(LineMatchCollection.Empty);

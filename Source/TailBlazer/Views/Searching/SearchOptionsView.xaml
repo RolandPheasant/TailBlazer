@@ -79,32 +79,23 @@
                                                   Background="Transparent">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Button Style="{StaticResource MaterialDesignFloatingActionButton}"
+                                    <Viewbox  Width="22" Height="22" Margin="2">
+                                        <Button Style="{StaticResource MaterialDesignFloatingActionButton}"
                                                         BorderBrush="{DynamicResource GrayBrush2}"
                                                         BorderThickness="0"
-                                                        Width="22" Height="22"
-                                                        wpf:ShadowAssist.ShadowDepth="Depth2"
+                                                       
+                                                    
+                                                    
                                                         Command="{Binding ElementName=Row,Path=DataContext.HighlightCommand}"
                                                         CommandParameter="{Binding}"
                                                         Margin="2">
-                                        <Button.Background>
-                                            <SolidColorBrush Color="{Binding Background, Mode=OneTime}" />
-                                        </Button.Background>
+                                            <Button.Background>
+                                                <SolidColorBrush Color="{Binding Background, Mode=OneTime}" />
+                                            </Button.Background>
+                                        </Button>
+                                    </Viewbox>
+                                    
 
-
-                                        <!--<Button.ToolTip>
-                                            <Grid>
-                                                <Grid.Background>
-                                                    <SolidColorBrush Color="{Binding Background, Mode=OneTime}" />
-                                                </Grid.Background>
-                                                <TextBlock Text="{Binding ElementName=Label,Path=Text}" Margin="2">
-                                                    <TextBlock.Foreground>
-                                                        <SolidColorBrush Color="{Binding Foreground, Mode=OneTime}" />
-                                                    </TextBlock.Foreground>
-                                                </TextBlock>
-                                            </Grid>
-                                        </Button.ToolTip>-->
-                                    </Button>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
 
