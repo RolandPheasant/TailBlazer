@@ -51,8 +51,9 @@ namespace TailBlazer.Views.Tail
 
             //if use selection is null, tail the file
             var scrollSelected = selectedChanged
-                .CombineLatest(lineProvider, pageSize, (proxy, lp, pge) => proxy==null ? new ScrollRequest(pge) : new ScrollRequest(pge, proxy.Start))
-                .DistinctUntilChanged();
+                   //.CombineLatest(lineProvider, pageSize, (proxy, lp, pge) => proxy==null ? ScrollRequest.None : new ScrollRequest(pge, proxy.Start))
+                   .CombineLatest(lineProvider, pageSize, (proxy, lp, pge) => proxy == null ? new ScrollRequest(pge,0) : new ScrollRequest(pge, proxy.Start))
+                    .DistinctUntilChanged();
             
 
             var scrollUser = _userScrollRequested
