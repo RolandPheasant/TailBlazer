@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace TailBlazer.Domain.Formatting
 {
-    public interface IAccentColourProvider
+    public interface IColourProvider
     {
         IEnumerable<Hue> Hues { get; }
         Hue DefaultHighlight { get; }

@@ -9,7 +9,7 @@ using Hue = TailBlazer.Domain.Formatting.Hue;
 
 namespace TailBlazer.Views.Formatting
 {
-    public class AccentColourProvider : IAccentColourProvider
+    public class ColourProvider : IColourProvider
     {
         public IEnumerable<Hue> Hues { get; }
         public Hue DefaultHighlight { get; }
@@ -34,7 +34,7 @@ namespace TailBlazer.Views.Formatting
             "deeppurple",
         };
 
-        public AccentColourProvider()
+        public ColourProvider()
         {
 
             var swatches = new SwatchesProvider()

@@ -93,8 +93,10 @@
     <Compile Include="FileHandling\IndexEx.cs" />
     <Compile Include="FileHandling\IndexType.cs" />
     <Compile Include="FileHandling\LineKey.cs" />
+    <Compile Include="FileHandling\Search\DefaultIcons.cs" />
+    <Compile Include="FileHandling\Search\IColourSelector.cs" />
     <Compile Include="FileHandling\Search\IconTypeSelector.cs" />
-    <Compile Include="FileHandling\Search\IKnownIcons.cs" />
+    <Compile Include="FileHandling\Search\IDefaultIconSelector.cs" />
     <Compile Include="FileHandling\Search\ISearchInfoCollection.cs" />
     <Compile Include="FileHandling\LineIndexType.cs" />
     <Compile Include="FileHandling\FileNotification.cs" />
@@ -127,7 +129,8 @@
     <Compile Include="FileHandling\TailInfo.cs" />
     <Compile Include="Formatting\DisplayText.cs" />
     <Compile Include="Formatting\Hue.cs" />
-    <Compile Include="Formatting\IAccentColourProvider.cs" />
+    <Compile Include="Formatting\HueKey.cs" />
+    <Compile Include="Formatting\IColourProvider.cs" />
     <Compile Include="Formatting\ILineMatches.cs" />
     <Compile Include="Formatting\ITextFormatter.cs" />
     <Compile Include="Formatting\LineMatch.cs" />

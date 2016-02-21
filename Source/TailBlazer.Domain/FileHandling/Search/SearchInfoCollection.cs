@@ -11,9 +11,9 @@ namespace TailBlazer.Domain.FileHandling.Search
     {
         private readonly ISearchMetadataCollection _metadataCollection;
         private readonly ISearchMetadataFactory _searchMetadataFactory;
-        private readonly IAccentColourProvider _accentColourProvider;
+        private readonly IColourProvider _colourProvider;
         private readonly IFileWatcher _fileWatcher;
-        private readonly IKnownIcons _knownIcons;
+        private readonly IDefaultIconSelector _defaultIconSelector;
         private readonly IDisposable _cleanUp;
 
         public IObservableCache<SearchInfo, string> Searches { get; }
@@ -22,15 +22,15 @@ namespace TailBlazer.Domain.FileHandling.Search
         
         public SearchInfoCollection(ISearchMetadataCollection searchMetadataCollection,
             ISearchMetadataFactory searchMetadataFactory,
-            IAccentColourProvider accentColourProvider,
+            IColourProvider colourProvider,
             IFileWatcher fileWatcher,
-            IKnownIcons knownIcons)
+            IDefaultIconSelector defaultIconSelector)
         {
             _metadataCollection = searchMetadataCollection;
             _searchMetadataFactory = searchMetadataFactory;
-            _accentColourProvider = accentColourProvider;
+            _colourProvider = colourProvider;
             _fileWatcher = fileWatcher;
-            _knownIcons = knownIcons;
+            _defaultIconSelector = defaultIconSelector;
 
             //Add a complete file display
             All = fileWatcher.Latest.Index().Replay(1).RefCount();

@@ -28,7 +28,7 @@ namespace TailBlazer.Domain
 
         public bool Equals(CaseInsensitiveString other)
         {
-            return String.Equals(this, other, StringComparison.InvariantCultureIgnoreCase);
+            return String.Equals(this, other, StringComparison.OrdinalIgnoreCase);
 
         }
 
@@ -45,12 +45,12 @@ namespace TailBlazer.Domain
 
         public static bool operator ==(CaseInsensitiveString left, CaseInsensitiveString right)
         {
-            return String.Equals(left,right,StringComparison.InvariantCultureIgnoreCase);
+            return String.Equals(left,right,StringComparison.OrdinalIgnoreCase);
         }
 
         public static bool operator !=(CaseInsensitiveString left, CaseInsensitiveString right)
         {
-            return !String.Equals(left, right, StringComparison.InvariantCultureIgnoreCase);
+            return !String.Equals(left, right, StringComparison.OrdinalIgnoreCase);
         }
 
         #endregion

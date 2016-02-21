@@ -10,14 +10,14 @@ namespace TailBlazer.Views.Formatting
 {
     public class IconProvider : IIconProvider, IDisposable
     {
-        public IKnownIcons KnownIcons { get;  }
+        public IDefaultIconSelector DefaultIconSelector { get;  }
 
         private readonly IDisposable _cleanUp;
         private readonly ISourceList<IconDescription> _icons = new SourceList<IconDescription>();
 
-        public IconProvider(IKnownIcons knownIcons)
+        public IconProvider(IDefaultIconSelector defaultIconSelector)
         {
-            KnownIcons = knownIcons;
+            DefaultIconSelector = defaultIconSelector;
 
             Icons = _icons.AsObservableList();
 

@@ -30,7 +30,7 @@ namespace TailBlazer.Views.Searching
         public SearchOptionsViewModel(ISearchMetadataCollection metadataCollection,
             ISearchMetadataFactory searchMetadataFactory,
             ISchedulerProvider schedulerProvider,
-            IAccentColourProvider accentColourProvider,
+            IColourProvider colourProvider,
             IIconProvider iconsProvider,
             SearchHints searchHints)
         {
@@ -42,10 +42,10 @@ namespace TailBlazer.Views.Searching
                 .Transform(meta =>
                 {
                     return new SearchOptionsProxy(meta,
-                        accentColourProvider,
+                        colourProvider,
                         new IconSelector(iconsProvider, schedulerProvider),
                         m => metadataCollection.Remove(m.SearchText),
-                        iconsProvider.KnownIcons,
+                        iconsProvider.DefaultIconSelector,
                         Id);
                 })
                 .SubscribeMany(so =>

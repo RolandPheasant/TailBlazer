@@ -1,20 +1,27 @@
 using System;
 using System.Windows.Media;
+using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.Formatting
 {
     public class Hue : IEquatable<Hue>
     {
-        public string Swatch { get; set; }
+        public string Swatch { get; }
         public string Name { get; set; }
         public Color Foreground { get;  }
         public Color Background { get;  }
 
+        public HueKey Key { get; }
+
         public Brush ForegroundBrush { get; }
         public Brush BackgroundBrush { get; }
         
-        public Hue(string swatch, string name, Color foreground, Color background)
+        public Hue([NotNull] string swatch, [NotNull] string name, Color foreground, Color background)
         {
+            if (swatch == null) throw new ArgumentNullException(nameof(swatch));
+            if (name == null) throw new ArgumentNullException(nameof(name));
+
+            Key = new HueKey(swatch,name);
             Swatch = swatch;
             Name = name;
             Foreground = foreground;
@@ -28,14 +35,15 @@ namespace TailBlazer.Domain.Formatting
             BackgroundBrush.Freeze();
 
         }
-        
+
+
         #region Equality
 
         public bool Equals(Hue other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(Swatch, other.Swatch) && string.Equals(Name, other.Name);
+            return Key.Equals(other.Key);
         }
 
         public override bool Equals(object obj)
@@ -48,10 +56,7 @@ namespace TailBlazer.Domain.Formatting
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                return ((Swatch != null ? Swatch.GetHashCode() : 0)*397) ^ (Name != null ? Name.GetHashCode() : 0);
-            }
+            return Key.GetHashCode();
         }
 
         public static bool operator ==(Hue left, Hue right)

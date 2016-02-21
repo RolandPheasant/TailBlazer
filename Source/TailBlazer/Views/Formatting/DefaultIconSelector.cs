@@ -6,21 +6,17 @@ using TailBlazer.Domain.FileHandling.Search;
 
 namespace TailBlazer.Views.Formatting
 {
-    public sealed class KnownIcons: IKnownIcons
+    public sealed class DefaultIconSelector: IDefaultIconSelector
     {
-        public string Selected { get; } = PackIconKind.ArrowRightBold.ToString();
-
-        public string RegEx { get; } = PackIconKind.Regex.ToString();
-        public string Search { get; } = PackIconKind.Magnify.ToString();
-
-
+        private string RegEx { get; } = PackIconKind.Regex.ToString();
+        private string Search { get; } = PackIconKind.Magnify.ToString();
+        
         private IEnumerable<DefaultIcons> DefaultMatches { get; }
 
-        public KnownIcons()
+        public DefaultIconSelector()
         {
             DefaultMatches = LoadIcons().ToArray();
         }
-
 
         public string GetIconFor(string text, bool useRegex)
         {
@@ -31,8 +27,7 @@ namespace TailBlazer.Views.Formatting
 
             return match != null ? match.IconName : useRegex ? RegEx : Search;
         }
-
-
+        
         private IEnumerable<DefaultIcons> LoadIcons()
         {
             yield return new DefaultIcons("DEBUG", PackIconKind.Bug.ToString());
@@ -40,6 +35,9 @@ namespace TailBlazer.Views.Formatting
             yield return new DefaultIcons("WARN", PackIconKind.AlertOutline.ToString());
             yield return new DefaultIcons("WARNING", PackIconKind.AlertOutline.ToString());
             yield return new DefaultIcons("ERROR", PackIconKind.SquareInc.ToString());
+            
+            //yield return new DefaultIcons("CLOSE", PackIconKind.CloseCircleOutline.ToString(), false);
+            //yield return new DefaultIcons("CLOSED", PackIconKind.CloseCircleOutline.ToString(), false);
 
             yield return new DefaultIcons("BANK", PackIconKind.Bank.ToString(), false);
             yield return new DefaultIcons("PERSON", PackIconKind.Account.ToString(), false);

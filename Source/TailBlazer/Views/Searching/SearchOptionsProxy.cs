@@ -21,7 +21,7 @@ namespace TailBlazer.Views.Searching
     {
         private readonly IDisposable _cleanUp;
         private readonly SearchMetadata _searchMetadata;
-        private readonly IKnownIcons _knownIcons;
+        private readonly IDefaultIconSelector _defaultIconSelector;
         private bool _highlight;
         private bool _filter;
         private bool _useRegex;
@@ -46,21 +46,21 @@ namespace TailBlazer.Views.Searching
         public IProperty<Brush> Foreground { get; }
 
         public SearchOptionsProxy([NotNull] SearchMetadata searchMetadata, 
-            [NotNull] IAccentColourProvider accentColourProvider, 
+            [NotNull] IColourProvider colourProvider, 
             [NotNull] IconSelector iconSelector,
             [NotNull] Action<SearchMetadata> removeAction, 
-            [NotNull] IKnownIcons knownIcons,
+            [NotNull] IDefaultIconSelector defaultIconSelector,
             Guid parentId)
         {
             if (searchMetadata == null) throw new ArgumentNullException(nameof(searchMetadata));
-            if (accentColourProvider == null) throw new ArgumentNullException(nameof(accentColourProvider));
+            if (colourProvider == null) throw new ArgumentNullException(nameof(colourProvider));
             if (iconSelector == null) throw new ArgumentNullException(nameof(iconSelector));
             if (removeAction == null) throw new ArgumentNullException(nameof(removeAction));
-            if (knownIcons == null) throw new ArgumentNullException(nameof(knownIcons));
+            if (defaultIconSelector == null) throw new ArgumentNullException(nameof(defaultIconSelector));
 
 
             _searchMetadata = searchMetadata;
-            _knownIcons = knownIcons;
+            _defaultIconSelector = defaultIconSelector;
             IconSelector = iconSelector;
 
             ShowIconSelectorCommand = new Command(ShowIconSelector);
@@ -76,7 +76,7 @@ namespace TailBlazer.Views.Searching
             UseRegex = searchMetadata.UseRegex;
             IgnoreCase = searchMetadata.IgnoreCase;
             Position = searchMetadata.Position;
-            Hues = accentColourProvider.Hues;
+            Hues = colourProvider.Hues;
             HighlightHue = searchMetadata.HighlightHue;
 
             IconKind = _searchMetadata.IconKind.ParseEnum<PackIconKind>()
@@ -100,7 +100,7 @@ namespace TailBlazer.Views.Searching
             if (result == IconSelectorResult.UseDefault)
             {
                 //Use default
-                var icon = _knownIcons.GetIconFor(Text, UseRegex);
+                var icon = _defaultIconSelector.GetIconFor(Text, UseRegex);
                 IconKind = icon.ParseEnum<PackIconKind>().ValueOr(() => PackIconKind.ArrowRightBold);
             }
             else if (result == IconSelectorResult.UseSelected)
