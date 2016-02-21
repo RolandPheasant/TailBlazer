@@ -8,15 +8,15 @@ namespace TailBlazer.Domain.FileHandling.Search
     {
         private readonly IDefaultIconSelector _defaultIconSelector;
         private readonly IColourProvider _colourProvider;
-        private readonly IColourSelector _colourSelector;
+        private readonly IDefaultColourSelector _defaultColourSelector;
 
         public SearchMetadataFactory(IDefaultIconSelector defaultIconSelector, 
             IColourProvider colourProvider,
-            IColourSelector colourSelector)
+            IDefaultColourSelector defaultColourSelector)
         {
             _defaultIconSelector = defaultIconSelector;
             _colourProvider = colourProvider;
-            _colourSelector = colourSelector;
+            _defaultColourSelector = defaultColourSelector;
         }
 
         public SearchMetadata Create([NotNull] string searchText, bool useRegex, int index, bool filter)
@@ -24,14 +24,14 @@ namespace TailBlazer.Domain.FileHandling.Search
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
 
             var icon = _defaultIconSelector.GetIconFor(searchText, useRegex);
-            var hue = _colourSelector.SelectFor(searchText);
+            var hue = _defaultColourSelector.Select(searchText);
 
             return new SearchMetadata(index, searchText,
                 filter, 
                 true, 
                 useRegex, 
                 true,
-                hue, 
+                hue , 
                 icon);
         }
 

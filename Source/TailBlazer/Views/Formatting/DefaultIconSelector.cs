@@ -46,12 +46,28 @@ namespace TailBlazer.Views.Formatting
             yield return new DefaultIcons("USD", PackIconKind.CurrencyUsd.ToString(), false);
             yield return new DefaultIcons("GBP", PackIconKind.CurrencyGbp.ToString(), false);
             yield return new DefaultIcons("EUR", PackIconKind.CurrencyEur.ToString(), false);
-
-
+            
             yield return new DefaultIcons("FUCK", PackIconKind.EmoticonDevil.ToString(), false);
-            yield return new DefaultIcons("SHIT", PackIconKind.EmoticonDevil.ToString(), false);
+            yield return new DefaultIcons("SHIT", PackIconKind.EmoticonPoop.ToString(), false);
+            yield return new DefaultIcons("POOP", PackIconKind.EmoticonPoop.ToString(), false);
             yield return new DefaultIcons("PISS", PackIconKind.EmoticonDevil.ToString(), false);
             yield return new DefaultIcons("WANK", PackIconKind.EmoticonDevil.ToString(), false);
+        }
+
+        private class DefaultIcons
+        {
+            public string Text { get; }
+            public string IconName { get; }
+            public bool MatchTextOnCase { get; }
+
+
+            public DefaultIcons(string text, string iconName, bool matchTextOnCase = false)
+            {
+                Text = text;
+                IconName = iconName;
+                MatchTextOnCase = matchTextOnCase;
+            }
+
         }
     }
 

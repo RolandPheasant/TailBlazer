@@ -152,7 +152,7 @@
     <Compile Include="Infrastucture\StartupController.cs" />
     <Compile Include="Infrastucture\UhandledExceptionHandler.cs" />
     <Compile Include="Infrastucture\VirtualizingWrapPanel.cs" />
-    <Compile Include="Views\Formatting\ColourSelector.cs" />
+    <Compile Include="Views\Formatting\DefaultColourSelector.cs" />
     <Compile Include="Views\Formatting\IconDescription.cs" />
     <Compile Include="Views\Formatting\IIconProvider.cs" />
     <Compile Include="Views\Formatting\DefaultIconSelector.cs" />

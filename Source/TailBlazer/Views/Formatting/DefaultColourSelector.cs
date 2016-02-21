@@ -14,14 +14,14 @@ namespace TailBlazer.Views.Formatting
     //    publ
     //}
 
-    public sealed class ColourSelector : IColourSelector
+    public sealed class DefaultColourSelector : IDefaultColourSelector
     {
         private readonly IColourProvider _colourProvider;
         private Dictionary<HueKey, Hue> _hues;
         private readonly Hue _defaultHighlight;
         private readonly DefaultHue[] _defaults;
 
-        public ColourSelector(IColourProvider colourProvider)
+        public DefaultColourSelector(IColourProvider colourProvider)
         {
             _colourProvider = colourProvider;
 
@@ -34,7 +34,7 @@ namespace TailBlazer.Views.Formatting
 
       
 
-        public Hue SelectFor(string text)
+        public Hue Select(string text)
         {
             var match = _defaults
                 .FirstOrDefault(hue => hue.MatchTextOnCase
@@ -47,7 +47,8 @@ namespace TailBlazer.Views.Formatting
         private IEnumerable<DefaultHue> Load()
         {
             yield return new DefaultHue("DEBUG", Lookup("blue", "Accent400"));
-            yield return new DefaultHue("INFO", Lookup("yellow", "Accent400"));
+            //yield return new DefaultHue("INFO", Lookup("yellow", "Accent400"));
+            yield return new DefaultHue("INFO", Lookup("yellow", "Accent700"));
             yield return new DefaultHue("WARN", Lookup("orange", "Accent400"));
             yield return new DefaultHue("WARNING", Lookup("orange", "Accent400"));
             yield return new DefaultHue("ERROR", Lookup("red", "Accent200"));
@@ -67,7 +68,7 @@ namespace TailBlazer.Views.Formatting
             public bool MatchTextOnCase { get; }
 
 
-            public DefaultHue(string text, Hue hue, bool matchTextOnCase = true)
+            public DefaultHue(string text, Hue hue, bool matchTextOnCase = false)
             {
                 Text = text;
                 Hue = hue;

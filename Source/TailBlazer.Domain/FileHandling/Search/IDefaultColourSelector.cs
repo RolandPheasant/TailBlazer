@@ -2,8 +2,8 @@ using TailBlazer.Domain.Formatting;
 
 namespace TailBlazer.Domain.FileHandling.Search
 {
-    public interface IColourSelector
+    public interface IDefaultColourSelector
     {
-        Hue SelectFor(string text);
+        Hue Select(string text);
     }
 }
