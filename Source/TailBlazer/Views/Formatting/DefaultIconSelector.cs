@@ -51,6 +51,7 @@ namespace TailBlazer.Views.Formatting
             yield return new DefaultIcons("FUCK", PackIconKind.EmoticonDevil.ToString(), false);
             yield return new DefaultIcons("SHIT", PackIconKind.EmoticonDevil.ToString(), false);
             yield return new DefaultIcons("PISS", PackIconKind.EmoticonDevil.ToString(), false);
+            yield return new DefaultIcons("WANK", PackIconKind.EmoticonDevil.ToString(), false);
         }
     }
 
