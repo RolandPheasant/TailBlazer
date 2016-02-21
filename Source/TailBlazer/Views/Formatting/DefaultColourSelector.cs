@@ -16,17 +16,14 @@ namespace TailBlazer.Views.Formatting
 
     public sealed class DefaultColourSelector : IDefaultColourSelector
     {
-        private readonly IColourProvider _colourProvider;
-        private Dictionary<HueKey, Hue> _hues;
+        private readonly Dictionary<HueKey, Hue> _hues;
         private readonly Hue _defaultHighlight;
         private readonly DefaultHue[] _defaults;
 
         public DefaultColourSelector(IColourProvider colourProvider)
         {
-            _colourProvider = colourProvider;
-
             _hues = colourProvider.Hues.ToDictionary(h => h.Key);
-            _defaultHighlight = _colourProvider.Hues
+            _defaultHighlight = colourProvider.Hues
                                     .Last(s => s.Swatch.Equals("amber", StringComparison.OrdinalIgnoreCase));
 
             _defaults = Load().ToArray();
@@ -48,10 +45,12 @@ namespace TailBlazer.Views.Formatting
         {
             yield return new DefaultHue("DEBUG", Lookup("blue", "Accent400"));
             //yield return new DefaultHue("INFO", Lookup("yellow", "Accent400"));
-            yield return new DefaultHue("INFO", Lookup("yellow", "Accent700"));
-            yield return new DefaultHue("WARN", Lookup("orange", "Accent400"));
-            yield return new DefaultHue("WARNING", Lookup("orange", "Accent400"));
-            yield return new DefaultHue("ERROR", Lookup("red", "Accent200"));
+           // yield return new DefaultHue("INFO", Lookup("orange", "Accent200"));
+            yield return new DefaultHue("INFO", Lookup("deeppurple", "Accent200"));
+            yield return new DefaultHue("WARN", Lookup("orange", "Accent700"));
+            yield return new DefaultHue("WARNING", Lookup("orange", "Accent700"));
+            yield return new DefaultHue("ERROR", Lookup("red", "Accent400"));
+            yield return new DefaultHue("FATAL", Lookup("red", "Accent700"));
 
         }
 
