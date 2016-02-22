@@ -380,7 +380,8 @@
                             
                             
                             <Grid Margin="6 0 6 0"
-                                  
+                                    TextOptions.TextFormattingMode="Ideal" 
+                                    TextOptions.TextRenderingMode="Auto" 
                                   HorizontalAlignment="Left">
                                 <Grid.Resources>
                                     <Style TargetType="{x:Type TextBlock}">

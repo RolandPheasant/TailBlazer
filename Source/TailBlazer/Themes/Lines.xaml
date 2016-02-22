@@ -25,15 +25,19 @@
                         FontFamily="{StaticResource MaterialDesignFont}"
                         Visibility="{Binding ShowIndicator.Value}">
                     <materialDesign:PopupBox.ToggleContent>
-                 
-                    <materialDesign:PackIcon
-                        Width="14"
-                        Height="14"
-                        Foreground="{Binding IndicatorColour.Value}"
-                        Kind="{Binding IndicatorIcon.Value,FallbackValue={x:Static materialDesign:PackIconKind.Information}}"/>
+
+
+                            <materialDesign:PackIcon
+                            Width="14"
+                            Height="14"
+                            materialDesign:ShadowAssist.ShadowDepth="Depth5"    
+                            Foreground="{Binding IndicatorColour.Value}"
+                            Kind="{Binding IndicatorIcon.Value,FallbackValue={x:Static materialDesign:PackIconKind.Information}}"/>
                     </materialDesign:PopupBox.ToggleContent>
 
-                    <Grid Margin="8">
+                <Grid Margin="8"    TextOptions.TextFormattingMode="Ideal" 
+                                    TextOptions.TextRenderingMode="Auto"   >
+                    
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>

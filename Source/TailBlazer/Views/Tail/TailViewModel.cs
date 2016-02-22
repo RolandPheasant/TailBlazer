@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -11,6 +13,7 @@ using DynamicData;
 using DynamicData.Binding;
 using DynamicData.PLinq;
 using MaterialDesignThemes.Wpf;
+using Microsoft.Win32;
 using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
@@ -89,6 +92,7 @@ namespace TailBlazer.Views.Tail
             if (searchHints == null) throw new ArgumentNullException(nameof(searchHints));
 
             _stateProvider = new TailViewPersister(this);
+
             Name = fileWatcher.FullName;
             SelectionMonitor = selectionMonitor;
             SearchOptions = searchOptionsViewModel;

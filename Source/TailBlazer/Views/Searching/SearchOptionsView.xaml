@@ -9,8 +9,7 @@
              xmlns:controls="clr-namespace:TailBlazer.Controls"
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              mc:Ignorable="d" 
-            TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
-             Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
+
              d:DataContext="{d:DesignInstance searching:SearchOptionsViewModel}"
              d:DesignHeight="300">
 
@@ -49,7 +48,12 @@
                                         ToolTip="Change icon"
                                         Padding="0"
                                         Width="24" Height="24"
+                                       
+                                        BorderThickness="0"
                                         HorizontalAlignment="Left"
+                                        SnapsToDevicePixels="True"
+                                        UseLayoutRounding="True"
+                                        wpf:ShadowAssist.ShadowDepth="Depth2"
                                         VerticalAlignment="Center">
                         <wpf:PackIcon  
                                         Padding="4" 
@@ -83,9 +87,9 @@
                                         <Button Style="{StaticResource MaterialDesignFloatingActionButton}"
                                                         BorderBrush="{DynamicResource GrayBrush2}"
                                                         BorderThickness="0"
-                                                       
-                                                    
-                                                    
+                                                        SnapsToDevicePixels="True"
+                                                        UseLayoutRounding="True"
+                                                        wpf:ShadowAssist.ShadowDepth="Depth2"
                                                         Command="{Binding ElementName=Row,Path=DataContext.HighlightCommand}"
                                                         CommandParameter="{Binding}"
                                                         Margin="2">
@@ -194,7 +198,6 @@
                     </TextBox.InputBindings>
                 </TextBox>
             </Grid>
-
 
             <dragablz:DragablzItemsControl  Grid.Row="2" 
                                              Margin="6 0 6 0"

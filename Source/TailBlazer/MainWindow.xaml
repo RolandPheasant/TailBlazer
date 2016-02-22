@@ -20,7 +20,7 @@
         TextElement.FontSize="12"
         TextOptions.TextFormattingMode="Ideal" 
         TextOptions.TextRenderingMode="Auto"       
-        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"   
+        FontFamily="{StaticResource MaterialDesignFont}"  
         NonActiveWindowTitleBrush="{DynamicResource WindowTitleColorBrush}"
         WindowTitleBrush="{DynamicResource WindowTitleColorBrush}"
         GlowBrush="{DynamicResource AccentColorBrush3}"
@@ -38,6 +38,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/controls.buttons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToggleButton.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Font.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/MaterialDesign.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 

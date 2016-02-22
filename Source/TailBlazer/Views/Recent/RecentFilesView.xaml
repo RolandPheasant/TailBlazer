@@ -5,6 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:controls="clr-namespace:TailBlazer.Controls"
              xmlns:recent="clr-namespace:TailBlazer.Views.Recent"
+              TextOptions.TextFormattingMode="Ideal" 
+              TextOptions.TextRenderingMode="Auto" 
+             
              mc:Ignorable="d" 
                d:DataContext="{d:DesignInstance recent:RecentFilesViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="300" d:DesignWidth="300">

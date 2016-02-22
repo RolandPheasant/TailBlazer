@@ -27,6 +27,8 @@ namespace TailBlazer.Domain.FileHandling
         
         public string Folder => FileInfo.DirectoryName;
 
+        public string Extension => FileInfo.Extension;
+
         public FileWatcher([NotNull] FileInfo fileInfo, IScheduler scheduler=null)
         {
             FileInfo = fileInfo;
