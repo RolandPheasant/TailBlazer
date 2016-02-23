@@ -3,6 +3,7 @@ using System.Reflection;
 using TailBlazer.Domain.FileHandling.Recent;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
+using TailBlazer.Domain.StateHandling;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Recent;
 using TailBlazer.Views.Searching;
@@ -26,7 +27,7 @@ namespace TailBlazer.Infrastucture
             var settingsRegister = objectProvider.Get<ISettingsRegister>();
             settingsRegister.Register(new GeneralOptionsConverter(), "GeneralOptions");
             settingsRegister.Register(new RecentFilesToStateConverter(), "RecentFiles");
-            settingsRegister.Register(new SearchOptionsConverter(), "SearchOptions");
+            settingsRegister.Register(new StateBucketConverter(), "BucketOfState");
             settingsRegister.Register(new RecentSearchToStateConverter(), "RecentSearch");
             logger.Info("Starting complete");
 

@@ -11,6 +11,8 @@ namespace TailBlazer.Views.Formatting
 {
     public class ColourProvider : IColourProvider
     {
+        private IDictionary<HueKey ,Hue> HueCache { get; }
+
         public IEnumerable<Hue> Hues { get; }
         public Hue DefaultHighlight { get; }
 
@@ -53,9 +55,16 @@ namespace TailBlazer.Views.Formatting
                         })
                         .ToArray();
 
+            HueCache = Hues.ToDictionary(h => h.Key);
+
             DefaultHighlight = Hues
                 .Last(s => s.Swatch.Equals("amber",StringComparison.OrdinalIgnoreCase));
     
         }
+
+        public Optional<Hue> Lookup(HueKey key)
+        {
+            return HueCache.Lookup(key);
+        }  
     }
 }

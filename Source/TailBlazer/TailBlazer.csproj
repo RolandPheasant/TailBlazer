@@ -181,8 +181,6 @@
       <DependentUpon>SearchOptionsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Searching\SearchOptionsViewModel.cs" />
-    <Compile Include="Views\Searching\SearchOptions.cs" />
-    <Compile Include="Views\Searching\SearchOptionsConverter.cs" />
     <Compile Include="Views\Options\Theme.cs" />
     <Compile Include="Views\FileDrop\FileDropContainer.cs" />
     <Compile Include="Views\FileDrop\FileDropMonitor.cs" />

@@ -1,12 +1,15 @@
 ﻿
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace TailBlazer.Domain
 {
     public struct CaseInsensitiveString : IEquatable<CaseInsensitiveString>
     {
         private readonly string _original;
+        private static readonly StringComparer Comparer = StringComparer.OrdinalIgnoreCase;
 
 
         public CaseInsensitiveString(string source)
@@ -28,7 +31,7 @@ namespace TailBlazer.Domain
 
         public bool Equals(CaseInsensitiveString other)
         {
-            return String.Equals(this, other, StringComparison.OrdinalIgnoreCase);
+            return Comparer.Equals(this, other);
 
         }
 
@@ -40,17 +43,17 @@ namespace TailBlazer.Domain
 
         public override int GetHashCode()
         {
-            return _original.ToUpperInvariant().GetHashCode();
+            return Comparer.GetHashCode(this);
         }
 
         public static bool operator ==(CaseInsensitiveString left, CaseInsensitiveString right)
         {
-            return String.Equals(left,right,StringComparison.OrdinalIgnoreCase);
+            return Comparer.Equals(left, right);
         }
 
         public static bool operator !=(CaseInsensitiveString left, CaseInsensitiveString right)
         {
-            return !String.Equals(left, right, StringComparison.OrdinalIgnoreCase);
+            return !Comparer.Equals(left, right);
         }
 
         #endregion

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.Formatting
 {
@@ -6,5 +7,7 @@ namespace TailBlazer.Domain.Formatting
     {
         IEnumerable<Hue> Hues { get; }
         Hue DefaultHighlight { get; }
+
+        Optional<Hue> Lookup(HueKey key);
     }
 }

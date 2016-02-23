@@ -6,7 +6,6 @@ namespace TailBlazer.Domain.Settings
     {
         IObservable<T> Value { get; }
          
-
         void Write(T item);
     }
 }

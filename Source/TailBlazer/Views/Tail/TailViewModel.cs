@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -13,7 +11,6 @@ using DynamicData;
 using DynamicData.Binding;
 using DynamicData.PLinq;
 using MaterialDesignThemes.Wpf;
-using Microsoft.Win32;
 using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
@@ -21,6 +18,7 @@ using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
+using TailBlazer.Domain.StateHandling;
 using TailBlazer.Infrastucture;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Searching;
@@ -76,7 +74,9 @@ namespace TailBlazer.Views.Tail
             [NotNull] IInlineViewerFactory inlineViewerFactory, 
             [NotNull] ISetting<GeneralOptions> generalOptions,
             [NotNull] ISearchMetadataCollection searchMetadataCollection,
+            [NotNull] IStateBucketService stateBucketService,
             [NotNull] SearchOptionsViewModel searchOptionsViewModel,
+            ISearchStateToMetadataMapper metadataMapper,
             [NotNull] SearchHints searchHints)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
@@ -88,10 +88,11 @@ namespace TailBlazer.Views.Tail
             if (inlineViewerFactory == null) throw new ArgumentNullException(nameof(inlineViewerFactory));
             if (generalOptions == null) throw new ArgumentNullException(nameof(generalOptions));
             if (searchMetadataCollection == null) throw new ArgumentNullException(nameof(searchMetadataCollection));
+            if (stateBucketService == null) throw new ArgumentNullException(nameof(stateBucketService));
             if (searchOptionsViewModel == null) throw new ArgumentNullException(nameof(searchOptionsViewModel));
             if (searchHints == null) throw new ArgumentNullException(nameof(searchHints));
 
-            _stateProvider = new TailViewPersister(this);
+   
 
             Name = fileWatcher.FullName;
             SelectionMonitor = selectionMonitor;
@@ -117,6 +118,8 @@ namespace TailBlazer.Views.Tail
                 .ObserveOn(schedulerProvider.MainThread)
                 .Select(options => new Duration(TimeSpan.FromSeconds(options.HighlightDuration)))
                 .ForBinding();
+
+            _stateProvider = new TailViewPersister(this, searchMetadataCollection, stateBucketService, metadataMapper);
 
             //An observable which acts as a scroll command
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
@@ -192,12 +195,6 @@ namespace TailBlazer.Views.Tail
             //return an empty line provider unless user is viewing inline - this saves needless trips to the file
             var inline = searchInfoCollection.All.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : new EmptyLineProvider());
 
-            var firstVisibleRow = this._data.ToObservableChangeSet().ToCollection()
-                                            .Select(collection => collection.FirstOrDefault());
-
-            //var itemToSelect = this.WhenValueChanged(vm => vm.SelectedItem)
-            //    .CombineLatest(firstVisibleRow, (selected, first) => selected ?? first);
-            ////
             InlineViewer = inlineViewerFactory.Create(inline, this.WhenValueChanged(vm => vm.SelectedItem), lineProxyFactory);
 
             _cleanUp = new CompositeDisposable(lineScroller,
@@ -215,7 +212,6 @@ namespace TailBlazer.Views.Tail
                 HighlightTail,
                 UsingDarkTheme,
                 searchHints,
-                searchMetadataCollection,
                 searchMetadataCollection,
                 SelectionMonitor,
                 SearchOptions,
@@ -305,8 +301,7 @@ namespace TailBlazer.Views.Tail
         }
 
         #endregion
-
-
+        
         public void Dispose()
         {
             _cleanUp.Dispose();

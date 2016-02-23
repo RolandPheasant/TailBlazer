@@ -106,7 +106,7 @@ namespace TailBlazer.Views.WindowManagement
         {
             var analyser = new LayoutAnalyser();
             var root = analyser.QueryLayouts();
-            Console.WriteLine(root);
+           // Console.WriteLine(root);
         }
 
         private void OpenFile()

@@ -30,7 +30,7 @@ namespace TailBlazer.Domain.Formatting
         {
             unchecked
             {
-                return ((Swatch != null ? Swatch.GetHashCode() : 0)*397) ^ (Name != null ? Name.GetHashCode() : 0);
+                return ((Swatch.GetHashCode())*397) ^ (Name.GetHashCode());
             }
         }
 

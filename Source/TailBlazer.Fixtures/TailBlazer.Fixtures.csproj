@@ -113,6 +113,7 @@
     <Compile Include="SettingsConversion.cs" />
     <Compile Include="SchedulerEx.cs" />
     <Compile Include="IndexerFixture.cs" />
+    <Compile Include="StateBucketFixture.cs" />
     <Compile Include="SettingsStoreFixture.cs" />
     <Compile Include="SplitFileByMatchingTextFixture.cs" />
     <Compile Include="TestFile.cs" />

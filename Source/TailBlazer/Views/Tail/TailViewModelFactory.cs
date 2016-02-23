@@ -1,9 +1,11 @@
 using System;
 using System.IO;
+using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
+using TailBlazer.Domain.StateHandling;
 using TailBlazer.Views.Formatting;
 using TailBlazer.Views.Searching;
 
@@ -16,18 +18,27 @@ namespace TailBlazer.Views.Tail
         private readonly IColourProvider _colourProvider;
         private readonly ISearchMetadataFactory _searchMetadataFactory;
         private readonly IIconProvider _iconProvider;
+        private readonly IStateBucketService _stateBucketService;
 
-        public TailViewModelFactory(IObjectProvider objectProvider, 
-            ISchedulerProvider schedulerProvider,
-            IColourProvider colourProvider,
-            ISearchMetadataFactory searchMetadataFactory,
-            IIconProvider iconProvider)
+        public TailViewModelFactory([NotNull] IObjectProvider objectProvider,
+            [NotNull] ISchedulerProvider schedulerProvider, 
+            [NotNull] IColourProvider colourProvider,
+            [NotNull] ISearchMetadataFactory searchMetadataFactory, 
+            [NotNull] IIconProvider iconProvider,
+            [NotNull] IStateBucketService stateBucketService)
         {
+            if (objectProvider == null) throw new ArgumentNullException(nameof(objectProvider));
+            if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
+            if (colourProvider == null) throw new ArgumentNullException(nameof(colourProvider));
+            if (searchMetadataFactory == null) throw new ArgumentNullException(nameof(searchMetadataFactory));
+            if (iconProvider == null) throw new ArgumentNullException(nameof(iconProvider));
+            if (stateBucketService == null) throw new ArgumentNullException(nameof(stateBucketService));
             _objectProvider = objectProvider;
             _schedulerProvider = schedulerProvider;
             _colourProvider = colourProvider;
             _searchMetadataFactory = searchMetadataFactory;
             _iconProvider = iconProvider;
+            _stateBucketService = stateBucketService;
         }
 
         public TailViewModel Create(FileInfo fileInfo)
