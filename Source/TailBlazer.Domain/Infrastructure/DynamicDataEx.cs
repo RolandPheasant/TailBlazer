@@ -14,7 +14,7 @@ namespace DynamicData.Binding
 {
     public static class DynamicDataEx
     {
-        public static IObservable<IChangeSet<T>> RecordChanges<T>(this IObservable<IChangeSet<T>> source, ILogger logger,string label)
+        public static IObservable<IChangeSet<T>> LogChanges<T>(this IObservable<IChangeSet<T>> source, ILogger logger,string label)
         {
             if (!Debugger.IsAttached)
                 return source;
@@ -39,7 +39,7 @@ namespace DynamicData.Binding
             return source.Do(t =>  logger.Info(formatter(t)), ex => logger.Error(ex, "There has been an error "));
         }
 
-        public static IObservable<IChangeSet<TObject,TKey>> RecordChanges<TObject, TKey>(this IObservable<IChangeSet<TObject, TKey>> source, ILogger logger, string label)
+        public static IObservable<IChangeSet<TObject,TKey>> LogChanges<TObject, TKey>(this IObservable<IChangeSet<TObject, TKey>> source, ILogger logger, string label)
         {
             if (!Debugger.IsAttached)
                 return source;

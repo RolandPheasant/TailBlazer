@@ -18,27 +18,29 @@ namespace TailBlazer.Views.Tail
         private readonly IColourProvider _colourProvider;
         private readonly ISearchMetadataFactory _searchMetadataFactory;
         private readonly IIconProvider _iconProvider;
-        private readonly IStateBucketService _stateBucketService;
+        private readonly ITailViewStateControllerFactory _tailViewStateControllerFactory;
 
         public TailViewModelFactory([NotNull] IObjectProvider objectProvider,
             [NotNull] ISchedulerProvider schedulerProvider, 
             [NotNull] IColourProvider colourProvider,
             [NotNull] ISearchMetadataFactory searchMetadataFactory, 
             [NotNull] IIconProvider iconProvider,
-            [NotNull] IStateBucketService stateBucketService)
+            [NotNull] ITailViewStateControllerFactory tailViewStateControllerFactory)
         {
             if (objectProvider == null) throw new ArgumentNullException(nameof(objectProvider));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (colourProvider == null) throw new ArgumentNullException(nameof(colourProvider));
             if (searchMetadataFactory == null) throw new ArgumentNullException(nameof(searchMetadataFactory));
             if (iconProvider == null) throw new ArgumentNullException(nameof(iconProvider));
-            if (stateBucketService == null) throw new ArgumentNullException(nameof(stateBucketService));
+            if (tailViewStateControllerFactory == null)
+                throw new ArgumentNullException(nameof(tailViewStateControllerFactory));
+
             _objectProvider = objectProvider;
             _schedulerProvider = schedulerProvider;
             _colourProvider = colourProvider;
             _searchMetadataFactory = searchMetadataFactory;
             _iconProvider = iconProvider;
-            _stateBucketService = stateBucketService;
+            _tailViewStateControllerFactory = tailViewStateControllerFactory;
         }
 
         public TailViewModel Create(FileInfo fileInfo)
@@ -72,7 +74,9 @@ namespace TailBlazer.Views.Tail
                 new ExplictArg("fileWatcher", fileWatcher),
                 new ExplictArg("searchInfoCollection", searchInfo),
                 new ExplictArg("searchMetadataCollection", searchMetadataCollection),
-                new ExplictArg("searchOptionsViewModel", searchOptionsViewModel)
+                new ExplictArg("searchOptionsViewModel", searchOptionsViewModel),
+                new ExplictArg("tailViewStateControllerFactory", _tailViewStateControllerFactory)
+                
             });
         }
     }

@@ -27,6 +27,7 @@
         WindowStartupLocation="CenterScreen"  
         WindowTransitionsEnabled="False"
         x:Name="Window"
+        SaveWindowPosition="True"
 
         d:DataContext="{d:DesignInstance windowManagement:WindowViewModel, IsDesignTimeCreatable=False}"
         Title="Tail Blazer" 
@@ -177,6 +178,7 @@
             <Grid>
                 <dockablz:Layout   x:Name="Layout" >
                     <dragablz:TabablzControl 
+                            IsTabStop="False"
                         x:Name="InitialTabablzControl"
                             HeaderMemberPath="Header" 
                             TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"

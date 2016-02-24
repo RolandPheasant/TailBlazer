@@ -49,6 +49,8 @@ namespace TailBlazer.Views.Tail
         public SearchOptionsViewModel SearchOptions { get;  }
         public SearchHints SearchHints { get;  }
         public SearchCollection SearchCollection { get; }
+        internal ISearchMetadataCollection SearchMetadataCollection { get; }
+
         public InlineViewer InlineViewer { get; }
         public IProperty<int> Count { get; }
         public IProperty<string> CountText { get; }
@@ -76,8 +78,9 @@ namespace TailBlazer.Views.Tail
             [NotNull] ISearchMetadataCollection searchMetadataCollection,
             [NotNull] IStateBucketService stateBucketService,
             [NotNull] SearchOptionsViewModel searchOptionsViewModel,
-            ISearchStateToMetadataMapper metadataMapper,
-            [NotNull] SearchHints searchHints)
+            //ISearchStateToMetadataMapper metadataMapper,
+            [NotNull] SearchHints searchHints,
+           [NotNull]  ITailViewStateControllerFactory tailViewStateControllerFactory)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
@@ -92,18 +95,15 @@ namespace TailBlazer.Views.Tail
             if (searchOptionsViewModel == null) throw new ArgumentNullException(nameof(searchOptionsViewModel));
             if (searchHints == null) throw new ArgumentNullException(nameof(searchHints));
 
-   
-
             Name = fileWatcher.FullName;
             SelectionMonitor = selectionMonitor;
             SearchOptions = searchOptionsViewModel;
             SearchHints = searchHints;
             SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
-
             CopyToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
             OpenFileCommand = new Command(() => Process.Start(fileWatcher.FullName));
             OpenFolderCommand = new Command(() => Process.Start(fileWatcher.Folder));
-            
+            SearchMetadataCollection = searchMetadataCollection;
             UsingDarkTheme = generalOptions.Value
                     .ObserveOn(schedulerProvider.MainThread)
                     .Select(options => options.Theme== Theme.Dark)
@@ -119,7 +119,10 @@ namespace TailBlazer.Views.Tail
                 .Select(options => new Duration(TimeSpan.FromSeconds(options.HighlightDuration)))
                 .ForBinding();
 
-            _stateProvider = new TailViewPersister(this, searchMetadataCollection, stateBucketService, metadataMapper);
+            _stateProvider = new TailViewPersister(this);
+
+            //this controller responsible for loading and persisting user search stuff
+            var stateController = tailViewStateControllerFactory.Create(this);
 
             //An observable which acts as a scroll command
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
@@ -152,11 +155,13 @@ namespace TailBlazer.Views.Tail
             var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection),new LineMatches(searchMetadataCollection));
             var loader = lineScroller.Lines.Connect()
               
-                .RecordChanges(logger, "Received")
+                .LogChanges(logger, "Received")
                 .Transform(lineProxyFactory.Create, new ParallelisationOptions(ParallelType.Ordered, 3))
+                .LogChanges(logger, "Sorting")
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data,100)
+                .LogChanges(logger, "Bound")
                 .DisposeMany()
                 .LogErrors(logger)
                 .Subscribe();
@@ -216,6 +221,7 @@ namespace TailBlazer.Views.Tail
                 SelectionMonitor,
                 SearchOptions,
                 searchInvoker,
+                stateController,
                 _userScrollRequested.SetAsComplete());
         }
         

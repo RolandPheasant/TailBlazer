@@ -16,14 +16,12 @@ using TailBlazer.Views.Formatting;
 
 namespace TailBlazer.Views.Searching
 {
-
     public class SearchOptionsViewModel: AbstractNotifyPropertyChanged, IDisposable
     {
         public Guid Id { get; } = Guid.NewGuid();
         private readonly IDisposable _cleanUp;
 
         public ReadOnlyObservableCollection<SearchOptionsProxy> Data { get; }
-
         public VerticalPositionMonitor PositionMonitor { get; } = new VerticalPositionMonitor();
         public SearchHints SearchHints { get;  }
 
@@ -58,10 +56,7 @@ namespace TailBlazer.Views.Searching
                 .AsObservableCache();
 
             var monitor = MonitorPositionalChanges()
-                            .Subscribe(positionChangedArgs =>
-                            {
-                                positionChangedArgs.ForEach(metadataCollection.AddorUpdate);
-                            });
+                            .Subscribe(metadataCollection.Add);
 
             
             //load data onto grid

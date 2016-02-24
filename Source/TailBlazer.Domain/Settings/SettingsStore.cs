@@ -9,7 +9,6 @@ namespace TailBlazer.Domain.Settings
     public class FileSettingsStore : ISettingsStore
     {
         private readonly ILogger _logger;
-
         private string Location { get; }
 
         private static class Structure
@@ -36,18 +35,15 @@ namespace TailBlazer.Domain.Settings
 
             _logger.Info($"Creating setting for {key}");
 
-
-            //var value = XDocument.Parse(state.Value);
-
             var root = new XElement(new XElement(Structure.Root, new XAttribute(Structure.Version,state.Version)));
             root.Add(new XElement(Structure.State, state.Value));
-
 
             var doc = new XDocument(root);
             var fileText = doc.ToString();
 
-            _logger.Info($"Writing value {fileText}");
+            _logger.Info($"Writing settings for {key} to {file}");
             File.WriteAllText(file, fileText);
+            _logger.Info($"Setting  for {key} committed");
 
         }
 
@@ -67,7 +63,7 @@ namespace TailBlazer.Domain.Settings
             var version = int.Parse(versionString);
             var state = root.ElementOrThrow("State");
 
-            _logger.Info($"{key} has the value {state}");
+            _logger.Debug($"{key} has the value {state}");
             return new State(version, state);
         }
     }

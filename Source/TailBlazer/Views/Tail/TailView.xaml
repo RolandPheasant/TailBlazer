@@ -16,6 +16,7 @@
                 Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
              x:Name="Control"
              mc:Ignorable="d" 
+              FocusManager.FocusedElement="{Binding ElementName= SearchTextBox}"
              d:DataContext="{d:DesignInstance tail:TailViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="400" d:DesignWidth="400">
 
@@ -135,7 +136,7 @@
                     <RowDefinition Height="20"/>
                 </Grid.RowDefinitions>
 
-                <Grid Margin="0 4 0 4">
+                <Grid Margin="0 4 0 4" KeyboardNavigation.TabNavigation="Cycle">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto" />
@@ -150,6 +151,8 @@
                                    VerticalAlignment="Bottom" 
                                    Margin="2 0 0 0"
                                    Padding="2"
+                                    TabIndex="5"
+                                   IsTabStop="False"
                                    Width="32" 
                                    Height="32" 
                                    IsChecked="{Binding SearchHints.UseRegex}">
@@ -166,6 +169,8 @@
                     </ToggleButton>
 
                     <TextBox Grid.Column="1" 
+                            TabIndex="0"
+                             x:Name="SearchTextBox"
                             Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                             wpf:TextFieldAssist.Hint="{Binding SearchHints.Message.Value}" 
                             VerticalAlignment="Center"
@@ -190,7 +195,9 @@
                             Text="Switch Results"/>
 
 
-                    <ListBox Grid.Column="3" Margin="4 2 0 2" 
+                    <ListBox
+                        TabIndex="1"
+                        Grid.Column="3" Margin="4 2 0 2" 
                         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
                         Background="{DynamicResource MaterialDesignPaper}"
                         VerticalAlignment="Stretch"
@@ -264,7 +271,7 @@
                     <!--</Border>-->
 
                     <Button Grid.Column="4" 
-
+                            TabIndex="2"
                         Style="{StaticResource MaterialDesignFlatButton}"
                         Command="{Binding OpenSearchOptionsCommand}"
                         HorizontalAlignment="Left"
@@ -282,6 +289,7 @@
 
                         <CheckBox HorizontalAlignment="Left"
                             VerticalAlignment="Center"
+                            TabIndex="3"
                             IsChecked="{Binding AutoTail}"
                             Margin="4 0 4 0"
                             Content="Follow Tail"/>
@@ -289,6 +297,7 @@
                         <CheckBox Visibility="{Binding CanViewInline.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"
+                            TabIndex="4"
                             IsChecked="{Binding ShowInline}"
                             Content="Show inline"
                             Margin="4 0 4 0"/>
