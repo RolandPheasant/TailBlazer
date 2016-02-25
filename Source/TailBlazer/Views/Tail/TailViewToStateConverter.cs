@@ -9,8 +9,6 @@ using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {
-
-
     public class TailViewToStateConverter : IConverter<TailViewState>
     {
         private static class Structure

@@ -16,12 +16,10 @@ namespace TailBlazer.Views.Tail
             _searchStateToMetadataMapper = searchStateToMetadataMapper;
         }
 
-
         public void Restore(TailViewModel view, State state)
         {
             var converter = new TailViewToStateConverter();
             Restore(view,converter.Convert(state));
-
         }
 
         public void Restore(TailViewModel view,TailViewState tailviewstate)
@@ -31,7 +29,6 @@ namespace TailBlazer.Views.Tail
             view.SearchMetadataCollection.Add(searches);
             view.SearchCollection.Select(tailviewstate.SelectedSearch);
             _logger.Info("DONE: Applied {0} search settings for {1} ", tailviewstate.SearchItems.Count(), view.Name);
-
         }
     }
 }

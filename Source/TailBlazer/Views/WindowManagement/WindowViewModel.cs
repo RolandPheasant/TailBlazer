@@ -65,8 +65,8 @@ namespace TailBlazer.Views.WindowManagement
             _objectProvider = objectProvider;
             InterTabClient = new InterTabClient(windowFactory);
             OpenFileCommand =  new Command(OpenFile);
-            ShowInGitHubCommand = new Command(()=>   Process.Start("https://github.com/RolandPheasant"));
 
+            ShowInGitHubCommand = new Command(()=>   Process.Start("https://github.com/RolandPheasant"));
             ZoomOutCommand= new Command(()=> { GeneralOptions.Scale = GeneralOptions.Scale + 5; });
             ZoomInCommand = new Command(() => { GeneralOptions.Scale = GeneralOptions.Scale - 5; });
             SaveLayoutCommand = new Command(WalkTheLayout);
@@ -150,8 +150,7 @@ namespace TailBlazer.Views.WindowManagement
                     //do the work on the ui thread
                     _schedulerProvider.MainThread.Schedule(() =>
                     {
-                        
-                        Views.Add(newItem);
+                       Views.Add(newItem);
                         _logger.Info($"Opened '{file.FullName}'");
                         Selected = newItem;
                     });
@@ -207,12 +206,9 @@ namespace TailBlazer.Views.WindowManagement
             set { SetAndRaise(ref _menuIsOpen, value); }
         }
 
-
         public void Dispose()
         {
             _cleanUp.Dispose();
         }
-
-
     }
 }
