@@ -28,12 +28,13 @@ namespace TailBlazer.Views.Tail
         public int Index { get; }
         public string Text => Line.Text;
         public LineKey Key { get; }
-
         public IProperty<IEnumerable<DisplayText>> FormattedText { get; }
         public IProperty<Brush> IndicatorColour { get; }
         public IProperty<PackIconKind> IndicatorIcon { get; }
         public IProperty<IEnumerable<LineMatchProxy>> IndicatorMatches { get; }
         public IProperty<Visibility> ShowIndicator { get; }
+        public IProperty<bool> HasSingleLine { get; }
+
 
         public bool IsRecent => Line.Timestamp.HasValue && DateTime.Now.Subtract(Line.Timestamp.Value).TotalSeconds < 0.25;
 
@@ -77,15 +78,19 @@ namespace TailBlazer.Views.Tail
                     {
                         return lmc.Matches.Select(m => new LineMatchProxy(m)).ToList();
                     }).ForBinding();
-        
+
+            HasSingleLine = lineMatchesShared
+                    .Select(lmc => lmc.Count == 1).ForBinding();
 
             _cleanUp = new CompositeDisposable(FormattedText, 
                 IndicatorColour,
                 IndicatorMatches,
                 IndicatorIcon,
                 ShowIndicator,
+                HasSingleLine,
                 lineMatchesShared.Connect());
         }
+
 
 
         public int CompareTo(LineProxy other)

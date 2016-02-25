@@ -10,7 +10,9 @@
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.font.xaml" />
 
     </ResourceDictionary.MergedDictionaries>
-
+    
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"/>
 
     <DataTemplate DataType="{x:Type tail:LineProxy}">
         <Grid Margin="2 0 0 0">
@@ -94,13 +96,28 @@
                         
                 </materialDesign:PopupBox>
 
-            <controls:HighlightTextControl
-                            Grid.Column="1" Margin="4 0 0 0"   
-                                Text="{Binding Text}" 
-                                VerticalAlignment="Center"
-                                FormattedText = "{Binding FormattedText.Value}"
-                                HighlightForeground = "{StaticResource SecondaryAccentForegroundBrush}"
-                                HighlightBackground = "{StaticResource SecondaryAccentBrush}"/>
+
+            <controls:HighlightTextControl 
+                    Grid.Column="1" Margin="4 0 0 0"   
+                    Text="{Binding Text}" 
+                    VerticalAlignment="Center"
+                    FormattedText = "{Binding FormattedText.Value}"/>
+
+            <!--<TextBlock  
+                    Visibility="{Binding HasSingleLine.Value,Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Grid.Column="1" 
+                    Margin="4 0 0 0"
+                    Text="{Binding Text}"  
+                    VerticalAlignment="Center"/>
+
+            <controls:HighlightTextControl 
+                    Visibility="{Binding HasSingleLine.Value,Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
+                    Grid.Column="1" Margin="4 0 0 0"   
+                    Text="{Binding Text}" 
+                    VerticalAlignment="Center"
+                    FormattedText = "{Binding FormattedText.Value}"
+                    HighlightForeground = "{StaticResource SecondaryAccentForegroundBrush}"
+                    HighlightBackground = "{StaticResource SecondaryAccentBrush}"/>-->
         </Grid>
 
 
