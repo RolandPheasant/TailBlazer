@@ -10,46 +10,12 @@ using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Views.Layout
 {
-
-    public class StateNodeInterpreter
-    {
-       
-    }
-
-   
-
-    public class BranchNode
-    {
-        public string Orientation { get; }
-        public double Ratio { get; }
-
-        public BranchNode(double ratio)
-        {
-            Ratio = ratio;
-        }
-
-        public BranchNode(string orientation)
-        {
-            Orientation = orientation;
-        }
-
-        public override string ToString()
-        {
-            if (string.IsNullOrEmpty(Orientation))
-                return $"Branch {Orientation}";
-
-            return $"Proportion {Ratio}";
-        }
-    }
-
-
-    
-    public class LayoutAnalyser
+    public class LayoutNodeBuilder
     {
         private readonly StateNode _rootNode;
 
-        public LayoutAnalyser()
-        {;
+        public LayoutNodeBuilder()
+        {
             _rootNode = new StateNode("Application");
         }
 
@@ -76,23 +42,6 @@ namespace TailBlazer.Views.Layout
             }
 
             return new[] {_rootNode};
-        }
-
-
-        private static void FloatingItemsVisitor(StateNode layoutNode, LayoutAccessor layoutAccessor)
-        {
-            var floatingItems = layoutAccessor.FloatingItems.ToList();
-            var floatingItemsNode = new StateNode("Floating Items " + floatingItems.Count);
-            foreach (var floatingItemNode in floatingItems.Select(floatingItem => new StateNode
-            (
-                $"Floating Item {floatingItem.X}, {floatingItem.Y} : {floatingItem.ActualWidth}, {floatingItem.ActualHeight}"
-            )))
-            {
-                floatingItemsNode.Children.Add(floatingItemNode);
-            }
-
-            if (floatingItemsNode.Children.Count != 0)
-                layoutNode.Children.Add(floatingItemsNode);
         }
 
         private static void TabablzControlVisitor(StateNode stateNode, TabablzControl tabablzControl)

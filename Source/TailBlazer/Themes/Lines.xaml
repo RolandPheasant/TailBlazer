@@ -3,7 +3,8 @@
                     xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
                     xmlns:controls="clr-namespace:TailBlazer.Controls"
                     xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
-                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:converters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
@@ -28,14 +29,13 @@
                         Visibility="{Binding ShowIndicator.Value}">
                     <materialDesign:PopupBox.ToggleContent>
 
-
-                            <materialDesign:PackIcon
+                    <materialDesign:PackIcon
                             Width="14"
                             Height="14"
-                            materialDesign:ShadowAssist.ShadowDepth="Depth5"    
                             Foreground="{Binding IndicatorColour.Value}"
                             Kind="{Binding IndicatorIcon.Value,FallbackValue={x:Static materialDesign:PackIconKind.Information}}"/>
-                    </materialDesign:PopupBox.ToggleContent>
+
+                </materialDesign:PopupBox.ToggleContent>
 
                 <Grid Margin="8"    TextOptions.TextFormattingMode="Ideal" 
                                     TextOptions.TextRenderingMode="Auto"   >

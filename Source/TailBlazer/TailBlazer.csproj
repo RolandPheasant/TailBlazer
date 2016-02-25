@@ -156,7 +156,8 @@
     <Compile Include="Views\Formatting\IconDescription.cs" />
     <Compile Include="Views\Formatting\IIconProvider.cs" />
     <Compile Include="Views\Formatting\DefaultIconSelector.cs" />
-    <Compile Include="Views\Layout\LayoutAnalyser.cs" />
+    <Compile Include="Views\Layout\BranchNode.cs" />
+    <Compile Include="Views\Layout\LayoutNodeBuilder.cs" />
     <Compile Include="Views\Layout\LayoutContent.cs" />
     <Compile Include="Views\Layout\ShellSettings.cs" />
     <Compile Include="Views\Layout\StateNode.cs" />
@@ -187,6 +188,7 @@
     <Compile Include="Views\Tail\ILinesVisualisation.cs" />
     <Compile Include="Views\Searching\ISearchStateToMetadataMapper.cs" />
     <Compile Include="Views\Tail\ITailViewStateControllerFactory.cs" />
+    <Compile Include="Views\Tail\ITailViewStateRestorer.cs" />
     <Compile Include="Views\Tail\LineMatchProxy.cs" />
     <Compile Include="Views\Searching\SearchState.cs" />
     <Compile Include="Views\Searching\SearchStateToMetadataMapper.cs" />
@@ -194,6 +196,7 @@
     <Compile Include="Views\Tail\TailViewState.cs" />
     <Compile Include="Views\Tail\TailViewStateController.cs" />
     <Compile Include="Views\Tail\TailViewStateControllerFactory.cs" />
+    <Compile Include="Views\Tail\TailViewStateRestorer.cs" />
     <Compile Include="Views\Tail\TailViewToStateConverter.cs" />
     <Compile Include="Views\WindowManagement\FileHeaderNamingJob.cs" />
     <Compile Include="Controls\FileIcon.cs" />

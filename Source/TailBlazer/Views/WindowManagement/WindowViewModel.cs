@@ -104,7 +104,7 @@ namespace TailBlazer.Views.WindowManagement
 
         private void WalkTheLayout()
         {
-            var analyser = new LayoutAnalyser();
+            var analyser = new LayoutNodeBuilder();
             var root = analyser.QueryLayouts();
            // Console.WriteLine(root);
         }

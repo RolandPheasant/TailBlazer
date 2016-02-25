@@ -39,7 +39,6 @@ namespace TailBlazer.Views.Tail
         private bool _showInline;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
-
         public Guid Id { get; }= Guid.NewGuid();
         public ICommand CopyToClipboardCommand { get; }
         public ICommand OpenFileCommand { get; }
@@ -50,7 +49,6 @@ namespace TailBlazer.Views.Tail
         public SearchHints SearchHints { get;  }
         public SearchCollection SearchCollection { get; }
         internal ISearchMetadataCollection SearchMetadataCollection { get; }
-
         public InlineViewer InlineViewer { get; }
         public IProperty<int> Count { get; }
         public IProperty<string> CountText { get; }
@@ -62,7 +60,6 @@ namespace TailBlazer.Views.Tail
         public IProperty<bool> HighlightTail { get; }
         public IProperty<bool> UsingDarkTheme { get; }
         public IProperty<Duration> HighlightDuration { get; }
-
         public ICommand OpenSearchOptionsCommand => new Command(OpenSearchOptions);
 
         public string Name { get; }
@@ -78,7 +75,7 @@ namespace TailBlazer.Views.Tail
             [NotNull] ISearchMetadataCollection searchMetadataCollection,
             [NotNull] IStateBucketService stateBucketService,
             [NotNull] SearchOptionsViewModel searchOptionsViewModel,
-            //ISearchStateToMetadataMapper metadataMapper,
+             [NotNull] ITailViewStateRestorer restorer,
             [NotNull] SearchHints searchHints,
            [NotNull]  ITailViewStateControllerFactory tailViewStateControllerFactory)
         {
@@ -104,6 +101,7 @@ namespace TailBlazer.Views.Tail
             OpenFileCommand = new Command(() => Process.Start(fileWatcher.FullName));
             OpenFolderCommand = new Command(() => Process.Start(fileWatcher.Folder));
             SearchMetadataCollection = searchMetadataCollection;
+
             UsingDarkTheme = generalOptions.Value
                     .ObserveOn(schedulerProvider.MainThread)
                     .Select(options => options.Theme== Theme.Dark)
@@ -119,9 +117,10 @@ namespace TailBlazer.Views.Tail
                 .Select(options => new Duration(TimeSpan.FromSeconds(options.HighlightDuration)))
                 .ForBinding();
 
-            _stateProvider = new TailViewPersister(this);
+            //this deails with state when loading the system at start up and at shut-down
+            _stateProvider = new TailViewPersister(this, restorer);
 
-            //this controller responsible for loading and persisting user search stuff
+            //this controller responsible for loading and persisting user search stuff as the user changes stuff
             var stateController = tailViewStateControllerFactory.Create(this);
 
             //An observable which acts as a scroll command

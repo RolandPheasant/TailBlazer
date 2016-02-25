@@ -18,24 +18,6 @@ namespace TailBlazer.Controls
         }
 
 
-        public static readonly DependencyProperty HighlightBackgroundProperty = DependencyProperty.Register(
-            "HighlightBackground", typeof (Brush), typeof (HighlightTextControl), new PropertyMetadata(default(Brush), UpdateControlCallBack));
-
-        public Brush HighlightBackground
-        {
-            get { return (Brush) GetValue(HighlightBackgroundProperty); }
-            set { SetValue(HighlightBackgroundProperty, value); }
-        }
-
-        public static readonly DependencyProperty HighlightForegroundProperty = DependencyProperty.Register(
-            "HighlightForeground", typeof (Brush), typeof (HighlightTextControl), new PropertyMetadata(default(Brush), UpdateControlCallBack));
-
-        public Brush HighlightForeground
-        {
-            get { return (Brush) GetValue(HighlightForegroundProperty); }
-            set { SetValue(HighlightForegroundProperty, value); }
-        }
-
         public static readonly DependencyProperty FormattedTextProperty = DependencyProperty.Register(
             "FormattedText", typeof (IEnumerable<DisplayText>), typeof (HighlightTextControl), new PropertyMetadata(default(IEnumerable<DisplayText>), UpdateControlCallBack));
 
@@ -113,16 +95,11 @@ namespace TailBlazer.Controls
                     {
                         run.Background = ft.Hue.BackgroundBrush;
                         run.Foreground = ft.Hue.ForegroundBrush;
-
-                        run.FontWeight = FontWeights.Bold;
+                        //run.FontWeight = FontWeights.Bold;
                     }
                     return run;
                 }));
             }
-
-
-
-
             base.OnRender(drawingContext);
         }
     }

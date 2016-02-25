@@ -10,22 +10,22 @@ namespace TailBlazer.Views.Tail
     {
         private readonly IStateBucketService _stateBucketService;
         private readonly ISchedulerProvider _schedulerProvider;
-        private readonly ISearchStateToMetadataMapper _searchStateToMetadataMapper;
+        private readonly ITailViewStateRestorer _tailViewStateRestorer;
         private readonly ILogFactory _loggerFactory;
 
         public TailViewStateControllerFactory([NotNull] IStateBucketService stateBucketService,
-            [NotNull] ISchedulerProvider schedulerProvider,
-            [NotNull] ISearchStateToMetadataMapper searchStateToMetadataMapper, 
+            [NotNull] ISchedulerProvider schedulerProvider, 
+            [NotNull] ITailViewStateRestorer tailViewStateRestorer, 
             [NotNull] ILogFactory loggerFactory)
         {
             if (stateBucketService == null) throw new ArgumentNullException(nameof(stateBucketService));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
-            if (searchStateToMetadataMapper == null)
-                throw new ArgumentNullException(nameof(searchStateToMetadataMapper));
+            if (tailViewStateRestorer == null) throw new ArgumentNullException(nameof(tailViewStateRestorer));
+      
             if (loggerFactory == null) throw new ArgumentNullException(nameof(loggerFactory));
             _stateBucketService = stateBucketService;
             _schedulerProvider = schedulerProvider;
-            _searchStateToMetadataMapper = searchStateToMetadataMapper;
+            _tailViewStateRestorer = tailViewStateRestorer;
             _loggerFactory = loggerFactory;
         }
 
@@ -34,7 +34,7 @@ namespace TailBlazer.Views.Tail
             if (tailView == null) throw new ArgumentNullException(nameof(tailView));
 
             var logger = _loggerFactory.Create<TailViewStateController>();
-            return new TailViewStateController(tailView,_stateBucketService, _schedulerProvider,_searchStateToMetadataMapper, logger);
+            return new TailViewStateController(tailView,_stateBucketService, _schedulerProvider, _tailViewStateRestorer, logger);
         }
     }
 }

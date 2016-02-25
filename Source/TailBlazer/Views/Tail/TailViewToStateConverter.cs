@@ -3,11 +3,14 @@ using System.Collections;
 using System.Linq;
 using System.Xml.Linq;
 using DynamicData.Kernel;
+using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {
+
+
     public class TailViewToStateConverter : IConverter<TailViewState>
     {
         private static class Structure
@@ -32,6 +35,31 @@ namespace TailBlazer.Views.Tail
             public const string Icon = "Icon";
         }
 
+        //convert from the view model values
+
+        public State Convert(string fileName, string selectedSearch, SearchMetadata[] items)
+        {
+            var searchItems = items
+                .OrderBy(s => s.Position)
+                .Select(search => new SearchState
+                    (
+                    search.SearchText,
+                    search.Position,
+                    search.UseRegex,
+                    search.Highlight,
+                    search.Filter,
+                    false,
+                    search.IgnoreCase,
+                    search.HighlightHue.Swatch,
+                    search.IconKind,
+                    search.HighlightHue.Name
+
+                    )).ToArray();
+
+            var tailViewState = new TailViewState(fileName, selectedSearch, searchItems);
+            return this.Convert(tailViewState);
+        }
+
         public TailViewState Convert(State state)
         {
             if (state == null || state == State.Empty)
@@ -47,13 +75,13 @@ namespace TailBlazer.Views.Tail
                 .Elements(Structure.SearchItem)
                 .Select((element,index) =>
                 {
-                    var text = XmlEx.ElementOrThrow((XElement) element, Structure.Text);
-                    var position = ParseEx.ParseInt(element.Attribute(Structure.Filter).Value).ValueOr(() => index);
-                    var filter = ParseEx.ParseBool(element.Attribute(Structure.Filter).Value).ValueOr(() => true);
-                    var useRegEx = ParseEx.ParseBool(element.Attribute(Structure.UseRegEx).Value).ValueOr(() => false);
-                    var highlight = ParseEx.ParseBool(element.Attribute(Structure.Highlight).Value).ValueOr(() => true);
-                    var alert = ParseEx.ParseBool(element.Attribute(Structure.Alert).Value).ValueOr(() => false);
-                    var ignoreCase = ParseEx.ParseBool(element.Attribute(Structure.IgnoreCase).Value).ValueOr(() => true);
+                    var text = ((XElement) element).ElementOrThrow(Structure.Text);
+                    var position = element.Attribute(Structure.Filter).Value.ParseInt().ValueOr(() => index);
+                    var filter = element.Attribute(Structure.Filter).Value.ParseBool().ValueOr(() => true);
+                    var useRegEx = element.Attribute(Structure.UseRegEx).Value.ParseBool().ValueOr(() => false);
+                    var highlight = element.Attribute(Structure.Highlight).Value.ParseBool().ValueOr(() => true);
+                    var alert = element.Attribute(Structure.Alert).Value.ParseBool().ValueOr(() => false);
+                    var ignoreCase = element.Attribute(Structure.IgnoreCase).Value.ParseBool().ValueOr(() => true);
 
                     var swatch = element.Attribute(Structure.Swatch).Value;
                     var hue = element.Attribute(Structure.Hue).Value;
