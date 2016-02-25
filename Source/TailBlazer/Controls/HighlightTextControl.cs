@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using DynamicData.Kernel;
 using TailBlazer.Domain.Formatting;
 
 namespace TailBlazer.Controls
@@ -88,19 +89,39 @@ namespace TailBlazer.Controls
                 return;
             }
 
-            _textBlock.Inlines.AddRange(FormattedText.Select(ft =>
+            var formattedText = FormattedText.AsArray();
+
+            if (formattedText.Length == 1)
             {
-                var run = new Run(ft.Text);
+                var line = formattedText[0];
+                _textBlock.Text = line.Text;
 
-                if (ft.Highlight && HighlightEnabled)
+                if (line.Highlight && HighlightEnabled)
                 {
-                    run.Background = ft.Hue.BackgroundBrush;
-                    run.Foreground = ft.Hue.ForegroundBrush;
-
-                    run.FontWeight = FontWeights.Bold;
+                    _textBlock.Background = line.Hue.BackgroundBrush;
+                    _textBlock.Foreground = line.Hue.ForegroundBrush;
+                    _textBlock.FontWeight = FontWeights.Bold;
                 }
-                return run;
-            }));
+            }
+            else
+            {
+                _textBlock.Inlines.AddRange(formattedText.Select(ft =>
+                {
+                    var run = new Run(ft.Text);
+
+                    if (ft.Highlight && HighlightEnabled)
+                    {
+                        run.Background = ft.Hue.BackgroundBrush;
+                        run.Foreground = ft.Hue.ForegroundBrush;
+
+                        run.FontWeight = FontWeights.Bold;
+                    }
+                    return run;
+                }));
+            }
+
+
+
 
             base.OnRender(drawingContext);
         }
