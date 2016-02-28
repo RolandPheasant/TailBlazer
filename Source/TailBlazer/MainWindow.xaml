@@ -27,7 +27,7 @@
         WindowStartupLocation="CenterScreen"  
         WindowTransitionsEnabled="False"
         x:Name="Window"
-        SaveWindowPosition="True"
+        SaveWindowPosition="False"
 
         d:DataContext="{d:DesignInstance windowManagement:WindowViewModel, IsDesignTimeCreatable=False}"
         Title="Tail Blazer" 

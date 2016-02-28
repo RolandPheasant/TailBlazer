@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace TailBlazer.Views.Tail
@@ -11,7 +12,17 @@ namespace TailBlazer.Views.Tail
         public TailView()
         {
             InitializeComponent();
-            //Loaded += (sender, e) => MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
+            Loaded += (sender, e) =>
+            {
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+
+                    this.SearchTextBox.Focus();
+                    MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
+                }));
+
+
+            };
         }
     }
 }

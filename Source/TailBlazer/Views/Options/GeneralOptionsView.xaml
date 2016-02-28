@@ -52,10 +52,11 @@
 
             <TextBlock Grid.Row="1" Grid.Column="0" 
                            VerticalAlignment="Center">Zoom</TextBlock>
-
+         
+            <!--Style="{StaticResource MaterialDesignDiscreteSlider}"-->
             <Slider Grid.Row="1" 
                         Grid.Column="1" Minimum="50" Maximum="250" 
-                        Width="200"
+                   Width="200"
                         Margin="6 4 4 4"
                         SmallChange="5"
                         VerticalAlignment="Center"

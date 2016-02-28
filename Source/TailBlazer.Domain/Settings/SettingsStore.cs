@@ -63,7 +63,7 @@ namespace TailBlazer.Domain.Settings
             var version = int.Parse(versionString);
             var state = root.ElementOrThrow("State");
 
-            _logger.Debug($"{key} has the value {state}");
+          //  _logger.Debug($"{key} has the value {state}");
             return new State(version, state);
         }
     }

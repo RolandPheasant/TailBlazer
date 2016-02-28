@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using DynamicData;
 using DynamicData.Kernel;
-using MaterialDesignThemes.Wpf;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
 

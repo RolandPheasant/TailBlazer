@@ -148,10 +148,11 @@
 
 
                     <ToggleButton
+                                    
                                    VerticalAlignment="Bottom" 
                                    Margin="2 0 0 0"
                                    Padding="2"
-                                    TabIndex="5"
+                                   TabIndex="5"
                                    IsTabStop="False"
                                    Width="32" 
                                    Height="32" 
@@ -173,7 +174,7 @@
                              x:Name="SearchTextBox"
                             Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                             wpf:TextFieldAssist.Hint="{Binding SearchHints.Message.Value}" 
-                            VerticalAlignment="Center"
+                            VerticalAlignment="Bottom"
                             wpf:ValidationAssist.UsePopup="False"
                             Style="{StaticResource FloatingHintAndErrorTextBox}"
                             Validation.ErrorTemplate="{StaticResource BorderOnlyValidationErrorTemplate}" 
