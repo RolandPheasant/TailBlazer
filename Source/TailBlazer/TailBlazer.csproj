@@ -157,15 +157,12 @@
     <Compile Include="Views\Formatting\IIconProvider.cs" />
     <Compile Include="Views\Formatting\DefaultIconSelector.cs" />
     <Compile Include="Views\IViewFactory.cs" />
-    <Compile Include="Views\Layout\BranchNode.cs" />
-    <Compile Include="Views\Layout\LayoutNodeBuilder.cs" />
-    <Compile Include="Views\Layout\LayoutContent.cs" />
-    <Compile Include="Views\Layout\LayoutWriter.cs" />
-    <Compile Include="Views\Layout\Node.cs" />
-    <Compile Include="Views\Layout\RootState.cs" />
+    <Compile Include="Views\Layout\ILayoutConverter.cs" />
+    <Compile Include="Views\Layout\ILayoutService.cs" />
+    <Compile Include="Views\Layout\LayoutService.cs" />
+    <Compile Include="Views\Layout\LayoutStateWriter.cs" />
     <Compile Include="Views\Layout\ShellSettings.cs" />
     <Compile Include="Views\Layout\ShellStateConverter.cs" />
-    <Compile Include="Views\Layout\StateNode.cs" />
     <Compile Include="Views\Options\GeneralOptionsConverter.cs" />
     <Compile Include="Views\Options\GeneralOptionsView.xaml.cs">
       <DependentUpon>GeneralOptionsView.xaml</DependentUpon>

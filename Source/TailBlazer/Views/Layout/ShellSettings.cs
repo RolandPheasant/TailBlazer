@@ -5,7 +5,7 @@ using System.Windows;
 namespace TailBlazer.Views.Layout
 {
 
-    public class ShellSettings : IEquatable<ShellSettings>
+    public class ShellSettings :  IEquatable<ShellSettings>
     {
         public double Top { get; }
         public double Left { get; }

@@ -162,7 +162,7 @@
     <Compile Include="Settings\ISettingFactory.cs" />
     <Compile Include="Settings\ISettingsRegister.cs" />
     <Compile Include="Settings\ISettingsStore.cs" />
-    <Compile Include="Settings\IPersistentStateProvider.cs" />
+    <Compile Include="Settings\IPersistentView.cs" />
     <Compile Include="Settings\Setting.cs" />
     <Compile Include="Settings\SettingFactory.cs" />
     <Compile Include="Settings\SettingsRegister.cs" />

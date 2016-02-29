@@ -55,7 +55,8 @@ namespace TailBlazer.Views.WindowManagement
             IWindowsController windowsController,
             RecentFilesViewModel recentFilesViewModel,
             GeneralOptionsViewModel generalOptionsViewModel,
-            ISchedulerProvider schedulerProvider)
+            ISchedulerProvider schedulerProvider,
+            ILayoutService layoutService)
         {
             _logger = logger;
             _windowsController = windowsController;
@@ -69,7 +70,7 @@ namespace TailBlazer.Views.WindowManagement
             ShowInGitHubCommand = new Command(()=>   Process.Start("https://github.com/RolandPheasant"));
             ZoomOutCommand= new Command(()=> { GeneralOptions.Scale = GeneralOptions.Scale + 5; });
             ZoomInCommand = new Command(() => { GeneralOptions.Scale = GeneralOptions.Scale - 5; });
-            SaveLayoutCommand = new Command(WalkTheLayout);
+            SaveLayoutCommand = new Command(layoutService.Write);
             ExitCommmand = new Command(() => Application.Current.Shutdown());
 
             Version = $"v{Assembly.GetEntryAssembly().GetName().Version.ToString(3)}";
@@ -102,12 +103,6 @@ namespace TailBlazer.Views.WindowManagement
                 }));
         }
 
-        private void WalkTheLayout()
-        {
-            var analyser = new LayoutNodeBuilder();
-            var root = analyser.QueryLayouts();
-           // Console.WriteLine(root);
-        }
 
         private void OpenFile()
         {

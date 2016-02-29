@@ -25,12 +25,12 @@ using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {
-    public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentStateProvider
+    public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentView
     {
         private readonly IDisposable _cleanUp;
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
         private readonly ISubject<ScrollRequest> _userScrollRequested = new ReplaySubject<ScrollRequest>(1);
-        private readonly IPersistentStateProvider _stateProvider;
+        private readonly IPersistentView _view;
 
         private bool _autoTail=true;
         private int _firstIndex;
@@ -75,9 +75,9 @@ namespace TailBlazer.Views.Tail
             [NotNull] ISearchMetadataCollection searchMetadataCollection,
             [NotNull] IStateBucketService stateBucketService,
             [NotNull] SearchOptionsViewModel searchOptionsViewModel,
-             [NotNull] ITailViewStateRestorer restorer,
+            [NotNull] ITailViewStateRestorer restorer,
             [NotNull] SearchHints searchHints,
-           [NotNull]  ITailViewStateControllerFactory tailViewStateControllerFactory)
+            [NotNull]  ITailViewStateControllerFactory tailViewStateControllerFactory)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
@@ -118,7 +118,7 @@ namespace TailBlazer.Views.Tail
                 .ForBinding();
 
             //this deails with state when loading the system at start up and at shut-down
-            _stateProvider = new TailViewPersister(this, restorer);
+            _view = new TailViewPersister(this, restorer);
 
             //this controller responsible for loading and persisting user search stuff as the user changes stuff
             var stateController = tailViewStateControllerFactory.Create(this);
@@ -295,14 +295,14 @@ namespace TailBlazer.Views.Tail
 
         #region Persist state 
 
-        State IPersistentStateProvider.CaptureState()
+        ViewState IPersistentView.CaptureState()
         {
-            return _stateProvider.CaptureState();
+            return _view.CaptureState();
         }
 
-        void IPersistentStateProvider.Restore(State state)
+        void IPersistentView.Restore(ViewState state)
         {
-            _stateProvider.Restore(state);
+            _view.Restore(state);
         }
 
         #endregion

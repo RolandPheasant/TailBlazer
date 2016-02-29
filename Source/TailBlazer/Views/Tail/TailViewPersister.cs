@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Xml.Linq;
 using TailBlazer.Domain.Settings;
 
 namespace TailBlazer.Views.Tail
 {
-    public class TailViewPersister: IPersistentStateProvider
+    public class TailViewPersister: IPersistentView
     {
         private readonly TailViewModel _tailView;
         private readonly ITailViewStateRestorer _tailViewStateRestorer;
@@ -17,16 +18,16 @@ namespace TailBlazer.Views.Tail
         }
 
 
-        State IPersistentStateProvider.CaptureState()
+        ViewState IPersistentView.CaptureState()
         {
             var coverter = new TailViewToStateConverter();
             var state = coverter.Convert(_tailView.Name, _tailView.SearchCollection.Selected.Text, _tailView.SearchMetadataCollection.Metadata.Items.ToArray());
-            return new State(1, state.Value);
+            return new ViewState("TailViewModel", state);
         }
 
-        public void Restore(State state)
+        public void Restore(ViewState state)
         {
-            _tailViewStateRestorer.Restore(_tailView, state);
+            _tailViewStateRestorer.Restore(_tailView, state.State);
         }
     }
 }
