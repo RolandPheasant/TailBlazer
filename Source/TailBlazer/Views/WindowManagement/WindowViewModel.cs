@@ -70,20 +70,23 @@ namespace TailBlazer.Views.WindowManagement
             ShowInGitHubCommand = new Command(()=>   Process.Start("https://github.com/RolandPheasant"));
             ZoomOutCommand= new Command(()=> { GeneralOptions.Scale = GeneralOptions.Scale + 5; });
             ZoomInCommand = new Command(() => { GeneralOptions.Scale = GeneralOptions.Scale - 5; });
-            SaveLayoutCommand = new Command(layoutService.Write);
+            SaveLayoutCommand = new Command(()=>layoutService.Write());
             ExitCommmand = new Command(() => Application.Current.Shutdown());
 
             Version = $"v{Assembly.GetEntryAssembly().GetName().Version.ToString(3)}";
 
             var fileDropped = DropMonitor.Dropped.Subscribe(OpenFile);
+
             var isEmptyChecker = Views.ToObservableChangeSet()
                                     .ToCollection()
                                     .Select(items=>items.Count)
                                     .StartWith(0)
                                     .Select(count=>count==0)
+                                    .LogErrors(logger)
                                     .Subscribe(isEmpty=> IsEmpty = isEmpty);
 
             var openRecent = recentFilesViewModel.OpenFileRequest
+                                .LogErrors(logger)
                                 .Subscribe(file =>
                                 {
                                     MenuIsOpen = false;
@@ -134,11 +137,9 @@ namespace TailBlazer.Views.WindowManagement
 
                     //1. resolve TailViewModel
                     var factory = _objectProvider.Get<TailViewModelFactory>();
-                    var viewModel = factory.Create(file);
+                    var newItem = factory.Create(file);
 
                     //2. Display it
-                    var newItem = new ViewContainer(new FileHeader(file), viewModel);
-                    
                     _windowsController.Register(newItem);
 
                     _logger.Info($"Objects for '{file.FullName}' has been created.");
@@ -157,6 +158,36 @@ namespace TailBlazer.Views.WindowManagement
                 }
             });
         }
+
+        //TODO: Abstract this
+        public void OpenView(ViewContainer viewContainer)
+        {
+            _schedulerProvider.Background.Schedule(() =>
+            {
+                try
+                {
+                   _logger.Info($"Attempting to open a restored view {viewContainer.Header}");
+                    //var viewContainer = new ViewContainer(view);
+
+                    //TODO: Factory should create the ViewContainer
+
+                    _windowsController.Register(viewContainer);
+
+                    //do the work on the ui thread
+                    _schedulerProvider.MainThread.Schedule(() =>
+                    {
+                        Views.Add(viewContainer);
+                        Selected = viewContainer;
+                    });
+                }
+                catch (Exception ex)
+                {
+                    //TODO: Create a failed to load view
+                    _logger.Error(ex, $"There was a problem opening '{viewContainer.Header}'");
+                }
+            });
+        }
+
 
         public ItemActionCallback ClosingTabItemHandler => ClosingTabItemHandlerImpl;
 

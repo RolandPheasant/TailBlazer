@@ -22,7 +22,7 @@ namespace TailBlazer.Views.Tail
         {
             var coverter = new TailViewToStateConverter();
             var state = coverter.Convert(_tailView.Name, _tailView.SearchCollection.Selected.Text, _tailView.SearchMetadataCollection.Metadata.Items.ToArray());
-            return new ViewState("TailViewModel", state);
+            return new ViewState(TailViewModelConstants.ViewKey, state);
         }
 
         public void Restore(ViewState state)

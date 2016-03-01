@@ -25,7 +25,9 @@ using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {
-    public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentView
+
+
+    public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentView, ITitleProvider
     {
         private readonly IDisposable _cleanUp;
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
@@ -64,6 +66,9 @@ namespace TailBlazer.Views.Tail
 
         public string Name { get; }
 
+
+        public string Title => Name;
+
         public TailViewModel([NotNull] ILogger logger,
             [NotNull] ISchedulerProvider schedulerProvider,
             [NotNull] IFileWatcher fileWatcher,
@@ -77,7 +82,7 @@ namespace TailBlazer.Views.Tail
             [NotNull] SearchOptionsViewModel searchOptionsViewModel,
             [NotNull] ITailViewStateRestorer restorer,
             [NotNull] SearchHints searchHints,
-            [NotNull]  ITailViewStateControllerFactory tailViewStateControllerFactory)
+            [NotNull] ITailViewStateControllerFactory tailViewStateControllerFactory)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
@@ -223,7 +228,6 @@ namespace TailBlazer.Views.Tail
                 stateController,
                 _userScrollRequested.SetAsComplete());
         }
-        
 
         private async void OpenSearchOptions()
         {
@@ -261,8 +265,7 @@ namespace TailBlazer.Views.Tail
         }
 
         #region Interact with scroll panel
-
-
+        
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
         {
             if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));
@@ -302,6 +305,7 @@ namespace TailBlazer.Views.Tail
 
         void IPersistentView.Restore(ViewState state)
         {
+            //When this is called, we assume that FileInfo has not been set!
             _view.Restore(state);
         }
 
@@ -311,5 +315,6 @@ namespace TailBlazer.Views.Tail
         {
             _cleanUp.Dispose();
         }
+
     }
 }

@@ -7,6 +7,8 @@ using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
+using TailBlazer.Views;
+using TailBlazer.Views.Tail;
 using ILogger = TailBlazer.Domain.Infrastructure.ILogger;
 
 namespace TailBlazer.Infrastucture
@@ -45,7 +47,15 @@ namespace TailBlazer.Infrastucture
             For<ObjectProvider>().Singleton();
             Forward<ObjectProvider, IObjectProvider>();
             Forward<ObjectProvider, IObjectRegister>();
-            
+
+            //TODO: Account for there being multiple ViewModelFactories- probably need a register
+            For<ViewFactoryService>().Singleton();
+            Forward<ViewFactoryService, IViewFactoryRegister>();
+            Forward<ViewFactoryService, IViewFactoryProvider>();
+
+            For<TailViewModelFactory>().Singleton();
+          //  Forward<TailViewModelFactory, IViewModelFactory>();
+
             Scan(scanner =>
             {
                 scanner.ExcludeType<ILogger>();
@@ -55,6 +65,7 @@ namespace TailBlazer.Infrastucture
                 scanner.ExcludeType<SearchInfoCollection>();
                 scanner.ExcludeType<SearchMetadataCollection>();
                 scanner.ExcludeType<ITextFormatter>();
+                scanner.ExcludeType<ViewFactoryService>();
 
                 scanner.ExcludeType<FileWatcher>();
                 scanner.LookForRegistries();

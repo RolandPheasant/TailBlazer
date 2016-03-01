@@ -25,7 +25,6 @@ namespace TailBlazer
             container.GetInstance<StartupController>();
 
             var factory = container.GetInstance<WindowFactory>();
-
             var window = factory.Create(args);
 
 

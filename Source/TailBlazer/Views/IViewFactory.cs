@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using TailBlazer.Domain.Settings;
+using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Views
 {
-   // public interface 
 
     public interface IViewModelFactory
     {
+        ViewContainer Create(ViewState state);
+
         string Key { get; }
-
-        string Description { get; }
-
     }
 }

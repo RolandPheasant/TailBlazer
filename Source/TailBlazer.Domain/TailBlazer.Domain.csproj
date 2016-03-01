@@ -165,10 +165,12 @@
     <Compile Include="Settings\IPersistentView.cs" />
     <Compile Include="Settings\Setting.cs" />
     <Compile Include="Settings\SettingFactory.cs" />
+    <Compile Include="Settings\SettingsException.cs" />
     <Compile Include="Settings\SettingsRegister.cs" />
     <Compile Include="Settings\SettingsStore.cs" />
     <Compile Include="Settings\State.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings\ViewState.cs" />
     <Compile Include="Settings\XmlEx.cs" />
     <Compile Include="StateHandling\IStateBucketService.cs" />
     <Compile Include="StateHandling\StateBucketConverter.cs" />

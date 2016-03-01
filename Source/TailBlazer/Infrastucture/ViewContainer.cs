@@ -2,16 +2,27 @@
 
 namespace TailBlazer.Infrastucture
 {
+    public interface ITitleProvider
+    {
+        string Title { get; }
+    }
+
     public class ViewContainer : IEquatable<ViewContainer>
     {
         public Guid Id { get; } = Guid.NewGuid();
 
-
-
-
+        
         public ViewContainer(object header, object content)
         {
+            
             Header = header;
+            Content = content;
+        }
+
+        public ViewContainer(ITitleProvider content)
+        {
+
+            Header = content.Title;
             Content = content;
         }
 

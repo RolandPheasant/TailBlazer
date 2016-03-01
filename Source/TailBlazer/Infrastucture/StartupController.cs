@@ -7,6 +7,7 @@ using TailBlazer.Domain.StateHandling;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Recent;
 using TailBlazer.Views.Searching;
+using TailBlazer.Views.Tail;
 using TailBlazer.Views.WindowManagement;
 
 namespace TailBlazer.Infrastucture
@@ -30,6 +31,11 @@ namespace TailBlazer.Infrastucture
             settingsRegister.Register(new StateBucketConverter(), "BucketOfState");
             settingsRegister.Register(new RecentSearchToStateConverter(), "RecentSearch");
             logger.Info("Starting complete");
+
+
+            //TODO: Need type scanner then this code is not required
+            var viewFactoryRegister = objectProvider.Get<IViewFactoryRegister>();
+            viewFactoryRegister.Register<TailViewModelFactory>();
 
         }
     }
