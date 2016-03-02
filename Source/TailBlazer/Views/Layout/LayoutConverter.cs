@@ -28,7 +28,6 @@ namespace TailBlazer.Views.Layout
         {
             public const string Root = "LayoutRoot";
 
-
             public static class ShellNode
             {
                 public const string Shells = "Shells";
@@ -68,10 +67,8 @@ namespace TailBlazer.Views.Layout
         public XElement CaptureState()
         {
             var root = new XElement(XmlStructure.Root);
-            
             var shells = new XElement(XmlStructure.ShellNode.Shells);
-
-
+            
             foreach (var w in Application.Current.Windows.OfType<MainWindow>())
             {
                 var bounds = w.RestoreBounds;
@@ -95,7 +92,7 @@ namespace TailBlazer.Views.Layout
 
         private static void TabablzControlVisitor(XElement stateNode, TabablzControl tabablzControl)
         {
-            var tabStates = tabablzControl.Items.OfType<ViewContainer>()
+            var tabStates = tabablzControl.Items.OfType<HeaderedView>()
                 .Select(item => item.Content).OfType<IPersistentView>()
                 .Select(provider => provider.CaptureState())
                 .Select(state =>
@@ -104,7 +101,7 @@ namespace TailBlazer.Views.Layout
                     viewState.SetAttributeValue(XmlStructure.ViewNode.Version, state.State.Version);
                     viewState.Add(state.State.Value);
                     return viewState;
-                });
+                }).ToArray();
             
             var elements = new XElement(XmlStructure.ViewNode.Children, tabStates);
             stateNode.Add(elements);
@@ -147,6 +144,7 @@ namespace TailBlazer.Views.Layout
                     
                     var main = Application.Current.Windows.OfType<MainWindow>().First();
                     var window = index == 0 ? main : _windowFactory.Create();
+
                     window.WindowStartupLocation = WindowStartupLocation.Manual;
                     window.WindowState = winState;
                     window.Left = left;
@@ -174,7 +172,7 @@ namespace TailBlazer.Views.Layout
                 .ToArray();
         }
 
-        private void RestoreChildren(MainWindow window, TabablzControl control, XElement element)
+        private void RestoreChildren(MainWindow window, XElement element)
         {
              element.Elements(XmlStructure.ViewNode.Children)
                 .SelectMany(shells => shells.Elements(XmlStructure.ViewNode.ViewState))
@@ -202,10 +200,9 @@ namespace TailBlazer.Views.Layout
                     var windowViewModel = (WindowViewModel)window.DataContext;
                     Task.Factory.StartNew(() =>
                     {
-                        //this sucks because I am directly casting
-                        var view = factory.Value.Create(state);
-                       
-                        windowViewModel.OpenView(view);
+                            //this sucks because I am directly casting
+                            var view = factory.Value.Create(state);
+                            windowViewModel.OpenView(view);
                     });
 
                    

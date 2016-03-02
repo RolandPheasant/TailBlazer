@@ -29,12 +29,12 @@ namespace TailBlazer.Views.Tail
             _loggerFactory = loggerFactory;
         }
 
-        public IDisposable Create([NotNull] TailViewModel tailView)
+        public IDisposable Create(TailViewModel tailView, bool loadDefaults)
         {
             if (tailView == null) throw new ArgumentNullException(nameof(tailView));
 
             var logger = _loggerFactory.Create<TailViewStateController>();
-            return new TailViewStateController(tailView,_stateBucketService, _schedulerProvider, _tailViewStateRestorer, logger);
+            return new TailViewStateController(tailView,_stateBucketService, _schedulerProvider, _tailViewStateRestorer, logger, loadDefaults);
         }
     }
 }

@@ -32,10 +32,10 @@ namespace TailBlazer.Views.WindowManagement
         private readonly ISchedulerProvider _schedulerProvider;
         private readonly IObjectProvider _objectProvider;
         private readonly IDisposable _cleanUp;
-        private ViewContainer _selected;
+        private HeaderedView _selected;
         private bool _isEmpty;
         private bool _menuIsOpen;
-        public ObservableCollection<ViewContainer> Views { get; } = new ObservableCollection<ViewContainer>();
+        public ObservableCollection<HeaderedView> Views { get; } = new ObservableCollection<HeaderedView>();
         public RecentFilesViewModel RecentFiles { get; }
         public GeneralOptionsViewModel GeneralOptions { get; }
         public IInterTabClient InterTabClient { get; }
@@ -160,30 +160,30 @@ namespace TailBlazer.Views.WindowManagement
         }
 
         //TODO: Abstract this
-        public void OpenView(ViewContainer viewContainer)
+        public void OpenView(HeaderedView headeredView)
         {
             _schedulerProvider.Background.Schedule(() =>
             {
                 try
                 {
-                   _logger.Info($"Attempting to open a restored view {viewContainer.Header}");
-                    //var viewContainer = new ViewContainer(view);
+                   _logger.Info($"Attempting to open a restored view {headeredView.Header}");
+                    //var HeaderedView = new HeaderedView(view);
 
-                    //TODO: Factory should create the ViewContainer
+                    //TODO: Factory should create the HeaderedView
 
-                    _windowsController.Register(viewContainer);
+                    _windowsController.Register(headeredView);
 
                     //do the work on the ui thread
                     _schedulerProvider.MainThread.Schedule(() =>
                     {
-                        Views.Add(viewContainer);
-                        Selected = viewContainer;
+                        Views.Add(headeredView);
+                        Selected = headeredView;
                     });
                 }
                 catch (Exception ex)
                 {
                     //TODO: Create a failed to load view
-                    _logger.Error(ex, $"There was a problem opening '{viewContainer.Header}'");
+                    _logger.Error(ex, $"There was a problem opening '{headeredView.Header}'");
                 }
             });
         }
@@ -204,7 +204,7 @@ namespace TailBlazer.Views.WindowManagement
         private void ClosingTabItemHandlerImpl(ItemActionCallbackArgs<TabablzControl> args)
         {
             _logger.Info("Tab is closing. {0} view to close", Views.Count);
-            var container = (ViewContainer)args.DragablzItem.DataContext;
+            var container = (HeaderedView)args.DragablzItem.DataContext;
             _windowsController.Remove(container);
             if (container.Equals(Selected))
             {
@@ -214,7 +214,7 @@ namespace TailBlazer.Views.WindowManagement
             disposable?.Dispose();
         }
 
-        public ViewContainer Selected
+        public HeaderedView Selected
         {
             get { return _selected; }
             set { SetAndRaise(ref _selected, value); }

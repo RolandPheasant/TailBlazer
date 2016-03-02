@@ -43,26 +43,28 @@ namespace TailBlazer.Views.Tail
             _iconProvider = iconProvider;
             _tailViewStateControllerFactory = tailViewStateControllerFactory;
         }
-
-
-
-        public ViewContainer Create(ViewState state)
+        
+        public HeaderedView Create(ViewState state)
         {
             var converter = new TailViewToStateConverter();
             var converted = converter.Convert(state.State);
 
             var file = converted.FileName;
-            var viewModel = Create(new FileInfo(file));
-            var restorer = (IPersistentView) viewModel.Content;
+            var viewModel = CreateView(new FileInfo(file));
+
+            var restorer = (IPersistentView)viewModel;
             restorer.Restore(state);
-
-            var viewContainer = new ViewContainer(new FileHeader(new FileInfo(file)), viewModel);
-
-            return viewContainer;
+            return new HeaderedView(new FileHeader(new FileInfo(file)), viewModel);
         }
 
+        public HeaderedView Create(FileInfo fileInfo)
+        {
+            var viewModel = CreateView(fileInfo);
+            viewModel.ApplySettings();//apply default values
+            return new HeaderedView(new FileHeader(fileInfo), viewModel);
+        }
 
-        public ViewContainer Create(FileInfo fileInfo)
+        private TailViewModel CreateView(FileInfo fileInfo)
         {
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
 
@@ -71,8 +73,7 @@ namespace TailBlazer.Views.Tail
                 new ExplictArg("fileInfo", fileInfo),
                 new ExplictArg("scheduler",_schedulerProvider.Background)
             });
-
-
+            
             var searchMetadataCollection = _objectProvider.Get<ISearchMetadataCollection>();
             var searchHints = _objectProvider.Get<SearchHints>();
             var searchOptionsViewModel = new SearchOptionsViewModel(searchMetadataCollection, _searchMetadataFactory, _schedulerProvider, _colourProvider, _iconProvider, searchHints);
@@ -96,9 +97,9 @@ namespace TailBlazer.Views.Tail
                 new ExplictArg("tailViewStateControllerFactory", _tailViewStateControllerFactory)
             });
 
-            return  new ViewContainer(new FileHeader(fileInfo), viewModel);
+            return viewModel;
         }
-
+        
         public string Key => TailViewModelConstants.ViewKey;
     }
 }

@@ -6,7 +6,7 @@ namespace TailBlazer.Views
 
     public interface IViewModelFactory
     {
-        ViewContainer Create(ViewState state);
+        HeaderedView Create(ViewState state);
 
         string Key { get; }
     }

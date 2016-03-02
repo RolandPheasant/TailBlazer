@@ -2,37 +2,23 @@
 
 namespace TailBlazer.Infrastucture
 {
-    public interface ITitleProvider
-    {
-        string Title { get; }
-    }
-
-    public class ViewContainer : IEquatable<ViewContainer>
+    public class HeaderedView : IEquatable<HeaderedView>
     {
         public Guid Id { get; } = Guid.NewGuid();
-
         
-        public ViewContainer(object header, object content)
+        public HeaderedView(object header, object content)
         {
-            
             Header = header;
             Content = content;
         }
-
-        public ViewContainer(ITitleProvider content)
-        {
-
-            Header = content.Title;
-            Content = content;
-        }
-
+        
         public object Header { get; }
 
         public object Content { get; }
 
         #region Equality
 
-        public bool Equals(ViewContainer other)
+        public bool Equals(HeaderedView other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -44,7 +30,7 @@ namespace TailBlazer.Infrastucture
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((ViewContainer) obj);
+            return Equals((HeaderedView) obj);
         }
 
         public override int GetHashCode()
@@ -52,17 +38,16 @@ namespace TailBlazer.Infrastucture
             return Id.GetHashCode();
         }
 
-        public static bool operator ==(ViewContainer left, ViewContainer right)
+        public static bool operator ==(HeaderedView left, HeaderedView right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(ViewContainer left, ViewContainer right)
+        public static bool operator !=(HeaderedView left, HeaderedView right)
         {
             return !Equals(left, right);
         }
 
         #endregion
-        
     }
 }

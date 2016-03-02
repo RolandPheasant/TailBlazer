@@ -259,7 +259,7 @@
     <Compile Include="Views\WindowManagement\IWindowFactory.cs" />
     <Compile Include="Infrastucture\Log4NetLogger.cs" />
     <Compile Include="Infrastucture\ObjectProvider.cs" />
-    <Compile Include="Infrastucture\ViewContainer.cs" />
+    <Compile Include="Infrastucture\HeaderedView.cs" />
     <Compile Include="Views\WindowManagement\WindowFactory.cs" />
     <Compile Include="Views\WindowManagement\WindowsController.cs" />
     <Compile Include="Views\WindowManagement\WindowViewModel.cs" />

@@ -6,9 +6,9 @@ namespace TailBlazer.Views.WindowManagement
 {
     public interface IWindowsController
     {
-        IObservableCache<ViewContainer, Guid> Views { get; }
+        IObservableCache<HeaderedView, Guid> Views { get; }
 
-        void Register(ViewContainer item);
-        void Remove(ViewContainer item);
+        void Register(HeaderedView item);
+        void Remove(HeaderedView item);
     }
 }

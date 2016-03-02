@@ -52,7 +52,7 @@
 
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type infrastucture:ViewContainer}">
+            <DataTemplate DataType="{x:Type infrastucture:HeaderedView}">
                 <ContentControl Content="{Binding Content}">
                     <ContentControl.LayoutTransform>
                         <ScaleTransform ScaleX="{Binding DataContext.GeneralOptions.ScaleRatio.Value, ElementName=Window}" 

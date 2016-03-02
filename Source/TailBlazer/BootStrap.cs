@@ -18,7 +18,7 @@ namespace TailBlazer
             app.InitializeComponent();
 
 
-           var tempWindowToGetDispatcher = new MainWindow();
+           var tempWindowToGetDispatcher = new Window();
 
             var container = new Container(x => x.AddRegistry<AppRegistry>());
             container.Configure(x => x.For<Dispatcher>().Add(tempWindowToGetDispatcher.Dispatcher));

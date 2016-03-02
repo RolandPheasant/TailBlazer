@@ -10,14 +10,12 @@ namespace TailBlazer.Views.Tail
         private readonly TailViewModel _tailView;
         private readonly ITailViewStateRestorer _tailViewStateRestorer;
 
-
         public TailViewPersister(TailViewModel tailView, ITailViewStateRestorer tailViewStateRestorer)
         {
             _tailView = tailView;
             _tailViewStateRestorer = tailViewStateRestorer;
         }
-
-
+        
         ViewState IPersistentView.CaptureState()
         {
             var coverter = new TailViewToStateConverter();

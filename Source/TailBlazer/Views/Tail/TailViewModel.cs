@@ -25,14 +25,15 @@ using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {
-
-
-    public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentView, ITitleProvider
+    public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentView
     {
+    
         private readonly IDisposable _cleanUp;
+        private readonly SingleAssignmentDisposable _stateMonitor= new SingleAssignmentDisposable();
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
         private readonly ISubject<ScrollRequest> _userScrollRequested = new ReplaySubject<ScrollRequest>(1);
-        private readonly IPersistentView _view;
+        private readonly IPersistentView _persister;
+        private readonly ITailViewStateControllerFactory _tailViewStateControllerFactory;
 
         private bool _autoTail=true;
         private int _firstIndex;
@@ -66,9 +67,6 @@ namespace TailBlazer.Views.Tail
 
         public string Name { get; }
 
-
-        public string Title => Name;
-
         public TailViewModel([NotNull] ILogger logger,
             [NotNull] ISchedulerProvider schedulerProvider,
             [NotNull] IFileWatcher fileWatcher,
@@ -84,6 +82,7 @@ namespace TailBlazer.Views.Tail
             [NotNull] SearchHints searchHints,
             [NotNull] ITailViewStateControllerFactory tailViewStateControllerFactory)
         {
+         
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (fileWatcher == null) throw new ArgumentNullException(nameof(fileWatcher));
@@ -107,6 +106,8 @@ namespace TailBlazer.Views.Tail
             OpenFolderCommand = new Command(() => Process.Start(fileWatcher.Folder));
             SearchMetadataCollection = searchMetadataCollection;
 
+            _tailViewStateControllerFactory = tailViewStateControllerFactory;
+            
             UsingDarkTheme = generalOptions.Value
                     .ObserveOn(schedulerProvider.MainThread)
                     .Select(options => options.Theme== Theme.Dark)
@@ -122,12 +123,9 @@ namespace TailBlazer.Views.Tail
                 .Select(options => new Duration(TimeSpan.FromSeconds(options.HighlightDuration)))
                 .ForBinding();
 
-            //this deails with state when loading the system at start up and at shut-down
-            _view = new TailViewPersister(this, restorer);
-
-            //this controller responsible for loading and persisting user search stuff as the user changes stuff
-            var stateController = tailViewStateControllerFactory.Create(this);
-
+            //this deals with state when loading the system at start up and at shut-down
+            _persister = new TailViewPersister(this, restorer);
+            
             //An observable which acts as a scroll command
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
             var scroller = _userScrollRequested.CombineLatest(autoChanged, (user, auto) =>
@@ -158,7 +156,6 @@ namespace TailBlazer.Views.Tail
             //load lines into observable collection
             var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection),new LineMatches(searchMetadataCollection));
             var loader = lineScroller.Lines.Connect()
-              
                 .LogChanges(logger, "Received")
                 .Transform(lineProxyFactory.Create, new ParallelisationOptions(ParallelType.Ordered, 3))
                 .LogChanges(logger, "Sorting")
@@ -169,8 +166,7 @@ namespace TailBlazer.Views.Tail
                 .DisposeMany()
                 .LogErrors(logger)
                 .Subscribe();
-
-
+            
             //monitor matching lines and start index,
             Count = searchInfoCollection.All.Select(latest=>latest.Count).ForBinding();
             CountText = searchInfoCollection.All.Select(latest => $"{latest.Count.ToString("##,###")} lines").ForBinding();
@@ -225,7 +221,7 @@ namespace TailBlazer.Views.Tail
                 SelectionMonitor,
                 SearchOptions,
                 searchInvoker,
-                stateController,
+                _stateMonitor,
                 _userScrollRequested.SetAsComplete());
         }
 
@@ -298,15 +294,25 @@ namespace TailBlazer.Views.Tail
 
         #region Persist state 
 
+        public void ApplySettings()
+        {
+            //this controller responsible for loading and persisting user search stuff as the user changes stuff
+            _stateMonitor.Disposable = _tailViewStateControllerFactory.Create(this,true);
+        }
+
+
         ViewState IPersistentView.CaptureState()
         {
-            return _view.CaptureState();
+            return _persister.CaptureState();
         }
 
         void IPersistentView.Restore(ViewState state)
         {
             //When this is called, we assume that FileInfo has not been set!
-            _view.Restore(state);
+            _persister.Restore(state);
+
+            //this controller responsible for loading and persisting user search stuff as the user changes stuff
+            _stateMonitor.Disposable = _tailViewStateControllerFactory.Create(this,false);
         }
 
         #endregion

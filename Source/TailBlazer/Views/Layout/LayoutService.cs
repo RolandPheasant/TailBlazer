@@ -53,6 +53,9 @@ namespace TailBlazer.Views.Layout
             try
             {
                 var restored = _store.Load(LayoutName);
+                if (restored == State.Empty)
+                    return;
+
                 var element = XDocument.Parse(restored.Value);
 
                 var converter = _objectProvider.Get<ILayoutConverter>();
