@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Xml.Linq;
 using Dragablz;
 using Dragablz.Dockablz;
+using DynamicData.Kernel;
 using TailBlazer.Domain.Annotations;
+using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Infrastucture;
 using TailBlazer.Views.WindowManagement;
+using System.Reactive.Concurrency;
 
 namespace TailBlazer.Views.Layout
 {
@@ -23,6 +28,7 @@ namespace TailBlazer.Views.Layout
     {
         private readonly IWindowFactory _windowFactory;
         private readonly IViewFactoryProvider _viewFactoryProvider;
+        private readonly ISchedulerProvider _schedulerProvider;
 
         private static class XmlStructure
         {
@@ -56,10 +62,16 @@ namespace TailBlazer.Views.Layout
             }
         }
 
-        public LayoutConverter(IWindowFactory windowFactory, IViewFactoryProvider viewFactoryProvider)
+        public LayoutConverter([NotNull] IWindowFactory windowFactory,
+            [NotNull] IViewFactoryProvider viewFactoryProvider, 
+            [NotNull] ISchedulerProvider schedulerProvider)
         {
+            if (windowFactory == null) throw new ArgumentNullException(nameof(windowFactory));
+            if (viewFactoryProvider == null) throw new ArgumentNullException(nameof(viewFactoryProvider));
+            if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             _windowFactory = windowFactory;
             _viewFactoryProvider = viewFactoryProvider;
+            _schedulerProvider = schedulerProvider;
         }
 
         #region Capture state
@@ -69,11 +81,11 @@ namespace TailBlazer.Views.Layout
             var root = new XElement(XmlStructure.Root);
             var shells = new XElement(XmlStructure.ShellNode.Shells);
             
-            foreach (var w in Application.Current.Windows.OfType<MainWindow>())
+            foreach (var window in Application.Current.Windows.OfType<MainWindow>())
             {
-                var bounds = w.RestoreBounds;
+                var bounds = window.RestoreBounds;
                 var shellNode = new XElement(new XElement(XmlStructure.ShellNode.Shell));
-                shellNode.Add(new XElement(XmlStructure.ShellNode.WindowsState, w.WindowState));
+                shellNode.Add(new XElement(XmlStructure.ShellNode.WindowsState, window.WindowState));
                 shellNode.Add(new XElement(XmlStructure.ShellNode.Top, bounds.Top));
                 shellNode.Add(new XElement(XmlStructure.ShellNode.Left, bounds.Left));
                 shellNode.Add(new XElement(XmlStructure.ShellNode.Width, bounds.Right - bounds.Left));
@@ -82,7 +94,7 @@ namespace TailBlazer.Views.Layout
                 shells.Add(shellNode);
 
                 //add children to shell node
-                var layoutAccessor = w.Layout.Query();
+                var layoutAccessor = window.Layout.Query();
                 layoutAccessor.Visit(shellNode, BranchAccessorVisitor, TabablzControlVisitor);
             }
 
@@ -158,58 +170,93 @@ namespace TailBlazer.Views.Layout
                 .ForEach(x =>
                 {
                     RestoreBranches(x.window, x.shellState);
-                    RestoreChildren(x.window, x.window.InitialTabablzControl, x.shellState);
+                    RestoreChildren(x.window,  x.shellState);
                 });
         }
 
-        private void RestoreBranches(Window window, XElement element)
+        private void RestoreBranches(MainWindow window, XElement element)
         {
-            var branchNodes = element.Elements(XmlStructure.BranchNode.Branches)
-                .Select(branch =>
+            var tabControl = window.InitialTabablzControl;
+
+            element.Elements(XmlStructure.BranchNode.Branches)
+                .ForEach(branch =>
                 {
-                    return branch;
-                })
-                .ToArray();
+                    var orientaton = branch.AttributeOrThrow(XmlStructure.BranchNode.Orientation)
+                                                .ParseEnum<Orientation>()
+                                                .ValueOr(() => Orientation.Horizontal);
+                    var childBranches = branch.Elements(XmlStructure.BranchNode.Branch).ToArray();
+                    var firstBranch = childBranches.ElementAt(0);
+                    var secondBranch = childBranches.ElementAt(1);
+
+
+                    var proportion = firstBranch.AttributeOrThrow(XmlStructure.BranchNode.Proportion)
+                                        .ParseDouble()
+                                        .ValueOr(() => 0.5);
+                    //  var branchAccessor = layoutAccessor.BranchAccessor.Branch;
+
+
+                    var firstChildList = GetViews(firstBranch);
+                    var secondChildList = GetViews(secondBranch);
+
+
+                    var windowViewModel = (WindowViewModel) window.DataContext;
+                    foreach (var headeredView in firstChildList.Union(secondChildList))
+                    {
+                        windowViewModel.OpenView(headeredView);
+                    }
+
+                   // var branchResult = Dragablz.Dockablz.Layout.Branch(tabControl, orientaton, false, proportion);
+                  
+                    //Create branch, restore children + add to branch
+                    //branchResult.TabablzControl.AddToSource(newItem);
+                    //branchResult.TabablzControl.SelectedItem = newItem;
+                });
         }
+
 
         private void RestoreChildren(MainWindow window, XElement element)
         {
-             element.Elements(XmlStructure.ViewNode.Children)
+            //NEED TO GET A BETTER HANDLE ON WINDOWS CONTROLLER - Currently done via WindowsViewModel
+            var windowViewModel = (WindowViewModel)window.DataContext;
+
+            GetViews(element)
+                .ForEach(view =>
+                {
+                    windowViewModel.OpenView(view);
+                });
+        }
+        private IEnumerable<HeaderedView> GetViews(XElement element)
+        {
+            return GetChildrenState(element)
+                .AsParallel()
+                .Select(state =>
+                {
+                    var key = state.Key;
+                    var factory = _viewFactoryProvider.Lookup(key);
+
+                    //NEED TO GET A BETTER HANDLE ON WINDOWS CONTROLLER - Currently done via WindowsViewModel
+                    return !factory.HasValue ? null : factory.Value.Create(state);
+
+                }).Where(view => view != null)
+
+                .ToArray();
+        }
+
+
+        private IEnumerable<ViewState> GetChildrenState(XElement element)
+        {
+            return element.Elements(XmlStructure.ViewNode.Children)
                 .SelectMany(shells => shells.Elements(XmlStructure.ViewNode.ViewState))
                 .Select(viewStateElement =>
                 {
-                    //1, Need factory for specific view
-                    //2. Need factory to add view to specific tabablzControl
                     var key = viewStateElement.AttributeOrThrow(XmlStructure.ViewNode.Key);
                     var version = viewStateElement.AttributeOrThrow(XmlStructure.ViewNode.Version).ParseInt().Value;
                     var state = viewStateElement.Value;
                     var viewstate = new ViewState(key, new State(version, state));
                     return viewstate;
-                })
-                .ToArray()
-                .ForEach(state =>
-                {
-                    var key = state.Key;
-                    
-                    var factory = _viewFactoryProvider.Lookup(key);
-
-                    if (!factory.HasValue)
-                        return;
-
-                    //NEED TO GET A BETTER HANDLE ON WINDOWS CONTROLLER - Currently done via WindowsViewModel
-                    var windowViewModel = (WindowViewModel)window.DataContext;
-                    Task.Factory.StartNew(() =>
-                    {
-                            //this sucks because I am directly casting
-                            var view = factory.Value.Create(state);
-                            windowViewModel.OpenView(view);
-                    });
-
-                   
-
-
                 });
         }
+
 
         #endregion
 
