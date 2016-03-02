@@ -194,7 +194,6 @@ namespace TailBlazer.Views.Layout
                                         .ValueOr(() => 0.5);
                     //  var branchAccessor = layoutAccessor.BranchAccessor.Branch;
 
-
                     var firstChildList = GetViews(firstBranch);
                     var secondChildList = GetViews(secondBranch);
 
