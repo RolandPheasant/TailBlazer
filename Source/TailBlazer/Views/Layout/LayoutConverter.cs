@@ -206,7 +206,7 @@ namespace TailBlazer.Views.Layout
 
                    // var branchResult = Dragablz.Dockablz.Layout.Branch(tabControl, orientaton, false, proportion);
                   
-                    //Create branch, restore children + add to branch
+                    //Create branch, restore children + add to branch.
                     //branchResult.TabablzControl.AddToSource(newItem);
                     //branchResult.TabablzControl.SelectedItem = newItem;
                 });
