@@ -1,5 +1,5 @@
 using System;
-using System.Globalization;
+using System.Text.RegularExpressions;
 using MaterialDesignThemes.Wpf;
 
 namespace TailBlazer.Views.Formatting
@@ -11,16 +11,13 @@ namespace TailBlazer.Views.Formatting
 
         public string Description { get; }
 
-        private readonly TextInfo _textInfo = CultureInfo.CurrentCulture.TextInfo;
 
         public IconDescription(PackIconKind type, string name)
         {
             Type = type;
             Name = name;
-            Description = _textInfo.ToTitleCase(name); 
+            Description = Regex.Replace(name, "(\\B[A-Z])", " $1");
         }
-
-      
 
         #region Equality
 
