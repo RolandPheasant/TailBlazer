@@ -1,10 +1,10 @@
 using System;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
-using TailBlazer.Views.WindowManagement;
 using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using TailBlazer.Infrastucture.AppState;
 
 namespace TailBlazer.Views.Layout
 {
@@ -18,12 +18,19 @@ namespace TailBlazer.Views.Layout
         public LayoutService(ISettingsStore store, 
             ILogger logger,
             ISchedulerProvider schedulerProvider,
-            IObjectProvider objectProvider)
+            IObjectProvider objectProvider,
+            IApplicationStateNotifier stateNotifier)
         {
             _store = store;
             _logger = logger;
             _objectProvider = objectProvider;
             schedulerProvider.MainThread.Schedule(Restore);
+
+            stateNotifier.StateChanged.Where(state => state == ApplicationState.ShuttingDown)
+                .Subscribe(_ =>
+                {
+                    Write();
+                });
         }
 
         public void Write()

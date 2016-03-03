@@ -18,15 +18,6 @@ namespace TailBlazer.Infrastucture
             types.FindTypes(TypeClassification.Concretes | TypeClassification.Closed).ForEach(type =>
             {
 
-                // Only work on concrete types
-                //   if (!type.IsConcrete() || type.IsGenericType) return;
-
-                // Add against all the interfaces implemented
-                // by this concrete class
-                //type.GetInterfaces()
-                //    .Where(@interface => type()  @interface.IsAic)
-                //    .ForEach(@interface => registry.For(@interface).Use(type).Singleton());
-
                 if (type.Name.EndsWith("Job"))
                     registry.For(type).Singleton();
             });

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.IO;
 using StructureMap;
-using StructureMap.Configuration.DSL;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
-using TailBlazer.Views;
+using TailBlazer.Infrastucture.AppState;
 using TailBlazer.Views.Tail;
 using ILogger = TailBlazer.Domain.Infrastructure.ILogger;
 
@@ -36,9 +35,7 @@ namespace TailBlazer.Infrastucture
             For<ISelectionMonitor>().Use<SelectionMonitor>();
             For<ISearchInfoCollection>().Use<SearchInfoCollection>();
             For<ISearchMetadataCollection>().Use<SearchMetadataCollection>().Transient();
-            
             For<ITextFormatter>().Use<TextFormatter>();
-
             For<ISettingsStore>().Use<FileSettingsStore>().Singleton();
             For<IFileWatcher>().Use<FileWatcher>();
 
@@ -48,13 +45,22 @@ namespace TailBlazer.Infrastucture
             Forward<ObjectProvider, IObjectProvider>();
             Forward<ObjectProvider, IObjectRegister>();
 
-            //TODO: Account for there being multiple ViewModelFactories- probably need a register
+
             For<ViewFactoryService>().Singleton();
             Forward<ViewFactoryService, IViewFactoryRegister>();
             Forward<ViewFactoryService, IViewFactoryProvider>();
 
+            //For<ViewFactoryService>().Singleton();
+            //Forward<ViewFactoryService, IViewFactoryRegister>();
+            //Forward<ViewFactoryService, IViewFactoryProvider>();
+
+            For<ApplicationStateBroker>().Singleton();
+            Forward<ApplicationStateBroker, IApplicationStateNotifier>();
+            Forward<ApplicationStateBroker, IApplicationStatePublisher>();
+
+
             For<TailViewModelFactory>().Singleton();
-          //  Forward<TailViewModelFactory, IViewModelFactory>();
+
 
             Scan(scanner =>
             {

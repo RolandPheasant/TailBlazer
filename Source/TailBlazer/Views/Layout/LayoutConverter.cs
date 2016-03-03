@@ -185,13 +185,10 @@ namespace TailBlazer.Views.Layout
                     var childBranches = branch.Elements(XmlStructure.BranchNode.Branch).ToArray();
                     var firstBranch = childBranches.ElementAt(0);
                     var secondBranch = childBranches.ElementAt(1);
-
-
+                    
                     var proportion = firstBranch.AttributeOrThrow(XmlStructure.BranchNode.Proportion)
                                         .ParseDouble()
                                         .ValueOr(() => 0.5);
-
-     
 
                     var firstChildList = GetViews(firstBranch);
                     var secondChildList = GetViews(secondBranch);
@@ -202,7 +199,7 @@ namespace TailBlazer.Views.Layout
                         windowViewModel.OpenView(headeredView);
                     }
 
-                    //TODO: Sort this out. This throws an exception
+                    //TODO: Sort this out. Throws an exception when I try to create a branch
                     //var branchResult = Dragablz.Dockablz.Layout.Branch(tabControl, orientaton, false, proportion);
                     
                     //Create branches + add children to branche
