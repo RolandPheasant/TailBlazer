@@ -14,7 +14,7 @@ namespace TailBlazer.Views.Recent
         public string Name => _recentFile.Name;
 
         public string OpenToolTip => $"Open {_recentFile.Name}";
-        public string RemoveToolTip => $"Remove {_recentFile.Name}";
+        public string RemoveToolTip => $"Remove {_recentFile.Name} from recent list";
         public DateTime Timestamp => _recentFile.Timestamp;
 
         public ICommand OpenCommand { get; }

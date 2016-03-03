@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Windows;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
@@ -27,7 +26,6 @@ namespace TailBlazer.Views.Tail
 {
     public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentView
     {
-    
         private readonly IDisposable _cleanUp;
         private readonly SingleAssignmentDisposable _stateMonitor= new SingleAssignmentDisposable();
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
@@ -48,7 +46,7 @@ namespace TailBlazer.Views.Tail
         public ICommand OpenFolderCommand { get; }
 
         public ISelectionMonitor SelectionMonitor { get; }
-        public SearchOptionsViewModel SearchOptions { get;  }
+        private SearchOptionsViewModel SearchOptions { get;  }
         public SearchHints SearchHints { get;  }
         public SearchCollection SearchCollection { get; }
         internal ISearchMetadataCollection SearchMetadataCollection { get; }
@@ -62,7 +60,7 @@ namespace TailBlazer.Views.Tail
         public IProperty<bool> CanViewInline { get; }
         public IProperty<bool> HighlightTail { get; }
         public IProperty<bool> UsingDarkTheme { get; }
-        public IProperty<Duration> HighlightDuration { get; }
+
         public ICommand OpenSearchOptionsCommand => new Command(OpenSearchOptions);
 
         public string Name { get; }
@@ -108,6 +106,7 @@ namespace TailBlazer.Views.Tail
 
             _tailViewStateControllerFactory = tailViewStateControllerFactory;
             
+            //Move these 2 highlight fields to a service as all view require them
             UsingDarkTheme = generalOptions.Value
                     .ObserveOn(schedulerProvider.MainThread)
                     .Select(options => options.Theme== Theme.Dark)
@@ -116,11 +115,6 @@ namespace TailBlazer.Views.Tail
             HighlightTail = generalOptions.Value
                 .ObserveOn(schedulerProvider.MainThread)
                 .Select(options => options.HighlightTail)
-                .ForBinding();
-
-            HighlightDuration = generalOptions.Value
-                .ObserveOn(schedulerProvider.MainThread)
-                .Select(options => new Duration(TimeSpan.FromSeconds(options.HighlightDuration)))
                 .ForBinding();
 
             //this deals with state when loading the system at start up and at shut-down
