@@ -25,7 +25,7 @@ using TailBlazer.Views.Tail;
 
 namespace TailBlazer.Views.WindowManagement
 {
-    public class WindowViewModel: AbstractNotifyPropertyChanged, IDisposable
+    public class WindowViewModel: AbstractNotifyPropertyChanged, IDisposable, IViewOpener
     {
         private readonly ILogger _logger;
         private readonly IWindowsController _windowsController;

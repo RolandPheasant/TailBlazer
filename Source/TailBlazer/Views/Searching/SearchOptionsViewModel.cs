@@ -73,17 +73,15 @@ namespace TailBlazer.Views.Searching
             Data = new ReadOnlyObservableCollection<SearchOptionsProxy>(collection);
 
             //command to add the current search to the tail collection
-            var searchInvoker = SearchHints.SearchRequested.Subscribe(request =>
+            var searchInvoker = SearchHints.SearchRequested
+                .ObserveOn(schedulerProvider.Background)
+                .Subscribe(request =>
             {
-                schedulerProvider.Background.Schedule(() =>
-                {
                     var meta = searchMetadataFactory.Create(request.Text, 
                             request.UseRegEx,
                             metadataCollection.NextIndex(), 
                             false);
                     metadataCollection.AddorUpdate(meta);
-                   
-                });
             });
             
             _cleanUp = new CompositeDisposable(searchInvoker,

@@ -44,8 +44,8 @@
     <ApplicationIcon>tailblazer.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dragablz, Version=0.0.3.153, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dragablz.0.0.3.153\lib\net45\Dragablz.dll</HintPath>
+    <Reference Include="Dragablz, Version=0.0.3.157, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dragablz.0.0.3.157\lib\net45\Dragablz.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="DynamicData, Version=4.4.0.1110, Culture=neutral, processorArchitecture=MSIL">
@@ -219,6 +219,7 @@
     <Compile Include="Views\Tail\InlineViewerArgs.cs" />
     <Compile Include="Views\Tail\InlineViewerFactory.cs" />
     <Compile Include="Infrastucture\IScrollReceiver.cs" />
+    <Compile Include="Views\WindowManagement\IViewOpener.cs" />
     <Compile Include="Views\WindowManagement\IWindowsController.cs" />
     <Compile Include="Views\Tail\LineProxy.cs" />
     <Compile Include="Views\Tail\LineProxyFactory.cs" />

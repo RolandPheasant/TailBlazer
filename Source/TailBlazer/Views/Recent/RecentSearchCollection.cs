@@ -4,7 +4,6 @@ using System.Reactive.Disposables;
 using DynamicData;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
-using TailBlazer.Settings;
 using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Recent
@@ -59,7 +58,6 @@ namespace TailBlazer.Views.Recent
         public void Remove(RecentSearch file)
         {
             _files.Remove(file);
-
         }
 
         public void Dispose()

@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Xml.Linq;
@@ -14,7 +13,6 @@ using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Infrastucture;
 using TailBlazer.Views.WindowManagement;
-using System.Reactive.Concurrency;
 
 namespace TailBlazer.Views.Layout
 {
@@ -63,7 +61,7 @@ namespace TailBlazer.Views.Layout
         }
 
         public LayoutConverter([NotNull] IWindowFactory windowFactory,
-            [NotNull] IViewFactoryProvider viewFactoryProvider, 
+            [NotNull] IViewFactoryProvider viewFactoryProvider,
             [NotNull] ISchedulerProvider schedulerProvider)
         {
             if (windowFactory == null) throw new ArgumentNullException(nameof(windowFactory));
@@ -75,12 +73,12 @@ namespace TailBlazer.Views.Layout
         }
 
         #region Capture state
-        
+
         public XElement CaptureState()
         {
             var root = new XElement(XmlStructure.Root);
             var shells = new XElement(XmlStructure.ShellNode.Shells);
-            
+
             foreach (var window in Application.Current.Windows.OfType<MainWindow>())
             {
                 var bounds = window.RestoreBounds;
@@ -109,12 +107,12 @@ namespace TailBlazer.Views.Layout
                 .Select(provider => provider.CaptureState())
                 .Select(state =>
                 {
-                    var viewState = new XElement(XmlStructure.ViewNode.ViewState,new XAttribute(XmlStructure.ViewNode.Key, state.Key));
+                    var viewState = new XElement(XmlStructure.ViewNode.ViewState, new XAttribute(XmlStructure.ViewNode.Key, state.Key));
                     viewState.SetAttributeValue(XmlStructure.ViewNode.Version, state.State.Version);
                     viewState.Add(state.State.Value);
                     return viewState;
                 }).ToArray();
-            
+
             var elements = new XElement(XmlStructure.ViewNode.Children, tabStates);
             stateNode.Add(elements);
         }
@@ -153,7 +151,7 @@ namespace TailBlazer.Views.Layout
                     var left = shellState.ElementOrThrow(XmlStructure.ShellNode.Left).ParseDouble().Value;
                     var width = shellState.ElementOrThrow(XmlStructure.ShellNode.Width).ParseDouble().Value;
                     var height = shellState.ElementOrThrow(XmlStructure.ShellNode.Height).ParseDouble().Value;
-                    
+
                     var main = Application.Current.Windows.OfType<MainWindow>().First();
                     var window = index == 0 ? main : _windowFactory.Create();
 
@@ -165,12 +163,12 @@ namespace TailBlazer.Views.Layout
                     window.Height = height;
 
                     window.Show();
-                    return new {window, shellState};
+                    return new { window, shellState };
                 })
                 .ForEach(x =>
                 {
                     RestoreBranches(x.window, x.shellState);
-                    RestoreChildren(x.window,  x.shellState);
+                    RestoreChildren(x.window, x.shellState);
                 });
         }
 
@@ -192,31 +190,31 @@ namespace TailBlazer.Views.Layout
                     var proportion = firstBranch.AttributeOrThrow(XmlStructure.BranchNode.Proportion)
                                         .ParseDouble()
                                         .ValueOr(() => 0.5);
-                    //  var branchAccessor = layoutAccessor.BranchAccessor.Branch;
+
+     
 
                     var firstChildList = GetViews(firstBranch);
                     var secondChildList = GetViews(secondBranch);
-
-
-                    var windowViewModel = (WindowViewModel) window.DataContext;
+                    
+                    var windowViewModel = (IViewOpener)window.DataContext;
                     foreach (var headeredView in firstChildList.Union(secondChildList))
                     {
                         windowViewModel.OpenView(headeredView);
                     }
 
-                   // var branchResult = Dragablz.Dockablz.Layout.Branch(tabControl, orientaton, false, proportion);
-                  
-                    //Create branch, restore children + add to branch.
+                    //TODO: Sort this out. This throws an exception
+                    //var branchResult = Dragablz.Dockablz.Layout.Branch(tabControl, orientaton, false, proportion);
+                    
+                    //Create branches + add children to branche
                     //branchResult.TabablzControl.AddToSource(newItem);
                     //branchResult.TabablzControl.SelectedItem = newItem;
                 });
         }
-
-
+        
         private void RestoreChildren(MainWindow window, XElement element)
         {
             //NEED TO GET A BETTER HANDLE ON WINDOWS CONTROLLER - Currently done via WindowsViewModel
-            var windowViewModel = (WindowViewModel)window.DataContext;
+            var windowViewModel = (IViewOpener)window.DataContext;
 
             GetViews(element)
                 .ForEach(view =>
@@ -224,6 +222,7 @@ namespace TailBlazer.Views.Layout
                     windowViewModel.OpenView(view);
                 });
         }
+
         private IEnumerable<HeaderedView> GetViews(XElement element)
         {
             return GetChildrenState(element)
@@ -232,15 +231,11 @@ namespace TailBlazer.Views.Layout
                 {
                     var key = state.Key;
                     var factory = _viewFactoryProvider.Lookup(key);
-
-                    //NEED TO GET A BETTER HANDLE ON WINDOWS CONTROLLER - Currently done via WindowsViewModel
                     return !factory.HasValue ? null : factory.Value.Create(state);
 
                 }).Where(view => view != null)
-
                 .ToArray();
         }
-
 
         private IEnumerable<ViewState> GetChildrenState(XElement element)
         {
@@ -256,12 +251,6 @@ namespace TailBlazer.Views.Layout
                 });
         }
 
-
         #endregion
-
-
-
     }
-
-    
 }

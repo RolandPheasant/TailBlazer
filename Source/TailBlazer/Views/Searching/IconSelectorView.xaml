@@ -7,6 +7,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:formatting="clr-namespace:TailBlazer.Views.Formatting"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
              d:DataContext="{d:DesignInstance local:IconSelector}">
@@ -63,7 +64,7 @@
                      ItemsSource="{Binding Icons}">
 
                 <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type local:IconDescription}">
+                    <DataTemplate DataType="{x:Type formatting:IconDescription}">
                         <materialDesign:PackIcon
                             Padding="2"
                             Kind="{Binding Type,FallbackValue={x:Static materialDesign:PackIconKind.Information}}"   

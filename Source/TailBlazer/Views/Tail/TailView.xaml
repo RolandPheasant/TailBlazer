@@ -125,6 +125,8 @@
 
             </StackPanel>
 
+
+
             <Grid  
                 Visibility="{Binding FileStatus.Value, Converter={StaticResource EqualityToVisibilityConverter},ConverterParameter={x:Static fileHandling:FileStatus.Loaded}}"
                 Margin="-4 0 -4 0">
@@ -136,7 +138,8 @@
                     <RowDefinition Height="20"/>
                 </Grid.RowDefinitions>
 
-                <Grid Margin="0 4 0 4" KeyboardNavigation.TabNavigation="Cycle">
+                <Grid 
+                    Margin="0 4 0 2" KeyboardNavigation.TabNavigation="Cycle">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto" />
@@ -307,7 +310,12 @@
                     </StackPanel>
                 </Grid>
 
-                <ListBox
+                <Border Grid.Row="0" Grid.Column="0" 
+                            Visibility="Collapsed"
+                            BorderThickness="0 0 0 1" BorderBrush="{DynamicResource PrimaryHueMidBrush}"/>
+
+
+                <ListBox Margin="0 4 0 2"
                     Grid.Row="1" 
                     VerticalAlignment="Stretch"
                         ItemsSource="{Binding Lines}" 

@@ -1,8 +1,8 @@
 using System;
-using Humanizer;
+using System.Globalization;
 using MaterialDesignThemes.Wpf;
 
-namespace TailBlazer.Views.Searching
+namespace TailBlazer.Views.Formatting
 {
     public class IconDescription : IEquatable<IconDescription>
     {
@@ -11,11 +11,13 @@ namespace TailBlazer.Views.Searching
 
         public string Description { get; }
 
+        private readonly TextInfo _textInfo = CultureInfo.CurrentCulture.TextInfo;
+
         public IconDescription(PackIconKind type, string name)
         {
             Type = type;
             Name = name;
-            Description = name.Humanize();
+            Description = _textInfo.ToTitleCase(name); 
         }
 
       
