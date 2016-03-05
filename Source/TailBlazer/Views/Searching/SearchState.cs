@@ -1,5 +1,7 @@
 namespace TailBlazer.Views.Searching
 {
+
+
     public sealed  class SearchState
     {
         public string Text { get; }

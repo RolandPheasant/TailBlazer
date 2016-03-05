@@ -9,7 +9,6 @@ using System.Text;
 using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.Annotations;
-using TailBlazer.Domain.FileHandling.Search;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -94,8 +93,7 @@ namespace TailBlazer.Domain.FileHandling
                     innerList.Add(tail);
                 });
             });
-
-
+            
             //Scan the remainer of the file
             var headSubscriber = tailScanner.FirstAsync()
                 .Subscribe(tail =>

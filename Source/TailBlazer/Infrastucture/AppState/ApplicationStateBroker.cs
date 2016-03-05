@@ -8,7 +8,7 @@ namespace TailBlazer.Infrastucture.AppState
     {
         private readonly ISubject<ApplicationState> _stateChanged = new ReplaySubject<ApplicationState>(1);
 
-        public IObservable<ApplicationState> StateChanged => _stateChanged;
+        public IObservable<ApplicationState> StateChanged => _stateChanged.DistinctUntilChanged();
 
         public void Publish(ApplicationState state)
         {

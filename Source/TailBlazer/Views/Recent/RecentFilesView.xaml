@@ -7,7 +7,6 @@
              xmlns:recent="clr-namespace:TailBlazer.Views.Recent"
               TextOptions.TextFormattingMode="Ideal" 
               TextOptions.TextRenderingMode="Auto" 
-             
              mc:Ignorable="d" 
                d:DataContext="{d:DesignInstance recent:RecentFilesViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="300" d:DesignWidth="300">
@@ -30,13 +29,11 @@
 
         <TextBlock  Text="Recent Files" FontSize="16" FontWeight="SemiBold"/>
 
-        <ScrollViewer
-                        Grid.Row="1" Margin="8 12 4 0" 
-                        VerticalScrollBarVisibility="Auto"
+        <ScrollViewer Grid.Row="1" Margin="8 12 4 0" 
+                      VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Auto">
-          
-            <ItemsControl ItemsSource="{Binding  Files}">
 
+            <ItemsControl ItemsSource="{Binding  Files}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type recent:RecentFileProxy}">
                         <Grid Margin="0 0 4 0">
@@ -76,7 +73,5 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
-        
-
     </Grid>
 </UserControl>

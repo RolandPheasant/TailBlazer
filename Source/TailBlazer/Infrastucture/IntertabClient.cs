@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Windows;
 using Dragablz;
-using TailBlazer.Views;
 using TailBlazer.Views.WindowManagement;
 
 namespace TailBlazer.Infrastucture
@@ -18,8 +17,6 @@ namespace TailBlazer.Infrastucture
         public INewTabHost<Window> GetNewHost(IInterTabClient interTabClient, object partition, TabablzControl source)
         {
             var window = _factory.Create();
-           
-
             return new NewTabHost<Window>(window, window.InitialTabablzControl);
         }
 

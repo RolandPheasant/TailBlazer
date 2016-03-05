@@ -7,7 +7,6 @@ using System.Windows.Media;
 using DynamicData.Binding;
 using DynamicData.Kernel;
 using MaterialDesignThemes.Wpf;
-using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
@@ -58,18 +57,10 @@ namespace TailBlazer.Views.Searching
             if (removeAction == null) throw new ArgumentNullException(nameof(removeAction));
             if (defaultIconSelector == null) throw new ArgumentNullException(nameof(defaultIconSelector));
 
-
             _searchMetadata = searchMetadata;
             _defaultIconSelector = defaultIconSelector;
-            IconSelector = iconSelector;
 
-            ShowIconSelectorCommand = new Command(ShowIconSelector);
-            RemoveCommand = new Command(() => removeAction(searchMetadata));
-            HighlightCommand = new Command<Hue>(newHue =>
-            {
-                HighlightHue = newHue;
-            });
-            
+            IconSelector = iconSelector;
             ParentId = parentId;
             Highlight = _searchMetadata.Highlight;
             Filter = _searchMetadata.Filter;
@@ -79,6 +70,13 @@ namespace TailBlazer.Views.Searching
             Hues = colourProvider.Hues;
             HighlightHue = searchMetadata.HighlightHue;
 
+            ShowIconSelectorCommand = new Command(ShowIconSelector);
+            RemoveCommand = new Command(() => removeAction(searchMetadata));
+            HighlightCommand = new Command<Hue>(newHue =>
+            {
+                HighlightHue = newHue;
+            });
+            
             IconKind = _searchMetadata.IconKind.ParseEnum<PackIconKind>()
                             .ValueOr(() => PackIconKind.ArrowRightBold);
 
@@ -182,7 +180,7 @@ namespace TailBlazer.Views.Searching
 
         public override int GetHashCode()
         {
-            return (_searchMetadata != null ? _searchMetadata.GetHashCode() : 0);
+            return _searchMetadata?.GetHashCode() ?? 0;
         }
 
         public static bool operator ==(SearchOptionsProxy left, SearchOptionsProxy right)

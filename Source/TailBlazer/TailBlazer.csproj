@@ -154,6 +154,7 @@
     <Compile Include="Infrastucture\IViewFactoryRegister.cs" />
     <Compile Include="Infrastucture\ViewFactoryService.cs" />
     <Compile Include="Infrastucture\VirtualizingWrapPanel.cs" />
+    <Compile Include="Infrastucture\WindowAssist.cs" />
     <Compile Include="Views\Formatting\DefaultColourSelector.cs" />
     <Compile Include="Views\Formatting\IconDescription.cs" />
     <Compile Include="Views\Formatting\IIconProvider.cs" />

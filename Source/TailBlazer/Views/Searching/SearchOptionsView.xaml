@@ -6,7 +6,6 @@
              xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
              xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
-             xmlns:controls="clr-namespace:TailBlazer.Controls"
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              mc:Ignorable="d" 
 
@@ -26,9 +25,7 @@
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Colours.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Dragable.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"/>
-
+            
             <DataTemplate DataType="{x:Type searching:SearchOptionsProxy}">
 
                 <Grid Margin="4 4 4 4" x:Name="Row">
@@ -48,14 +45,13 @@
                                         ToolTip="Change icon"
                                         Padding="0"
                                         Width="24" Height="24"
-                                       
                                         BorderThickness="0"
                                         HorizontalAlignment="Left"
                                         SnapsToDevicePixels="True"
                                         UseLayoutRounding="True"
                                         wpf:ShadowAssist.ShadowDepth="Depth2"
                                         VerticalAlignment="Center">
-                        <wpf:PackIcon  
+                            <wpf:PackIcon  
                                         Padding="4" 
                                         Foreground="{Binding Background.Value}"
                                         Kind="{Binding IconKind,FallbackValue={x:Static wpf:PackIconKind.ArrowRightBold}}"/>
@@ -98,11 +94,8 @@
                                             </Button.Background>
                                         </Button>
                                     </Viewbox>
-                                    
-
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
-
 
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -110,7 +103,6 @@
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                         </ItemsControl>
-
                     </wpf:PopupBox>
 
                     <CheckBox Margin="4 0 0 0" Grid.Column="3" 
@@ -129,7 +121,6 @@
                                       VerticalAlignment="Center"
                                       IsChecked="{Binding IgnoreCase}" 
                                       Content="Ignore Case"/>
-
 
                     <Button Margin="8 0 6 0"
                                         Grid.Column="6" 

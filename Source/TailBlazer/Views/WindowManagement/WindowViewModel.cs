@@ -17,6 +17,7 @@ using DynamicData.Binding;
 using Microsoft.Win32;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
+using TailBlazer.Infrastucture.AppState;
 using TailBlazer.Views.FileDrop;
 using TailBlazer.Views.Layout;
 using TailBlazer.Views.Options;
@@ -42,12 +43,13 @@ namespace TailBlazer.Views.WindowManagement
         public ICommand OpenFileCommand { get; }
         public Command ShowInGitHubCommand { get; }
         public string Version { get; }
-        public ICommand SaveLayoutCommand { get; }
         public ICommand ExitCommmand { get; }
         public ICommand ZoomInCommand { get; }
         public ICommand ZoomOutCommand { get; }
         
         public FileDropMonitor DropMonitor { get; } = new FileDropMonitor();
+
+        public ApplicationExitingDelegate WindowExiting { get; }
 
         public WindowViewModel(IObjectProvider objectProvider, 
             IWindowFactory windowFactory, 
@@ -56,7 +58,8 @@ namespace TailBlazer.Views.WindowManagement
             RecentFilesViewModel recentFilesViewModel,
             GeneralOptionsViewModel generalOptionsViewModel,
             ISchedulerProvider schedulerProvider,
-            ILayoutService layoutService)
+            ILayoutService layoutService,
+            IApplicationStatePublisher applicationStatePublisher)
         {
             _logger = logger;
             _windowsController = windowsController;
@@ -70,8 +73,15 @@ namespace TailBlazer.Views.WindowManagement
             ShowInGitHubCommand = new Command(()=>   Process.Start("https://github.com/RolandPheasant"));
             ZoomOutCommand= new Command(()=> { GeneralOptions.Scale = GeneralOptions.Scale + 5; });
             ZoomInCommand = new Command(() => { GeneralOptions.Scale = GeneralOptions.Scale - 5; });
-            SaveLayoutCommand = new Command(()=>layoutService.Write());
-            ExitCommmand = new Command(() => Application.Current.Shutdown());
+            ExitCommmand = new Command(() =>
+            {
+                applicationStatePublisher.Publish(ApplicationState.ShuttingDown);
+                Application.Current.Shutdown();
+            });
+            WindowExiting = () =>
+            {
+                applicationStatePublisher.Publish(ApplicationState.ShuttingDown);
+            };
 
             Version = $"v{Assembly.GetEntryAssembly().GetName().Version.ToString(3)}";
 
@@ -92,7 +102,8 @@ namespace TailBlazer.Views.WindowManagement
                                     MenuIsOpen = false;
                                     OpenFile(file);
                                 });
-            
+
+
             _cleanUp = new CompositeDisposable(recentFilesViewModel,
                 isEmptyChecker,
                 fileDropped,
@@ -105,6 +116,7 @@ namespace TailBlazer.Views.WindowManagement
                             .ForEach(d=>d.Dispose());
                 }));
         }
+
 
 
         private void OpenFile()

@@ -24,6 +24,7 @@
         NonActiveWindowTitleBrush="{DynamicResource WindowTitleColorBrush}"
         WindowTitleBrush="{DynamicResource WindowTitleColorBrush}"
         GlowBrush="{DynamicResource AccentColorBrush3}"
+        infrastucture:WindowAssist.ApplicationClosing="{Binding WindowExiting}"
         WindowStartupLocation="CenterScreen"  
         WindowTransitionsEnabled="False"
         x:Name="Window"
@@ -76,20 +77,11 @@
                     <StackPanel  Orientation="Vertical" Margin="2">
 
                         <Button Margin="6 0 0 0"
-                                Command ="{Binding SaveLayoutCommand}"
-                                ToolTip="Save Layout">
-                            <StackPanel Orientation="Horizontal">
-                                <controls1:SaveLayoutIcon Width="18" Height="18"/>
-                                <TextBlock Margin="8 0 8 0" VerticalAlignment="Center" Text="Save layout"/>
-                            </StackPanel>
-                        </Button>
-
-                        <Button Margin="6 0 0 0"
                                 Command ="{Binding ExitCommmand}"
                                 ToolTip="Exit Tail Blazer">
                             <StackPanel Orientation="Horizontal">
                                 <controls1:ExitIcon Width="18" Height="18"/>
-                                <TextBlock Margin="8 0 0 0" VerticalAlignment="Center" Text="Exit"/>
+                                <TextBlock Margin="8 0 0 0" VerticalAlignment="Center" Text="Exit and save layout"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -151,9 +143,7 @@
                 <MouseBinding Gesture="{x:Static infrastucture:MouseWheelGesture.ControlUp}"  
                                 Command="{Binding ZoomOutCommand}" />
             </Grid.InputBindings>
-            
-
-             <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
+            <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
             <materialDesign:DrawerHost.LeftDrawerContent>
 
                 <Grid>
@@ -170,16 +160,28 @@
                             Grid.Row="1"
                             Margin="6 12 6 0"
                             DataContext="{Binding RecentFiles}"/>
-
                 </Grid>
 
             </materialDesign:DrawerHost.LeftDrawerContent>
 
             <Grid>
-                <dockablz:Layout   x:Name="Layout" >
+                        <StackPanel
+                            Visibility="{Binding IsEmpty,Converter={StaticResource BooleanToVisibilityConverter}}"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Orientation="Vertical"
+                            IsHitTestVisible="False">
+
+                            <TextBlock  FontSize="26" HorizontalAlignment="Center" Margin="0 0 0 4" Text="Drag files here"/>
+                            <controls1:FileIcon  BorderThickness="0" Width="50" Height="50" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            <TextBlock FontSize="26" Margin="0 4 0 0" Text="to open" HorizontalAlignment="Center"/>
+
+                        </StackPanel>
+
+                 <dockablz:Layout   x:Name="Layout">
                     <dragablz:TabablzControl 
-                            IsTabStop="False"
-                        x:Name="InitialTabablzControl"
+                            IsTabStop="True"
+                             x:Name="InitialTabablzControl"
                             HeaderMemberPath="Header" 
                             TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
                             Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
@@ -195,18 +197,7 @@
                     </dragablz:TabablzControl>
                 </dockablz:Layout>
 
-                <StackPanel
-                    Visibility="{Binding IsEmpty,Converter={StaticResource BooleanToVisibilityConverter}}"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
-                    Orientation="Vertical"
-                    IsHitTestVisible="False">
 
-                    <TextBlock  FontSize="26" HorizontalAlignment="Center" Margin="0 0 0 4" Text="Drag files here"/>
-                    <controls1:FileIcon x:Name="FileIcon" BorderThickness="0" Width="50" Height="50" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-                    <TextBlock FontSize="26" Margin="0 4 0 0" Text="to open" HorizontalAlignment="Center"/>
-
-                </StackPanel>
             </Grid>
         </materialDesign:DrawerHost>
 
