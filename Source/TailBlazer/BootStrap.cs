@@ -5,6 +5,7 @@ using StructureMap;
 using TailBlazer.Infrastucture;
 using TailBlazer.Infrastucture.AppState;
 using TailBlazer.Views;
+using TailBlazer.Views.Layout;
 using TailBlazer.Views.WindowManagement;
 
 namespace TailBlazer
@@ -27,6 +28,9 @@ namespace TailBlazer
             var factory = container.GetInstance<WindowFactory>();
             var window = factory.Create(args);
             tempWindowToGetDispatcher.Close();
+
+            var layoutServce = container.GetInstance<ILayoutService>();
+           // layoutServce.Restore();
 
             var appStatePublisher = container.GetInstance<IApplicationStatePublisher>();
             app.Exit += (sender, e) => appStatePublisher.Publish(ApplicationState.ShuttingDown);

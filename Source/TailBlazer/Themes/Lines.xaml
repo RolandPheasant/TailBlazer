@@ -8,7 +8,6 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.font.xaml" />
-
     </ResourceDictionary.MergedDictionaries>
     
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -21,12 +20,12 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-                <materialDesign:PopupBox 
+            <materialDesign:PopupBox 
                         PlacementMode="RightAndAlignTopEdges"
                         PopupMode="MouseOver"
                         FontFamily="{StaticResource MaterialDesignFont}"
                         Visibility="{Binding ShowIndicator.Value}">
-                    <materialDesign:PopupBox.ToggleContent>
+                <materialDesign:PopupBox.ToggleContent>
 
                     <materialDesign:PackIcon
                             Width="14"
@@ -38,62 +37,62 @@
 
                 <Grid Margin="8"    TextOptions.TextFormattingMode="Ideal" 
                                     TextOptions.TextRenderingMode="Auto"   >
-                    
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
 
-                        <TextBlock 
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock 
                             FontSize="14"
                             FontWeight="DemiBold"
                             Text="This line is highlighted because:"/>
 
-                        <ItemsControl 
+                    <ItemsControl 
                                 Margin="0 8 0 0"
                                 Grid.Row="1" 
                                 ItemsSource="{Binding IndicatorMatches.Value}">
-                            
-                            <ItemsControl.ItemTemplate>
+
+                        <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type tail:LineMatchProxy}">
                                 <Grid Margin="6">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="22"/>
-                                            <ColumnDefinition MinWidth="75"/>
-                                        </Grid.ColumnDefinitions>
-                                    
-                                        <materialDesign:PackIcon Width="14" Height="14"  
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="22"/>
+                                        <ColumnDefinition MinWidth="75"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <materialDesign:PackIcon Width="14" Height="14"  
                                                          Foreground="{Binding Background}"
                                                          Padding="4" 
                                                          VerticalAlignment="Center"
                                                          Kind="{Binding IconKind}"/>
 
-                                        <StackPanel  Grid.Column="1"
+                                    <StackPanel  Grid.Column="1"
                                                  Margin="4 0 0 0"
                                                  VerticalAlignment="Center"
                                                  Orientation="Horizontal">
-                                           
-                                            <TextBlock  FontSize="12"
+
+                                        <TextBlock  FontSize="12"
                                                   Text="It matches"  
                                                    VerticalAlignment="Center"/>
 
-                                            <TextBlock  
+                                        <TextBlock  
                                                 Margin="4 0 0 0"
                                                 FontSize="12"
                                                 Text="{Binding Text}"  
                                                 Foreground="{Binding Foreground}"
                                                 Background="{Binding Background}"
                                                 VerticalAlignment="Center"/>
-                                        </StackPanel>
+                                    </StackPanel>
 
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
 
-                        </ItemsControl>
-                    </Grid>
-                        
-                </materialDesign:PopupBox>
+                    </ItemsControl>
+                </Grid>
+
+            </materialDesign:PopupBox>
 
 
             <controls:HighlightTextControl 
@@ -102,11 +101,6 @@
                     VerticalAlignment="Center"
                     FormattedText = "{Binding FormattedText.Value}"/>
         </Grid>
-
-
-
-
-
     </DataTemplate>
 
     <Style x:Key="LinesItemContainerStyle" TargetType="{x:Type ListBoxItem}" 

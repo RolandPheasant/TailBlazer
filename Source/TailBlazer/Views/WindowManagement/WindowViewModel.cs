@@ -19,7 +19,6 @@ using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
 using TailBlazer.Infrastucture.AppState;
 using TailBlazer.Views.FileDrop;
-using TailBlazer.Views.Layout;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Recent;
 using TailBlazer.Views.Tail;
@@ -36,6 +35,7 @@ namespace TailBlazer.Views.WindowManagement
         private HeaderedView _selected;
         private bool _isEmpty;
         private bool _menuIsOpen;
+
         public ObservableCollection<HeaderedView> Views { get; } = new ObservableCollection<HeaderedView>();
         public RecentFilesViewModel RecentFiles { get; }
         public GeneralOptionsViewModel GeneralOptions { get; }
@@ -46,9 +46,8 @@ namespace TailBlazer.Views.WindowManagement
         public ICommand ExitCommmand { get; }
         public ICommand ZoomInCommand { get; }
         public ICommand ZoomOutCommand { get; }
-        
         public FileDropMonitor DropMonitor { get; } = new FileDropMonitor();
-
+        public ItemActionCallback ClosingTabItemHandler => ClosingTabItemHandlerImpl;
         public ApplicationExitingDelegate WindowExiting { get; }
 
         public WindowViewModel(IObjectProvider objectProvider, 
@@ -58,7 +57,6 @@ namespace TailBlazer.Views.WindowManagement
             RecentFilesViewModel recentFilesViewModel,
             GeneralOptionsViewModel generalOptionsViewModel,
             ISchedulerProvider schedulerProvider,
-            ILayoutService layoutService,
             IApplicationStatePublisher applicationStatePublisher)
         {
             _logger = logger;
@@ -116,9 +114,7 @@ namespace TailBlazer.Views.WindowManagement
                             .ForEach(d=>d.Dispose());
                 }));
         }
-
-
-
+        
         private void OpenFile()
         {
             // open dialog to select file [get rid of this shit and create a material design file selector]
@@ -200,8 +196,6 @@ namespace TailBlazer.Views.WindowManagement
             });
         }
 
-
-        public ItemActionCallback ClosingTabItemHandler => ClosingTabItemHandlerImpl;
 
         public void OnWindowClosing()
         {

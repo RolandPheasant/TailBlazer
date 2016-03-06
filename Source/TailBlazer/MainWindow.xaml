@@ -43,6 +43,8 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Font.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/MaterialDesign.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            
+            <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter" />
 
             <DataTemplate DataType="{x:Type infrastucture:FileHeader}">
                 <TextBlock Margin="6 2 2 2" 
@@ -165,24 +167,13 @@
             </materialDesign:DrawerHost.LeftDrawerContent>
 
             <Grid>
-                        <StackPanel
-                            Visibility="{Binding IsEmpty,Converter={StaticResource BooleanToVisibilityConverter}}"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Center"
-                            Orientation="Vertical"
-                            IsHitTestVisible="False">
 
-                            <TextBlock  FontSize="26" HorizontalAlignment="Center" Margin="0 0 0 4" Text="Drag files here"/>
-                            <controls1:FileIcon  BorderThickness="0" Width="50" Height="50" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-                            <TextBlock FontSize="26" Margin="0 4 0 0" Text="to open" HorizontalAlignment="Center"/>
-
-                        </StackPanel>
-
-                 <dockablz:Layout   x:Name="Layout">
+                  <dockablz:Layout   x:Name="Layout">
                     <dragablz:TabablzControl 
                             IsTabStop="True"
-                             x:Name="InitialTabablzControl"
+                            x:Name="InitialTabablzControl"
                             HeaderMemberPath="Header" 
+                          
                             TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
                             Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
                             ShowDefaultCloseButton="True"       
@@ -197,8 +188,17 @@
                     </dragablz:TabablzControl>
                 </dockablz:Layout>
 
-
-            </Grid>
+                        <StackPanel
+                        Visibility="{Binding IsEmpty,Converter={StaticResource BooleanToVisibilityConverter}}"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Orientation="Vertical"
+                        IsHitTestVisible="False">
+                            <TextBlock  FontSize="26" HorizontalAlignment="Center" Margin="0 0 0 4" Text="Drag files here"/>
+                            <controls1:FileIcon  BorderThickness="0" Width="50" Height="50" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            <TextBlock FontSize="26" Margin="0 4 0 0" Text="to open" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
         </materialDesign:DrawerHost>
 
         </Grid>
