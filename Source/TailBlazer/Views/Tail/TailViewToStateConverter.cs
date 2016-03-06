@@ -41,17 +41,16 @@ namespace TailBlazer.Views.Tail
                 .OrderBy(s => s.Position)
                 .Select(search => new SearchState
                     (
-                    search.SearchText,
-                    search.Position,
-                    search.UseRegex,
-                    search.Highlight,
-                    search.Filter,
-                    false,
-                    search.IgnoreCase,
-                    search.HighlightHue.Swatch,
-                    search.IconKind,
-                    search.HighlightHue.Name
-
+                        search.SearchText,
+                        search.Position,
+                        search.UseRegex,
+                        search.Highlight,
+                        search.Filter,
+                        false,
+                        search.IgnoreCase,
+                        search.HighlightHue.Swatch,
+                        search.IconKind,
+                        search.HighlightHue.Name
                     )).ToArray();
 
             var tailViewState = new TailViewState(fileName, selectedSearch, searchItems);

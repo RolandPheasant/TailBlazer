@@ -122,6 +122,10 @@
     <Compile Include="FileHandling\Search\SearchInfoCollection.cs" />
     <Compile Include="FileHandling\Search\SearchInfo.cs" />
     <Compile Include="FileHandling\TailInfo.cs" />
+    <Compile Include="FileHandling\TextAssociations\ITextAssociationCollection.cs" />
+    <Compile Include="FileHandling\TextAssociations\TextAssociation.cs" />
+    <Compile Include="FileHandling\TextAssociations\TextAssociationCollection.cs" />
+    <Compile Include="FileHandling\TextAssociations\TextAssociationToStateConverter.cs" />
     <Compile Include="Formatting\DisplayText.cs" />
     <Compile Include="Formatting\Hue.cs" />
     <Compile Include="Formatting\HueKey.cs" />

@@ -119,7 +119,7 @@ namespace TailBlazer.Views.Searching
             set { SetAndRaise(ref _highlight, value); }
         }
 
-        private Hue HighlightHue
+        public Hue HighlightHue
         {
             get { return _highlightHue; }
             set { SetAndRaise(ref _highlightHue, value); }

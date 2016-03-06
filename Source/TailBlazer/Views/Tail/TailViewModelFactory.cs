@@ -3,6 +3,7 @@ using System.IO;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Search;
+using TailBlazer.Domain.FileHandling.TextAssociations;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
@@ -20,13 +21,15 @@ namespace TailBlazer.Views.Tail
         private readonly ISearchMetadataFactory _searchMetadataFactory;
         private readonly IIconProvider _iconProvider;
         private readonly ITailViewStateControllerFactory _tailViewStateControllerFactory;
+        private readonly ITextAssociationCollection _textAssociationCollection;
 
         public TailViewModelFactory([NotNull] IObjectProvider objectProvider,
             [NotNull] ISchedulerProvider schedulerProvider, 
             [NotNull] IColourProvider colourProvider,
             [NotNull] ISearchMetadataFactory searchMetadataFactory, 
             [NotNull] IIconProvider iconProvider,
-            [NotNull] ITailViewStateControllerFactory tailViewStateControllerFactory)
+            [NotNull] ITailViewStateControllerFactory tailViewStateControllerFactory,
+            [NotNull] ITextAssociationCollection textAssociationCollection) 
         {
             if (objectProvider == null) throw new ArgumentNullException(nameof(objectProvider));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
@@ -42,6 +45,7 @@ namespace TailBlazer.Views.Tail
             _searchMetadataFactory = searchMetadataFactory;
             _iconProvider = iconProvider;
             _tailViewStateControllerFactory = tailViewStateControllerFactory;
+            _textAssociationCollection = textAssociationCollection;
         }
         
         public HeaderedView Create(ViewState state)
@@ -76,7 +80,7 @@ namespace TailBlazer.Views.Tail
             
             var searchMetadataCollection = _objectProvider.Get<ISearchMetadataCollection>();
             var searchHints = _objectProvider.Get<SearchHints>();
-            var searchOptionsViewModel = new SearchOptionsViewModel(searchMetadataCollection, _searchMetadataFactory, _schedulerProvider, _colourProvider, _iconProvider, searchHints);
+            var searchOptionsViewModel = new SearchOptionsViewModel(searchMetadataCollection, _searchMetadataFactory, _schedulerProvider, _colourProvider, _iconProvider, _textAssociationCollection, searchHints);
             
             var searchInfo = _objectProvider.Get<ISearchInfoCollection>
                 (

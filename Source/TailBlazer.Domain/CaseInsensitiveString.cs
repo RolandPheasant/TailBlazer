@@ -17,10 +17,11 @@ namespace TailBlazer.Domain
             return source._original;
         }
 
-        public static explicit operator CaseInsensitiveString(string source)
+        public static implicit operator CaseInsensitiveString(string source)
         {
             return new CaseInsensitiveString(source);
         }
+
         #region Equality
 
         public bool Equals(CaseInsensitiveString other)

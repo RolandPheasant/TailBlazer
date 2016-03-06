@@ -3,7 +3,6 @@ using System.Collections;
 using System.Linq;
 using System.Xml.Linq;
 using TailBlazer.Domain.Settings;
-using TailBlazer.Settings;
 
 namespace TailBlazer.Views.Recent
 {

@@ -27,7 +27,20 @@ namespace TailBlazer.Views.Formatting
 
             return match != null ? match.IconName : useRegex ? RegEx : Search;
         }
-        
+
+        public string GetIconOrDefault(string text, bool useRegex, string iconKind)
+        {
+            var existing = DefaultMatches
+                .FirstOrDefault(icon => icon.IconName.Equals(iconKind, StringComparison.OrdinalIgnoreCase));
+
+
+            if (existing != null)
+                return existing.IconName;
+
+            return GetIconFor(text, useRegex);
+
+        }
+
         private IEnumerable<DefaultIcons> LoadIcons()
         {
             yield return new DefaultIcons("DEBUG", PackIconKind.Bug.ToString());

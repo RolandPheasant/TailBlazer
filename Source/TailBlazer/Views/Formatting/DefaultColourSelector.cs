@@ -33,6 +33,11 @@ namespace TailBlazer.Views.Formatting
             return match != null ? match.Hue :  _defaultHighlight;
         }
 
+        public Hue Lookup(HueKey key)
+        {
+            return _hues.Lookup(key).ValueOr(() => _defaultHighlight);
+        }
+
         private IEnumerable<DefaultHue> Load()
         {
             yield return new DefaultHue("DEBUG", Lookup("blue", "Accent400"));

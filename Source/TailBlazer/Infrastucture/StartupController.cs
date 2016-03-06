@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using TailBlazer.Domain.FileHandling.Recent;
+using TailBlazer.Domain.FileHandling.TextAssociations;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Domain.StateHandling;
@@ -22,27 +23,6 @@ namespace TailBlazer.Infrastucture
         {
             applicationStatePublisher.Publish(ApplicationState.Startup);
 
-            //Observable.FromEventPattern<CancelEventHandler, CancelEventArgs>(
-            //            h => Application.Current.MainWindow.Closing += h,
-            //            h => Application.Current.MainWindow.Closing -= h)
-            //            .Subscribe(_ =>
-            //            {
-            //                applicationStatePublisher.Publish(ApplicationState.ShuttingDown);
-            //                applicationStatePublisher.Publish(ApplicationState.ShutDown);
-            //            });
-
-
-            //Observable.FromEventPattern<ExitEventHandler, ExitEventArgs>(
-            //            h => Application.Current.Exit += h,
-            //            h => Application.Current.Exit -= h)
-            //            .Subscribe(_ =>
-            //            {
-            //                applicationStatePublisher.Publish(ApplicationState.ShuttingDown);
-            //                applicationStatePublisher.Publish(ApplicationState.ShutDown);
-            //            });
-
-
-
             logger.Info($"Starting Tail Blazer version v{Assembly.GetEntryAssembly().GetName().Version}");
             logger.Info($"at {DateTime.Now}");
 
@@ -56,24 +36,15 @@ namespace TailBlazer.Infrastucture
             settingsRegister.Register(new RecentFilesToStateConverter(), "RecentFiles");
             settingsRegister.Register(new StateBucketConverter(), "BucketOfState");
             settingsRegister.Register(new RecentSearchToStateConverter(), "RecentSearch");
+            settingsRegister.Register(new TextAssociationToStateConverter(), "TextAssociation");
+
             logger.Info("Starting complete");
-
-
+            
             //TODO: Need type scanner then this code is not required
             var viewFactoryRegister = objectProvider.Get<IViewFactoryRegister>();
             viewFactoryRegister.Register<TailViewModelFactory>();
 
 
-        }
-
-        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-           
-        }
-
-        private void Current_Exit(object sender, System.Windows.ExitEventArgs e)
-        {
-            throw new NotImplementedException();
         }
     }
 
