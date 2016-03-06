@@ -6,10 +6,8 @@
              xmlns:local="clr-namespace:TailBlazer.Views.Searching"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
-             xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:formatting="clr-namespace:TailBlazer.Views.Formatting"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300"
              d:DataContext="{d:DesignInstance local:IconSelector}">
 
     <Control.Resources>
@@ -27,7 +25,7 @@
 
     <!--<DataTemplate DataType="{x:Type searching:IconSelector}">-->
 
-        <Grid Margin="4">
+    <Grid Margin="4" Width="435" Height="325">
             <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -59,7 +57,7 @@
 
             </StackPanel>
 
-            <ListBox Grid.Row="2" Height="225" Width="375" 
+            <ListBox Grid.Row="2" 
                      SelectedItem="{Binding Selected}"
                      ItemsSource="{Binding Icons}">
 

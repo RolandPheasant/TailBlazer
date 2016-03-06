@@ -203,10 +203,10 @@
             </dragablz:DragablzItemsControl>
 
             <Button  Grid.Row="3" IsDefault="True"
-                Margin="0 0 6 0"
-                HorizontalAlignment="Right"
+                 Margin="0 6 6 6"
+                HorizontalAlignment="Left"
                 Style="{DynamicResource MaterialDesignFlatButton}"
-                Content="Finished"     
+                Content="Close"     
                 Command="{x:Static wpf:DialogHost.CloseDialogCommand}"/>
      
             
