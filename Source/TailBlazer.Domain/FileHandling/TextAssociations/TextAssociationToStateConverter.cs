@@ -55,7 +55,7 @@ namespace TailBlazer.Domain.FileHandling.TextAssociations
             var root = new XElement(new XElement(Structure.Root));
 
             var itemsNode = items.Select(f => new XElement(Structure.TextAssociation,
-                new XElement(Structure.Text, f),
+                new XElement(Structure.Text, f.Text),
                 new XAttribute(Structure.UseRegEx, f.UseRegEx),
                 new XAttribute(Structure.IgnoreCase, f.IgnoreCase),
                 new XAttribute(Structure.Swatch, f.Swatch),
