@@ -3,8 +3,7 @@
                     xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
                     xmlns:controls="clr-namespace:TailBlazer.Controls"
                     xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
-                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                    xmlns:converters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf">
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" >
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
@@ -102,22 +101,6 @@
                     Text="{Binding Text}" 
                     VerticalAlignment="Center"
                     FormattedText = "{Binding FormattedText.Value}"/>
-
-            <!--<TextBlock  
-                    Visibility="{Binding HasSingleLine.Value,Converter={StaticResource BooleanToVisibilityConverter}}"
-                    Grid.Column="1" 
-                    Margin="4 0 0 0"
-                    Text="{Binding Text}"  
-                    VerticalAlignment="Center"/>
-
-            <controls:HighlightTextControl 
-                    Visibility="{Binding HasSingleLine.Value,Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
-                    Grid.Column="1" Margin="4 0 0 0"   
-                    Text="{Binding Text}" 
-                    VerticalAlignment="Center"
-                    FormattedText = "{Binding FormattedText.Value}"
-                    HighlightForeground = "{StaticResource SecondaryAccentForegroundBrush}"
-                    HighlightBackground = "{StaticResource SecondaryAccentBrush}"/>-->
         </Grid>
 
 
