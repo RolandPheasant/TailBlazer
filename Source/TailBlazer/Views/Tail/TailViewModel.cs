@@ -41,10 +41,6 @@ namespace TailBlazer.Views.Tail
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         public Guid Id { get; }= Guid.NewGuid();
-        public ICommand CopyToClipboardCommand { get; }
-        public ICommand OpenFileCommand { get; }
-        public ICommand OpenFolderCommand { get; }
-
         public ISelectionMonitor SelectionMonitor { get; }
         private SearchOptionsViewModel SearchOptions { get;  }
         public SearchHints SearchHints { get;  }
@@ -60,7 +56,9 @@ namespace TailBlazer.Views.Tail
         public IProperty<bool> CanViewInline { get; }
         public IProperty<bool> HighlightTail { get; }
         public IProperty<bool> UsingDarkTheme { get; }
-
+        public ICommand CopyToClipboardCommand { get; }
+        public ICommand OpenFileCommand { get; }
+        public ICommand OpenFolderCommand { get; }
         public ICommand OpenSearchOptionsCommand => new Command(OpenSearchOptions);
 
         public string Name { get; }

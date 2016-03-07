@@ -49,10 +49,7 @@ namespace DynamicData.Binding
                 logger.Info($"{label}: {changes.Count}");
             });
         }
-
-
-
-
+        
         public static IObservable<IChangeSet<T>> ToObservableChangeSet<T>(this ReadOnlyObservableCollection<T> source)
         {
             return Observable.Create<IChangeSet<T>>
