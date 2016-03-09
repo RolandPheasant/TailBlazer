@@ -50,7 +50,7 @@ namespace TailBlazer.Views.Tail
                     new[]
                     {
                         new ExplictArg("fileWatcher", fileWatcher),
-                        new ExplictArg("searchMetadataCollection", searchMetadataCollection),
+                        new ExplictArg("searchMetadataCollection", searchMetadataCollection)
                     }
                 );
 

@@ -260,7 +260,7 @@ namespace TailBlazer.Infrastucture
                 FirstRealizedItemIndex = firstRealizedIndex,
                 FirstRealizedItemLeft = firstRealizedItemLeft,
                 FirstRealizedLineTop = firstRealizedItemTop,
-                LastRealizedItemIndex = lastRealizedIndex,
+                LastRealizedItemIndex = lastRealizedIndex
             };
         }
 
@@ -275,12 +275,12 @@ namespace TailBlazer.Infrastucture
             var totalLines = (int)Math.Ceiling((double)_itemsControl.Items.Count / itemsPerLine);
             var extentHeight = Math.Max(totalLines * ItemHeight, viewPortSize.Height);
 
-            return new ExtentInfo()
+            return new ExtentInfo
             {
                 ItemsPerLine = itemsPerLine,
                 TotalLines = totalLines,
                 ExtentHeight = extentHeight,
-                MaxVerticalOffset = extentHeight - viewPortSize.Height,
+                MaxVerticalOffset = extentHeight - viewPortSize.Height
             };
         }
 

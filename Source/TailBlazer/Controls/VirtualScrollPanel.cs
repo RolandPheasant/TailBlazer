@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using System.Windows.Threading;
 using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Controls
@@ -37,7 +36,7 @@ namespace TailBlazer.Controls
     {
         private const double ScrollLineAmount = 16.0;
         private Size _extentSize;
-        private ExtentInfo _extentInfo = new ExtentInfo();
+        private ExtentInfo _extentInfo;
         private Size _viewportSize;
         private Point _offset;
         private ItemsControl _itemsControl;

@@ -4,7 +4,7 @@ using System.Windows.Controls.Primitives;
 
 namespace TailBlazer.Infrastucture
 {
-    public  class ListBoxHelper
+    public  static class ListBoxHelper
     {
         
         public static readonly DependencyProperty SelectionMonitorProperty = DependencyProperty.RegisterAttached("SelectionMonitor", typeof(IAttachedListBox), typeof(ListBoxHelper),

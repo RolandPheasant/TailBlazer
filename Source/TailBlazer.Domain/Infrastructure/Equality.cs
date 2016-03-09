@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using DynamicData.Binding;
 
 namespace TailBlazer.Domain.Infrastructure
 {
@@ -38,7 +37,7 @@ namespace TailBlazer.Domain.Infrastructure
         public GenericEqualityComparer(IEqualityComparer<T> rootComparer,Func<T, T, bool> compareFunction, Func<T, int> hashFunction)
         {
 
-            _hashFunction = (t) =>
+            _hashFunction = t =>
             {
                 unchecked
                 {

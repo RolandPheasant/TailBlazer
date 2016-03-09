@@ -1,6 +1,5 @@
 ﻿using System;
 
-
 namespace TailBlazer.Domain.Infrastructure
 {
     /// <summary>

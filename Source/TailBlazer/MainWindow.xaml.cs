@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
+﻿using System.ComponentModel;
 using MahApps.Metro.Controls;
-using TailBlazer.Views;
 using TailBlazer.Views.WindowManagement;
 
 namespace TailBlazer
@@ -25,7 +20,7 @@ namespace TailBlazer
             Closing += MainWindow_Closing;
         }
 
-        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
 
             var windowsModel = DataContext as WindowViewModel;

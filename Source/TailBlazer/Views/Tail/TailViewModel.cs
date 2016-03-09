@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -13,7 +11,6 @@ using DynamicData;
 using DynamicData.Binding;
 using DynamicData.PLinq;
 using MaterialDesignThemes.Wpf;
-using Microsoft.Win32;
 using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
@@ -192,7 +189,7 @@ namespace TailBlazer.Views.Tail
             //return an empty line provider unless user is viewing inline - this saves needless trips to the file
             var inline = searchInfoCollection.All.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : new EmptyLineProvider());
 
-            var firstVisibleRow = this._data.ToObservableChangeSet().ToCollection()
+            var firstVisibleRow = _data.ToObservableChangeSet().ToCollection()
                                             .Select(collection => collection.FirstOrDefault());
 
             //var itemToSelect = this.WhenValueChanged(vm => vm.SelectedItem)
@@ -281,8 +278,7 @@ namespace TailBlazer.Views.Tail
 
         void IScrollReceiver.ScrollChanged(ScrollChangedArgs scrollChangedArgs)
         {
-            if (scrollChangedArgs.Direction == ScrollDirection.Up)
-                AutoTail = false;
+            AutoTail &= scrollChangedArgs.Direction != ScrollDirection.Up;
         }
 
         void IScrollReceiver.ScrollDiff(int linesChanged)

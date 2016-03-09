@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Linq;
 using FluentAssertions;
 using TailBlazer.Domain.Formatting;
@@ -9,10 +8,6 @@ namespace TailBlazer.Fixtures
 {
     public class SplitFileByMatchingTextFixture
     {
-        public SplitFileByMatchingTextFixture()
-        {
-        }
-
 
         [Fact]
         public void FindMatchingText()

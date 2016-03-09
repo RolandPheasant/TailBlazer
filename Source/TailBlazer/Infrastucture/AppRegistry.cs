@@ -1,13 +1,14 @@
 ﻿using System;
 using System.IO;
+using System.Text;
+using log4net.Config;
 using StructureMap;
-using StructureMap.Configuration.DSL;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
-using ILogger = TailBlazer.Domain.Infrastructure.ILogger;
+using TailBlazer.Properties;
 
 namespace TailBlazer.Infrastucture
 {
@@ -20,14 +21,14 @@ namespace TailBlazer.Infrastucture
             if (!File.Exists(path))
             {
                 // should use the default config which is a resource
-                using (var stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(TailBlazer.Properties.Resources.log4net)))
+                using (var stream = new MemoryStream(Encoding.ASCII.GetBytes(Resources.log4net)))
                 {
-                    log4net.Config.XmlConfigurator.Configure(stream);
+                    XmlConfigurator.Configure(stream);
                 }
             }
             else
             {
-                log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(path));
+                XmlConfigurator.ConfigureAndWatch(new FileInfo(path));
             }
             For<ILogger>().Use<Log4NetLogger>().Ctor<Type>("type").Is(x => x.ParentType).AlwaysUnique();
 

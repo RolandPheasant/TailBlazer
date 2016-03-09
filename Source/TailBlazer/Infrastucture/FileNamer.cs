@@ -25,7 +25,7 @@ namespace TailBlazer.Infrastucture
 
         public string GetName(string path)
         {
-            return CombinePath(GetName(Root, path: new Stack<string>(path.Split(DirectorySeparators))));
+            return CombinePath(GetName(Root, new Stack<string>(path.Split(DirectorySeparators))));
         }
 
         private static string CombinePath(Stack<string> path)
@@ -49,7 +49,7 @@ namespace TailBlazer.Infrastucture
 
         private static Stack<string> GetName(Node node, Stack<string> path)
         {
-            return GetName(node, path, result: new Stack<string>());
+            return GetName(node, path, new Stack<string>());
         }
 
         private static Stack<string> GetName(Node node, Stack<string> path, Stack<string> result)
@@ -79,7 +79,7 @@ namespace TailBlazer.Infrastucture
 
         public void Insert(string path)
         {
-            Insert(Root, path: new Stack<string>(path.Split(DirectorySeparators)));
+            Insert(Root, new Stack<string>(path.Split(DirectorySeparators)));
         }
 
         private static void Insert(Node node, Stack<string> path)

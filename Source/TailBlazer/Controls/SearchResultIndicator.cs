@@ -1,8 +1,6 @@
 ﻿
-using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Controls
@@ -23,7 +21,7 @@ namespace TailBlazer.Controls
     public class SearchResultIndicator : Control
     {
         [UsedImplicitly]
-        private class SearchResultIndicatorStates
+        private static class SearchResultIndicatorStates
         {
             public const string None = "None";
             public const string Regex = "Regex";
@@ -31,7 +29,7 @@ namespace TailBlazer.Controls
         }
 
         [UsedImplicitly]
-        private class TemplateParts
+        private static class TemplateParts
         {
             public const string Regex = "PART_RegexImage";
             public const string Text = "PART_TextImage";
@@ -79,7 +77,7 @@ namespace TailBlazer.Controls
 
         private void UpdateVisualState(bool useTransitions)
         {
-            switch (this.Status)
+            switch (Status)
             {
                 case SearchResultIndicatorStatus.Regex:
                     var x = VisualStateManager.GoToState(this, SearchResultIndicatorStates.Regex, useTransitions);

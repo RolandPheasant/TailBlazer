@@ -30,7 +30,7 @@ namespace TailBlazer.Views.Formatting
                                             "pink",
                                             "red",
                                             "purple",
-                                            "deeppurple",
+                                            "deeppurple"
                                         };
 
         public ColourProvider()

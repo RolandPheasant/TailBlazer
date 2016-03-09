@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Threading;
 using StructureMap;
 using TailBlazer.Infrastucture;
-using TailBlazer.Views;
 using TailBlazer.Views.WindowManagement;
 
 namespace TailBlazer

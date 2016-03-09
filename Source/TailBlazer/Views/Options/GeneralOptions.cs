@@ -1,6 +1,4 @@
-﻿using TailBlazer.Settings;
-
-namespace TailBlazer.Views.Options
+﻿namespace TailBlazer.Views.Options
 {
     public class  GeneralOptions
     {

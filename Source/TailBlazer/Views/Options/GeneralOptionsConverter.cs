@@ -2,7 +2,6 @@ using System;
 using System.Xml.Linq;
 using DynamicData.Kernel;
 using TailBlazer.Domain.Settings;
-using TailBlazer.Settings;
 
 namespace TailBlazer.Views.Options
 {
@@ -19,7 +18,7 @@ namespace TailBlazer.Views.Options
 
         public GeneralOptions Convert(State state)
         {
-            var defaults = this.GetDefaultValue();
+            var defaults = GetDefaultValue();
 
             var doc = XDocument.Parse(state.Value);
             var root = doc.ElementOrThrow(Structure.Root);

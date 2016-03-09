@@ -54,7 +54,7 @@ namespace TailBlazer.Domain.FileHandling.Recent
 
             fileNodeArray.ForEach(root.Add);
 
-            XDocument doc = new XDocument(root);
+            var doc = new XDocument(root);
             return new State(2, doc.ToString());
         }
 

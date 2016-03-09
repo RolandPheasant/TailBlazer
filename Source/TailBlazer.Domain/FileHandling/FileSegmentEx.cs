@@ -1,7 +1,6 @@
 using System;
 using System.Reactive.Linq;
 
-
 namespace TailBlazer.Domain.FileHandling
 {
     public static class FileSegmentEx

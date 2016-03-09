@@ -16,7 +16,7 @@ namespace TailBlazer.Views.Searching
 
         public SearchOptions Convert(State state)
         {
-            var defaults = this.GetDefaultValue();
+            var defaults = GetDefaultValue();
 
             //var doc = XDocument.Parse(state.Value);
             //var root = doc.ElementOrThrow(Structure.Root);

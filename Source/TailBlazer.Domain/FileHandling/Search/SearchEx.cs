@@ -25,7 +25,11 @@ namespace TailBlazer.Domain.FileHandling.Search
             {
                 var options = source.IgnoreCase ? caseInsensitiveOptions : caseSensitiveOptions;
                 var regex = new Regex(source.SearchText, options);
-                predicate = s => regex.IsMatch(s);
+                predicate = s =>
+                {
+                    if (s == null) throw new ArgumentNullException(nameof(s));
+                    return regex.IsMatch(s);
+                };
             }
             return predicate;
         }

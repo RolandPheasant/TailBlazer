@@ -1,6 +1,4 @@
-﻿using TailBlazer.Infrastucture;
-
-namespace TailBlazer.Controls
+﻿namespace TailBlazer.Controls
 {
     public class ScrollChangedArgs
     {

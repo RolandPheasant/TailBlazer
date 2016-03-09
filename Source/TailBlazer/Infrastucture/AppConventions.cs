@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using StructureMap;
-using StructureMap.Configuration.DSL;
 using StructureMap.Graph;
 using StructureMap.Graph.Scanning;
-using StructureMap.TypeRules;
 
 namespace TailBlazer.Infrastucture
 {

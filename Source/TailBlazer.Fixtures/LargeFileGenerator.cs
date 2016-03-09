@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace TailBlazer.Fixtures
 {
@@ -46,7 +42,7 @@ namespace TailBlazer.Fixtures
             {
 
 
-                File.AppendAllLines(fileName,new string[] {sb.ToString()});
+                File.AppendAllLines(fileName,new[] {sb.ToString()});
             }
         }
 

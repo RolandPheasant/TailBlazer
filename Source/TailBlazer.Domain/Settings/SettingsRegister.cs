@@ -23,7 +23,7 @@ namespace TailBlazer.Domain.Settings
             if (key == null) throw new ArgumentNullException(nameof(key));
             var setting = _settingFactory.Create(converter, key);
 
-            _register.Register<ISetting<T>>(setting);
+            _register.Register(setting);
         }
     }
 }

@@ -124,7 +124,7 @@ namespace TailBlazer.Views.Tail
 
             root.Add(list);
 
-            XDocument doc = new XDocument(root);
+            var doc = new XDocument(root);
             return new State(1, doc.ToString());
         }
 

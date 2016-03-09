@@ -3,7 +3,6 @@ using System.Collections;
 using System.Linq;
 using System.Xml.Linq;
 using TailBlazer.Domain.Settings;
-using TailBlazer.Settings;
 
 namespace TailBlazer.Views.Recent
 {
@@ -49,7 +48,7 @@ namespace TailBlazer.Views.Recent
 
             fileNodeArray.ForEach(root.Add);
 
-            XDocument doc = new XDocument(root);
+            var doc = new XDocument(root);
             return new State(2, doc.ToString());
         }
 

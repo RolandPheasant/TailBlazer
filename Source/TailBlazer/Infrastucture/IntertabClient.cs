@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Windows;
 using Dragablz;
-using TailBlazer.Views;
 using TailBlazer.Views.WindowManagement;
 
 namespace TailBlazer.Infrastucture

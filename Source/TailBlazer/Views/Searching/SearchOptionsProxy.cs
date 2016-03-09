@@ -1,19 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Reactive.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Windows.Input;
 using System.Windows.Media;
 using DynamicData.Binding;
 using DynamicData.Kernel;
 using MaterialDesignThemes.Wpf;
-using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
-using Hue = TailBlazer.Domain.Formatting.Hue;
 
 namespace TailBlazer.Views.Searching
 {
@@ -176,7 +174,7 @@ namespace TailBlazer.Views.Searching
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((SearchOptionsProxy) obj);
         }
 
