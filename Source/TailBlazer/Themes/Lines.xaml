@@ -94,7 +94,6 @@
 
             </materialDesign:PopupBox>
 
-
             <controls:HighlightTextControl 
                     Grid.Column="1" Margin="4 0 0 0"   
                     Text="{Binding Text}" 
@@ -178,8 +177,7 @@
                     <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
                         <ScrollViewer Focusable="false" 
                                       Padding="{TemplateBinding Padding}"
-                                       
-                                        IsTabStop="True">
+                                      IsTabStop="True">
                             <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
                         </ScrollViewer>
                     </Border>
@@ -207,7 +205,7 @@
                     <controls:VirtualScrollPanel ItemHeight="22"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
-                                                TotalItems="{Binding Count.Value}"/>
+                                                TotalItems="{Binding LatestCount.Value}"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
 

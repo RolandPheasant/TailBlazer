@@ -9,6 +9,7 @@ using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
 using DynamicData.PLinq;
+using DynamicData.Aggregation;
 using MaterialDesignThemes.Wpf;
 using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
@@ -56,6 +57,7 @@ namespace TailBlazer.Views.Tail
         public IProperty<bool> CanViewInline { get; }
         public IProperty<bool> HighlightTail { get; }
         public IProperty<bool> UsingDarkTheme { get; }
+        public IProperty<int> MaximumChars { get; }
         public ICommand CopyToClipboardCommand { get; }
         public ICommand OpenFileCommand { get; }
         public ICommand OpenFolderCommand { get; }
@@ -101,6 +103,13 @@ namespace TailBlazer.Views.Tail
             OpenFileCommand = new Command(() => Process.Start(fileWatcher.FullName));
             OpenFolderCommand = new Command(() => Process.Start(fileWatcher.Folder));
             SearchMetadataCollection = searchMetadataCollection;
+            
+            var textScrollArgs = new ReplaySubject<TextScrollInfo>(1);
+            HorizonalScrollChanged = args =>
+            {
+                Console.WriteLine(args);
+                textScrollArgs.OnNext(args);
+            };
 
             _tailViewStateControllerFactory = tailViewStateControllerFactory;
             
@@ -145,8 +154,18 @@ namespace TailBlazer.Views.Tail
             //tailer is the main object used to tail, scroll and filter in a file
             var lineScroller = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
 
+ 
+
+            MaximumChars = lineScroller.Lines.Connect()
+                            .Maximum(l => l.Text.Length)
+                            .StartWith(0)
+                            .DistinctUntilChanged()
+                            .ObserveOn(schedulerProvider.MainThread)
+                            .ForBinding();
+
             //load lines into observable collection
-            var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection),new LineMatches(searchMetadataCollection));
+            var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection), new LineMatches(searchMetadataCollection), textScrollArgs);
+
             var loader = lineScroller.Lines.Connect()
                 .LogChanges(logger, "Received")
                 .Transform(lineProxyFactory.Create, new ParallelisationOptions(ParallelType.Ordered, 3))
@@ -174,6 +193,7 @@ namespace TailBlazer.Views.Tail
                 {
                     FirstIndex = first;
                 });
+
 
             //Create objects required for inline viewing
             var isUserDefinedChanged = SearchCollection.WhenValueChanged(sc => sc.Selected)
@@ -213,9 +233,15 @@ namespace TailBlazer.Views.Tail
                 SelectionMonitor,
                 SearchOptions,
                 searchInvoker,
+                MaximumChars,
                 _stateMonitor,
+                textScrollArgs.SetAsComplete(),
                 _userScrollRequested.SetAsComplete());
         }
+
+     
+        public TextScrollDelegate HorizonalScrollChanged { get; }
+
 
         private async void OpenSearchOptions()
         {

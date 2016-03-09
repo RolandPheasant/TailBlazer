@@ -9,4 +9,6 @@ namespace TailBlazer.Infrastucture
 
         void ScrollDiff(int lineChanged);
     }
+
+
 }

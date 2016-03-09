@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -11,14 +11,28 @@ using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Controls
 {
+    public static class MeasureEx
+    {public static Size MeasureString(this Control source, string candidate)
+        {
+            var formattedText = new FormattedText(
+                candidate,
+                CultureInfo.CurrentUICulture,
+                FlowDirection.LeftToRight,
+                new Typeface(source.FontFamily, source.FontStyle, source.FontWeight, source.FontStretch),
+                source.FontSize,
+                Brushes.Black);
 
+            return new Size(formattedText.Width, formattedText.Height);
+        }
+
+    }
 
     /// <summary>
     /// This is adapted (butchered!) from VirtualWrapPanel in https://github.com/samueldjack/VirtualCollection
     /// 
     /// See http://blog.hibernatingrhinos.com/12515/implementing-a-virtualizingwrappanel
     /// </summary>
-    public class VirtualScrollPanel : VirtualizingPanel, IScrollInfo
+    public class LinesScrollPanel : VirtualizingPanel, IScrollInfo
     {
         private const double ScrollLineAmount = 16.0;
         private Size _extentSize;
@@ -31,59 +45,76 @@ namespace TailBlazer.Controls
         private bool _isInMeasure;
 
         public static readonly DependencyProperty ItemHeightProperty =
-            DependencyProperty.Register("ItemHeight", typeof(double), typeof(VirtualScrollPanel), new PropertyMetadata(1.0, OnRequireMeasure));
-        
+            DependencyProperty.Register("ItemHeight", typeof(double), typeof(LinesScrollPanel), new PropertyMetadata(1.0, OnRequireMeasure));
+
         private static readonly DependencyProperty VirtualItemIndexProperty =
-            DependencyProperty.RegisterAttached("VirtualItemIndex", typeof(int), typeof(VirtualScrollPanel), new PropertyMetadata(-1));
+            DependencyProperty.RegisterAttached("VirtualItemIndex", typeof(int), typeof(LinesScrollPanel), new PropertyMetadata(-1));
 
         public static readonly DependencyProperty TotalItemsProperty =
-            DependencyProperty.Register("TotalItems", typeof (int), typeof (VirtualScrollPanel), new PropertyMetadata(default(int),OnRequireMeasure));
-        
+            DependencyProperty.Register("TotalItems", typeof(int), typeof(LinesScrollPanel), new PropertyMetadata(default(int), OnRequireMeasure));
+
         public static readonly DependencyProperty StartIndexProperty =
-            DependencyProperty.Register("StartIndex", typeof(int), typeof(VirtualScrollPanel), new PropertyMetadata(default(int), OnStartIndexChanged));
+            DependencyProperty.Register("StartIndex", typeof(int), typeof(LinesScrollPanel), new PropertyMetadata(default(int), OnStartIndexChanged));
 
         public static readonly DependencyProperty ScrollReceiverProperty = DependencyProperty.Register(
-            "ScrollReceiver", typeof (IScrollReceiver), typeof (VirtualScrollPanel), new PropertyMetadata(default(IScrollReceiver)));
+            "ScrollReceiver", typeof(IScrollReceiver), typeof(LinesScrollPanel), new PropertyMetadata(default(IScrollReceiver)));
 
 
-        public static readonly DependencyProperty LeftPositionProperty = DependencyProperty.Register(
-            "LeftPosition", typeof (double), typeof (VirtualScrollPanel), new PropertyMetadata(default(double)));
+        public static readonly DependencyProperty HorizontalScrollChangedProperty = DependencyProperty.Register(
+            "HorizontalScrollChanged", typeof (TextScrollDelegate), typeof (LinesScrollPanel), new PropertyMetadata(default(TextScrollDelegate)));
 
-
-
-        public double LeftPosition
+        public TextScrollDelegate HorizontalScrollChanged
         {
-            get { return (double) GetValue(LeftPositionProperty); }
-            set { SetValue(LeftPositionProperty, value); }
+            get { return (TextScrollDelegate) GetValue(HorizontalScrollChangedProperty); }
+            set { SetValue(HorizontalScrollChangedProperty, value); }
         }
 
-        public static readonly DependencyProperty TextWidthProperty = DependencyProperty.Register(
-            "TextWidth", typeof (int), typeof (VirtualScrollPanel), new PropertyMetadata(default(int)));
 
-        public int TextWidth
+        //For Horizonal scroll we need
+        //1. Max number of chars of all the lines []
+        //2. Starting Character
+        //3. Number of visible characters required
+        //4. Plus we need to be supplied 
+
+        //We need 2 calcs - First visible char + number of visible chars (+ overflow)
+
+        public static readonly DependencyProperty CharacterWidthProperty = DependencyProperty.Register(
+            "CharacterWidth", typeof (double), typeof (LinesScrollPanel), new PropertyMetadata(default(double), OnCharactersChanged));
+
+        public double CharacterWidth
         {
-            get { return (int) GetValue(TextWidthProperty); }
-            set { SetValue(TextWidthProperty, value); }
+            get { return (double) GetValue(CharacterWidthProperty); }
+            set { SetValue(CharacterWidthProperty, value); }
+        }
+
+
+        public static readonly DependencyProperty TotalCharactersProperty = DependencyProperty.Register(
+            "TotalCharacters", typeof(int), typeof(LinesScrollPanel), new PropertyMetadata(default(int), OnCharactersChanged));
+
+        public int TotalCharacters
+        {
+            get { return (int)GetValue(TotalCharactersProperty); }
+            set { SetValue(TotalCharactersProperty, value); }
         }
 
         public IScrollReceiver ScrollReceiver
         {
-            get { return (IScrollReceiver) GetValue(ScrollReceiverProperty); }
+            get { return (IScrollReceiver)GetValue(ScrollReceiverProperty); }
             set { SetValue(ScrollReceiverProperty, value); }
         }
 
         public int StartIndex
         {
-            get { return (int) GetValue(StartIndexProperty); }
+            get { return (int)GetValue(StartIndexProperty); }
             set { SetValue(StartIndexProperty, value); }
         }
 
         public int TotalItems
         {
-            get { return (int) GetValue(TotalItemsProperty); }
+            get { return (int)GetValue(TotalItemsProperty); }
             set { SetValue(TotalItemsProperty, value); }
         }
-        
+
         private static int GetVirtualItemIndex(DependencyObject obj)
         {
             return (int)obj.GetValue(VirtualItemIndexProperty);
@@ -102,7 +133,7 @@ namespace TailBlazer.Controls
 
         public double ItemWidth => _extentSize.Width;
 
-        public VirtualScrollPanel()
+        public LinesScrollPanel()
         {
             if (!DesignerProperties.GetIsInDesignMode(this))
                 Dispatcher.BeginInvoke(new Action(Initialize));
@@ -118,49 +149,79 @@ namespace TailBlazer.Controls
 
         private static void OnStartIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var panel = (VirtualScrollPanel)d;
-            panel. CallbackStartIndexChanged(Convert.ToInt32(e.NewValue));
+            var panel = (LinesScrollPanel)d;
+            panel.CallbackStartIndexChanged(Convert.ToInt32(e.NewValue));
             panel.InvalidateMeasure();
+            
         }
+
+        private static void OnCharactersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var panel = (LinesScrollPanel)d;
+            //   panel.InvalidateMeasure();
+           // panel.CalculateHorizonalScrollInfo();
+            panel.InvalidateScrollInfo();
+
+        }
+
+
 
         private static void OnRequireMeasure(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var panel = (VirtualScrollPanel)d;
+            var panel = (LinesScrollPanel)d;
             panel.InvalidateMeasure();
             panel.InvalidateScrollInfo();
 
         }
-        
+
         protected override void OnItemsChanged(object sender, ItemsChangedEventArgs args)
         {
             base.OnItemsChanged(sender, args);
             InvalidateMeasure();
         }
-        
+
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
             base.OnRenderSizeChanged(sizeInfo);
 
-            if (!sizeInfo.HeightChanged) return;
+            if (sizeInfo.HeightChanged)
+            {
 
-            var items = (int)(sizeInfo.NewSize.Height / ItemHeight) ;
-            InvokeSizeCommand(items);
+                var items = (int)(sizeInfo.NewSize.Height / ItemHeight);
+                InvokeSizeCommand(items);
+            }
 
+            if (sizeInfo.WidthChanged)
+            {
+                CalculateHorizonalScrollInfo();
+            }
         }
+
+
+        private void CalculateHorizonalScrollInfo()
+        {
+            double availableWidth = this.RenderSize.Width;
+            var startCharacter = (_offset.X / CharacterWidth);
+            var numberOfCharacters = (availableWidth - 22) / CharacterWidth;
+
+            HorizontalScrollChanged?.Invoke(new TextScrollInfo((int)startCharacter, (int)numberOfCharacters + 1));
+        }
+
+
 
         protected override Size MeasureOverride(Size availableSize)
         {
             if (_itemsControl == null)
             {
 
-                return new Size(double.IsInfinity(availableSize.Width) ? 0: availableSize.Width,
-                    double.IsInfinity(availableSize.Height)  ? 0 : availableSize.Height);
+                return new Size(double.IsInfinity(availableSize.Width) ? 0 : availableSize.Width,
+                    double.IsInfinity(availableSize.Height) ? 0 : availableSize.Height);
             }
 
-            
+
             _isInMeasure = true;
             _childLayouts.Clear();
-            _extentInfo = GetVerticalExtentInfo(availableSize);
+            _extentInfo = GetExtentInfo(availableSize);
 
             EnsureScrollOffsetIsWithinConstrains(_extentInfo);
             var layoutInfo = GetLayoutInfo(availableSize, ItemHeight, _extentInfo);
@@ -174,6 +235,9 @@ namespace TailBlazer.Controls
             double widestWidth = 0;
             var currentX = layoutInfo.FirstRealizedItemLeft;
             var currentY = layoutInfo.FirstRealizedLineTop;
+     
+            ////1. Calc width, Call back available chars + first char
+            //var width = TotalCharacters * CharacterWidth + 22;
 
             using (_itemsGenerator.StartAt(generatorStartPosition, GeneratorDirection.Forward, true))
             {
@@ -184,8 +248,8 @@ namespace TailBlazer.Controls
                     bool newlyRealized;
 
                     var child = (UIElement)_itemsGenerator.GenerateNext(out newlyRealized);
-                    if (child==null) continue;
-                    
+                    if (child == null) continue;
+
                     children.Add(child);
 
                     SetVirtualItemIndex(child, itemIndex);
@@ -221,25 +285,29 @@ namespace TailBlazer.Controls
                 //part 2: do the measure
                 foreach (var child in children)
                 {
-                   
+                    //TODO: Widest = Chars + Additional space = 20
+                    //[ideally should scroll from where the text begins]
+
                     _itemsGenerator.PrepareItemContainer(child);
-                    child.Measure(new Size(double.PositiveInfinity, ItemHeight));
-                    widestWidth= Math.Max(widestWidth, child.DesiredSize.Width);
+                    child.Measure(new Size(_viewportSize.Width, ItemHeight));
+                    widestWidth = Math.Max(widestWidth, child.DesiredSize.Width); 
                 }
+
+            //    Console.WriteLine("Widest={0} Calc={1}", widestWidth, width);
 
                 //part 3: Create the elements
                 foreach (var child in children)
                 {
-                    _childLayouts.Add(child, new Rect(currentX, currentY, Math.Max(widestWidth,_viewportSize.Width), ItemHeight));
+                    _childLayouts.Add(child, new Rect(currentX, currentY, Math.Max(widestWidth, _viewportSize.Width), ItemHeight));
                     currentY += ItemHeight;
                 }
             }
             RemoveRedundantChildren();
-            UpdateScrollInfo(availableSize, _extentInfo, widestWidth);
+            UpdateScrollInfo(availableSize, _extentInfo);
 
             _isInMeasure = false;
 
-            return new Size(double.IsInfinity(availableSize.Width) ? 0 : availableSize.Width,double.IsInfinity(availableSize.Height) ? 0 : availableSize.Height);
+            return new Size(double.IsInfinity(availableSize.Width) ? 0 : availableSize.Width, double.IsInfinity(availableSize.Height) ? 0 : availableSize.Height);
             //return availableSize;
         }
 
@@ -247,6 +315,8 @@ namespace TailBlazer.Controls
         {
             _offset.Y = Clamp(_offset.Y, 0, extentInfo.MaxVerticalOffset);
         }
+
+
 
         private void RecycleItems(ItemLayoutInfo layoutInfo)
         {
@@ -283,11 +353,10 @@ namespace TailBlazer.Controls
             }
             return finalSize;
         }
-
-        private void UpdateScrollInfo(Size availableSize, ExtentInfo extentInfo, double actualWidth)
+        private void UpdateScrollInfo(Size availableSize, ExtentInfo extentInfo)
         {
             _viewportSize = availableSize;
-            _extentSize = new Size(actualWidth, extentInfo.Height);
+            _extentSize = new Size(extentInfo.Width, extentInfo.Height);
 
             InvalidateScrollInfo();
         }
@@ -317,9 +386,8 @@ namespace TailBlazer.Controls
         private ItemLayoutInfo GetLayoutInfo(Size availableSize, double itemHeight, ExtentInfo extentInfo)
         {
             if (_itemsControl == null)
-            {
                 return new ItemLayoutInfo();
-            }
+    
 
             // we need to ensure that there is one realized item prior to the first visible item, and one after the last visible item,
             // so that keyboard navigation works properly. For example, when focus is on the first visible item, and the user
@@ -327,34 +395,41 @@ namespace TailBlazer.Controls
             // in that row
             var firstVisibleLine = (int)Math.Floor(_offset.Y / itemHeight);
             var firstRealizedIndex = Math.Max(firstVisibleLine - 1, 0);
-            var firstRealizedItemLeft = firstRealizedIndex  * ItemWidth - HorizontalOffset;
-            var firstRealizedItemTop = (firstRealizedIndex ) * itemHeight - _offset.Y;
+            var firstRealizedItemLeft = firstRealizedIndex * ItemWidth - HorizontalOffset;
+            var firstRealizedItemTop = (firstRealizedIndex) * itemHeight - _offset.Y;
             var firstCompleteLineTop = (firstVisibleLine == 0 ? firstRealizedItemTop : firstRealizedItemTop + ItemHeight);
             var completeRealizedLines = (int)Math.Ceiling((availableSize.Height - firstCompleteLineTop) / itemHeight);
 
-            var lastRealizedIndex = Math.Min(firstRealizedIndex + completeRealizedLines  + 2, _itemsControl.Items.Count - 1);
-
+            var lastRealizedIndex = Math.Min(firstRealizedIndex + completeRealizedLines + 2, _itemsControl.Items.Count - 1);
             return new ItemLayoutInfo(firstRealizedIndex, firstRealizedItemTop, firstRealizedItemLeft, lastRealizedIndex);
 
         }
-        
-        private ExtentInfo GetVerticalExtentInfo(Size viewPortSize)
+
+        private ExtentInfo GetExtentInfo(Size viewPortSize)
         {
             if (_itemsControl == null)
                 return new ExtentInfo();
-        
+
             var extentHeight = Math.Max(TotalItems * ItemHeight, viewPortSize.Height);
             var maxVerticalOffset = extentHeight;// extentHeight - viewPortSize.Height;
-            var verticalOffset = (StartIndex /(double) TotalItems)*maxVerticalOffset;
+            var verticalOffset = (StartIndex / (double)TotalItems) * maxVerticalOffset;
 
-            return new ExtentInfo(TotalItems, _itemsControl.Items.Count, verticalOffset, maxVerticalOffset, extentHeight);
+            //widest width
+            var extentWidth = Math.Max((TotalCharacters * CharacterWidth) + 22, viewPortSize.Width);
+
+            return new ExtentInfo(TotalItems, 
+                _itemsControl.Items.Count, 
+                verticalOffset, 
+                maxVerticalOffset, 
+                extentHeight, 
+                extentWidth);
         }
-        
+
         public void SetHorizontalOffset(double offset)
         {
             offset = Clamp(offset, 0, ExtentWidth - ViewportWidth);
 
-            if (offset<0)
+            if (offset < 0)
             {
                 _offset.X = 0;
             }
@@ -363,7 +438,7 @@ namespace TailBlazer.Controls
                 _offset = new Point(offset, _offset.Y);
 
             }
-
+            CalculateHorizonalScrollInfo();
             InvalidateScrollInfo();
             InvalidateMeasure();
         }
@@ -372,16 +447,16 @@ namespace TailBlazer.Controls
         public void SetVerticalOffset(double offset)
         {
             if (double.IsInfinity(offset)) return;
-            var diff = (int) ((offset - _extentInfo.VerticalOffset)/ItemHeight);
+            var diff = (int)((offset - _extentInfo.VerticalOffset) / ItemHeight);
 
             InvokeStartIndexCommand(diff);
-           
+
             //stop the control from losing focus on page up / down
             Observable.Timer(TimeSpan.FromMilliseconds(125))
                 .ObserveOn(Dispatcher)
                 .Subscribe(_ =>
                 {
-                    if (_itemsControl.Items.Count==0) return;
+                    if (_itemsControl.Items.Count == 0) return;
 
                     var index = diff < 0 ? 0 : _itemsControl.Items.Count - 1;
                     var generator = (ItemContainerGenerator)_itemsGenerator;
@@ -391,7 +466,7 @@ namespace TailBlazer.Controls
                 });
         }
 
-        
+
         private double Clamp(double value, double min, double max)
         {
             return Math.Min(Math.Max(value, min), max);
@@ -405,7 +480,7 @@ namespace TailBlazer.Controls
             if (_isInMeasure) return;
 
             var firstIndex = StartIndex + lines;
-            if (firstIndex<0)
+            if (firstIndex < 0)
             {
                 firstIndex = 0;
             }
@@ -428,7 +503,7 @@ namespace TailBlazer.Controls
             ScrollReceiver?.ScrollBoundsChanged(new ScrollBoundsArgs(_size, _firstIndex));
         }
 
-        private void OnOffsetChanged(ScrollDirection direction,int firstRow)
+        private void OnOffsetChanged(ScrollDirection direction, int firstRow)
         {
             ScrollReceiver?.ScrollChanged(new ScrollChangedArgs(direction, firstRow));
         }
@@ -437,9 +512,9 @@ namespace TailBlazer.Controls
         {
             if (_firstIndex == index) return;
             _firstIndex = index;
-           ReportChanges();
+            ReportChanges();
         }
- 
+        
         private void InvokeSizeCommand(int size)
         {
             if (_size == size) return;
@@ -447,15 +522,18 @@ namespace TailBlazer.Controls
             ReportChanges();
         }
 
-        public bool CanVerticallyScroll {get;set;}
-        public bool CanHorizontallyScroll {get;set;}
+        #region IScrollInfo
+
+
+        public bool CanVerticallyScroll { get; set; }
+        public bool CanHorizontallyScroll { get; set; }
         public double ExtentWidth => _extentSize.Width;
         public double ExtentHeight => _extentSize.Height;
         public double ViewportWidth => _viewportSize.Width;
         public double ViewportHeight => _viewportSize.Height;
         public double HorizontalOffset => _offset.X;
         public double VerticalOffset => _offset.Y + _extentInfo.VerticalOffset;
-        public ScrollViewer ScrollOwner {get;set;}
+        public ScrollViewer ScrollOwner { get; set; }
 
         public void LineUp()
         {
@@ -483,7 +561,7 @@ namespace TailBlazer.Controls
         public void PageUp()
         {
             SetVerticalOffset(VerticalOffset - ViewportHeight);
-         
+
         }
 
         public void PageDown()
@@ -527,6 +605,9 @@ namespace TailBlazer.Controls
         }
 
 
+        #endregion
+
+
         private struct ItemLayoutInfo
         {
             public int FirstRealizedItemIndex { get; }
@@ -543,28 +624,32 @@ namespace TailBlazer.Controls
                 LastRealizedItemIndex = lastRealizedItemIndex;
             }
         }
-
-
-
+        
         private struct ExtentInfo
         {
-             
             public int TotalCount { get; }
             public int VirtualCount { get; }
             public double VerticalOffset { get; }
             public double MaxVerticalOffset { get; }
             public double Height { get; }
 
-            public ExtentInfo(int totalCount, int virtualCount, double verticalOffset, double maxVerticalOffset, double height)
-                    :this()
+            public double Width { get; }
+
+            public ExtentInfo(int totalCount,
+                int virtualCount, 
+                double verticalOffset, 
+                double maxVerticalOffset, 
+                double height,
+                double width)
+                : this()
             {
                 TotalCount = totalCount;
                 VirtualCount = virtualCount;
                 VerticalOffset = verticalOffset;
                 MaxVerticalOffset = maxVerticalOffset;
                 Height = height;
+                Width = width;
             }
         }
     }
-
 }

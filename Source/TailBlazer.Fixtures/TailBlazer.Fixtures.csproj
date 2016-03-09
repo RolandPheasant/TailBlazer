@@ -101,6 +101,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DisplayTextFixture.cs" />
     <Compile Include="FileSearchFixture.cs" />
     <Compile Include="FileSegmentFixture.cs" />
     <Compile Include="FileSegmentUsingExtensionFixture.cs" />

@@ -127,6 +127,7 @@
     </ApplicationDefinition>
     <Compile Include="Controls\ExitIcon.cs" />
     <Compile Include="Controls\FilterIcon.cs" />
+    <Compile Include="Controls\LinesScrollPanel.cs" />
     <Compile Include="Controls\RegexIcon.cs" />
     <Compile Include="Controls\RegexMatchedIcon.cs" />
     <Compile Include="Controls\SaveLayoutIcon.cs" />
@@ -150,6 +151,7 @@
     <Compile Include="Infrastucture\MouseWheelGesture.cs" />
     <Compile Include="Infrastucture\SelectionMonitor.cs" />
     <Compile Include="Infrastucture\StartupController.cs" />
+    <Compile Include="Infrastucture\TextScrollInfo.cs" />
     <Compile Include="Infrastucture\UhandledExceptionHandler.cs" />
     <Compile Include="Infrastucture\IViewFactoryRegister.cs" />
     <Compile Include="Infrastucture\ViewFactoryService.cs" />

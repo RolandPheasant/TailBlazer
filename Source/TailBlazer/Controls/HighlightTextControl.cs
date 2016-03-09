@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,8 +17,7 @@ namespace TailBlazer.Controls
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(HighlightTextControl), new FrameworkPropertyMetadata(typeof(HighlightTextControl)));
         }
-
-
+        
         public static readonly DependencyProperty FormattedTextProperty = DependencyProperty.Register(
             "FormattedText", typeof (IEnumerable<DisplayText>), typeof (HighlightTextControl), new PropertyMetadata(default(IEnumerable<DisplayText>), UpdateControlCallBack));
 
@@ -56,11 +56,17 @@ namespace TailBlazer.Controls
         {
             base.OnApplyTemplate();
             _textBlock = (TextBlock)Template.FindName("PART_TEXT", this);
+
+            //const string sample = "The quick brown fox jumps over the lazy dog";
+            //var stringSize = this.MeasureString(sample);
+            //var widthPerChar = stringSize.Width / sample.Length;
+
+            ////6.5966
+            //Console.WriteLine(widthPerChar);
         }
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-
             _textBlock.Inlines.Clear();
             if (FormattedText == null || !FormattedText.Any())
             {
@@ -70,6 +76,7 @@ namespace TailBlazer.Controls
                 base.OnRender(drawingContext);
                 return;
             }
+
 
             var formattedText = FormattedText.AsArray();
 
@@ -82,11 +89,13 @@ namespace TailBlazer.Controls
                 {
                     _textBlock.Background = line.Hue.BackgroundBrush;
                     _textBlock.Foreground = line.Hue.ForegroundBrush;
-                    _textBlock.FontWeight = FontWeights.Bold;
+                  //  _textBlock.FontWeight = FontWeights.Bold;
                 }
             }
             else
             {
+                
+
                 _textBlock.Inlines.AddRange(formattedText.Select(ft =>
                 {
                     var run = new Run(ft.Text);

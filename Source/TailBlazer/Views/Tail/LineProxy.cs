@@ -12,6 +12,7 @@ using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
+using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Views.Tail
 {
@@ -34,14 +35,14 @@ namespace TailBlazer.Views.Tail
         public IProperty<IEnumerable<LineMatchProxy>> IndicatorMatches { get; }
         public IProperty<Visibility> ShowIndicator { get; }
         public IProperty<bool> HasSingleLine { get; }
-
-
+        
         public bool IsRecent => Line.Timestamp.HasValue && DateTime.Now.Subtract(Line.Timestamp.Value).TotalSeconds < 0.25;
 
 
         public LineProxy([NotNull] Line line, 
             [NotNull] IObservable<IEnumerable<DisplayText>> formattedText,
-            [NotNull] IObservable<LineMatchCollection> lineMatches)
+            [NotNull] IObservable<LineMatchCollection> lineMatches,
+            IObservable<TextScrollInfo> textScroll=null)
         {
        
             if (line == null) throw new ArgumentNullException(nameof(line));
@@ -55,7 +56,20 @@ namespace TailBlazer.Views.Tail
 
             var lineMatchesShared = lineMatches.Publish();
 
-            FormattedText = formattedText.ForBinding();
+            if (textScroll == null)
+            {
+
+                FormattedText = formattedText.ForBinding();
+            }
+            else
+            {
+
+                var virtualisedText = formattedText.CombineLatest(textScroll, (fmt, scroll) =>
+                {
+                    return fmt.Virtualise(scroll);
+                });
+                FormattedText = virtualisedText.ForBinding();
+            }
 
             ShowIndicator = lineMatchesShared
                     .Select(lmc => lmc.HasMatches ? Visibility.Visible: Visibility.Collapsed)
@@ -90,7 +104,6 @@ namespace TailBlazer.Views.Tail
                 HasSingleLine,
                 lineMatchesShared.Connect());
         }
-
 
 
         public int CompareTo(LineProxy other)

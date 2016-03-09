@@ -325,11 +325,16 @@
 
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <controls:VirtualScrollPanel ItemHeight="22"
+                            <controls:LinesScrollPanel ItemHeight="22"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
-                                                TotalItems="{Binding LatestCount.Value}"/>
+                                                TotalItems="{Binding Count.Value}"
+                                                HorizontalScrollChanged="{Binding HorizonalScrollChanged}"       
+                                                CharacterWidth ="6.59666666666667"
+                                                       
+                                                TotalCharacters="{Binding MaximumChars.Value, UpdateSourceTrigger=PropertyChanged}"/>
                         </ItemsPanelTemplate>
+
                     </ListBox.ItemsPanel>
 
                     <ListBox.InputBindings>
