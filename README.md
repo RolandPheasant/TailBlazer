@@ -26,25 +26,24 @@ That's better. A tail program which is pleasing to my eyes!
  - Auto tail or scroll mode
  - Filter lines to match text
  - Conditionally highlight text
+ - Highlight text in different colours
+ - Highlight rows using different images
  - Filter or highlight using regex
  - Apply multiple searches and toogle between search results
  - View search result in original position in file
  - Copy to clipboard
- - Remembers recent files
  - Handle extemely large files (I have opened a 45 Gb file)
  - Dark and light theme
-
+ - Remembers all your settings
+ 
 ## Future feature list
 
+ - Conditional Alerts
  - Automatic creation of columns
  - Pipe filter to file
  - Ability to pin a file
  - Plug in to external providers (see [#51](https://github.com/RolandPheasant/TailBlazer/issues/51))
-
-## Future feature list (Folder tail)
-
- - Find in entire folder
- - Tail entire folder
+ - Search and tail entire folder
 
 ## Feature requests and any other issues
 

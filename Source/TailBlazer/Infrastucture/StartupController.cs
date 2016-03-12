@@ -1,17 +1,12 @@
-﻿using System;
-using System.ComponentModel;
-using System.Reactive.Linq;
+﻿
+using System;
 using System.Reflection;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 using TailBlazer.Domain.FileHandling.Recent;
 using TailBlazer.Domain.FileHandling.TextAssociations;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Domain.StateHandling;
 using TailBlazer.Infrastucture.AppState;
-using TailBlazer.Views.Layout;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Recent;
 using TailBlazer.Views.Tail;
@@ -21,7 +16,8 @@ namespace TailBlazer.Infrastucture
 {
     public class StartupController
     {
-        public StartupController(IObjectProvider objectProvider,ILogger logger, IApplicationStatePublisher applicationStatePublisher)
+        public StartupController(IObjectProvider objectProvider, ILogger logger,
+            IApplicationStatePublisher applicationStatePublisher)
         {
             applicationStatePublisher.Publish(ApplicationState.Startup);
 
@@ -46,9 +42,7 @@ namespace TailBlazer.Infrastucture
             viewFactoryRegister.Register<TailViewModelFactory>();
 
 
-           logger.Info("Starting complete");
-
+            logger.Info("Starting complete");
         }
     }
-
 }

@@ -44,7 +44,6 @@ namespace TailBlazer.Views.Formatting
             var orders = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
             _order.Select((str,idx)=>new {str,idx})
-                
                 .ForEach(x=> orders[x.str] = x.idx);
 
             Hues = swatches
