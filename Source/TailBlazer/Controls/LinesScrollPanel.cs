@@ -131,7 +131,7 @@ namespace TailBlazer.Controls
             set { SetValue(ItemHeightProperty, value); }
         }
 
-        public double ItemWidth => _extentSize.Width;
+        public double ItemWidth => _viewportSize.Width;
 
         public LinesScrollPanel()
         {
@@ -158,8 +158,8 @@ namespace TailBlazer.Controls
         private static void OnCharactersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var panel = (LinesScrollPanel)d;
-            //   panel.InvalidateMeasure();
-           // panel.CalculateHorizonalScrollInfo();
+              panel.InvalidateMeasure();
+            panel.CalculateHorizonalScrollInfo();
             panel.InvalidateScrollInfo();
 
         }
@@ -201,11 +201,20 @@ namespace TailBlazer.Controls
         private void CalculateHorizonalScrollInfo()
         {
             double availableWidth = this.RenderSize.Width;
-            var startCharacter = (_offset.X / CharacterWidth);
-            var numberOfCharacters = (availableWidth - 22) / CharacterWidth;
+
+            var maxChars = availableWidth/CharacterWidth;
+            var ratioX = _offset.X/availableWidth;
+
+            var startCharacter = Math.Max(0,(int) (ratioX*maxChars));
+            var numberOfCharacters = Math.Max(100, (availableWidth - 22) / CharacterWidth);
 
             HorizontalScrollChanged?.Invoke(new TextScrollInfo((int)startCharacter, (int)numberOfCharacters + 1));
         }
+
+        //private struct HorizonalBounds
+        //{
+        //    double offsetX =  
+        //}
 
 
 
@@ -233,7 +242,7 @@ namespace TailBlazer.Controls
 
             var visualIndex = 0;
             double widestWidth = 0;
-            var currentX = layoutInfo.FirstRealizedItemLeft;
+            var currentX = 0;//layoutInfo.FirstRealizedItemLeft;
             var currentY = layoutInfo.FirstRealizedLineTop;
      
             ////1. Calc width, Call back available chars + first char
@@ -298,7 +307,7 @@ namespace TailBlazer.Controls
                 //part 3: Create the elements
                 foreach (var child in children)
                 {
-                    _childLayouts.Add(child, new Rect(currentX, currentY, Math.Max(widestWidth, _viewportSize.Width), ItemHeight));
+                    _childLayouts.Add(child, new Rect(currentX, currentY, Math.Max(_viewportSize.Width, _viewportSize.Width), ItemHeight));
                     currentY += ItemHeight;
                 }
             }
@@ -415,19 +424,22 @@ namespace TailBlazer.Controls
             var verticalOffset = (StartIndex / (double)TotalItems) * maxVerticalOffset;
 
             //widest width
-            var extentWidth = Math.Max((TotalCharacters * CharacterWidth) + 22, viewPortSize.Width);
+            var extentWidth = Math.Max((TotalCharacters * CharacterWidth), viewPortSize.Width);
+
+            var maximumChars = viewPortSize.Width / CharacterWidth;
 
             return new ExtentInfo(TotalItems, 
                 _itemsControl.Items.Count, 
                 verticalOffset, 
                 maxVerticalOffset, 
                 extentHeight, 
-                extentWidth);
+                extentWidth,
+                maximumChars);
         }
 
         public void SetHorizontalOffset(double offset)
         {
-            offset = Clamp(offset, 0, ExtentWidth - ViewportWidth);
+         //   offset = Clamp(offset, 0, ExtentWidth - ViewportWidth);
 
             if (offset < 0)
             {
@@ -531,7 +543,7 @@ namespace TailBlazer.Controls
         public double ExtentHeight => _extentSize.Height;
         public double ViewportWidth => _viewportSize.Width;
         public double ViewportHeight => _viewportSize.Height;
-        public double HorizontalOffset => _offset.X;
+        public double HorizontalOffset => _offset.X;//+ _extentInfo.VerticalOffset;
         public double VerticalOffset => _offset.Y + _extentInfo.VerticalOffset;
         public ScrollViewer ScrollOwner { get; set; }
 
@@ -627,6 +639,7 @@ namespace TailBlazer.Controls
         
         private struct ExtentInfo
         {
+
             public int TotalCount { get; }
             public int VirtualCount { get; }
             public double VerticalOffset { get; }
@@ -634,15 +647,12 @@ namespace TailBlazer.Controls
             public double Height { get; }
 
             public double Width { get; }
+            public double MaximumChars { get; }
 
-            public ExtentInfo(int totalCount,
-                int virtualCount, 
-                double verticalOffset, 
-                double maxVerticalOffset, 
-                double height,
-                double width)
+            public ExtentInfo(int totalCount, int virtualCount, double verticalOffset, double maxVerticalOffset, double height, double width, double maximumChars)
                 : this()
             {
+                MaximumChars = maximumChars;
                 TotalCount = totalCount;
                 VirtualCount = virtualCount;
                 VerticalOffset = verticalOffset;

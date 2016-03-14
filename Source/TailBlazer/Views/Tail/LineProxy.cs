@@ -19,6 +19,7 @@ namespace TailBlazer.Views.Tail
     public class LineProxy: AbstractNotifyPropertyChanged,IComparable<LineProxy>, IComparable, IEquatable<LineProxy>, IDisposable
     {
         private readonly IDisposable _cleanUp;
+        private string _text;
 
         public static readonly IComparer<LineProxy> DefaultSort = SortExpressionComparer<LineProxy>
             .Ascending(p => p.Line.LineInfo.Start)
@@ -27,7 +28,6 @@ namespace TailBlazer.Views.Tail
         public Line Line { get; }
         public long Start { get; }
         public int Index { get; }
-        public string Text => Line.Text;
         public LineKey Key { get; }
         public IProperty<IEnumerable<DisplayText>> FormattedText { get; }
         public IProperty<Brush> IndicatorColour { get; }
@@ -53,16 +53,21 @@ namespace TailBlazer.Views.Tail
             Index = line.LineInfo.Index;
             Line = line;
             Key = Line.Key;
+         
 
             var lineMatchesShared = lineMatches.Publish();
 
             if (textScroll == null)
             {
-
+                Text = line.Text;
                 FormattedText = formattedText.ForBinding();
             }
             else
             {
+                var lineScroll = textScroll.Subscribe(ts =>
+                {
+                    Text = line.Text.Virtualise(ts);
+                });
 
                 var virtualisedText = formattedText.CombineLatest(textScroll, (fmt, scroll) =>
                 {
@@ -105,6 +110,11 @@ namespace TailBlazer.Views.Tail
                 lineMatchesShared.Connect());
         }
 
+        public string Text
+        {
+            get { return _text; }
+            set { SetAndRaise(ref _text, value); }
+        }
 
         public int CompareTo(LineProxy other)
         {

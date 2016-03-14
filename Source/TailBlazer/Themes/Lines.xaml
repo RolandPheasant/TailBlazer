@@ -94,11 +94,16 @@
 
             </materialDesign:PopupBox>
 
+            <!--<TextBlock
+                    Grid.Column="1" Margin="4 0 0 0"   
+                    Text="{Binding Text,UpdateSourceTrigger=PropertyChanged}" 
+                    VerticalAlignment="Center"/>-->
+
             <controls:HighlightTextControl 
                     Grid.Column="1" Margin="4 0 0 0"   
-                    Text="{Binding Text}" 
+                    Text="{Binding Text,UpdateSourceTrigger=PropertyChanged}" 
                     VerticalAlignment="Center"
-                    FormattedText = "{Binding FormattedText.Value}"/>
+                    FormattedText = "{Binding FormattedText.Value, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
     </DataTemplate>
 

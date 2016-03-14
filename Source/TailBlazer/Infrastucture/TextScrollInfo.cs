@@ -65,6 +65,19 @@ namespace TailBlazer.Infrastucture
 
     public static class TextScrollEx
     {
+        public static string Virtualise(this string source, TextScrollInfo scroll)
+        {
+           // var items = source.AsArray();
+
+            if (scroll == null || scroll.TotalChars == 0)
+                return source;
+
+            // var list = new List<DisplayText>(items.Length);
+          // int lastIndex = scroll.FirstIndex + scroll.TotalChars;
+
+            return new String(source.Skip(scroll.FirstIndex).Take(scroll.TotalChars).ToArray());
+        }
+
         public static IEnumerable<DisplayText> Virtualise(this IEnumerable<DisplayText> source, TextScrollInfo scroll)
         {
             var items = source.AsArray();

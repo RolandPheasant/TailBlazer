@@ -18,8 +18,7 @@ namespace TailBlazer.Controls
             DefaultStyleKeyProperty.OverrideMetadata(typeof(HighlightTextControl), new FrameworkPropertyMetadata(typeof(HighlightTextControl)));
         }
         
-        public static readonly DependencyProperty FormattedTextProperty = DependencyProperty.Register(
-            "FormattedText", typeof (IEnumerable<DisplayText>), typeof (HighlightTextControl), new PropertyMetadata(default(IEnumerable<DisplayText>), UpdateControlCallBack));
+        public static readonly DependencyProperty FormattedTextProperty = DependencyProperty.Register("FormattedText", typeof (IEnumerable<DisplayText>), typeof (HighlightTextControl), new PropertyMetadata(default(IEnumerable<DisplayText>), UpdateControlCallBack));
 
         public IEnumerable<DisplayText> FormattedText
         {
@@ -27,8 +26,7 @@ namespace TailBlazer.Controls
             set { SetValue(FormattedTextProperty, value); }
         }
 
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
-            "Text", typeof (string), typeof (HighlightTextControl), new PropertyMetadata(default(string)));
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof (string), typeof (HighlightTextControl), new PropertyMetadata(default(string), UpdateControlCallBack));
 
         public string Text
         {
@@ -36,8 +34,7 @@ namespace TailBlazer.Controls
             set { SetValue(TextProperty, value); }
         }
 
-        public static readonly DependencyProperty HighlightEnabledProperty = DependencyProperty.Register(
-            "HighlightEnabled", typeof (bool), typeof (HighlightTextControl), new PropertyMetadata(true, UpdateControlCallBack));
+        public static readonly DependencyProperty HighlightEnabledProperty = DependencyProperty.Register("HighlightEnabled", typeof (bool), typeof (HighlightTextControl), new PropertyMetadata(true, UpdateControlCallBack));
 
         public bool HighlightEnabled
         {

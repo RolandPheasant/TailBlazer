@@ -16,9 +16,7 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
-                        <TextBlock  TextWrapping="NoWrap" 
-                                    TextTrimming="CharacterEllipsis"  
-                                    x:Name="PART_TEXT"/>
+                        <TextBlock  TextWrapping="NoWrap" x:Name="PART_TEXT"/>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
