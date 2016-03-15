@@ -203,10 +203,8 @@ namespace TailBlazer.Controls
         {
             if (_isInMeasure)
                 return;
-            var maxChars = extentInfo.MaximumChars;
-            var ratioX = _offset.X   / extentInfo.Width;
-            var startCharacter = Math.Max(0, (int)(ratioX * maxChars));
-           // var numberOfCharacters = Math.Min(100, (extentInfo.Width) / CharacterWidth);
+            var startCharacter = Math.Ceiling(_offset.X/CharacterWidth);
+            //Console.WriteLine("{0}/{1}. Total={2}",startCharacter, extentInfo.MaximumChars,this.TotalCharacters);
             HorizontalScrollChanged?.Invoke(new TextScrollInfo((int)startCharacter, (int)extentInfo.MaximumChars));
         }
 
