@@ -101,9 +101,9 @@
 
             <controls:HighlightTextControl 
                     Grid.Column="1" Margin="4 0 0 0"   
-                    Text="{Binding Text,UpdateSourceTrigger=PropertyChanged}" 
+                    Text="{Binding Text}" 
                     VerticalAlignment="Center"
-                    FormattedText = "{Binding FormattedText.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                    FormattedText = "{Binding FormattedText.Value}"/>
         </Grid>
     </DataTemplate>
 

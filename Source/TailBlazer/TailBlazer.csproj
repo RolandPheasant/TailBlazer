@@ -151,6 +151,7 @@
     <Compile Include="Infrastucture\MouseWheelGesture.cs" />
     <Compile Include="Infrastucture\SelectionMonitor.cs" />
     <Compile Include="Infrastucture\StartupController.cs" />
+    <Compile Include="Infrastucture\TextScrollEx.cs" />
     <Compile Include="Infrastucture\TextScrollInfo.cs" />
     <Compile Include="Infrastucture\UhandledExceptionHandler.cs" />
     <Compile Include="Infrastucture\IViewFactoryRegister.cs" />

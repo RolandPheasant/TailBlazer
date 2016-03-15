@@ -104,11 +104,11 @@ namespace TailBlazer.Views.Tail
             OpenFolderCommand = new Command(() => Process.Start(fileWatcher.Folder));
             SearchMetadataCollection = searchMetadataCollection;
             
-            var textScrollArgs = new ReplaySubject<TextScrollInfo>(1);
+            var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
             HorizonalScrollChanged = args =>
             {
-                Console.WriteLine(args);
-                textScrollArgs.OnNext(args);
+              
+                horizonalScrollArgs.OnNext(args);
             };
 
             _tailViewStateControllerFactory = tailViewStateControllerFactory;
@@ -153,9 +153,7 @@ namespace TailBlazer.Views.Tail
 
             //tailer is the main object used to tail, scroll and filter in a file
             var lineScroller = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
-
- 
-
+            
             MaximumChars = lineScroller.Lines.Connect()
                             .Maximum(l => l.Text.Length)
                             .StartWith(0)
@@ -164,7 +162,7 @@ namespace TailBlazer.Views.Tail
                             .ForBinding();
 
             //load lines into observable collection
-            var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection), new LineMatches(searchMetadataCollection), textScrollArgs);
+            var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection), new LineMatches(searchMetadataCollection), horizonalScrollArgs.DistinctUntilChanged());
 
             var loader = lineScroller.Lines.Connect()
                 .LogChanges(logger, "Received")
@@ -235,7 +233,7 @@ namespace TailBlazer.Views.Tail
                 searchInvoker,
                 MaximumChars,
                 _stateMonitor,
-                textScrollArgs.SetAsComplete(),
+                horizonalScrollArgs.SetAsComplete(),
                 _userScrollRequested.SetAsComplete());
         }
 

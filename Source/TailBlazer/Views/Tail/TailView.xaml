@@ -331,7 +331,6 @@
                                                 TotalItems="{Binding Count.Value}"
                                                 HorizontalScrollChanged="{Binding HorizonalScrollChanged}"       
                                                 CharacterWidth ="6.59666666666667"
-                                                       
                                                 TotalCharacters="{Binding MaximumChars.Value, UpdateSourceTrigger=PropertyChanged}"/>
                         </ItemsPanelTemplate>
 
