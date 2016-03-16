@@ -48,12 +48,12 @@
       <HintPath>..\packages\Dragablz.0.0.3.157\lib\net45\Dragablz.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DynamicData, Version=4.4.0.1110, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DynamicData.4.4.0.1110-beta\lib\net45\DynamicData.dll</HintPath>
+    <Reference Include="DynamicData, Version=4.5.0.1112, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DynamicData.4.5.0.1112\lib\net45\DynamicData.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DynamicData.Plinq, Version=4.4.0.1110, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DynamicData.Plinq.4.4.0.1110-beta\lib\net45\DynamicData.Plinq.dll</HintPath>
+    <Reference Include="DynamicData.Plinq, Version=4.5.0.1112, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DynamicData.Plinq.4.5.0.1112\lib\net45\DynamicData.Plinq.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
@@ -69,7 +69,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="MaterialDesignThemes.Wpf, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignThemes.1.5.0-ci496\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+      <HintPath>..\packages\MaterialDesignThemes.1.5.0-ci516\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />

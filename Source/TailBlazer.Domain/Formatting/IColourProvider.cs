@@ -9,6 +9,7 @@ namespace TailBlazer.Domain.Formatting
         IEnumerable<Hue> Hues { get; }
 
         IObservable<Hue> AccentChanged { get; }
+
         Hue DefaultAccent { get; }
 
         Optional<Hue> Lookup(HueKey key);
