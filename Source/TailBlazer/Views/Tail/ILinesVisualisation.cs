@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Input;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
+using TailBlazer.Infrastucture.Virtualisation;
 
 namespace TailBlazer.Views.Tail
 {

@@ -3,7 +3,8 @@
                     xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
                     xmlns:controls="clr-namespace:TailBlazer.Controls"
                     xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
-                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" >
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:virtualisation="clr-namespace:TailBlazer.Infrastucture.Virtualisation">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
@@ -207,7 +208,7 @@
 
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <controls:VirtualScrollPanel ItemHeight="22"
+                    <virtualisation:VirtualScrollPanel ItemHeight="22"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
                                                 TotalItems="{Binding LatestCount.Value}"/>

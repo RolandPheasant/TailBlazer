@@ -7,9 +7,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using TailBlazer.Infrastucture;
+using TailBlazer.Controls;
 
-namespace TailBlazer.Controls
+namespace TailBlazer.Infrastucture.Virtualisation
 
 
     //TODO: 1) Clamp offset.X. 
@@ -548,7 +548,6 @@ namespace TailBlazer.Controls
 
         #region IScrollInfo
 
-
         public bool CanVerticallyScroll { get; set; }
         public bool CanHorizontallyScroll { get; set; }
         public double ExtentWidth => _extentSize.Width;
@@ -564,7 +563,6 @@ namespace TailBlazer.Controls
             // InvokeStartIndexCommand(-1);
             ScrollReceiver?.ScrollDiff(-1);
         }
-
         public void LineDown()
         {
             //  InvokeStartIndexCommand(1);

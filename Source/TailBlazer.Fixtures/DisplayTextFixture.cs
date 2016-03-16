@@ -2,6 +2,7 @@
 using FluentAssertions;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Infrastucture;
+using TailBlazer.Infrastucture.Virtualisation;
 using Xunit;
 
 namespace TailBlazer.Fixtures

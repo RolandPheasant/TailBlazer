@@ -20,6 +20,7 @@ using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Domain.StateHandling;
 using TailBlazer.Infrastucture;
+using TailBlazer.Infrastucture.Virtualisation;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Searching;
 

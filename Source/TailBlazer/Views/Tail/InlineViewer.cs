@@ -13,6 +13,7 @@ using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
+using TailBlazer.Infrastucture.Virtualisation;
 
 namespace TailBlazer.Views.Tail
 {

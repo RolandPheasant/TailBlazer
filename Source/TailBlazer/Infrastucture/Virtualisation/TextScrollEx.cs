@@ -4,7 +4,7 @@ using System.Linq;
 using DynamicData.Kernel;
 using TailBlazer.Domain.Formatting;
 
-namespace TailBlazer.Infrastucture
+namespace TailBlazer.Infrastucture.Virtualisation
 {
     public static class TextScrollEx
     {

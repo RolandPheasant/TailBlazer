@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using TailBlazer.Infrastucture;
 
-namespace TailBlazer.Controls
+namespace TailBlazer.Infrastucture.Virtualisation
 {
-
-
+    
     /// <summary>
     /// This is adapted (butchered!) from VirtualWrapPanel in https://github.com/samueldjack/VirtualCollection
     /// 
