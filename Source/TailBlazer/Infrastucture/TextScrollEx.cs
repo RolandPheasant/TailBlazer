@@ -10,15 +10,10 @@ namespace TailBlazer.Infrastucture
     {
         public static string Virtualise(this string source, TextScrollInfo scroll)
         {
-            // var items = source.AsArray();
-
             if (scroll == null || scroll.TotalChars == 0)
                 return source;
 
-            // var list = new List<DisplayText>(items.Length);
-            // int lastIndex = scroll.FirstIndex + scroll.TotalChars;
-
-            return new String(source.Skip(scroll.FirstIndex).Take(scroll.TotalChars).ToArray());
+            return new string(source.Skip(scroll.FirstIndex).Take(scroll.TotalChars).ToArray());
         }
 
         public static IEnumerable<DisplayText> Virtualise(this IEnumerable<DisplayText> source, TextScrollInfo scroll)
@@ -85,12 +80,7 @@ namespace TailBlazer.Infrastucture
                 var clippedStart = Math.Max(start - StartIndex, 0);
                 int maxLength = lastIndex - StartIndex;
 
-                //int clippedLength = (lastIndex < EndIndex)
-                //    ? maxLength
-                //    : Math.Min(maxLength, Text.Length - clippedStart);
-
                 var clippedLength=  Math.Min(maxLength, Text.Length - clippedStart);
-
                 var clipped = Text.Text.Substring(clippedStart, clippedLength);
                 return new DisplayText(Text, clipped);
             }
@@ -101,10 +91,5 @@ namespace TailBlazer.Infrastucture
             }
         }
 
-        public static DisplayText Clip(this DisplayText source, int start, int length)
-        {
-            var clipped = source.Text.Substring(start, Math.Min(length, source.Text.Length));
-            return new DisplayText(source, clipped);
-        }
     }
 }

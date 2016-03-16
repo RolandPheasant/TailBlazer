@@ -52,8 +52,7 @@ namespace TailBlazer.Fixtures
             var expected = new[]
             {
                 new MatchedString("t "),
-                new MatchedString("sat "),
-                new MatchedString("on t")
+                new MatchedString("on the m"),
             }
             .Select(ms => new DisplayText(ms))
             .ToArray();

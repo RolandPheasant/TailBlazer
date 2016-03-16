@@ -197,40 +197,11 @@ namespace TailBlazer.Controls
             if (sizeInfo.WidthChanged)
                 CalculateHorizonalScrollInfo();
         }
-
-
-        private void NotifyHorizonalScroll(ExtentInfo extentInfo)
-        {
-            if (_isInMeasure)
-                return;
-            var startCharacter = Math.Ceiling(_offset.X/CharacterWidth);
-            //Console.WriteLine("{0}/{1}. Total={2}",startCharacter, extentInfo.MaximumChars,this.TotalCharacters);
-            HorizontalScrollChanged?.Invoke(new TextScrollInfo((int)startCharacter, (int)extentInfo.MaximumChars));
-        }
-
-
-        private void CalculateHorizonalScrollInfo()
-        {
-            _extentInfo = GetExtentInfo(this.RenderSize);
-
-            UpdateScrollInfo(this.RenderSize, _extentInfo);
-            EnsureScrollOffsetIsWithinConstrains(_extentInfo);
-
-            NotifyHorizonalScroll(_extentInfo);
-        }
-
-        //private struct HorizonalBounds
-        //{
-        //    double offsetX =  
-        //}
-
-
-
-        protected override Size MeasureOverride(Size availableSize)
+        
+       protected override Size MeasureOverride(Size availableSize)
         {
             if (_itemsControl == null)
             {
-
                 return new Size(double.IsInfinity(availableSize.Width) ? 0 : availableSize.Width,
                     double.IsInfinity(availableSize.Height) ? 0 : availableSize.Height);
             }
@@ -504,6 +475,21 @@ namespace TailBlazer.Controls
                 });
         }
 
+        private void NotifyHorizonalScroll(ExtentInfo extentInfo)
+        {
+            var startCharacter = Math.Ceiling(_offset.X / CharacterWidth);
+            //Console.WriteLine("{0}/{1}. Total={2}",startCharacter, extentInfo.MaximumChars,this.TotalCharacters);
+            HorizontalScrollChanged?.Invoke(new TextScrollInfo((int)startCharacter, (int)extentInfo.MaximumChars));
+        }
+        private void CalculateHorizonalScrollInfo()
+        {
+            _extentInfo = GetExtentInfo(this.RenderSize);
+
+            UpdateScrollInfo(this.RenderSize, _extentInfo);
+            EnsureScrollOffsetIsWithinConstrains(_extentInfo);
+
+            NotifyHorizonalScroll(_extentInfo);
+        }
 
         private double Clamp(double value, double min, double max)
         {
