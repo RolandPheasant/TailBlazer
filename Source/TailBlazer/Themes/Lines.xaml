@@ -102,7 +102,7 @@
 
             <controls:HighlightTextControl 
                     Grid.Column="1" Margin="4 0 0 0"   
-                    Text="{Binding Text}" 
+                    Text="{Binding PlainText.Value}" 
                     VerticalAlignment="Center"
                     FormattedText = "{Binding FormattedText.Value}"/>
         </Grid>
@@ -175,7 +175,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="FontFamily" Value="Consolas"/>
         <Setter Property="SelectionMode" Value="Extended"/>
-        <!--<Setter Property="KeyboardNavigation.TabNavigation" Value="Cycle"/>-->
+        <Setter Property="KeyboardNavigation.TabNavigation" Value="Cycle"/>
         <Setter Property="ItemContainerStyle" Value="{StaticResource LinesItemContainerStyle}"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -203,15 +203,19 @@
 
     <DataTemplate x:Key="LinesDataTemplate" DataType="{x:Type tail:ILinesVisualisation}">
         <ListBox ItemsSource="{Binding Lines}" 
+                 MinHeight="50" 
                  Style="{StaticResource LinesListBoxStyle}"
                  infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}" >
 
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <virtualisation:VirtualScrollPanel ItemHeight="22"
+                    <virtualisation:LinesScrollPanel ItemHeight="22"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
-                                                TotalItems="{Binding LatestCount.Value}"/>
+                                                TotalItems="{Binding Count.Value}"
+                                                CharacterWidth ="6.59666666666667"
+                                                HorizontalScrollChanged="{Binding HorizonalScrollChanged}"       
+                                                TotalCharacters="{Binding MaximumChars.Value, UpdateSourceTrigger=PropertyChanged}"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
 

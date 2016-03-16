@@ -1,7 +1,6 @@
 using System;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Formatting;
-using TailBlazer.Infrastucture;
 using TailBlazer.Infrastucture.Virtualisation;
 
 namespace TailBlazer.Views.Tail

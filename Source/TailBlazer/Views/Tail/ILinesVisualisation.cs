@@ -11,9 +11,10 @@ namespace TailBlazer.Views.Tail
     {
         ReadOnlyObservableCollection<LineProxy> Lines { get; }
         IProperty<int> Count { get; }
+        IProperty<int> MaximumChars { get; }
         ICommand CopyToClipboardCommand { get; }
         ISelectionMonitor SelectionMonitor { get; }
-
+        TextScrollDelegate HorizonalScrollChanged { get; }
         int PageSize { get; set; }
         int FirstIndex { get; set; }
     }

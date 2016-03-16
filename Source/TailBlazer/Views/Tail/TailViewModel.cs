@@ -108,13 +108,12 @@ namespace TailBlazer.Views.Tail
             var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
             HorizonalScrollChanged = args =>
             {
-              
                 horizonalScrollArgs.OnNext(args);
             };
 
             _tailViewStateControllerFactory = tailViewStateControllerFactory;
             
-            //Move these 2 highlight fields to a service as all view require them
+            //Move these 2 highlight fields to a service as all views require them
             UsingDarkTheme = generalOptions.Value
                     .ObserveOn(schedulerProvider.MainThread)
                     .Select(options => options.Theme== Theme.Dark)
@@ -155,10 +154,7 @@ namespace TailBlazer.Views.Tail
             //tailer is the main object used to tail, scroll and filter in a file
             var lineScroller = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
             
-            MaximumChars = lineScroller.Lines.Connect()
-                            .Maximum(l => l.Text.Length)
-                            .StartWith(0)
-                            .DistinctUntilChanged()
+            MaximumChars = lineScroller.MaximumLines()
                             .ObserveOn(schedulerProvider.MainThread)
                             .ForBinding();
 
@@ -211,7 +207,7 @@ namespace TailBlazer.Views.Tail
             //return an empty line provider unless user is viewing inline - this saves needless trips to the file
             var inline = searchInfoCollection.All.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : new EmptyLineProvider());
 
-            InlineViewer = inlineViewerFactory.Create(inline, this.WhenValueChanged(vm => vm.SelectedItem), lineProxyFactory);
+            InlineViewer = inlineViewerFactory.Create(inline, this.WhenValueChanged(vm => vm.SelectedItem), searchMetadataCollection);
 
             _cleanUp = new CompositeDisposable(lineScroller,
                 loader,
