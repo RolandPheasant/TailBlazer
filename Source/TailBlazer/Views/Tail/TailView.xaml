@@ -329,7 +329,7 @@
                             <virtualisation:LinesScrollPanel ItemHeight="22"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
-                                                TotalItems="{Binding Count.Value}"
+                                                TotalItems="{Binding LatestCount.Value}"
                                                 HorizontalScrollChanged="{Binding HorizonalScrollChanged}"       
                                                 CharacterWidth ="6.59666666666667"
                                                 TotalCharacters="{Binding MaximumChars.Value, UpdateSourceTrigger=PropertyChanged}"/>

@@ -155,7 +155,6 @@ namespace TailBlazer.Infrastucture.Virtualisation
             var panel = (LinesScrollPanel)d;
             panel.CallbackStartIndexChanged(Convert.ToInt32(e.NewValue));
             panel.InvalidateMeasure();
-            
         }
 
         private static void OnCharactersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -163,12 +162,7 @@ namespace TailBlazer.Infrastucture.Virtualisation
             var panel = (LinesScrollPanel)d;
             panel.InvalidateScrollInfo();
             panel.InvalidateMeasure();
-            //panel.CalculateHorizonalScrollInfo();
-         
-
         }
-
-
 
         private static void OnRequireMeasure(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -187,15 +181,14 @@ namespace TailBlazer.Infrastucture.Virtualisation
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
             base.OnRenderSizeChanged(sizeInfo);
-
-            if (sizeInfo.HeightChanged)
-            {
-                var items = (int)(sizeInfo.NewSize.Height / ItemHeight);
-                InvokeSizeCommand(items);
-            }
-
+            
             if (sizeInfo.WidthChanged)
                 CalculateHorizonalScrollInfo();
+
+            if (!sizeInfo.HeightChanged) return;
+
+            var items = (int)(sizeInfo.NewSize.Height / ItemHeight);
+            InvokeSizeCommand(items);
         }
         
        protected override Size MeasureOverride(Size availableSize)
