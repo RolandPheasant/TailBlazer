@@ -1,7 +1,6 @@
-﻿using TailBlazer.Domain.Formatting;
-using TailBlazer.Settings;
+﻿
 
-namespace TailBlazer.Views.Options
+namespace TailBlazer.Domain.Formatting
 {
     public class  GeneralOptions
     {

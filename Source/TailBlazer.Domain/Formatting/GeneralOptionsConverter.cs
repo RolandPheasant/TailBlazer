@@ -1,11 +1,9 @@
 using System;
 using System.Xml.Linq;
 using DynamicData.Kernel;
-using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Settings;
-using TailBlazer.Settings;
 
-namespace TailBlazer.Views.Options
+namespace TailBlazer.Domain.Formatting
 {
     public class GeneralOptionsConverter: IConverter<GeneralOptions>
     {

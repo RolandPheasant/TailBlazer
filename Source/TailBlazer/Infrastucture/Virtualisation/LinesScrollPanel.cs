@@ -457,7 +457,7 @@ namespace TailBlazer.Infrastucture.Virtualisation
         {
             var startCharacter = Math.Ceiling(_offset.X / CharacterWidth);
 
-            //clamp is required
+            //clamp when required
             if (startCharacter + extentInfo.MaximumChars > TotalCharacters)
                 startCharacter = Math.Max(0, TotalCharacters - extentInfo.MaximumChars);
             

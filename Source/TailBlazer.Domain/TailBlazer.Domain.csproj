@@ -127,6 +127,8 @@
     <Compile Include="FileHandling\TextAssociations\TextAssociationCollection.cs" />
     <Compile Include="FileHandling\TextAssociations\TextAssociationToStateConverter.cs" />
     <Compile Include="Formatting\DisplayText.cs" />
+    <Compile Include="Formatting\GeneralOptions.cs" />
+    <Compile Include="Formatting\GeneralOptionsConverter.cs" />
     <Compile Include="Formatting\Hue.cs" />
     <Compile Include="Formatting\HueKey.cs" />
     <Compile Include="Formatting\IColourProvider.cs" />
@@ -140,6 +142,8 @@
     <Compile Include="Formatting\MatchedStringEx.cs" />
     <Compile Include="Formatting\SearchMetadataEnumerator.cs" />
     <Compile Include="Formatting\TextFormatter.cs" />
+    <Compile Include="Formatting\Theme.cs" />
+    <Compile Include="Formatting\ThemeConstants.cs" />
     <Compile Include="Infrastructure\NullLogger.cs" />
     <Compile Include="Infrastructure\DynamicDataEx.cs" />
     <Compile Include="Infrastructure\EnumerableEx.cs" />

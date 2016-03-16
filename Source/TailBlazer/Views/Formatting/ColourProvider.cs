@@ -2,48 +2,36 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using DynamicData.Kernel;
 using MaterialDesignColors;
 using TailBlazer.Domain.Formatting;
+using TailBlazer.Domain.Settings;
 using Hue = TailBlazer.Domain.Formatting.Hue;
 
 namespace TailBlazer.Views.Formatting
 {
-    public class ColourProvider : IColourProvider
+
+    public class ColourProvider : IColourProvider, IDisposable
     {
+        private readonly IDisposable _cleanUp;
+
         private IDictionary<HueKey ,Hue> HueCache { get; }
 
         public IEnumerable<Hue> Hues { get; }
-        public Hue DefaultHighlight { get; }
 
-        private readonly string[] _order = {
-                                            "yellow",
-                                            "amber",
-                                            "lightgreen",
-                                            "green",
-                                            "lime",
-                                            "teal",
-                                            "cyan",
-                                            "lightblue",
-                                            "blue",
-                                            "indigo",
-                                            "orange",
-                                            "deeporange",
-                                            "pink",
-                                            "red",
-                                            "purple",
-                                            "deeppurple",
-                                        };
+        public IObservable<Hue> AccentChanged { get; }
 
-        public ColourProvider()
+        public Hue DefaultAccent { get; private set; }
+
+        public ColourProvider(ISetting<GeneralOptions> setting)
         {
-
             var swatches = new SwatchesProvider()
                 .Swatches.Where(s => s.IsAccented).ToArray();
 
             var orders = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
-            _order.Select((str,idx)=>new {str,idx})
+            ThemeConstants.Themes.Select((str,idx)=>new {str,idx})
                 
                 .ForEach(x=> orders[x.str] = x.idx);
 
@@ -57,14 +45,23 @@ namespace TailBlazer.Views.Formatting
 
             HueCache = Hues.ToDictionary(h => h.Key);
 
-            DefaultHighlight = Hues
-                .Last(s => s.Swatch.Equals("amber",StringComparison.OrdinalIgnoreCase));
-    
+            AccentChanged = setting.Value
+                .Select(options => options.Theme.GetAccentColor())
+                .Select(colour => Hues.Last(s => s.Swatch.Equals(colour, StringComparison.OrdinalIgnoreCase)))
+                .Replay(1).RefCount();
+
+            _cleanUp = AccentChanged.Subscribe(accent => DefaultAccent = accent);
+            
         }
+
 
         public Optional<Hue> Lookup(HueKey key)
         {
             return HueCache.Lookup(key);
-        }  
+        }
+        public void Dispose()
+        {
+            _cleanUp.Dispose();
+        }
     }
 }

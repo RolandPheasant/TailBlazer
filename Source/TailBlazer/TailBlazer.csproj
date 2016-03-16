@@ -163,13 +163,13 @@
     <Compile Include="Views\Formatting\IconDescription.cs" />
     <Compile Include="Views\Formatting\IIconProvider.cs" />
     <Compile Include="Views\Formatting\DefaultIconSelector.cs" />
+    <Compile Include="Views\Formatting\ThemeSetterJob.cs" />
     <Compile Include="Views\IViewFactory.cs" />
     <Compile Include="Views\Layout\ILayoutConverter.cs" />
     <Compile Include="Views\Layout\ILayoutService.cs" />
     <Compile Include="Views\Layout\LayoutService.cs" />
     <Compile Include="Views\Layout\LayoutConverter.cs" />
     <Compile Include="Views\Layout\ShellSettings.cs" />
-    <Compile Include="Views\Options\GeneralOptionsConverter.cs" />
     <Compile Include="Views\Options\GeneralOptionsView.xaml.cs">
       <DependentUpon>GeneralOptionsView.xaml</DependentUpon>
     </Compile>
@@ -190,7 +190,6 @@
       <DependentUpon>SearchOptionsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Searching\SearchOptionsViewModel.cs" />
-    <Compile Include="Views\Options\Theme.cs" />
     <Compile Include="Views\FileDrop\FileDropContainer.cs" />
     <Compile Include="Views\FileDrop\FileDropMonitor.cs" />
     <Compile Include="Views\Tail\ILinesVisualisation.cs" />
@@ -243,7 +242,6 @@
     <Compile Include="Views\Searching\SearchHintEx.cs" />
     <Compile Include="Views\Searching\SearchViewModel.cs" />
     <Compile Include="Controls\SettingsIcon.cs" />
-    <Compile Include="Views\Options\GeneralOptions.cs" />
     <Compile Include="Controls\TailBlazerIcon.cs" />
     <Compile Include="Views\Searching\SearchCollection.cs" />
     <Compile Include="Infrastucture\Virtualisation\VirtualScrollPanel.cs" />
