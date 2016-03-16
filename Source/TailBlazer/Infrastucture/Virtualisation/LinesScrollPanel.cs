@@ -388,20 +388,6 @@ namespace TailBlazer.Infrastucture.Virtualisation
 
         }
 
-        //private struct Extent
-        //{
-        //    public double Size { get;  }
-        //    public double Offset { get;  }
-        //    public double MaxOffset { get;  }
-
-        //    public Extent(double size,double offset, double maxOffset)
-        //    {
-        //        Size = size;
-        //        Offset = offset;
-        //        MaxOffset = maxOffset;
-        //    }
-        //}
-
         private ExtentInfo GetExtentInfo(Size viewPortSize)
         {
             if (_itemsControl == null)
@@ -412,7 +398,6 @@ namespace TailBlazer.Infrastucture.Virtualisation
             var verticalOffset = (StartIndex / (double)TotalItems) * maxVerticalOffset;
 
             //widest width
-           // var extentWidth = Math.Max((TotalCharacters * CharacterWidth)-22, viewPortSize.Width);
             var extentWidth = (TotalCharacters * CharacterWidth)+22;
             var maximumChars = Math.Ceiling((viewPortSize.Width)/ CharacterWidth);
             var maxHorizontalOffset = extentWidth ;
@@ -471,7 +456,11 @@ namespace TailBlazer.Infrastucture.Virtualisation
         private void NotifyHorizonalScroll(ExtentInfo extentInfo)
         {
             var startCharacter = Math.Ceiling(_offset.X / CharacterWidth);
-            //Console.WriteLine("{0}/{1}. Total={2}",startCharacter, extentInfo.MaximumChars,this.TotalCharacters);
+
+            //clamp is required
+            if (startCharacter + extentInfo.MaximumChars > TotalCharacters)
+                startCharacter = Math.Max(0, TotalCharacters - extentInfo.MaximumChars);
+            
             HorizontalScrollChanged?.Invoke(new TextScrollInfo((int)startCharacter, (int)extentInfo.MaximumChars));
         }
         private void CalculateHorizonalScrollInfo()
