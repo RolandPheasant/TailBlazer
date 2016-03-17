@@ -108,15 +108,27 @@
         </Grid>
     </DataTemplate>
 
-    <Style x:Key="LinesItemContainerStyle" TargetType="{x:Type ListBoxItem}" 
-           BasedOn="{StaticResource  MaterialDesignListBoxItem}">
+    <Style x:Key="BaseLinesItemContainerStyle" TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
         <Style.Setters>
             <Setter Property="Padding" Value="0"/>
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             <Setter Property="Height" Value="22"/>
         </Style.Setters>
+      </Style>  
 
-        <Style.Triggers>
+      <Style x:Key="LinesItemContainerStyle" TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
+        <Style.Setters>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="controls:ListboxItemHighlightAssist.BaseStyle" Value="{StaticResource BaseLinesItemContainerStyle}"/>
+            <Setter Property="controls:ListboxItemHighlightAssist.IsEnabled" Value="{Binding Path=DataContext.HighlightTail.Value, ElementName=Control}"/>
+            <Setter Property="controls:ListboxItemHighlightAssist.IsRecent" Value="{Binding Path=IsRecent}"/>
+            <Setter Property="controls:ListboxItemHighlightAssist.FromBrush" Value="{DynamicResource SecondaryAccentBrush}"/>
+            <Setter Property="controls:ListboxItemHighlightAssist.ToBrush" Value="{DynamicResource SecondaryAccentForegroundBrush}"/>
+        </Style.Setters>
+
+        <!--<Style.Triggers>
             <MultiDataTrigger >
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding Path=IsRecent}" Value="True"/>
@@ -157,7 +169,7 @@
 
                 </MultiDataTrigger.EnterActions>
             </MultiDataTrigger>
-        </Style.Triggers>
+        </Style.Triggers>-->
     </Style>
 
     <Style x:Key="LinesListBoxStyle" TargetType="{x:Type ListBox}">

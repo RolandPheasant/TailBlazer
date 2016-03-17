@@ -17,7 +17,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             return source.Lines.Connect()
-                           .Maximum(l => l.Text.Length)
+                           .Maximum(l => l.Text?.Length ?? 0)
                            .StartWith(0)
                            .DistinctUntilChanged();
         }

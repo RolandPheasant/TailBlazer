@@ -18,7 +18,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             Number = number;
             Start = number;
-            Text = text;
+            Text = text ?? string.Empty;
             Timestamp = timestamp;
             Key = new LineKey(text, number);
         }
@@ -27,7 +27,7 @@ namespace TailBlazer.Domain.FileHandling
         public Line(LineInfo lineInfo, string text, DateTime? timestamp)
         {
             LineInfo = lineInfo;
-            Text = text;
+            Text = text ?? string.Empty;
             Timestamp = timestamp;
             Number = LineInfo.Line;
             Start = LineInfo.Start;

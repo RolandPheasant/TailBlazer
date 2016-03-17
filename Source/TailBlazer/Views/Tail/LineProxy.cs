@@ -20,6 +20,7 @@ namespace TailBlazer.Views.Tail
     {
         private readonly IDisposable _cleanUp;
         private string _text;
+        private bool _isRecent;
 
         public static readonly IComparer<LineProxy> DefaultSort = SortExpressionComparer<LineProxy>
             .Ascending(p => p.Line.LineInfo.Start)
@@ -37,8 +38,7 @@ namespace TailBlazer.Views.Tail
         public IProperty<IEnumerable<LineMatchProxy>> IndicatorMatches { get; }
         public IProperty<Visibility> ShowIndicator { get; }
 
-        public bool IsRecent => Line.Timestamp.HasValue && DateTime.Now.Subtract(Line.Timestamp.Value).TotalSeconds < 0.25;
-        
+
         public LineProxy([NotNull] Line line, 
             [NotNull] IObservable<IEnumerable<DisplayText>> formattedText,
             [NotNull] IObservable<LineMatchCollection> lineMatches, 
@@ -87,6 +87,13 @@ namespace TailBlazer.Views.Tail
                         return lmc.Matches.Select(m => new LineMatchProxy(m)).ToList();
                     }).ForBinding();
 
+            if (Line.Timestamp.HasValue && DateTime.Now.Subtract(Line.Timestamp.Value).TotalSeconds < 0.25)
+            {
+                IsRecent =true;
+                Observable.Timer(TimeSpan.FromSeconds(0.25))
+                    .Subscribe(_ => IsRecent = false);
+            }
+
 
             _cleanUp = new CompositeDisposable(FormattedText, 
                 IndicatorColour,
@@ -106,6 +113,12 @@ namespace TailBlazer.Views.Tail
         public int CompareTo(object obj)
         {
             return CompareTo((LineProxy) obj);
+        }
+
+        public bool IsRecent
+        {
+            get { return _isRecent; }
+            set { SetAndRaise(ref _isRecent, value); }
         }
 
         #region Equality

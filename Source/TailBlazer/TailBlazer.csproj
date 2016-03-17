@@ -127,6 +127,7 @@
     </ApplicationDefinition>
     <Compile Include="Controls\ExitIcon.cs" />
     <Compile Include="Controls\FilterIcon.cs" />
+    <Compile Include="Controls\ListboxItemHighlightAssist.cs" />
     <Compile Include="Infrastucture\Virtualisation\LineScrollDelegate.cs" />
     <Compile Include="Infrastucture\Virtualisation\LinesScrollPanel.cs" />
     <Compile Include="Controls\RegexIcon.cs" />
