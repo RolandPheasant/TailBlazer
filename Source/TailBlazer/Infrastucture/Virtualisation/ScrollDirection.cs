@@ -1,4 +1,4 @@
-﻿namespace TailBlazer.Controls
+﻿namespace TailBlazer.Infrastucture.Virtualisation
 {
     public enum ScrollDirection
     {

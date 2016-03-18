@@ -7,6 +7,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              xmlns:formatting="clr-namespace:TailBlazer.Views.Formatting"
+             xmlns:virtualisation="clr-namespace:TailBlazer.Infrastucture.Virtualisation"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:IconSelector}">
 
@@ -84,7 +85,7 @@
 
             <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
-                    <infrastucture:VirtualizingWrapPanel ItemHeight="32" ItemWidth="32" />
+                    <virtualisation:VirtualizingWrapPanel ItemHeight="32" ItemWidth="32" />
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
             </ListBox>

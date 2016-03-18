@@ -34,19 +34,18 @@ namespace TailBlazer.Fixtures
             var template = "0123456789abcdefghijklmnopqrstuvwxyz";
             var sb = new StringBuilder();
 
-            for (int i = 0; i < 100; i++)
-            {
-                sb.Append(i);
-                sb.Append("_");
-                sb.Append(template);
-             
-            }
 
+            long x;
             for (int i = 0; i < 1000; i++)
             {
+                for (int j = 0; i < 200; i++)
+                {
+                    sb.Append(j);
+                    sb.Append("_");
+                    sb.Append(template);
+                }
 
-
-                File.AppendAllLines(fileName,new string[] {sb.ToString()});
+                File.AppendAllLines(fileName,new string[] {sb.Append(i).ToString()});
             }
         }
 

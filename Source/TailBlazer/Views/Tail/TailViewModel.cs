@@ -9,6 +9,7 @@ using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
 using DynamicData.PLinq;
+using DynamicData.Aggregation;
 using MaterialDesignThemes.Wpf;
 using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
@@ -19,6 +20,7 @@ using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Domain.StateHandling;
 using TailBlazer.Infrastucture;
+using TailBlazer.Infrastucture.Virtualisation;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Searching;
 
@@ -56,6 +58,7 @@ namespace TailBlazer.Views.Tail
         public IProperty<bool> CanViewInline { get; }
         public IProperty<bool> HighlightTail { get; }
         public IProperty<bool> UsingDarkTheme { get; }
+        public IProperty<int> MaximumChars { get; }
         public ICommand CopyToClipboardCommand { get; }
         public ICommand OpenFileCommand { get; }
         public ICommand OpenFolderCommand { get; }
@@ -101,10 +104,16 @@ namespace TailBlazer.Views.Tail
             OpenFileCommand = new Command(() => Process.Start(fileWatcher.FullName));
             OpenFolderCommand = new Command(() => Process.Start(fileWatcher.Folder));
             SearchMetadataCollection = searchMetadataCollection;
+            
+            var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
+            HorizonalScrollChanged = args =>
+            {
+                horizonalScrollArgs.OnNext(args);
+            };
 
             _tailViewStateControllerFactory = tailViewStateControllerFactory;
             
-            //Move these 2 highlight fields to a service as all view require them
+            //Move these 2 highlight fields to a service as all views require them
             UsingDarkTheme = generalOptions.Value
                     .ObserveOn(schedulerProvider.MainThread)
                     .Select(options => options.Theme== Theme.Dark)
@@ -144,9 +153,14 @@ namespace TailBlazer.Views.Tail
 
             //tailer is the main object used to tail, scroll and filter in a file
             var lineScroller = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
+            
+            MaximumChars = lineScroller.MaximumLines()
+                            .ObserveOn(schedulerProvider.MainThread)
+                            .ForBinding();
 
             //load lines into observable collection
-            var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection),new LineMatches(searchMetadataCollection));
+            var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection), new LineMatches(searchMetadataCollection), horizonalScrollArgs.DistinctUntilChanged());
+
             var loader = lineScroller.Lines.Connect()
                 .LogChanges(logger, "Received")
                 .Transform(lineProxyFactory.Create, new ParallelisationOptions(ParallelType.Ordered, 3))
@@ -175,6 +189,7 @@ namespace TailBlazer.Views.Tail
                     FirstIndex = first;
                 });
 
+
             //Create objects required for inline viewing
             var isUserDefinedChanged = SearchCollection.WhenValueChanged(sc => sc.Selected)
                 .Where(selected=> selected!=null)
@@ -192,7 +207,7 @@ namespace TailBlazer.Views.Tail
             //return an empty line provider unless user is viewing inline - this saves needless trips to the file
             var inline = searchInfoCollection.All.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : new EmptyLineProvider());
 
-            InlineViewer = inlineViewerFactory.Create(inline, this.WhenValueChanged(vm => vm.SelectedItem), lineProxyFactory);
+            InlineViewer = inlineViewerFactory.Create(inline, this.WhenValueChanged(vm => vm.SelectedItem), searchMetadataCollection);
 
             _cleanUp = new CompositeDisposable(lineScroller,
                 loader,
@@ -213,9 +228,15 @@ namespace TailBlazer.Views.Tail
                 SelectionMonitor,
                 SearchOptions,
                 searchInvoker,
+                MaximumChars,
                 _stateMonitor,
+                horizonalScrollArgs.SetAsComplete(),
                 _userScrollRequested.SetAsComplete());
         }
+
+     
+        public TextScrollDelegate HorizonalScrollChanged { get; }
+
 
         private async void OpenSearchOptions()
         {

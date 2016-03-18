@@ -1,6 +1,7 @@
-﻿using TailBlazer.Infrastucture;
+﻿using TailBlazer.Controls;
 
-namespace TailBlazer.Controls
+namespace TailBlazer.Infrastucture.Virtualisation
+
 {
     public class ScrollChangedArgs
     {

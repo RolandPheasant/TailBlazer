@@ -12,12 +12,14 @@ using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
+using TailBlazer.Infrastucture.Virtualisation;
 
 namespace TailBlazer.Views.Tail
 {
     public class LineProxy: AbstractNotifyPropertyChanged,IComparable<LineProxy>, IComparable, IEquatable<LineProxy>, IDisposable
     {
         private readonly IDisposable _cleanUp;
+        private string _text;
 
         public static readonly IComparer<LineProxy> DefaultSort = SortExpressionComparer<LineProxy>
             .Ascending(p => p.Line.LineInfo.Start)
@@ -26,36 +28,42 @@ namespace TailBlazer.Views.Tail
         public Line Line { get; }
         public long Start { get; }
         public int Index { get; }
-        public string Text => Line.Text;
         public LineKey Key { get; }
+
         public IProperty<IEnumerable<DisplayText>> FormattedText { get; }
+        public IProperty<string> PlainText { get; }
         public IProperty<Brush> IndicatorColour { get; }
         public IProperty<PackIconKind> IndicatorIcon { get; }
         public IProperty<IEnumerable<LineMatchProxy>> IndicatorMatches { get; }
         public IProperty<Visibility> ShowIndicator { get; }
-        public IProperty<bool> HasSingleLine { get; }
-
 
         public bool IsRecent => Line.Timestamp.HasValue && DateTime.Now.Subtract(Line.Timestamp.Value).TotalSeconds < 0.25;
-
-
+        
         public LineProxy([NotNull] Line line, 
             [NotNull] IObservable<IEnumerable<DisplayText>> formattedText,
-            [NotNull] IObservable<LineMatchCollection> lineMatches)
+            [NotNull] IObservable<LineMatchCollection> lineMatches, 
+            [NotNull] IObservable<TextScrollInfo> textScroll)
         {
        
             if (line == null) throw new ArgumentNullException(nameof(line));
             if (formattedText == null) throw new ArgumentNullException(nameof(formattedText));
             if (lineMatches == null) throw new ArgumentNullException(nameof(lineMatches));
+            if (textScroll == null) throw new ArgumentNullException(nameof(textScroll));
 
             Start = line.LineInfo.Start;
             Index = line.LineInfo.Index;
             Line = line;
             Key = Line.Key;
-
+         
             var lineMatchesShared = lineMatches.Publish();
 
-            FormattedText = formattedText.ForBinding();
+            PlainText = textScroll
+                        .Select(ts => line.Text.Virtualise(ts))
+                        .ForBinding(); 
+
+            FormattedText = formattedText
+                        .CombineLatest(textScroll, (fmt, scroll) => fmt.Virtualise(scroll))
+                        .ForBinding();
 
             ShowIndicator = lineMatchesShared
                     .Select(lmc => lmc.HasMatches ? Visibility.Visible: Visibility.Collapsed)
@@ -79,20 +87,17 @@ namespace TailBlazer.Views.Tail
                         return lmc.Matches.Select(m => new LineMatchProxy(m)).ToList();
                     }).ForBinding();
 
-            HasSingleLine = lineMatchesShared
-                    .Select(lmc => lmc.Count == 1).ForBinding();
 
             _cleanUp = new CompositeDisposable(FormattedText, 
                 IndicatorColour,
                 IndicatorMatches,
                 IndicatorIcon,
                 ShowIndicator,
-                HasSingleLine,
+                FormattedText,
+                PlainText,
                 lineMatchesShared.Connect());
         }
-
-
-
+        
         public int CompareTo(LineProxy other)
         {
             return DefaultSort.Compare(this, other);
@@ -124,7 +129,6 @@ namespace TailBlazer.Views.Tail
         {
             return Key.GetHashCode();
         }
-
 
         public static bool operator ==(LineProxy left, LineProxy right)
         {

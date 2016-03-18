@@ -12,6 +12,7 @@
              xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
              xmlns:fileHandling="clr-namespace:TailBlazer.Domain.FileHandling;assembly=TailBlazer.Domain"
              xmlns:converters="clr-namespace:Dragablz.Converters;assembly=Dragablz"
+             xmlns:virtualisation="clr-namespace:TailBlazer.Infrastucture.Virtualisation"
              TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
                 Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
              x:Name="Control"
@@ -318,17 +319,21 @@
                 <ListBox Margin="0 4 0 2"
                     Grid.Row="1" 
                     VerticalAlignment="Stretch"
-                        ItemsSource="{Binding Lines}" 
-                        SelectedItem="{Binding SelectedItem}"
-                        Style="{StaticResource LinesListBoxStyle}"
-                        infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}">
+                    MinHeight="50"     
+                    ItemsSource="{Binding Lines}" 
+                    SelectedItem="{Binding SelectedItem}"
+                    Style="{StaticResource LinesListBoxStyle}"
+                    infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}">
 
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <controls:VirtualScrollPanel ItemHeight="22"
+                            <virtualisation:LinesScrollPanel ItemHeight="22"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
-                                                TotalItems="{Binding LatestCount.Value}"/>
+                                                TotalItems="{Binding LatestCount.Value}"
+                                                HorizontalScrollChanged="{Binding HorizonalScrollChanged}"       
+                                                CharacterWidth ="6.59666666666667"
+                                                TotalCharacters="{Binding MaximumChars.Value, UpdateSourceTrigger=PropertyChanged}"/>
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
 

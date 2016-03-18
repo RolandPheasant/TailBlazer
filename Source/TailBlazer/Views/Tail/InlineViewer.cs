@@ -8,11 +8,12 @@ using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
 using DynamicData.PLinq;
-using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
+using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
+using TailBlazer.Infrastucture.Virtualisation;
 
 namespace TailBlazer.Views.Tail
 {
@@ -28,8 +29,9 @@ namespace TailBlazer.Views.Tail
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         public IProperty<int> Count { get; }
         public ICommand CopyToClipboardCommand { get; }
-
+        public IProperty<int> MaximumChars { get; }
         public ISelectionMonitor SelectionMonitor { get; }
+
         public InlineViewer([NotNull] InlineViewerArgs args,
             [NotNull] IClipboardHandler clipboardHandler,
             [NotNull] ISchedulerProvider schedulerProvider, 
@@ -51,10 +53,16 @@ namespace TailBlazer.Views.Tail
 
             //if use selection is null, tail the file
             var scrollSelected = selectedChanged
-                   //.CombineLatest(lineProvider, pageSize, (proxy, lp, pge) => proxy==null ? ScrollRequest.None : new ScrollRequest(pge, proxy.Start))
-                   .CombineLatest(lineProvider, pageSize, (proxy, lp, pge) => proxy == null ? new ScrollRequest(pge,0) : new ScrollRequest(pge, proxy.Start))
+                    .CombineLatest(lineProvider, pageSize, (proxy, lp, pge) => proxy == null ? new ScrollRequest(pge,0) : new ScrollRequest(pge, proxy.Start))
                     .DistinctUntilChanged();
-            
+
+
+
+            var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
+            HorizonalScrollChanged = hargs =>
+            {
+                horizonalScrollArgs.OnNext(hargs);
+            };
 
             var scrollUser = _userScrollRequested
                 .Where(x => !_isSettingScrollPosition)
@@ -64,12 +72,19 @@ namespace TailBlazer.Views.Tail
                 .ObserveOn(schedulerProvider.Background)
                 .DistinctUntilChanged();
 
+
             var lineScroller = new LineScroller(lineProvider, scroller);
             Count = lineProvider.Select(lp=>lp.Count).ForBinding();
             
+            MaximumChars = lineScroller.MaximumLines()
+                            .ObserveOn(schedulerProvider.MainThread)
+                            .ForBinding();
+
+            var proxyFactory = new LineProxyFactory(new TextFormatter(args.SearchMetadataCollection), new LineMatches(args.SearchMetadataCollection), horizonalScrollArgs.DistinctUntilChanged());
+
             //load lines into observable collection
             var loader = lineScroller.Lines.Connect()
-                .Transform(args.LineProxyFactory.Create,new ParallelisationOptions(ParallelType.Ordered,3))
+                .Transform(proxyFactory.Create,new ParallelisationOptions(ParallelType.Ordered,3))
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data)
@@ -101,10 +116,9 @@ namespace TailBlazer.Views.Tail
                         Count,
                         firstIndexMonitor,
                         SelectionMonitor,
-                        Disposable.Create(() =>
-                        {
-                            _userScrollRequested.OnCompleted();
-                        }));
+                         MaximumChars,
+                        horizonalScrollArgs.SetAsComplete(),
+                        _userScrollRequested.SetAsComplete());
         }
         
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
@@ -120,6 +134,9 @@ namespace TailBlazer.Views.Tail
         {
 
         }
+
+        public TextScrollDelegate HorizonalScrollChanged { get; }
+
 
         public void ScrollDiff(int lineChanged)
         {

@@ -1,33 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using System.Windows.Threading;
-using TailBlazer.Infrastucture;
 
-namespace TailBlazer.Controls
+namespace TailBlazer.Infrastucture.Virtualisation
 {
-    public static class MeasureEx
-    {
-        public static Size MeasureString(this Control source,  string candidate)
-        {
-            var formattedText = new FormattedText(
-                candidate,
-                CultureInfo.CurrentUICulture,
-                FlowDirection.LeftToRight,
-                new Typeface(source.FontFamily, source.FontStyle, source.FontWeight, source.FontStretch),
-                source.FontSize,
-                Brushes.Black);
-
-            return new Size(formattedText.Width, formattedText.Height);
-        }
-    }
-
+    
     /// <summary>
     /// This is adapted (butchered!) from VirtualWrapPanel in https://github.com/samueldjack/VirtualCollection
     /// 
@@ -47,7 +29,6 @@ namespace TailBlazer.Controls
 
         public static readonly DependencyProperty ItemHeightProperty =
             DependencyProperty.Register("ItemHeight", typeof(double), typeof(VirtualScrollPanel), new PropertyMetadata(1.0, OnRequireMeasure));
-
         
         private static readonly DependencyProperty VirtualItemIndexProperty =
             DependencyProperty.RegisterAttached("VirtualItemIndex", typeof(int), typeof(VirtualScrollPanel), new PropertyMetadata(-1));
@@ -60,6 +41,27 @@ namespace TailBlazer.Controls
 
         public static readonly DependencyProperty ScrollReceiverProperty = DependencyProperty.Register(
             "ScrollReceiver", typeof (IScrollReceiver), typeof (VirtualScrollPanel), new PropertyMetadata(default(IScrollReceiver)));
+
+
+        public static readonly DependencyProperty LeftPositionProperty = DependencyProperty.Register(
+            "LeftPosition", typeof (double), typeof (VirtualScrollPanel), new PropertyMetadata(default(double)));
+
+
+
+        public double LeftPosition
+        {
+            get { return (double) GetValue(LeftPositionProperty); }
+            set { SetValue(LeftPositionProperty, value); }
+        }
+
+        public static readonly DependencyProperty TextWidthProperty = DependencyProperty.Register(
+            "TextWidth", typeof (int), typeof (VirtualScrollPanel), new PropertyMetadata(default(int)));
+
+        public int TextWidth
+        {
+            get { return (int) GetValue(TextWidthProperty); }
+            set { SetValue(TextWidthProperty, value); }
+        }
 
         public IScrollReceiver ScrollReceiver
         {
@@ -179,10 +181,8 @@ namespace TailBlazer.Controls
                     bool newlyRealized;
 
                     var child = (UIElement)_itemsGenerator.GenerateNext(out newlyRealized);
-
                     if (child==null) continue;
-
-
+                    
                     children.Add(child);
 
                     SetVirtualItemIndex(child, itemIndex);
@@ -218,8 +218,7 @@ namespace TailBlazer.Controls
                 //part 2: do the measure
                 foreach (var child in children)
                 {
-
-
+                   
                     _itemsGenerator.PrepareItemContainer(child);
                     child.Measure(new Size(double.PositiveInfinity, ItemHeight));
                     widestWidth= Math.Max(widestWidth, child.DesiredSize.Width);
