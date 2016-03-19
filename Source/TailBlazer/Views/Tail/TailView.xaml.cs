@@ -12,7 +12,7 @@ namespace TailBlazer.Views.Tail
         public TailView()
         {
             InitializeComponent();
-            Loaded += (sender, e) =>
+            IsVisibleChanged += (sender, e) =>
             {
                 Dispatcher.BeginInvoke(new Action(() =>
                 {

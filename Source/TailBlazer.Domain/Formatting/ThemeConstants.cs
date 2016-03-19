@@ -2,8 +2,8 @@ namespace TailBlazer.Domain.Formatting
 {
     public static class ThemeConstants
     {
-        public const string LightThemeAccent = "deeporange";
-        public const string DarkThemeAccent = "yellow";
+        public const string LightThemeAccent = "indigo";
+        public const string DarkThemeAccent = "orange";
 
         public static readonly string[] Themes = {
             "yellow",

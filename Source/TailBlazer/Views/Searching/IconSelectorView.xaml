@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TailBlazer.Views.Searching"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              xmlns:formatting="clr-namespace:TailBlazer.Views.Formatting"
              xmlns:virtualisation="clr-namespace:TailBlazer.Infrastucture.Virtualisation"
              mc:Ignorable="d" 
@@ -23,9 +22,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Control.Resources>
-
-    <!--<DataTemplate DataType="{x:Type searching:IconSelector}">-->
-
+    
     <Grid Margin="4" Width="435" Height="325">
             <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -34,7 +31,6 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-
         <TextBlock 
                 Margin="4 8 6 0"
                 FontSize="16"
@@ -42,11 +38,9 @@
                 Text="Select a row indicator"/>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0 6 0 6">
-                <materialDesign:PackIcon Kind="Magnify" Width="22" Height="22"
+            <materialDesign:PackIcon Kind="Magnify" Width="22" Height="22"
                                          Foreground="{Binding ElementName= SearchBox, Path=BorderBrush}"
-                                         VerticalAlignment="Bottom">
-                    
-                </materialDesign:PackIcon>
+                                         VerticalAlignment="Bottom"/>
             
                 <TextBox x:Name="SearchBox"
                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
@@ -67,7 +61,6 @@
                         <materialDesign:PackIcon
                             Padding="2"
                             Kind="{Binding Type,FallbackValue={x:Static materialDesign:PackIconKind.Information}}"   
-                          
                             VerticalAlignment="Center" 
                             HorizontalAlignment="Center"/>
                     </DataTemplate>

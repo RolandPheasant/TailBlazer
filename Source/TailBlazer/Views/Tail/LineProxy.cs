@@ -19,10 +19,9 @@ namespace TailBlazer.Views.Tail
     public class LineProxy: AbstractNotifyPropertyChanged,IComparable<LineProxy>, IComparable, IEquatable<LineProxy>, IDisposable
     {
         private readonly IDisposable _cleanUp;
-        private string _text;
         private bool _isRecent;
 
-        public static readonly IComparer<LineProxy> DefaultSort = SortExpressionComparer<LineProxy>
+        private static readonly IComparer<LineProxy> DefaultSort = SortExpressionComparer<LineProxy>
             .Ascending(p => p.Line.LineInfo.Start)
             .ThenByAscending(p => p.Line.LineInfo.Offset);
 
@@ -37,7 +36,6 @@ namespace TailBlazer.Views.Tail
         public IProperty<PackIconKind> IndicatorIcon { get; }
         public IProperty<IEnumerable<LineMatchProxy>> IndicatorMatches { get; }
         public IProperty<Visibility> ShowIndicator { get; }
-
 
         public LineProxy([NotNull] Line line, 
             [NotNull] IObservable<IEnumerable<DisplayText>> formattedText,
@@ -56,13 +54,14 @@ namespace TailBlazer.Views.Tail
             Key = Line.Key;
          
             var lineMatchesShared = lineMatches.Publish();
+            var textScrollShared = textScroll.Publish();
 
-            PlainText = textScroll
+            PlainText = textScrollShared
                         .Select(ts => line.Text.Virtualise(ts))
                         .ForBinding(); 
 
             FormattedText = formattedText
-                        .CombineLatest(textScroll, (fmt, scroll) => fmt.Virtualise(scroll))
+                        .CombineLatest(textScrollShared, (fmt, scroll) => fmt.Virtualise(scroll))
                         .ForBinding();
 
             ShowIndicator = lineMatchesShared
@@ -90,7 +89,7 @@ namespace TailBlazer.Views.Tail
             if (Line.Timestamp.HasValue && DateTime.Now.Subtract(Line.Timestamp.Value).TotalSeconds < 0.25)
             {
                 IsRecent =true;
-                Observable.Timer(TimeSpan.FromSeconds(0.25))
+                Observable.Timer(TimeSpan.FromSeconds(2))
                     .Subscribe(_ => IsRecent = false);
             }
 
@@ -102,19 +101,10 @@ namespace TailBlazer.Views.Tail
                 ShowIndicator,
                 FormattedText,
                 PlainText,
-                lineMatchesShared.Connect());
+                lineMatchesShared.Connect(),
+                textScrollShared.Connect());
         }
         
-        public int CompareTo(LineProxy other)
-        {
-            return DefaultSort.Compare(this, other);
-        }
-
-        public int CompareTo(object obj)
-        {
-            return CompareTo((LineProxy) obj);
-        }
-
         public bool IsRecent
         {
             get { return _isRecent; }
@@ -151,6 +141,20 @@ namespace TailBlazer.Views.Tail
         public static bool operator !=(LineProxy left, LineProxy right)
         {
             return !Equals(left, right);
+        }
+
+        #endregion
+
+        #region Comparision
+
+        public int CompareTo(LineProxy other)
+        {
+            return DefaultSort.Compare(this, other);
+        }
+
+        public int CompareTo(object obj)
+        {
+            return CompareTo((LineProxy)obj);
         }
 
         #endregion

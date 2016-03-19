@@ -16,7 +16,7 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
-                        <TextBlock x:Name="PART_TEXT"/>
+                        <TextBlock x:Name="PART_TEXT" TextWrapping="NoWrap"/>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>

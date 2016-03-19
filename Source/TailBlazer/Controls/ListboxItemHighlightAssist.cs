@@ -1,50 +1,49 @@
 ﻿using System;
-using System.Diagnostics.Eventing.Reader;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Controls
 {
     public static class ListboxItemHighlightAssist
     {
-        public static readonly DependencyProperty FromBrushProperty = 
-            DependencyProperty.RegisterAttached("FromBrush", 
+        public static readonly DependencyProperty HighlightBackgroundBrushProperty = 
+            DependencyProperty.RegisterAttached("HighlightBackgroundBrush", 
                 typeof(Brush), 
                 typeof(ListboxItemHighlightAssist), 
                 new PropertyMetadata(default(Brush), OnPropertyChanged));
 
-        public static void SetFromBrush(ListBoxItem element, Brush value)
+        public static void SetHighlightBackgroundBrush(ListBoxItem element, Brush value)
         {
-            element.SetValue(FromBrushProperty, value);
+            element.SetValue(HighlightBackgroundBrushProperty, value);
         }
-        public static Brush GetFromBrush(ListBoxItem element)
+        public static Brush GetHighlightBackgroundBrush(ListBoxItem element)
         {
-            return (Brush)element.GetValue(FromBrushProperty);
+            return (Brush)element.GetValue(HighlightBackgroundBrushProperty);
         }
 
-        public static readonly DependencyProperty ToBrushProperty =
-        DependencyProperty.RegisterAttached("ToBrush",
+        public static readonly DependencyProperty HighlightForegroundBrushProperty =
+        DependencyProperty.RegisterAttached("HighlightForegroundBrush",
             typeof(Brush),
             typeof(ListboxItemHighlightAssist),
             new PropertyMetadata(default(Brush), OnPropertyChanged));
 
-        public static void SetToBrush(ListBoxItem element, Brush value)
+        public static void SetHighlightForegroundBrush(ListBoxItem element, Brush value)
         {
-            element.SetValue(ToBrushProperty, value);
+            element.SetValue(HighlightForegroundBrushProperty, value);
         }
-        public static Brush GetToBrush(ListBoxItem element)
+        public static Brush GetHighlightForegroundBrush(ListBoxItem element)
         {
-            return (Brush)element.GetValue(ToBrushProperty);
+            return (Brush)element.GetValue(HighlightForegroundBrushProperty);
         }
 
         public static readonly DependencyProperty IsRecentProperty = 
             DependencyProperty.RegisterAttached("IsRecent", 
                 typeof (bool), 
                 typeof (ListboxItemHighlightAssist), 
-                new PropertyMetadata(default(bool)));
+                new PropertyMetadata(default(bool), OnPropertyChanged));
 
         public static void SetIsRecent(ListBoxItem element, bool value)
         {
@@ -71,6 +70,7 @@ namespace TailBlazer.Controls
         {
             return (bool)element.GetValue(IsEnabledProperty);
         }
+        
 
         public static readonly DependencyProperty BaseStyleProperty = DependencyProperty.RegisterAttached(
             "BaseStyle", 
@@ -97,17 +97,56 @@ namespace TailBlazer.Controls
             if (!enabled || !isRecent)
                 return;
 
-            var animation = new ColorAnimation
-            {
-                From = ((SolidColorBrush) GetFromBrush(sender)).Color,
-                Duration = new Duration(TimeSpan.FromSeconds(5))
-            };
+            var foreground = GetHighlightForegroundBrush(sender);
+            var background = GetHighlightBackgroundBrush(sender);
+            if (foreground == null || background == null)
+                return;
 
-            Storyboard.SetTarget(animation, sender);
-            Storyboard.SetTargetProperty(animation, new PropertyPath("(Control.Foreground).Color"));
+            var foregroundAnimation = new ColorAnimationUsingKeyFrames
+            {
+                Duration = new Duration(TimeSpan.FromSeconds(5)),
+                AutoReverse = true
+            };
+            foregroundAnimation.KeyFrames.Add(new DiscreteColorKeyFrame(((SolidColorBrush)foreground).Color) { KeyTime = TimeSpan.FromSeconds(2) });
+            foregroundAnimation.KeyFrames.Add(new DiscreteColorKeyFrame(((SolidColorBrush)background).Color) { KeyTime = TimeSpan.FromSeconds(3) });
+            Storyboard.SetTarget(foregroundAnimation, sender);
+            Storyboard.SetTargetProperty(foregroundAnimation, new PropertyPath("(Control.Foreground).Color"));
+
+
+            var backgroundAnimation = new ColorAnimationUsingKeyFrames
+            {
+                Duration = new Duration(TimeSpan.FromSeconds(5)),
+                AutoReverse = true
+            };
+            backgroundAnimation.KeyFrames.Add(new DiscreteColorKeyFrame(((SolidColorBrush)background).Color) { KeyTime = TimeSpan.FromSeconds(0) });
+            backgroundAnimation.KeyFrames.Add(new DiscreteColorKeyFrame(((SolidColorBrush)foreground).Color) { KeyTime = TimeSpan.FromSeconds(2) });
+            Storyboard.SetTarget(backgroundAnimation, sender);
+            Storyboard.SetTargetProperty(backgroundAnimation, new PropertyPath("(Control.Background).Color"));
+
+            // //Foreground
+            // var foregroundAnimation = new ColorAnimation
+            // {
+            //     From = ((SolidColorBrush)background).Color,
+            ////     To = ((SolidColorBrush)background).Color,
+            //     Duration = new Duration(TimeSpan.FromSeconds(5))
+            // };
+            // Storyboard.SetTarget(foregroundAnimation, sender);
+            // Storyboard.SetTargetProperty(foregroundAnimation, new PropertyPath("(Control.Foreground).Color"));
+
+
+            //background
+            //var backgroundAnimation = new ColorAnimation
+            //{
+            //    From = ((SolidColorBrush)background).Color,
+            //    //   To = ((SolidColorBrush)foreground).Color,
+            //    Duration = new Duration(TimeSpan.FromSeconds(2))
+            //};
+         //   Storyboard.SetTarget(backgroundAnimation, sender);
+         //   Storyboard.SetTargetProperty(backgroundAnimation, new PropertyPath("(Control.Background).Color"));
 
             var sb = new Storyboard();
-            sb.Children.Add(animation);
+            sb.Children.Add(backgroundAnimation);
+            sb.Children.Add(foregroundAnimation);
             sb.Begin();
         }
 
