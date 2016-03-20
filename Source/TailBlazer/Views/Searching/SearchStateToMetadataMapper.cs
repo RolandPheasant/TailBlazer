@@ -1,20 +1,16 @@
 using DynamicData.Kernel;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
-using TailBlazer.Views.Formatting;
 
 namespace TailBlazer.Views.Searching
 {
     public class SearchStateToMetadataMapper : ISearchStateToMetadataMapper
     {
         private readonly IColourProvider _colourProvider;
-        private readonly IIconProvider _iconProvider;
 
-        public SearchStateToMetadataMapper(IColourProvider colourProvider,
-            IIconProvider iconProvider)
+        public SearchStateToMetadataMapper(IColourProvider colourProvider)
         {
             _colourProvider = colourProvider;
-            _iconProvider = iconProvider;
         }
 
         public SearchMetadata Map(SearchState state)

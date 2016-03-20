@@ -177,6 +177,7 @@
     <Compile Include="Views\Options\GeneralOptionsViewModel.cs" />
     <Compile Include="Views\Formatting\ColourProvider.cs" />
     <Compile Include="Views\Formatting\IconProvider.cs" />
+    <Compile Include="Views\Formatting\HueColourConverter.cs" />
     <Compile Include="Views\Searching\IconSelector.cs" />
     <Compile Include="Views\Searching\IconSelectorView.xaml.cs">
       <DependentUpon>IconSelectorView.xaml</DependentUpon>

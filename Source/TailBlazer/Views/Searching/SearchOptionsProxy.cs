@@ -1,16 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using System.Windows.Input;
-using System.Windows.Media;
 using DynamicData.Binding;
 using DynamicData.Kernel;
 using MaterialDesignThemes.Wpf;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
-using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
 using Hue = TailBlazer.Domain.Formatting.Hue;
 
@@ -34,15 +31,11 @@ namespace TailBlazer.Views.Searching
         public ICommand RemoveCommand { get; }
         public ICommand HighlightCommand { get; }
         public IEnumerable<Hue> Hues { get; }
-
         public ICommand ShowIconSelectorCommand { get; }
-
         private IconSelector IconSelector { get; }
-
         public Guid ParentId { get; }
-
-        public IProperty<Brush> Background { get; }
-        public IProperty<Brush> Foreground { get; }
+        //public IProperty<Brush> Background { get; }
+        //public IProperty<Brush> Foreground { get; }
 
         public SearchOptionsProxy([NotNull] SearchMetadata searchMetadata, 
             [NotNull] IColourProvider colourProvider, 
@@ -80,15 +73,17 @@ namespace TailBlazer.Views.Searching
             IconKind = _searchMetadata.IconKind.ParseEnum<PackIconKind>()
                             .ValueOr(() => PackIconKind.ArrowRightBold);
 
-            Foreground = this.WhenValueChanged(vm => vm.HighlightHue)
-                .Select(h => h.ForegroundBrush)
-                .ForBinding();
+         //   Hue = 
 
-            Background = this.WhenValueChanged(vm => vm.HighlightHue)
-               .Select(h => h.BackgroundBrush)
-               .ForBinding();
+            //Foreground = this.WhenValueChanged(vm => vm.HighlightHue)
+            //    .Select(h => h.ForegroundBrush)
+            //    .ForBinding();
 
-            _cleanUp = new CompositeDisposable(IconSelector,  Foreground, Background);
+            //Background = this.WhenValueChanged(vm => vm.HighlightHue)
+            //   .Select(h => h.BackgroundBrush)
+            //   .ForBinding();
+
+            _cleanUp = new CompositeDisposable(IconSelector);
         }
         
         private async void ShowIconSelector()
