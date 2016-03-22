@@ -3,6 +3,7 @@ using System;
 using System.Reflection;
 using TailBlazer.Domain.FileHandling.Recent;
 using TailBlazer.Domain.FileHandling.TextAssociations;
+using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Domain.StateHandling;
