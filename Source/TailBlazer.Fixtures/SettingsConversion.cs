@@ -29,23 +29,21 @@ namespace TailBlazer.Fixtures
         }
 
         [Fact]
-        public void GeneralOptionsDeDe()
+        public void GeneralOptionsWithCultureDeDe()
         {
-            Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE");
-
-            GeneralOptions();
+            SerializeAndDeserializeWithCulture("de-DE");
         }
 
         [Fact]
-        public void GeneralOptionsEnUs()
+        public void GeneralOptionsWithCultureEnUs()
         {
-            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
-
-            GeneralOptions();
+            SerializeAndDeserializeWithCulture("en-Us");
         }
 
-        private void GeneralOptions()
+        private void SerializeAndDeserializeWithCulture(string cultureName)
         {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo(cultureName);
+
             var original = new GeneralOptions(Theme.Dark, false,0.5,125);
             var converter = new GeneralOptionsConverter();
             var state = converter.Convert(original);
