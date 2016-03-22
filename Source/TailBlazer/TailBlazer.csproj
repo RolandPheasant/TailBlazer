@@ -69,7 +69,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="MaterialDesignThemes.Wpf, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignThemes.1.5.0-ci516\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+      <HintPath>..\packages\MaterialDesignThemes.1.5.0-ci508\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -127,7 +127,6 @@
     </ApplicationDefinition>
     <Compile Include="Controls\ExitIcon.cs" />
     <Compile Include="Controls\FilterIcon.cs" />
-    <Compile Include="Controls\ListboxItemHighlightAssist.cs" />
     <Compile Include="Infrastucture\Virtualisation\LineScrollDelegate.cs" />
     <Compile Include="Infrastucture\Virtualisation\LinesScrollPanel.cs" />
     <Compile Include="Controls\RegexIcon.cs" />
@@ -164,20 +163,19 @@
     <Compile Include="Views\Formatting\IconDescription.cs" />
     <Compile Include="Views\Formatting\IIconProvider.cs" />
     <Compile Include="Views\Formatting\DefaultIconSelector.cs" />
-    <Compile Include="Views\Formatting\ThemeSetterJob.cs" />
     <Compile Include="Views\IViewFactory.cs" />
     <Compile Include="Views\Layout\ILayoutConverter.cs" />
     <Compile Include="Views\Layout\ILayoutService.cs" />
     <Compile Include="Views\Layout\LayoutService.cs" />
     <Compile Include="Views\Layout\LayoutConverter.cs" />
     <Compile Include="Views\Layout\ShellSettings.cs" />
+    <Compile Include="Views\Options\GeneralOptionsConverter.cs" />
     <Compile Include="Views\Options\GeneralOptionsView.xaml.cs">
       <DependentUpon>GeneralOptionsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Options\GeneralOptionsViewModel.cs" />
     <Compile Include="Views\Formatting\ColourProvider.cs" />
     <Compile Include="Views\Formatting\IconProvider.cs" />
-    <Compile Include="Views\Formatting\HueColourConverter.cs" />
     <Compile Include="Views\Searching\IconSelector.cs" />
     <Compile Include="Views\Searching\IconSelectorView.xaml.cs">
       <DependentUpon>IconSelectorView.xaml</DependentUpon>
@@ -192,6 +190,7 @@
       <DependentUpon>SearchOptionsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Searching\SearchOptionsViewModel.cs" />
+    <Compile Include="Views\Options\Theme.cs" />
     <Compile Include="Views\FileDrop\FileDropContainer.cs" />
     <Compile Include="Views\FileDrop\FileDropMonitor.cs" />
     <Compile Include="Views\Tail\ILinesVisualisation.cs" />
@@ -244,6 +243,7 @@
     <Compile Include="Views\Searching\SearchHintEx.cs" />
     <Compile Include="Views\Searching\SearchViewModel.cs" />
     <Compile Include="Controls\SettingsIcon.cs" />
+    <Compile Include="Views\Options\GeneralOptions.cs" />
     <Compile Include="Controls\TailBlazerIcon.cs" />
     <Compile Include="Views\Searching\SearchCollection.cs" />
     <Compile Include="Infrastucture\Virtualisation\VirtualScrollPanel.cs" />
