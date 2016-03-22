@@ -102,47 +102,14 @@ namespace TailBlazer.Controls
             if (foreground == null || background == null)
                 return;
 
-            //var foregroundAnimation = new ColorAnimationUsingKeyFrames
-            //{
-            //    Duration = new Duration(TimeSpan.FromSeconds(5)),
-            //    AutoReverse = true
-            //};
-            //foregroundAnimation.KeyFrames.Add(new DiscreteColorKeyFrame(((SolidColorBrush)foreground).Color) { KeyTime = TimeSpan.FromSeconds(2) });
-            //foregroundAnimation.KeyFrames.Add(new DiscreteColorKeyFrame(((SolidColorBrush)background).Color) { KeyTime = TimeSpan.FromSeconds(3) });
-            //Storyboard.SetTarget(foregroundAnimation, sender);
-            //Storyboard.SetTargetProperty(foregroundAnimation, new PropertyPath("(Control.Foreground).Color"));
-
-
-            //var backgroundAnimation = new ColorAnimationUsingKeyFrames
-            //{
-            //    Duration = new Duration(TimeSpan.FromSeconds(5)),
-            //    AutoReverse = true
-            //};
-            //backgroundAnimation.KeyFrames.Add(new DiscreteColorKeyFrame(((SolidColorBrush)background).Color) { KeyTime = TimeSpan.FromSeconds(0) });
-            //backgroundAnimation.KeyFrames.Add(new DiscreteColorKeyFrame(((SolidColorBrush)foreground).Color) { KeyTime = TimeSpan.FromSeconds(2) });
-            //Storyboard.SetTarget(backgroundAnimation, sender);
-            //Storyboard.SetTargetProperty(backgroundAnimation, new PropertyPath("(Control.Background).Color"));
-
             //Foreground
             var foregroundAnimation = new ColorAnimation
             {
                 From = ((SolidColorBrush)background).Color,
-                //     To = ((SolidColorBrush)background).Color,
                 Duration = new Duration(TimeSpan.FromSeconds(5))
             };
             Storyboard.SetTarget(foregroundAnimation, sender);
             Storyboard.SetTargetProperty(foregroundAnimation, new PropertyPath("(Control.Foreground).Color"));
-
-
-            //background
-            //var backgroundAnimation = new ColorAnimation
-            //{
-            //    From = ((SolidColorBrush)background).Color,
-            //    //   To = ((SolidColorBrush)foreground).Color,
-            //    Duration = new Duration(TimeSpan.FromSeconds(2))
-            //};
-            //   Storyboard.SetTarget(backgroundAnimation, sender);
-            //   Storyboard.SetTargetProperty(backgroundAnimation, new PropertyPath("(Control.Background).Color"));
 
             var sb = new Storyboard();
           //  sb.Children.Add(backgroundAnimation);

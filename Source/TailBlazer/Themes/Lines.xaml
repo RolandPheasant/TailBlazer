@@ -96,11 +96,6 @@
 
             </materialDesign:PopupBox>
 
-            <!--<TextBlock
-                    Grid.Column="1" Margin="4 0 0 0"   
-                    Text="{Binding Text,UpdateSourceTrigger=PropertyChanged}" 
-                    VerticalAlignment="Center"/>-->
-
             <controls:HighlightTextControl 
                     Grid.Column="1" Margin="4 0 0 0"   
                     Text="{Binding PlainText.Value}" 
@@ -134,69 +129,10 @@
             <Setter Property="controls:ListboxItemHighlightAssist.BaseStyle" Value="{StaticResource BaseLinesItemContainerStyle}"/>
             <Setter Property="controls:ListboxItemHighlightAssist.IsEnabled" Value="{Binding Path=DataContext.HighlightTail.Value, ElementName=Control}"/>
             <Setter Property="controls:ListboxItemHighlightAssist.IsRecent" Value="{Binding Path=IsRecent}"/>
-
             <Setter Property="controls:ListboxItemHighlightAssist.HighlightForegroundBrush" Value="{DynamicResource SecondaryAccentForegroundBrush}"/>
             <Setter Property="controls:ListboxItemHighlightAssist.HighlightBackgroundBrush" Value="{DynamicResource SecondaryAccentBrush}"/>
-          
+
         </Style.Setters>
-
-        <Style.Triggers>
-            <!--<DataTrigger Binding="{Binding IsRecent}" Value="{x:Static system:Boolean.TrueString}">
-                <Setter Property="Background" Value="{DynamicResource SecondaryAccentBrush}"/>
-                <Setter Property="Foreground"  Value="{DynamicResource SecondaryAccentForegroundBrush}"/>
-            </DataTrigger>-->
-
-            <MultiDataTrigger >
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Path=IsRecent}" Value="{x:Static system:Boolean.TrueString}"/>
-                    <Condition Binding="{Binding Path=DataContext.HighlightTail.Value, ElementName=Control}" Value="True"/>
- 
-                </MultiDataTrigger.Conditions>
-
-                <!--<MultiDataTrigger.Setters>
-                    <Setter Property="Background" Value="{DynamicResource SecondaryAccentBrush}"/>
-                    <Setter Property="Foreground"  Value="{DynamicResource SecondaryAccentForegroundBrush}"/>
-                </MultiDataTrigger.Setters>-->
-
-                <!--<MultiDataTrigger.EnterActions>
-                    <BeginStoryboard>
-                        <Storyboard>
-                            <Storyboard  Duration="0:0:2" >
-                                <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(ListBoxItem.Background).(SolidColorBrush.Color)"
-                                      Storyboard.TargetName="TitleTextBlock"
-                                      AutoReverse="True">
-                                    <ColorAnimationUsingKeyFrames.KeyFrames>
-                                        <DiscreteColorKeyFrame KeyTime="0:0:0" Value="{DynamicResource SecondaryAccentBrush}"/>
-                                        <DiscreteColorKeyFrame KeyTime="0:0:1" Value="Black"/>
-                                    </ColorAnimationUsingKeyFrames.KeyFrames>
-                                </ColorAnimationUsingKeyFrames>
-
-                                <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
-                                      Storyboard.TargetName="TitleTextBlock"
-                                      AutoReverse="True">
-                                    <ColorAnimationUsingKeyFrames.KeyFrames>
-                                        <DiscreteColorKeyFrame KeyTime="0:0:0" Value="Black"/>
-                                        <DiscreteColorKeyFrame KeyTime="0:0:1" Value="White"/>
-                                        <DiscreteColorKeyFrame KeyTime="0:0:2" Value="Black"/>
-                                        <DiscreteColorKeyFrame KeyTime="0:0:3" Value="White"/>
-                                        <DiscreteColorKeyFrame KeyTime="0:0:4" Value="Black"/>
-                                    </ColorAnimationUsingKeyFrames.KeyFrames>
-                                </ColorAnimationUsingKeyFrames>
-                            </Storyboard>
-
-                            <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Background).(SolidColorBrush.Color)" 
-                                                                               FromBrush="{StaticResource SecondaryAccentBrush}" 
-                                                                               Duration="0:0:5"/>
-                            <infrastucture:SolidColorAnimation Storyboard.TargetProperty="(ListBoxItem.Foreground).(SolidColorBrush.Color)" 
-                                                                               ToBrush="{StaticResource SecondaryAccentForegroundBrush}" 
-                                                                               Duration="0:0:5"/>
-                        </Storyboard>
-                    </BeginStoryboard>
-
-                </MultiDataTrigger.EnterActions>-->
-            </MultiDataTrigger>
-        </Style.Triggers>
-
     </Style>
 
     <Style x:Key="LinesListBoxStyle" TargetType="{x:Type ListBox}">

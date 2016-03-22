@@ -274,7 +274,7 @@ namespace TailBlazer.Infrastucture
                                 _lastSelected = lineProxy;
                                 innerList.Add(lineProxy);
                             }
-                            args.Handled = true;
+                              args.Handled = true;
                             return;
                         }
 
