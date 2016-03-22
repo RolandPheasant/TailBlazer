@@ -108,14 +108,19 @@ namespace TailBlazer.Controls
                 var line = formattedText[0];
                 _textBlock.Text = line.Text;
 
-                if (line.Highlight && HighlightEnabled)
-                {
-                    //_textBlock.Background = line.Hue.BackgroundBrush;
-                    //_textBlock.Foreground = line.Hue.ForegroundBrush;
-
-                    _textBlock.Background = this.HighlightBackgroundBrush;
-                    _textBlock.Foreground = this.HighlightForegroundBrush;
-                }
+                //if (line.Highlight && HighlightEnabled)
+                //{
+                //    if (line.Hue == Hue.NotSpecified)
+                //    {
+                //        _textBlock.Background = this.HighlightBackgroundBrush;
+                //        _textBlock.Foreground = this.HighlightForegroundBrush;
+                //    }
+                //    else
+                //    {
+                //        _textBlock.Background = line.Hue.BackgroundBrush;
+                //        _textBlock.Foreground = line.Hue.ForegroundBrush;
+                //    }
+                //}
             }
             else
             {
@@ -125,11 +130,17 @@ namespace TailBlazer.Controls
 
                     if (ft.Highlight && HighlightEnabled)
                     {
-                        //run.Background = ft.Hue.BackgroundBrush;
-                        //run.Foreground = ft.Hue.ForegroundBrush;
 
-                        run.Background = HighlightBackgroundBrush;
-                        run.Foreground = HighlightForegroundBrush;
+                        if (ft.Hue == Hue.NotSpecified)
+                        {
+                            run.Background = this.HighlightBackgroundBrush;
+                            run.Foreground = this.HighlightForegroundBrush;
+                        }
+                        else
+                        {
+                            run.Background = ft.Hue.BackgroundBrush;
+                            run.Foreground = ft.Hue.ForegroundBrush;
+                        }
 
                     }
                     return run;

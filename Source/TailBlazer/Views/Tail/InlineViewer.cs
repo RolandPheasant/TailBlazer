@@ -36,12 +36,14 @@ namespace TailBlazer.Views.Tail
             [NotNull] IClipboardHandler clipboardHandler,
             [NotNull] ISchedulerProvider schedulerProvider, 
             [NotNull] ISelectionMonitor selectionMonitor,
-            [NotNull] ILogger logger)
+            [NotNull] ILogger logger, 
+            [NotNull] IThemeProvider themeProvider)
         {
             if (args == null) throw new ArgumentNullException(nameof(args));
             if (clipboardHandler == null) throw new ArgumentNullException(nameof(clipboardHandler));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (selectionMonitor == null) throw new ArgumentNullException(nameof(selectionMonitor));
+            if (themeProvider == null) throw new ArgumentNullException(nameof(themeProvider));
             SelectionMonitor = selectionMonitor;
             CopyToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
 
@@ -80,7 +82,7 @@ namespace TailBlazer.Views.Tail
                             .ObserveOn(schedulerProvider.MainThread)
                             .ForBinding();
 
-            var proxyFactory = new LineProxyFactory(new TextFormatter(args.SearchMetadataCollection), new LineMatches(args.SearchMetadataCollection), horizonalScrollArgs.DistinctUntilChanged());
+            var proxyFactory = new LineProxyFactory(new TextFormatter(args.SearchMetadataCollection), new LineMatches(args.SearchMetadataCollection), horizonalScrollArgs.DistinctUntilChanged(), themeProvider);
 
             //load lines into observable collection
             var loader = lineScroller.Lines.Connect()

@@ -40,13 +40,15 @@ namespace TailBlazer.Views.Tail
         public LineProxy([NotNull] Line line, 
             [NotNull] IObservable<IEnumerable<DisplayText>> formattedText,
             [NotNull] IObservable<LineMatchCollection> lineMatches, 
-            [NotNull] IObservable<TextScrollInfo> textScroll)
+            [NotNull] IObservable<TextScrollInfo> textScroll, 
+            [NotNull] IThemeProvider themeProvider)
         {
        
             if (line == null) throw new ArgumentNullException(nameof(line));
             if (formattedText == null) throw new ArgumentNullException(nameof(formattedText));
             if (lineMatches == null) throw new ArgumentNullException(nameof(lineMatches));
             if (textScroll == null) throw new ArgumentNullException(nameof(textScroll));
+            if (themeProvider == null) throw new ArgumentNullException(nameof(themeProvider));
 
             Start = line.LineInfo.Start;
             Index = line.LineInfo.Index;
@@ -68,8 +70,12 @@ namespace TailBlazer.Views.Tail
                     .Select(lmc => lmc.HasMatches ? Visibility.Visible: Visibility.Collapsed)
                     .ForBinding();
             
-            IndicatorColour = lineMatchesShared
-                                .Select(lmc => lmc.FirstMatch?.Hue?.BackgroundBrush)
+            IndicatorColour = lineMatchesShared.Select(lmc => lmc.FirstMatch?.Hue)
+                                    .CombineLatest(themeProvider.Accent, (user, system) =>
+                                    {
+                                        if (user == null) return null;
+                                        return user == Hue.NotSpecified ? system.BackgroundBrush : user.BackgroundBrush;
+                                    })
                                 .ForBinding();
 
             IndicatorIcon = lineMatchesShared
@@ -83,7 +89,7 @@ namespace TailBlazer.Views.Tail
             IndicatorMatches = lineMatchesShared
                     .Select(lmc =>
                     {
-                        return lmc.Matches.Select(m => new LineMatchProxy(m)).ToList();
+                        return lmc.Matches.Select(m => new LineMatchProxy(m, themeProvider)).ToList();
                     }).ForBinding();
 
             if (Line.Timestamp.HasValue && DateTime.Now.Subtract(Line.Timestamp.Value).TotalSeconds < 0.25)

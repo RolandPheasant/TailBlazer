@@ -77,7 +77,8 @@ namespace TailBlazer.Views.Tail
             [NotNull] SearchOptionsViewModel searchOptionsViewModel,
             [NotNull] ITailViewStateRestorer restorer,
             [NotNull] SearchHints searchHints,
-            [NotNull] ITailViewStateControllerFactory tailViewStateControllerFactory)
+            [NotNull] ITailViewStateControllerFactory tailViewStateControllerFactory,
+            [NotNull] IThemeProvider themeProvider)
         {
          
             if (logger == null) throw new ArgumentNullException(nameof(logger));
@@ -92,6 +93,7 @@ namespace TailBlazer.Views.Tail
             if (stateBucketService == null) throw new ArgumentNullException(nameof(stateBucketService));
             if (searchOptionsViewModel == null) throw new ArgumentNullException(nameof(searchOptionsViewModel));
             if (searchHints == null) throw new ArgumentNullException(nameof(searchHints));
+            if (themeProvider == null) throw new ArgumentNullException(nameof(themeProvider));
 
             Name = fileWatcher.FullName;
             SelectionMonitor = selectionMonitor;
@@ -157,7 +159,7 @@ namespace TailBlazer.Views.Tail
                             .ForBinding();
 
             //load lines into observable collection
-            var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection), new LineMatches(searchMetadataCollection), horizonalScrollArgs.DistinctUntilChanged());
+            var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection), new LineMatches(searchMetadataCollection), horizonalScrollArgs.DistinctUntilChanged(), themeProvider);
 
             var loader = lineScroller.Lines.Connect()
                 .LogChanges(logger, "Received")

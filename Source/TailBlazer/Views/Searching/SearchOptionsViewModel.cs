@@ -13,7 +13,6 @@ using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Views.Formatting;
 
-
 namespace TailBlazer.Views.Searching
 {
     public class SearchOptionsViewModel : AbstractNotifyPropertyChanged, IDisposable
@@ -31,7 +30,8 @@ namespace TailBlazer.Views.Searching
             IColourProvider colourProvider,
             IIconProvider iconsProvider,
             ITextAssociationCollection textAssociationCollection,
-            SearchHints searchHints)
+            SearchHints searchHints,
+            IThemeProvider themeProvider)
         {
             SearchHints = searchHints;
 
@@ -41,6 +41,7 @@ namespace TailBlazer.Views.Searching
                 {
                     return new SearchOptionsProxy(meta,
                         colourProvider,
+                        themeProvider,
                         new IconSelector(iconsProvider, schedulerProvider),
                         m => metadataCollection.Remove(m.SearchText),
                         iconsProvider.DefaultIconSelector,

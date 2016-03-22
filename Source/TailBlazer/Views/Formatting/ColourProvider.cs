@@ -13,21 +13,25 @@ namespace TailBlazer.Views.Formatting
     {
         private IDictionary<HueKey ,Hue> HueCache { get; }
 
+        private IDictionary<string, Swatch> Swatches { get; }
+
         public IEnumerable<Hue> Hues { get; }
 
         public Hue DefaultAccent => Hue.NotSpecified;
 
         public ColourProvider()
         {
-            var swatches = new SwatchesProvider()
-                .Swatches.Where(s => s.IsAccented).ToArray();
+            var swatches = new SwatchesProvider().Swatches.AsArray();
 
+            Swatches = swatches.ToDictionary(s => s.Name);
+
+            var accents = swatches.Where(s => s.IsAccented).ToArray();
             var orders = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
             ThemeConstants.Themes.Select((str,idx)=>new {str,idx})
                 .ForEach(x=> orders[x.str] = x.idx);
 
-            Hues = swatches
+            Hues = accents
                         .OrderBy(x => orders.Lookup(x.Name).ValueOr(() => 100))
                         .SelectMany(swatch =>
                         {
@@ -42,6 +46,15 @@ namespace TailBlazer.Views.Formatting
         public Optional<Hue> Lookup(HueKey key)
         {
             return HueCache.Lookup(key);
+        }
+
+        public Hue GetAccent(Theme theme)
+        {
+            var colour = theme.GetAccentColor();
+            var swatch = Swatches.Lookup(colour);
+
+            return swatch.Convert(s=> new Hue(s.Name, s.AccentExemplarHue.Name, s.AccentExemplarHue.Foreground, s.AccentExemplarHue.Color))
+                        .ValueOrThrow(()=> new ArgumentOutOfRangeException(colour.ToString()));
         }
 
     }

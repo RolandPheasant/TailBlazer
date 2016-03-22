@@ -22,6 +22,7 @@ namespace TailBlazer.Views.Tail
         private readonly IIconProvider _iconProvider;
         private readonly ITailViewStateControllerFactory _tailViewStateControllerFactory;
         private readonly ITextAssociationCollection _textAssociationCollection;
+        private readonly IThemeProvider _themeProvider;
 
         public TailViewModelFactory([NotNull] IObjectProvider objectProvider,
             [NotNull] ISchedulerProvider schedulerProvider, 
@@ -29,7 +30,8 @@ namespace TailBlazer.Views.Tail
             [NotNull] ISearchMetadataFactory searchMetadataFactory, 
             [NotNull] IIconProvider iconProvider,
             [NotNull] ITailViewStateControllerFactory tailViewStateControllerFactory,
-            [NotNull] ITextAssociationCollection textAssociationCollection) 
+            [NotNull] ITextAssociationCollection textAssociationCollection,
+           [NotNull]  IThemeProvider themeProvider) 
         {
             if (objectProvider == null) throw new ArgumentNullException(nameof(objectProvider));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
@@ -46,6 +48,7 @@ namespace TailBlazer.Views.Tail
             _iconProvider = iconProvider;
             _tailViewStateControllerFactory = tailViewStateControllerFactory;
             _textAssociationCollection = textAssociationCollection;
+            _themeProvider = themeProvider;
         }
         
         public HeaderedView Create(ViewState state)
@@ -80,7 +83,7 @@ namespace TailBlazer.Views.Tail
             
             var searchMetadataCollection = _objectProvider.Get<ISearchMetadataCollection>();
             var searchHints = _objectProvider.Get<SearchHints>();
-            var searchOptionsViewModel = new SearchOptionsViewModel(searchMetadataCollection, _searchMetadataFactory, _schedulerProvider, _colourProvider, _iconProvider, _textAssociationCollection, searchHints);
+            var searchOptionsViewModel = new SearchOptionsViewModel(searchMetadataCollection, _searchMetadataFactory, _schedulerProvider, _colourProvider, _iconProvider, _textAssociationCollection, searchHints, _themeProvider);
             
             var searchInfo = _objectProvider.Get<ISearchInfoCollection>
                 (

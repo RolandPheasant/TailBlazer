@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using DynamicData.Kernel;
 
@@ -11,5 +10,7 @@ namespace TailBlazer.Domain.Formatting
         Hue DefaultAccent { get; }
 
         Optional<Hue> Lookup(HueKey key);
+
+        Hue GetAccent(Theme theme);
     }
 }

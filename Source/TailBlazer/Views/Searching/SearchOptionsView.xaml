@@ -6,7 +6,7 @@
              xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
              xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
-             xmlns:formatting="clr-namespace:TailBlazer.Views.Formatting"
+             xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              mc:Ignorable="d" 
 
              d:DataContext="{d:DesignInstance searching:SearchOptionsViewModel}"
@@ -26,13 +26,6 @@
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Dragable.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <formatting:HueConverter x:Key="ForegroundConverter" Target="Foreground"/>
-            <formatting:HueConverter x:Key="BackgroundConverter" Target="Background"/>
-            
-            <!--<formatting:HueColourConverter x:Key="HueConverter" 
-                                           DefaultBackgroundBrush="{DynamicResource SecondaryAccentBrush}"
-                                           DefaultForegroundBrush="{DynamicResource SecondaryAccentForegroundBrush}"/>-->
-            
             <DataTemplate DataType="{x:Type searching:SearchOptionsProxy}">
 
                 <Grid Margin="4 4 4 4" x:Name="Row">
@@ -56,18 +49,17 @@
                                         HorizontalAlignment="Left"
                                         SnapsToDevicePixels="True"
                                         UseLayoutRounding="True"
-                            
+                                        wpf:ShadowAssist.ShadowDepth="Depth2"
                                         VerticalAlignment="Center">
-                            <wpf:PackIcon  
+                        <wpf:PackIcon  
                                         Padding="4" 
-                                        Background="{Binding HighlightHue, Converter={StaticResource BackgroundConverter}}"/>
+                                        Foreground="{Binding Background.Value}"
+                                        Kind="{Binding IconKind,FallbackValue={x:Static wpf:PackIconKind.ArrowRightBold}}"/>
                     </Button>
-                    <!--Foreground="{Binding HighlightHue, Converter={StaticResource HueConverter},ConverterParameter={x:Static formatting:HueBrushTarget.Foreground}}"
-                                       Background="{Binding HighlightHue, Converter={StaticResource HueConverter},ConverterParameter={x:Static formatting:HueBrushTarget.Background}}"-->
+
                     <TextBlock Padding="2" Margin="6 0 0 0" x:Name="Label" Grid.Column="1" 
-                         
-                                        Foreground="{Binding HighlightHue, Converter={StaticResource ForegroundConverter}}"
-                                        Background="{Binding HighlightHue, Converter={StaticResource Ba}}"
+                                       Foreground="{Binding Foreground.Value}"
+                                       Background="{Binding Background.Value}"
                                        Text="{Binding Text}"
                                         VerticalAlignment="Center"/>
 
@@ -79,13 +71,7 @@
                         <wpf:PopupBox.ToggleContent>
                             <wpf:PackIcon Kind="FormatPaint" 
                                             Margin="4 0 4 0" Width="14" Height="14"
-                                             Background="{Binding HighlightHue, Converter={StaticResource BackgroundConverter}}"  >
-
-                                <!--<wpf:PackIcon.Background>
-                                     Background="{Binding HighlightHue, Converter={StaticResource BackgroundConverter}}"
-                                </wpf:PackIcon.Background>-->
-                                
-                            </wpf:PackIcon>
+                                            Foreground="{Binding Background.Value}" />
                         </wpf:PopupBox.ToggleContent>
 
                         <ItemsControl ItemsSource="{Binding Hues}" 
@@ -99,7 +85,7 @@
                                                         BorderThickness="0"
                                                         SnapsToDevicePixels="True"
                                                         UseLayoutRounding="True"
-                                                        wpf:ShadowAssist.ShadowDepth="Depth2"
+                                                        ToolTip="{Binding}"
                                                         Command="{Binding ElementName=Row,Path=DataContext.HighlightCommand}"
                                                         CommandParameter="{Binding}"
                                                         Margin="2">
@@ -150,14 +136,14 @@
 
     <wpf:DialogHost Identifier="{Binding Id}">
         <Grid Width="435" Height="325">
-        <Grid.RowDefinitions>
-            <RowDefinition  Height="Auto"/>
-            <RowDefinition  Height="Auto"/>
-            <RowDefinition Height="*"/>
-             <RowDefinition  Height="Auto"/>
+            <Grid.RowDefinitions>
+                <RowDefinition  Height="Auto"/>
+                <RowDefinition  Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition  Height="Auto"/>
             </Grid.RowDefinitions>
-        
-        <TextBlock 
+
+            <TextBlock 
                 Margin="6 8 6 0"
                 FontSize="16"
                 FontWeight="DemiBold"
@@ -171,12 +157,12 @@
 
 
                 <ToggleButton
-                            VerticalAlignment="Bottom" 
-                            Margin="2 0 0 0"
-                            Padding="2"
-                            Width="32" 
-                            Height="32" 
-                            IsChecked="{Binding SearchHints.UseRegex}">
+                                   VerticalAlignment="Bottom" 
+                                   Margin="2 0 0 0"
+                                   Padding="2"
+                                   Width="32" 
+                                   Height="32" 
+                                   IsChecked="{Binding SearchHints.UseRegex}">
 
                     <ToggleButton.Style>
                         <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource  SearchToggleStyle}">
@@ -222,8 +208,8 @@
                 Style="{DynamicResource MaterialDesignFlatButton}"
                 Content="Close"     
                 Command="{x:Static wpf:DialogHost.CloseDialogCommand}"/>
-     
-            
+
+
         </Grid>
 
     </wpf:DialogHost>

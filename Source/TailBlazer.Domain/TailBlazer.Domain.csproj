@@ -134,6 +134,7 @@
     <Compile Include="Formatting\IColourProvider.cs" />
     <Compile Include="Formatting\ILineMatches.cs" />
     <Compile Include="Formatting\ITextFormatter.cs" />
+    <Compile Include="Formatting\IThemeProvider.cs" />
     <Compile Include="Formatting\LineMatch.cs" />
     <Compile Include="Formatting\LineMatchCollection.cs" />
     <Compile Include="Formatting\LineMatches.cs" />
@@ -144,6 +145,7 @@
     <Compile Include="Formatting\TextFormatter.cs" />
     <Compile Include="Formatting\Theme.cs" />
     <Compile Include="Formatting\ThemeConstants.cs" />
+    <Compile Include="Formatting\ThemeProvider.cs" />
     <Compile Include="Infrastructure\NullLogger.cs" />
     <Compile Include="Infrastructure\DynamicDataEx.cs" />
     <Compile Include="Infrastructure\EnumerableEx.cs" />

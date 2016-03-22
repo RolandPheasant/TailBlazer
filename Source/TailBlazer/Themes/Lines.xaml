@@ -28,11 +28,11 @@
                         FontFamily="{StaticResource MaterialDesignFont}"
                         Visibility="{Binding ShowIndicator.Value}">
                 <materialDesign:PopupBox.ToggleContent>
-                    <!-- Foreground="{Binding IndicatorColour.Value}" -->
+                    <!-- Foreground= -->
                     <materialDesign:PackIcon
                             Width="14"
                             Height="14"
-                            Foreground ="{DynamicResource SecondaryAccentBrush}"
+                            Foreground ="{Binding IndicatorColour.Value}"
                             Kind="{Binding IndicatorIcon.Value,FallbackValue={x:Static materialDesign:PackIconKind.Information}}"/>
 
                 </materialDesign:PopupBox.ToggleContent>
@@ -64,11 +64,10 @@
                                     </Grid.ColumnDefinitions>
 
                                     <materialDesign:PackIcon Width="14" Height="14"  
-                                                      
-                                                          Foreground="{Binding Background}"   
-                                                         Padding="4" 
-                                                         VerticalAlignment="Center"
-                                                         Kind="{Binding IconKind}"/>
+                                                      Foreground="{Binding Background.Value}"   
+                                                      Padding="4" 
+                                                      VerticalAlignment="Center"
+                                                      Kind="{Binding IconKind}"/>
 
                                     <StackPanel  Grid.Column="1"
                                                  Margin="4 0 0 0"
@@ -83,8 +82,8 @@
                                                 Margin="4 0 0 0"
                                                 FontSize="12"
                                                 Text="{Binding Text}"  
-                                                Foreground="{Binding Foreground}"
-                                                Background="{Binding Background}"
+                                                Foreground="{Binding Foreground.Value}"
+                                                Background="{Binding Background.Value}"
                                                 VerticalAlignment="Center"/>
                                     </StackPanel>
 
@@ -132,12 +131,12 @@
             <Setter Property="Padding" Value="0"/>
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             <Setter Property="Height" Value="22"/>
-            <!--<Setter Property="controls:ListboxItemHighlightAssist.BaseStyle" Value="{StaticResource BaseLinesItemContainerStyle}"/>
+            <Setter Property="controls:ListboxItemHighlightAssist.BaseStyle" Value="{StaticResource BaseLinesItemContainerStyle}"/>
             <Setter Property="controls:ListboxItemHighlightAssist.IsEnabled" Value="{Binding Path=DataContext.HighlightTail.Value, ElementName=Control}"/>
             <Setter Property="controls:ListboxItemHighlightAssist.IsRecent" Value="{Binding Path=IsRecent}"/>
 
             <Setter Property="controls:ListboxItemHighlightAssist.HighlightForegroundBrush" Value="{DynamicResource SecondaryAccentForegroundBrush}"/>
-            <Setter Property="controls:ListboxItemHighlightAssist.HighlightBackgroundBrush" Value="{DynamicResource SecondaryAccentBrush}"/>-->
+            <Setter Property="controls:ListboxItemHighlightAssist.HighlightBackgroundBrush" Value="{DynamicResource SecondaryAccentBrush}"/>
           
         </Style.Setters>
 
@@ -154,10 +153,10 @@
  
                 </MultiDataTrigger.Conditions>
 
-                <MultiDataTrigger.Setters>
+                <!--<MultiDataTrigger.Setters>
                     <Setter Property="Background" Value="{DynamicResource SecondaryAccentBrush}"/>
                     <Setter Property="Foreground"  Value="{DynamicResource SecondaryAccentForegroundBrush}"/>
-                </MultiDataTrigger.Setters>
+                </MultiDataTrigger.Setters>-->
 
                 <!--<MultiDataTrigger.EnterActions>
                     <BeginStoryboard>
