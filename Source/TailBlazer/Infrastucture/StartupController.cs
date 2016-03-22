@@ -8,6 +8,7 @@ using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Domain.StateHandling;
 using TailBlazer.Infrastucture.AppState;
+using TailBlazer.Views.Formatting;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Recent;
 using TailBlazer.Views.Tail;
@@ -42,6 +43,7 @@ namespace TailBlazer.Infrastucture
             var viewFactoryRegister = objectProvider.Get<IViewFactoryRegister>();
             viewFactoryRegister.Register<TailViewModelFactory>();
 
+            objectProvider.Get<ThemeSetterJob>();
 
             logger.Info("Starting complete");
         }

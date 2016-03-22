@@ -34,15 +34,8 @@ namespace TailBlazer.Views.Options
                     setting.Write(new GeneralOptions(UseDarkTheme ? Theme.Dark : Theme.Light, HighlightTail, HighlightDuration, Scale));
                 });
 
-            //var themeSetter = setting.Value.Select(options=> options.Theme)
-            //    .ObserveOn(schedulerProvider.MainThread)
-            //    .Subscribe(theme =>
-            //    {
-            //        var dark = theme == Theme.Dark;
-            //        new PaletteHelper().SetLightDark(dark);
-            //    });
 
-            
+
             HighlightDurationText = this.WhenValueChanged(vm=>vm.HighlightDuration)
                                         .Select(value => value.ToString("0.00 Seconds"))
                                         .ForBinding();
