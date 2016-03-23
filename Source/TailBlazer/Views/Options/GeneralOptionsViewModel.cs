@@ -48,7 +48,7 @@ namespace TailBlazer.Views.Options
 
             ScaleRatio= this.WhenValueChanged(vm => vm.Scale)
                                         .Select(value =>(decimal)value / (decimal)100)
-                                        .Sample(TimeSpan.FromMilliseconds(250))
+                                       // .Sample(TimeSpan.FromMilliseconds(250))
                                         .ForBinding();
 
             _cleanUp = new CompositeDisposable(reader, writter,  HighlightDurationText, ScaleText, ScaleRatio);

@@ -75,6 +75,7 @@ namespace TailBlazer.Infrastucture
             _selector = selector;
          //  return;
 
+
             var dataSource = ((ReadOnlyObservableCollection<LineProxy>) selector.ItemsSource)
                 .ToObservableChangeSet()
                 .ObserveOn(_schedulerProvider.Background)

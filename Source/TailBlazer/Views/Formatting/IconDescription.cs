@@ -40,7 +40,7 @@ namespace TailBlazer.Views.Formatting
         {
             unchecked
             {
-                return ((Name != null ? Name.GetHashCode() : 0)*397) ^ (int) Type;
+                return ((Name?.GetHashCode() ?? 0)*397) ^ (int) Type;
             }
         }
 

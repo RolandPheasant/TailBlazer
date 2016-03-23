@@ -95,7 +95,7 @@ namespace TailBlazer.Views.Tail
             if (Line.Timestamp.HasValue && DateTime.Now.Subtract(Line.Timestamp.Value).TotalSeconds < 0.25)
             {
                 IsRecent =true;
-                Observable.Timer(TimeSpan.FromSeconds(2))
+                Observable.Timer(TimeSpan.FromSeconds(1))
                     .Subscribe(_ => IsRecent = false);
             }
 

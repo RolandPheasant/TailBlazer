@@ -1,4 +1,6 @@
-﻿using MahApps.Metro.Controls;
+﻿using System.Windows;
+using System.Windows.Input;
+using MahApps.Metro.Controls;
 using TailBlazer.Views.WindowManagement;
 
 namespace TailBlazer
@@ -13,6 +15,7 @@ namespace TailBlazer
         public MainWindow()
         {
             InitializeComponent();
+          //  EventManager.RegisterClassHandler(typeof(Window), Mouse.MouseWheelEvent, new MouseEventHandler(MouseMouveEventHandler), true);
 
             Closing += MainWindow_Closing;
         }

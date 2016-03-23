@@ -114,7 +114,7 @@ namespace TailBlazer.Views.WindowManagement
                             .ForEach(d=>d.Dispose());
                 }));
         }
-        
+
         private void OpenFile()
         {
             // open dialog to select file [get rid of this shit and create a material design file selector]

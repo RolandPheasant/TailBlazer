@@ -13,6 +13,7 @@
              xmlns:fileHandling="clr-namespace:TailBlazer.Domain.FileHandling;assembly=TailBlazer.Domain"
              xmlns:converters="clr-namespace:Dragablz.Converters;assembly=Dragablz"
              xmlns:virtualisation="clr-namespace:TailBlazer.Infrastucture.Virtualisation"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
                 Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
              x:Name="Control"
@@ -365,10 +366,10 @@
                           BorderThickness="1" HorizontalAlignment="Stretch"/>
 
 
-                <ContentPresenter Grid.Row="3"
+                <ContentPresenter Grid.Row="3"   
                     ContentTemplate="{StaticResource LinesDataTemplate}"
                     Content="{Binding InlineViewer,Mode=OneWay}" />
-              
+
                 <Grid    Grid.Row="4" Margin = "0 0 0 -4"   Background="{StaticResource PrimaryHueMidBrush}">
 
                     <Grid.Resources>
