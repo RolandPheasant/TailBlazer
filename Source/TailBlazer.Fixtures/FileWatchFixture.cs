@@ -1,10 +1,10 @@
 ﻿ using System;
-using System.IO;
-using System.Linq;
-using FluentAssertions;
-using Microsoft.Reactive.Testing;
-using TailBlazer.Domain.FileHandling;
-using Xunit;
+ using System.IO;
+ using System.Linq;
+ using FluentAssertions;
+ using Microsoft.Reactive.Testing;
+ using TailBlazer.Domain.FileHandling;
+ using Xunit;
 
 namespace TailBlazer.Fixtures
 {
@@ -29,7 +29,7 @@ namespace TailBlazer.Fixtures
 
                 File.AppendAllLines(file, Enumerable.Range(1, 10).Select(i => i.ToString()));
                 scheduler.AdvanceBySeconds(1);
-                result.NotificationType.Should().Be(FileNotificationType.Created);
+                result.NotificationType.Should().Be(FileNotificationType.CreatedOrOpened);
                 result.NotificationType.Should().NotBe(0);
 
                 File.AppendAllLines(file, Enumerable.Range(11, 10).Select(i => i.ToString()));

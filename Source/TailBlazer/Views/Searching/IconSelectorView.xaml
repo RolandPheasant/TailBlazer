@@ -1,0 +1,129 @@
+﻿<UserControl x:Class="TailBlazer.Views.Searching.IconSelectorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TailBlazer.Views.Searching"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+             d:DataContext="{d:DesignInstance local:IconSelector}">
+
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Buttons.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ToggleButtons.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/TextBoxes.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Control.Resources>
+
+    <!--<DataTemplate DataType="{x:Type searching:IconSelector}">-->
+
+        <Grid Margin="4">
+            <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+
+        <TextBlock 
+                Margin="4 8 6 0"
+                FontSize="16"
+                FontWeight="DemiBold"
+                Text="Select a row indicator"/>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0 6 0 6">
+                <materialDesign:PackIcon Kind="Magnify" Width="22" Height="22"
+                                         Foreground="{Binding ElementName= SearchBox, Path=BorderBrush}"
+                                         VerticalAlignment="Bottom">
+                    
+                </materialDesign:PackIcon>
+            
+                <TextBox x:Name="SearchBox"
+                    Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                    materialDesign:TextFieldAssist.Hint="Enter text to find icon" 
+                    VerticalAlignment="Center"
+                    materialDesign:ValidationAssist.UsePopup="False"                   
+                    MinWidth="200">
+                </TextBox>
+
+            </StackPanel>
+
+            <ListBox Grid.Row="2" Height="225" Width="375" 
+                     SelectedItem="{Binding Selected}"
+                     ItemsSource="{Binding Icons}">
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type local:IconDescription}">
+                        <materialDesign:PackIcon
+                            Padding="2"
+                            Kind="{Binding Type,FallbackValue={x:Static materialDesign:PackIconKind.Information}}"   
+                          
+                            VerticalAlignment="Center" 
+                            HorizontalAlignment="Center"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                        <Setter Property="ToolTip">
+                            <Setter.Value>
+                            <TextBlock Text="{Binding Description}" />
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+
+            <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                    <infrastucture:VirtualizingWrapPanel ItemHeight="32" ItemWidth="32" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
+
+        <Grid Grid.Row="3" Margin="0 6 0 6">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button  Grid.Column="0" IsDefault="False"
+                HorizontalAlignment="Right"
+                Style="{DynamicResource MaterialDesignFlatButton}"
+                Content="Close"
+                ToolTip="Close and do nothing"     
+                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                CommandParameter="{x:Static local:IconSelectorResult.None}"/>
+
+
+            <Button  Grid.Column="1" IsDefault="False"
+                HorizontalAlignment="Right"
+                Style="{DynamicResource MaterialDesignFlatButton}"
+                ToolTip="Allow Tail Blazer to choose you icon" 
+                Content="Use Default"
+                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                CommandParameter="{x:Static local:IconSelectorResult.UseDefault}"/>
+            
+            <Button  Grid.Column="2" IsDefault="True"
+                HorizontalAlignment="Right"
+                Style="{DynamicResource MaterialDesignFlatButton}"
+                ToolTip="Use the selected icon" 
+                Content="Use Selected"
+                IsEnabled="{Binding HasSelection.Value}"
+                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                CommandParameter="{x:Static local:IconSelectorResult.UseSelected}"/>
+        </Grid>
+
+    </Grid>
+ 
+</UserControl>

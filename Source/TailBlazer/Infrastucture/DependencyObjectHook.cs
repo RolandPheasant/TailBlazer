@@ -26,11 +26,8 @@ namespace TailBlazer.Infrastucture
         public static void PropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
         {
             var receiver = args.NewValue as IDependencyObjectReceiver;
-            if (receiver == null) return;
 
-            receiver.Receive(sender);
+            receiver?.Receive(sender);
         }
-
-
     }
 }

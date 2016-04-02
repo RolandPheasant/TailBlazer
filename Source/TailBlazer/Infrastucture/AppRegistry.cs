@@ -1,8 +1,14 @@
 ﻿using System;
 using System.IO;
-using StructureMap.Configuration.DSL;
+using System.Text;
+using log4net.Config;
+using StructureMap;
+using TailBlazer.Domain.FileHandling;
+using TailBlazer.Domain.FileHandling.Search;
+using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
-using ILogger = TailBlazer.Domain.Infrastructure.ILogger;
+using TailBlazer.Domain.Settings;
+using TailBlazer.Properties;
 
 namespace TailBlazer.Infrastucture
 {
@@ -13,16 +19,45 @@ namespace TailBlazer.Infrastucture
             //set up logging
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
             if (!File.Exists(path))
-                throw new FileNotFoundException("The log4net.config file was not found" + path);
+            {
+                // should use the default config which is a resource
+                using (var stream = new MemoryStream(Encoding.ASCII.GetBytes(Resources.log4net)))
+                {
+                    XmlConfigurator.Configure(stream);
+                }
+            }
+            else
+            {
+                XmlConfigurator.ConfigureAndWatch(new FileInfo(path));
+            }
+            For<ILogger>().Use<Log4NetLogger>().Ctor<Type>("type").Is(x => x.ParentType).AlwaysUnique();
 
-            log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(path));
-            For<ILogger>().Use<Log4NetLogger>().Ctor<Type>("type").Is(x => x.RootType).AlwaysUnique();
+            For<ISelectionMonitor>().Use<SelectionMonitor>();
+            For<ISearchInfoCollection>().Use<SearchInfoCollection>();
+            For<ISearchMetadataCollection>().Use<SearchMetadataCollection>().Transient();
+            
+            For<ITextFormatter>().Use<TextFormatter>();
+
+            For<ISettingsStore>().Use<FileSettingsStore>().Singleton();
+            For<IFileWatcher>().Use<FileWatcher>();
 
 
-
+            For<UhandledExceptionHandler>().Singleton();
+            For<ObjectProvider>().Singleton();
+            Forward<ObjectProvider, IObjectProvider>();
+            Forward<ObjectProvider, IObjectRegister>();
+            
             Scan(scanner =>
             {
                 scanner.ExcludeType<ILogger>();
+
+                //to do, need a auto-exclude these from AppConventions
+                scanner.ExcludeType<SelectionMonitor>();
+                scanner.ExcludeType<SearchInfoCollection>();
+                scanner.ExcludeType<SearchMetadataCollection>();
+                scanner.ExcludeType<ITextFormatter>();
+
+                scanner.ExcludeType<FileWatcher>();
                 scanner.LookForRegistries();
                 scanner.Convention<AppConventions>();
 
@@ -30,6 +65,7 @@ namespace TailBlazer.Infrastucture
                 scanner.AssemblyContainingType<AppRegistry>();
             });
         }
+
     }
 }
 

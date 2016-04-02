@@ -23,7 +23,7 @@ namespace TailBlazer.Domain.FileHandling
 
             if (Exists)
             {
-                NotificationType = FileNotificationType.Created;
+                NotificationType = FileNotificationType.CreatedOrOpened;
                 Size = Info.Length;
             }
             else
@@ -53,7 +53,7 @@ namespace TailBlazer.Domain.FileHandling
 
                 if (!previous.Exists)
                 {
-                    NotificationType = FileNotificationType.Created;
+                    NotificationType = FileNotificationType.CreatedOrOpened;
                 }
                 else if (Size > previous.Size)
                 {
@@ -62,7 +62,7 @@ namespace TailBlazer.Domain.FileHandling
                 else if (Size < previous.Size)
                 {
                     //File has shrunk. We need it's own notification
-                    NotificationType = FileNotificationType.Created;
+                    NotificationType = FileNotificationType.CreatedOrOpened;
                 }
 
                 else
@@ -98,7 +98,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((FileNotification) obj);
         }
 

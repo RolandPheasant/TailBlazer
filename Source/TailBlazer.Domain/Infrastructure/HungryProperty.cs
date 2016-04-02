@@ -29,13 +29,13 @@ namespace TailBlazer.Domain.Infrastructure
     internal sealed class LazyProperty<T> : AbstractNotifyPropertyChanged, IProperty<T>, IDisposable
     {
 
-        private Lazy<IDisposable> factory;
+        private readonly Lazy<IDisposable> _factory;
         private readonly SingleAssignmentDisposable _cleanUp = new SingleAssignmentDisposable();
         private T _value;
 
         public LazyProperty(IObservable<T> source)
         {
-            factory = new Lazy<IDisposable>(() => source.Subscribe(t => Value = t));
+            _factory = new Lazy<IDisposable>(() => source.Subscribe(t => Value = t));
 
             //_cleanUp =
         }
@@ -56,7 +56,7 @@ namespace TailBlazer.Domain.Infrastructure
 
         private void EnsureLoaded()
         {
-            _cleanUp.Disposable = factory.Value;
+            _cleanUp.Disposable = _factory.Value;
         }
 
         public void Dispose()

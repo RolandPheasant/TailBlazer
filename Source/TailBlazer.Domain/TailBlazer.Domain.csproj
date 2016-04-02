@@ -31,17 +31,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DynamicData, Version=4.3.1.1090, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DynamicData.4.3.1.1090\lib\net45\DynamicData.dll</HintPath>
+    <Reference Include="DynamicData, Version=4.4.0.1110, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DynamicData.4.4.0.1110-beta\lib\net45\DynamicData.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DynamicData.Plinq, Version=4.3.1.1090, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DynamicData.4.3.1.1090\lib\net45\DynamicData.Plinq.dll</HintPath>
+    <Reference Include="DynamicData.Plinq, Version=4.4.0.1110, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DynamicData.Plinq.4.4.0.1110-beta\lib\net45\DynamicData.Plinq.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Humanizer, Version=2.0.1.0, Culture=neutral, PublicKeyToken=979442b78dfc278e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Humanizer.Core.2.0.1\lib\portable-win+net45+wp8+wpa81\Humanizer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
       <Private>True</Private>
@@ -54,40 +58,98 @@
       <HintPath>..\packages\Rx-Linq.2.2.5\lib\net45\System.Reactive.Linq.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Windows" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CaseInsensitiveString.cs" />
+    <Compile Include="FileHandling\EmptyLineProvider.cs" />
     <Compile Include="FileHandling\FileInfoEx.cs" />
-    <Compile Include="FileHandling\FileTailerFactory.cs" />
-    <Compile Include="FileHandling\IFileTailerFactory.cs" />
-    <Compile Include="FileHandling\IIndexCollection.cs" />
+    <Compile Include="FileHandling\FileSearcher.cs" />
+    <Compile Include="FileHandling\FileSearchEx.cs" />
+    <Compile Include="FileHandling\FileSearchResult.cs" />
+    <Compile Include="FileHandling\FileSearchResultEx.cs" />
+    <Compile Include="FileHandling\FileSegmentEx.cs" />
+    <Compile Include="FileHandling\FileSegmentSearchResult.cs" />
+    <Compile Include="FileHandling\FileSegment.cs" />
+    <Compile Include="FileHandling\FileSegmentChangedReason.cs" />
+    <Compile Include="FileHandling\FileSegmenter.cs" />
+    <Compile Include="FileHandling\FileSegmentKey.cs" />
+    <Compile Include="FileHandling\FileSegmentCollection.cs" />
+    <Compile Include="FileHandling\FileSegmentSearch.cs" />
+    <Compile Include="FileHandling\FileSegmentSearchStatus.cs" />
+    <Compile Include="FileHandling\FileSegmentType.cs" />
+    <Compile Include="FileHandling\FilesWatcher.cs" />
+    <Compile Include="FileHandling\FileWatcher.cs" />
+    <Compile Include="FileHandling\IFileWatcher.cs" />
+    <Compile Include="FileHandling\IHasLimitationOfLines.cs" />
+    <Compile Include="FileHandling\ILineProvider.cs" />
+    <Compile Include="FileHandling\ILineScroller.cs" />
+    <Compile Include="FileHandling\IndexEx.cs" />
     <Compile Include="FileHandling\IndexType.cs" />
-    <Compile Include="FileHandling\LineMatchChangedReason.cs" />
-    <Compile Include="FileHandling\LineMatches.cs" />
-    <Compile Include="FileHandling\LineMatcher.cs" />
-    <Compile Include="FileHandling\LineIndexCollection.cs" />
-    <Compile Include="FileHandling\LineIndexer.cs" />
+    <Compile Include="FileHandling\LineKey.cs" />
+    <Compile Include="FileHandling\Search\IDefaultColourSelector.cs" />
+    <Compile Include="FileHandling\Search\IconTypeSelector.cs" />
+    <Compile Include="FileHandling\Search\IDefaultIconSelector.cs" />
+    <Compile Include="FileHandling\Search\ISearchInfoCollection.cs" />
+    <Compile Include="FileHandling\LineIndexType.cs" />
     <Compile Include="FileHandling\FileNotification.cs" />
     <Compile Include="FileHandling\FileNotificationType.cs" />
-    <Compile Include="FileHandling\FileScanResult.cs" />
-    <Compile Include="FileHandling\FileTailer.cs" />
-    <Compile Include="FileHandling\LineIndex.cs" />
-    <Compile Include="FileHandling\LineReader.cs" />
+    <Compile Include="FileHandling\LineScroller.cs" />
+    <Compile Include="FileHandling\LineInfo.cs" />
+    <Compile Include="FileHandling\LineReaderEx.cs" />
     <Compile Include="FileHandling\LinesChangedReason.cs" />
-    <Compile Include="FileHandling\ScrollingMode.cs" />
+    <Compile Include="FileHandling\Page.cs" />
+    <Compile Include="FileHandling\Recent\RecentFile.cs" />
+    <Compile Include="FileHandling\Recent\RecentFileCollection.cs" />
+    <Compile Include="FileHandling\Recent\IRecentFileCollection.cs" />
+    <Compile Include="FileHandling\Recent\RecentFilesToStateConverter.cs" />
+    <Compile Include="FileHandling\ScrollReason.cs" />
     <Compile Include="FileHandling\ScrollRequest.cs" />
-    <Compile Include="FileHandling\SparseIndex.cs" />
-    <Compile Include="FileHandling\SparseIndexer.cs" />
-    <Compile Include="FileHandling\SparseIndexCollection.cs" />
+    <Compile Include="FileHandling\Index.cs" />
+    <Compile Include="FileHandling\IndexCollection.cs" />
+    <Compile Include="FileHandling\Indexer.cs" />
+    <Compile Include="FileHandling\Search\ISearchMetadataCollection.cs" />
+    <Compile Include="FileHandling\Search\ISearchMetadataFactory.cs" />
+    <Compile Include="FileHandling\Search\RegexInspector.cs" />
+    <Compile Include="FileHandling\Search\SearchEx.cs" />
+    <Compile Include="FileHandling\Search\SearchMetadata.cs" />
+    <Compile Include="FileHandling\Search\SearchMetadataCollection.cs" />
+    <Compile Include="FileHandling\Search\SearchMetadataFactory.cs" />
+    <Compile Include="FileHandling\Search\SearchType.cs" />
     <Compile Include="FileHandling\StreamReaderExtended.cs" />
-    <Compile Include="Infrastructure\Extensions.cs" />
+    <Compile Include="FileHandling\Search\SearchInfoCollection.cs" />
+    <Compile Include="FileHandling\Search\SearchInfo.cs" />
+    <Compile Include="FileHandling\TailInfo.cs" />
+    <Compile Include="Formatting\DisplayText.cs" />
+    <Compile Include="Formatting\Hue.cs" />
+    <Compile Include="Formatting\HueKey.cs" />
+    <Compile Include="Formatting\IColourProvider.cs" />
+    <Compile Include="Formatting\ILineMatches.cs" />
+    <Compile Include="Formatting\ITextFormatter.cs" />
+    <Compile Include="Formatting\LineMatch.cs" />
+    <Compile Include="Formatting\LineMatchCollection.cs" />
+    <Compile Include="Formatting\LineMatches.cs" />
+    <Compile Include="Formatting\MatchedString.cs" />
+    <Compile Include="Formatting\MatchedStringEnumerator.cs" />
+    <Compile Include="Formatting\MatchedStringEx.cs" />
+    <Compile Include="Formatting\SearchMetadataEnumerator.cs" />
+    <Compile Include="Formatting\TextFormatter.cs" />
+    <Compile Include="Infrastructure\NullLogger.cs" />
+    <Compile Include="Infrastructure\DynamicDataEx.cs" />
+    <Compile Include="Infrastructure\EnumerableEx.cs" />
+    <Compile Include="Infrastructure\Equality.cs" />
+    <Compile Include="Infrastructure\ParseEx.cs" />
+    <Compile Include="Infrastructure\StringEx.cs" />
     <Compile Include="Infrastructure\ILogFactory.cs" />
     <Compile Include="Infrastructure\ILogger.cs" />
+    <Compile Include="Infrastructure\ImmutableArray.cs" />
     <Compile Include="Infrastructure\ImmutableList.cs" />
     <Compile Include="Infrastructure\IObjectFactory.cs" />
     <Compile Include="Infrastructure\IProperty.cs" />
@@ -98,14 +160,22 @@
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Settings\IConverter.cs" />
     <Compile Include="Settings\ISetting.cs" />
+    <Compile Include="Settings\ISettingFactory.cs" />
+    <Compile Include="Settings\ISettingsRegister.cs" />
     <Compile Include="Settings\ISettingsStore.cs" />
+    <Compile Include="Settings\IPersistentStateProvider.cs" />
+    <Compile Include="Settings\Setting.cs" />
+    <Compile Include="Settings\SettingFactory.cs" />
+    <Compile Include="Settings\SettingsRegister.cs" />
     <Compile Include="Settings\SettingsStore.cs" />
     <Compile Include="Settings\State.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings\XmlEx.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

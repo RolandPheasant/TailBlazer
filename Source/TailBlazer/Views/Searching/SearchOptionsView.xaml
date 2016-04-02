@@ -1,0 +1,225 @@
+﻿<UserControl x:Class="TailBlazer.Settings.SearchOptionsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
+             xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
+             xmlns:controls="clr-namespace:TailBlazer.Controls"
+             xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
+             mc:Ignorable="d" 
+
+             d:DataContext="{d:DesignInstance searching:SearchOptionsViewModel}"
+             d:DesignHeight="300">
+
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.checkbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.popupbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Buttons.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ToggleButtons.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/TextBoxes.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Colours.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Dragable.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"/>
+
+            <DataTemplate DataType="{x:Type searching:SearchOptionsProxy}">
+
+                <Grid Margin="4 4 4 4" x:Name="Row">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="22"/>
+                        <ColumnDefinition Width="75"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                        Command="{Binding ShowIconSelectorCommand}"
+                                        ToolTip="Change icon"
+                                        Padding="0"
+                                        Width="24" Height="24"
+                                       
+                                        BorderThickness="0"
+                                        HorizontalAlignment="Left"
+                                        SnapsToDevicePixels="True"
+                                        UseLayoutRounding="True"
+                                        wpf:ShadowAssist.ShadowDepth="Depth2"
+                                        VerticalAlignment="Center">
+                        <wpf:PackIcon  
+                                        Padding="4" 
+                                        Foreground="{Binding Background.Value}"
+                                        Kind="{Binding IconKind,FallbackValue={x:Static wpf:PackIconKind.ArrowRightBold}}"/>
+                    </Button>
+
+                    <TextBlock Padding="2" Margin="6 0 0 0" x:Name="Label" Grid.Column="1" 
+                                       Foreground="{Binding Foreground.Value}"
+                                       Background="{Binding Background.Value}"
+                                       Text="{Binding Text}"
+                                        VerticalAlignment="Center"/>
+
+                    <wpf:PopupBox
+                                    ToolTip="Change colour"
+                                    Grid.Column="2"
+                                    FontFamily="{StaticResource MaterialDesignFont}"
+                                    PopupMode="Click">
+                        <wpf:PopupBox.ToggleContent>
+                            <wpf:PackIcon Kind="FormatPaint" 
+                                            Margin="4 0 4 0" Width="14" Height="14"
+                                            Foreground="{Binding Background.Value}" />
+                        </wpf:PopupBox.ToggleContent>
+
+                        <ItemsControl ItemsSource="{Binding Hues}" 
+                                                  Margin="4"
+                                                  Background="Transparent">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Viewbox  Width="22" Height="22" Margin="2">
+                                        <Button Style="{StaticResource MaterialDesignFloatingActionButton}"
+                                                        BorderBrush="{DynamicResource GrayBrush2}"
+                                                        BorderThickness="0"
+                                                        SnapsToDevicePixels="True"
+                                                        UseLayoutRounding="True"
+                                                        wpf:ShadowAssist.ShadowDepth="Depth2"
+                                                        Command="{Binding ElementName=Row,Path=DataContext.HighlightCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        Margin="2">
+                                            <Button.Background>
+                                                <SolidColorBrush Color="{Binding Background, Mode=OneTime}" />
+                                            </Button.Background>
+                                        </Button>
+                                    </Viewbox>
+                                    
+
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+
+
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="8"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+
+                    </wpf:PopupBox>
+
+                    <CheckBox Margin="4 0 0 0" Grid.Column="3" 
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding Filter}" 
+                                      ToolTip="Filter lines this value"
+                                      Content="Filter"/>
+
+                    <CheckBox Margin="4 0 0 0" Grid.Column="4" 
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding Highlight}" 
+                                      ToolTip="Highlight text within the line"
+                                      Content="Highlight"/>
+
+                    <CheckBox Margin="4 0 0 0" Grid.Column="5" 
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding IgnoreCase}" 
+                                      Content="Ignore Case"/>
+
+
+                    <Button Margin="8 0 6 0"
+                                        Grid.Column="6" 
+                                        ToolTip="{Binding RemoveTooltip}"
+                                        VerticalAlignment="Center"
+                                        Command="{Binding RemoveCommand}"
+                                        Style="{StaticResource CloseButtonStyle}"/>
+                </Grid>
+
+            </DataTemplate>
+        </ResourceDictionary>
+    </Control.Resources>
+
+    <wpf:DialogHost Identifier="{Binding Id}">
+        <Grid Width="435" Height="325">
+        <Grid.RowDefinitions>
+            <RowDefinition  Height="Auto"/>
+            <RowDefinition  Height="Auto"/>
+            <RowDefinition Height="*"/>
+             <RowDefinition  Height="Auto"/>
+            </Grid.RowDefinitions>
+        
+        <TextBlock 
+                Margin="6 8 6 0"
+                FontSize="16"
+                FontWeight="DemiBold"
+                Text="Search and highlight options"/>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+
+                <ToggleButton
+                                   VerticalAlignment="Bottom" 
+                                   Margin="2 0 0 0"
+                                   Padding="2"
+                                   Width="32" 
+                                   Height="32" 
+                                   IsChecked="{Binding SearchHints.UseRegex}">
+
+                    <ToggleButton.Style>
+                        <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource  SearchToggleStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SearchHints.IsValid.Value}" Value="False">
+                                    <Setter Property="Foreground" Value="{DynamicResource ValidationErrorBrush}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ToggleButton.Style>
+                </ToggleButton>
+
+                <TextBox Grid.Column="1" 
+                        Margin="0 4 0 0"
+                        Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                        wpf:TextFieldAssist.Hint="{Binding SearchHints.Message.Value}" 
+                        VerticalAlignment="Center"
+                        wpf:ValidationAssist.UsePopup="False"
+                        Style="{StaticResource FloatingHintAndErrorTextBox}"
+                        Validation.ErrorTemplate="{StaticResource BorderOnlyValidationErrorTemplate}" 
+                        MinWidth="180">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding SearchHints.AddSearchCommand}"/>
+                    </TextBox.InputBindings>
+                </TextBox>
+            </Grid>
+
+            <dragablz:DragablzItemsControl  Grid.Row="2" 
+                                             Margin="6 0 6 0"
+                                                ItemContainerStyle="{StaticResource DragableItem}"
+                                                HorizontalContentAlignment="Stretch"
+                                                PositionMonitor="{Binding PositionMonitor}"
+                                                ItemsSource="{Binding Data}">
+
+                <dragablz:DragablzItemsControl.ItemsOrganiser>
+                    <dragablz:VerticalOrganiser />
+                </dragablz:DragablzItemsControl.ItemsOrganiser>
+            </dragablz:DragablzItemsControl>
+
+            <Button  Grid.Row="3" IsDefault="True"
+                Margin="0 0 6 0"
+                HorizontalAlignment="Right"
+                Style="{DynamicResource MaterialDesignFlatButton}"
+                Content="Finished"     
+                Command="{x:Static wpf:DialogHost.CloseDialogCommand}"/>
+     
+            
+        </Grid>
+
+    </wpf:DialogHost>
+</UserControl>
