@@ -10,5 +10,11 @@ namespace TailBlazer.Domain.FileHandling
         {
             yield break;
         }
+
+        public int CompareTo(object obj)
+        {
+            var other = obj as EmptyLineProvider;
+            return Count.CompareTo(other?.Count);
+        }
     }
 }

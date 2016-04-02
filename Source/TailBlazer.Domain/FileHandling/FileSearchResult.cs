@@ -218,6 +218,12 @@ namespace TailBlazer.Domain.FileHandling
             }
         }
 
+        public int CompareTo(object obj)
+        {
+            //TODO: implement this the right way
+            throw new NotImplementedException();
+        }
+
         public static bool operator ==(FileSearchResult left, FileSearchResult right)
         {
             return Equals(left, right);

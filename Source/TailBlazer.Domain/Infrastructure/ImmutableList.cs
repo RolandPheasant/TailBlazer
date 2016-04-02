@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using DynamicData;
 
 namespace TailBlazer.Domain.Infrastructure
 {
-    public class ImmutableList<T>
+    public class ImmutableList<T> : IEnumerable<T>
     {
         public static readonly ImmutableList<T> Empty = new ImmutableList<T>();
 
@@ -84,6 +85,16 @@ namespace TailBlazer.Domain.Infrastructure
         public int IndexOf(T value)
         {
             return _data.IndexOf(value);
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return _data.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

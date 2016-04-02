@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
@@ -34,7 +36,10 @@ namespace TailBlazer.Domain.FileHandling
             return source.WithSegments().Index();
         }
 
-
+        public static IObservable<ILineProvider> Index(this IEnumerable<IObservable<FileNotification>> source)
+        {
+            return source.Merge().WithSegments().Index();
+        } 
 
     }
 }

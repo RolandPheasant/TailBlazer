@@ -62,7 +62,8 @@ namespace TailBlazer.Domain.FileHandling
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Start == other.Start && End == other.End && Compression == other.Compression && LineCount == other.LineCount && Type == other.Type && TimeStamp.Equals(other.TimeStamp);
+            return Start == other.Start && End == other.End && Compression == other.Compression &&
+                   LineCount == other.LineCount && Type == other.Type && TimeStamp.Equals(other.TimeStamp);
         }
 
         public override bool Equals(object obj)

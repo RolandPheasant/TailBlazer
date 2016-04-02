@@ -38,10 +38,11 @@
 
             <infrastucture:CheckedToLengthConverter TrueValue="*" FalseValue="*" x:Key="c1" />
             <infrastucture:CheckedToLengthConverter TrueValue="175" FalseValue="0" x:Key="c2" />
-
+            <infrastucture:DebugConverter x:Key="DebugConverter" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:EqualityToVisibilityConverter x:Key="EqualityToVisibilityConverter"/>
             <infrastucture:NotEqualsToVisibilityConverter x:Key="NotEqualsToVisibilityConverter"/>
+            <infrastucture:FilesNameConverter x:Key="FilesNameConverter"></infrastucture:FilesNameConverter>
             <system:Int32 x:Key="Zero">0</system:Int32>
             <system:Int32 x:Key="One">1</system:Int32>
 
@@ -375,7 +376,7 @@
                                 PopupMode="Click"
                                 PlacementMode="TopAndAlignLeftEdges">
                             <wpf:PopupBox.ToggleContent>
-                                <TextBlock FontSize="10" Text="{Binding Name}"/>
+                                <TextBlock FontSize="10" Text="{Binding Names, Converter={StaticResource FilesNameConverter}}"/>
                             </wpf:PopupBox.ToggleContent>
                             
                             
@@ -433,7 +434,7 @@
 
 
                         </wpf:PopupBox>
-
+                               
                     </StackPanel>
 
                     <StackPanel 

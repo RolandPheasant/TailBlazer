@@ -51,6 +51,15 @@
 
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type infrastucture:FilesHeader}">
+                <TextBlock Margin="6 2 2 2" 
+                           IsHitTestVisible="True"
+                           ToolTipService.ShowOnDisabled="True"
+                           ToolTip="{Binding FullName}"
+                           Text="{Binding  DisplayName}" />
+
+            </DataTemplate>
+
             <DataTemplate DataType="{x:Type infrastucture:ViewContainer}">
                 <ContentControl Content="{Binding Content}">
                     <ContentControl.LayoutTransform>

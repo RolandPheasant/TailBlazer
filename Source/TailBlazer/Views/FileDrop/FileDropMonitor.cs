@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -16,7 +17,7 @@ namespace TailBlazer.Views.FileDrop
     public class FileDropMonitor : IDependencyObjectReceiver, IDisposable
     {
         private readonly SerialDisposable _cleanUp = new SerialDisposable();
-        private readonly ISubject<FileInfo> _fileDropped = new Subject<FileInfo>();
+        private readonly ISubject<IEnumerable<FileInfo>> _fileDropped = new Subject<IEnumerable<FileInfo>>();
 
         public void Receive(DependencyObject value)
         {
@@ -56,7 +57,7 @@ namespace TailBlazer.Views.FileDrop
             var dropped = Observable.FromEventPattern<DragEventHandler, DragEventArgs>
                 (h => control.Drop += h, h => control.Drop -= h)
                 .Select(ev => ev.EventArgs)
-                .SelectMany(e =>
+                .Select(e =>
                 {
                     if (!e.Data.GetDataPresent(DataFormats.FileDrop))
                         return Enumerable.Empty<FileInfo>();
@@ -78,7 +79,7 @@ namespace TailBlazer.Views.FileDrop
             });
         }
 
-        public IObservable<FileInfo> Dropped => _fileDropped;
+        public IObservable<IEnumerable<FileInfo>> Dropped => _fileDropped;
         
         /// <summary>
         /// Taken shamelessly from https://github.com/punker76/gong-wpf-dragdrop

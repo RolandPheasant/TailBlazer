@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public interface ILineProvider
+    public interface ILineProvider : IComparable
     {
         //bool IsEmpty { get; }
 

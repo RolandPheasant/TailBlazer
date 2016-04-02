@@ -29,18 +29,18 @@ namespace TailBlazer.Domain.FileHandling
 
         private bool _closable;  // For Console.In. We should consider exposing a Closable bit perhaps on stream at some point. 
 
-        private Stream stream;
-        private Encoding encoding;
-        private Decoder decoder;
-        private byte[] byteBuffer;
-        private char[] charBuffer;
+        private Stream _stream;
+        private Encoding _encoding;
+        private Decoder _decoder;
+        private byte[] _byteBuffer;
+        private char[] _charBuffer;
         private byte[] _preamble;   // Encoding's preamble, which identifies this encoding. 
-        private int charPos;
-        private int charLen;
+        private int _charPos;
+        private int _charLen;
         // Record the number of valid bytes in the byteBuffer, for a few checks.
-        private int byteLen;
+        private int _byteLen;
         // This is used only for preamble detection
-        private int bytePos;
+        private int _bytePos;
 
         // This is the maximum number of chars we can get from one call to 
         // ReadBuffer.  Used so ReadBuffer can tell when to copy data into 
@@ -126,7 +126,7 @@ namespace TailBlazer.Domain.FileHandling
         [SecuritySafeCritical]  // auto-generated 
         [ResourceExposure(ResourceScope.Machine)]
         [ResourceConsumption(ResourceScope.Machine)]
-        public StreamReaderExtended(String path)
+        public StreamReaderExtended(string path)
             : this(path, true)
         {
         }
@@ -134,7 +134,7 @@ namespace TailBlazer.Domain.FileHandling
         [SecuritySafeCritical]  // auto-generated 
         [ResourceExposure(ResourceScope.Machine)]
         [ResourceConsumption(ResourceScope.Machine)]
-        public StreamReaderExtended(String path, bool detectEncodingFromByteOrderMarks)
+        public StreamReaderExtended(string path, bool detectEncodingFromByteOrderMarks)
             : this(path, Encoding.UTF8, detectEncodingFromByteOrderMarks, DefaultBufferSize)
         {
         }
@@ -142,7 +142,7 @@ namespace TailBlazer.Domain.FileHandling
         [SecuritySafeCritical]  // auto-generated
         [ResourceExposure(ResourceScope.Machine)]
         [ResourceConsumption(ResourceScope.Machine)]
-        public StreamReaderExtended(String path, Encoding encoding)
+        public StreamReaderExtended(string path, Encoding encoding)
             : this(path, encoding, true, DefaultBufferSize)
         {
         }
@@ -150,7 +150,7 @@ namespace TailBlazer.Domain.FileHandling
         [SecuritySafeCritical]  // auto-generated
         [ResourceExposure(ResourceScope.Machine)]
         [ResourceConsumption(ResourceScope.Machine)]
-        public StreamReaderExtended(String path, Encoding encoding, bool detectEncodingFromByteOrderMarks)
+        public StreamReaderExtended(string path, Encoding encoding, bool detectEncodingFromByteOrderMarks)
             : this(path, encoding, detectEncodingFromByteOrderMarks, DefaultBufferSize)
         {
         }
@@ -158,7 +158,7 @@ namespace TailBlazer.Domain.FileHandling
         [SecuritySafeCritical]  // auto-generated
         [ResourceExposure(ResourceScope.Machine)]
         [ResourceConsumption(ResourceScope.Machine)]
-        public StreamReaderExtended(String path, Encoding encoding, bool detectEncodingFromByteOrderMarks, int bufferSize)
+        public StreamReaderExtended(string path, Encoding encoding, bool detectEncodingFromByteOrderMarks, int bufferSize)
         {
             // Don't open a Stream before checking for invalid arguments, 
             // or we'll create a FileStream on disk and we won't close it until 
@@ -168,23 +168,23 @@ namespace TailBlazer.Domain.FileHandling
             if (path.Length == 0)
                 throw new ArgumentException("Path is empty");
             if (bufferSize <= 0)
-                throw new ArgumentOutOfRangeException("bufferSize");
+                throw new ArgumentOutOfRangeException(nameof(bufferSize));
 
-            Stream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultFileStreamBufferSize, FileOptions.SequentialScan);
-            Init(stream, encoding, detectEncodingFromByteOrderMarks, bufferSize);
+            Stream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultFileStreamBufferSize, FileOptions.SequentialScan);
+            Init(fileStream, encoding, detectEncodingFromByteOrderMarks, bufferSize);
         }
 
         private void Init(Stream stream, Encoding encoding, bool detectEncodingFromByteOrderMarks, int bufferSize)
         {
-            this.stream = stream;
-            this.encoding = encoding;
-            decoder = encoding.GetDecoder();
+            _stream = stream;
+            _encoding = encoding;
+            _decoder = encoding.GetDecoder();
             if (bufferSize < MinBufferSize) bufferSize = MinBufferSize;
-            byteBuffer = new byte[bufferSize];
+            _byteBuffer = new byte[bufferSize];
             _maxCharsPerBuffer = encoding.GetMaxCharCount(bufferSize);
-            charBuffer = new char[_maxCharsPerBuffer];
-            byteLen = 0;
-            bytePos = 0;
+            _charBuffer = new char[_maxCharsPerBuffer];
+            _byteLen = 0;
+            _bytePos = 0;
             _detectEncoding = detectEncodingFromByteOrderMarks;
             _preamble = encoding.GetPreamble();
             _checkPreamble = (_preamble.Length > 0);
@@ -195,7 +195,7 @@ namespace TailBlazer.Domain.FileHandling
         // Init used by NullStreamReader, to delay load encoding
         internal void Init(Stream stream)
         {
-            this.stream = stream;
+            _stream = stream;
             _closable = true;
         }
 
@@ -212,20 +212,20 @@ namespace TailBlazer.Domain.FileHandling
             {
                 // Note that Stream.Close() can potentially throw here. So we need to
                 // ensure cleaning up internal resources, inside the finally block.
-                if (Closable && disposing && (stream != null))
-                    stream.Close();
+                if (Closable && disposing && (_stream != null))
+                    _stream.Close();
             }
             finally
             {
-                if (Closable && (stream != null))
+                if (Closable && (_stream != null))
                 {
-                    stream = null;
-                    encoding = null;
-                    decoder = null;
-                    byteBuffer = null;
-                    charBuffer = null;
-                    charPos = 0;
-                    charLen = 0;
+                    _stream = null;
+                    _encoding = null;
+                    _decoder = null;
+                    _byteBuffer = null;
+                    _charBuffer = null;
+                    _charPos = 0;
+                    _charLen = 0;
                     base.Dispose(disposing);
                 }
             }
@@ -233,12 +233,12 @@ namespace TailBlazer.Domain.FileHandling
 
         public virtual Encoding CurrentEncoding
         {
-            get { return encoding; }
+            get { return _encoding; }
         }
 
         public virtual Stream BaseStream
         {
-            get { return stream; }
+            get { return _stream; }
         }
 
         internal bool Closable
@@ -256,14 +256,14 @@ namespace TailBlazer.Domain.FileHandling
         // users need to re-read the contents of a StreamReader a second time.
         public void DiscardBufferedData()
         {
-            byteLen = 0;
-            charLen = 0;
-            charPos = 0;
+            _byteLen = 0;
+            _charLen = 0;
+            _charPos = 0;
             // in general we'd like to have an invariant that encoding isn't null. However,
             // for startup improvements for NullStreamReader, we want to delay load encoding. 
-            if (encoding != null)
+            if (_encoding != null)
             {
-                decoder = encoding.GetDecoder();
+                _decoder = _encoding.GetDecoder();
             }
             _isBlocked = false;
         }
@@ -274,7 +274,7 @@ namespace TailBlazer.Domain.FileHandling
             get
             {
 
-                if (charPos < charLen)
+                if (_charPos < _charLen)
                     return false;
 
                 // This may block on pipes! 
@@ -288,23 +288,23 @@ namespace TailBlazer.Domain.FileHandling
         public override int Peek()
         {
 
-            if (charPos == charLen)
+            if (_charPos == _charLen)
             {
                 if (_isBlocked || ReadBuffer() == 0) return -1;
             }
-            return charBuffer[charPos];
+            return _charBuffer[_charPos];
         }
 
         [SecuritySafeCritical]  // auto-generated 
         public override int Read()
         {
 
-            if (charPos == charLen)
+            if (_charPos == _charLen)
             {
                 if (ReadBuffer() == 0) return -1;
             }
-            int result = charBuffer[charPos];
-            charPos++;
+            int result = _charBuffer[_charPos];
+            _charPos++;
             return result;
         }
 
@@ -324,14 +324,14 @@ namespace TailBlazer.Domain.FileHandling
             bool readToUserBuffer = false;
             while (count > 0)
             {
-                int n = charLen - charPos;
+                int n = _charLen - _charPos;
                 if (n == 0) n = ReadBuffer(buffer, index + charsRead, count, out readToUserBuffer);
                 if (n == 0) break;  // We're at EOF 
                 if (n > count) n = count;
                 if (!readToUserBuffer)
                 {
-                    Buffer.BlockCopy(charBuffer, charPos * 2, buffer, (index + charsRead) * 2, n * 2);
-                    charPos += n;
+                    Buffer.BlockCopy(_charBuffer, _charPos * 2, buffer, (index + charsRead) * 2, n * 2);
+                    _charPos += n;
                 }
                 charsRead += n;
                 count -= n;
@@ -345,17 +345,17 @@ namespace TailBlazer.Domain.FileHandling
         }
 
         [SecuritySafeCritical]  // auto-generated
-        public override String ReadToEnd()
+        public override string ReadToEnd()
         {
 
             // Call ReadBuffer, then pull data out of charBuffer. 
-            var sb = new StringBuilder(charLen - charPos);
+            var sb = new StringBuilder(_charLen - _charPos);
             do
             {
-                sb.Append(charBuffer, charPos, charLen - charPos);
-                charPos = charLen;  // Note we consumed these characters 
+                sb.Append(_charBuffer, _charPos, _charLen - _charPos);
+                _charPos = _charLen;  // Note we consumed these characters 
                 ReadBuffer();
-            } while (charLen > 0);
+            } while (_charLen > 0);
             return sb.ToString();
         }
 
@@ -364,32 +364,32 @@ namespace TailBlazer.Domain.FileHandling
         // Trims n bytes from the front of the buffer.
         private void CompressBuffer(int n)
         {
-            Contract.Assert(byteLen >= n, "CompressBuffer was called with a number of bytes greater than the current buffer length.  Are two threads using this StreamReader at the same time?");
-            Buffer.BlockCopy(byteBuffer, n, byteBuffer, 0, byteLen - n);
-            byteLen -= n;
+            Contract.Assert(_byteLen >= n, "CompressBuffer was called with a number of bytes greater than the current buffer length.  Are two threads using this StreamReader at the same time?");
+            Buffer.BlockCopy(_byteBuffer, n, _byteBuffer, 0, _byteLen - n);
+            _byteLen -= n;
         }
 
         private void DetectEncoding()
         {
-            if (byteLen < 2)
+            if (_byteLen < 2)
                 return;
             _detectEncoding = false;
             bool changedEncoding = false;
-            if (byteBuffer[0] == 0xFE && byteBuffer[1] == 0xFF)
+            if (_byteBuffer[0] == 0xFE && _byteBuffer[1] == 0xFF)
             {
                 // Big Endian Unicode 
 
-                encoding = new UnicodeEncoding(true, true);
+                _encoding = new UnicodeEncoding(true, true);
                 CompressBuffer(2);
                 changedEncoding = true;
             }
 
-            else if (byteBuffer[0] == 0xFF && byteBuffer[1] == 0xFE)
+            else if (_byteBuffer[0] == 0xFF && _byteBuffer[1] == 0xFE)
             {
                 // Little Endian Unicode, or possibly little endian UTF32 
-                if (byteLen < 4 || byteBuffer[2] != 0 || byteBuffer[3] != 0)
+                if (_byteLen < 4 || _byteBuffer[2] != 0 || _byteBuffer[3] != 0)
                 {
-                    encoding = new UnicodeEncoding(false, true);
+                    _encoding = new UnicodeEncoding(false, true);
                     CompressBuffer(2);
                     changedEncoding = true;
                 }
@@ -402,10 +402,10 @@ namespace TailBlazer.Domain.FileHandling
 #endif 
             }
 
-            else if (byteLen >= 3 && byteBuffer[0] == 0xEF && byteBuffer[1] == 0xBB && byteBuffer[2] == 0xBF)
+            else if (_byteLen >= 3 && _byteBuffer[0] == 0xEF && _byteBuffer[1] == 0xBB && _byteBuffer[2] == 0xBF)
             {
                 // UTF-8 
-                encoding = Encoding.UTF8;
+                _encoding = Encoding.UTF8;
                 CompressBuffer(3);
                 changedEncoding = true;
             }
@@ -418,15 +418,15 @@ namespace TailBlazer.Domain.FileHandling
                 changedEncoding = true; 
             } 
 #endif
-            else _detectEncoding |= byteLen == 2;
+            else _detectEncoding |= _byteLen == 2;
             // Note: in the future, if we change this algorithm significantly,
             // we can support checking for the preamble of the given encoding.
 
             if (changedEncoding)
             {
-                decoder = encoding.GetDecoder();
-                _maxCharsPerBuffer = encoding.GetMaxCharCount(byteBuffer.Length);
-                charBuffer = new char[_maxCharsPerBuffer];
+                _decoder = _encoding.GetDecoder();
+                _maxCharsPerBuffer = _encoding.GetMaxCharCount(_byteBuffer.Length);
+                _charBuffer = new char[_maxCharsPerBuffer];
             }
         }
 
@@ -440,28 +440,28 @@ namespace TailBlazer.Domain.FileHandling
             if (!_checkPreamble)
                 return _checkPreamble;
 
-            Contract.Assert(bytePos <= _preamble.Length, "_compressPreamble was called with the current bytePos greater than the preamble buffer length.  Are two threads using this StreamReader at the same time?");
-            int len = (byteLen >= (_preamble.Length)) ? (_preamble.Length - bytePos) : (byteLen - bytePos);
+            Contract.Assert(_bytePos <= _preamble.Length, "_compressPreamble was called with the current bytePos greater than the preamble buffer length.  Are two threads using this StreamReader at the same time?");
+            int len = (_byteLen >= (_preamble.Length)) ? (_preamble.Length - _bytePos) : (_byteLen - _bytePos);
 
-            for (int i = 0; i < len; i++, bytePos++)
+            for (int i = 0; i < len; i++, _bytePos++)
             {
-                if (byteBuffer[bytePos] != _preamble[bytePos])
+                if (_byteBuffer[_bytePos] != _preamble[_bytePos])
                 {
-                    bytePos = 0;
+                    _bytePos = 0;
                     _checkPreamble = false;
                     break;
                 }
             }
 
-            Contract.Assert(bytePos <= _preamble.Length, "possible bug in _compressPreamble.  Are two threads using this StreamReader at the same time?");
+            Contract.Assert(_bytePos <= _preamble.Length, "possible bug in _compressPreamble.  Are two threads using this StreamReader at the same time?");
 
             if (_checkPreamble)
             {
-                if (bytePos == _preamble.Length)
+                if (_bytePos == _preamble.Length)
                 {
                     // We have a match
                     CompressBuffer(_preamble.Length);
-                    bytePos = 0;
+                    _bytePos = 0;
                     _checkPreamble = false;
                     _detectEncoding = false;
                 }
@@ -472,45 +472,45 @@ namespace TailBlazer.Domain.FileHandling
 
         internal virtual int ReadBuffer()
         {
-            charLen = 0;
-            charPos = 0;
+            _charLen = 0;
+            _charPos = 0;
 
             if (!_checkPreamble)
-                byteLen = 0;
+                _byteLen = 0;
             do
             {
                 if (_checkPreamble)
                 {
-                    Contract.Assert(bytePos <= _preamble.Length, "possible bug in _compressPreamble.  Are two threads using this StreamReader at the same time?");
-                    int len = stream.Read(byteBuffer, bytePos, byteBuffer.Length - bytePos);
+                    Contract.Assert(_bytePos <= _preamble.Length, "possible bug in _compressPreamble.  Are two threads using this StreamReader at the same time?");
+                    int len = _stream.Read(_byteBuffer, _bytePos, _byteBuffer.Length - _bytePos);
                     Contract.Assert(len >= 0, "Stream.Read returned a negative number!  This is a bug in your stream class.");
 
                     if (len == 0)
                     {
                         // EOF but we might have buffered bytes from previous 
                         // attempts to detecting preamble that needs to decoded now
-                        if (byteLen > 0)
-                            charLen += decoder.GetChars(byteBuffer, 0, byteLen, charBuffer, charLen);
+                        if (_byteLen > 0)
+                            _charLen += _decoder.GetChars(_byteBuffer, 0, _byteLen, _charBuffer, _charLen);
 
-                        return charLen;
+                        return _charLen;
                     }
 
-                    byteLen += len;
+                    _byteLen += len;
                 }
                 else
                 {
-                    Contract.Assert(bytePos == 0, "bytePos can be non zero only when we are trying to _checkPreamble.  Are two threads using this StreamReader at the same time?");
-                    byteLen = stream.Read(byteBuffer, 0, byteBuffer.Length);
-                    Contract.Assert(byteLen >= 0, "Stream.Read returned a negative number!  This is a bug in your stream class.");
+                    Contract.Assert(_bytePos == 0, "bytePos can be non zero only when we are trying to _checkPreamble.  Are two threads using this StreamReader at the same time?");
+                    _byteLen = _stream.Read(_byteBuffer, 0, _byteBuffer.Length);
+                    Contract.Assert(_byteLen >= 0, "Stream.Read returned a negative number!  This is a bug in your stream class.");
 
-                    if (byteLen == 0)  // We're at EOF 
-                        return charLen;
+                    if (_byteLen == 0)  // We're at EOF 
+                        return _charLen;
                 }
 
                 // _isBlocked == whether we read fewer bytes than we asked for.
                 // Note we must check it here because CompressBuffer or 
                 // DetectEncoding will change byteLen.
-                _isBlocked = (byteLen < byteBuffer.Length);
+                _isBlocked = (_byteLen < _byteBuffer.Length);
 
                 // Check for preamble before detect encoding. This is not to override the 
                 // user suppplied Encoding for the one we implicitly detect. The user could
@@ -520,13 +520,13 @@ namespace TailBlazer.Domain.FileHandling
 
                 // If we're supposed to detect the encoding and haven't done so yet,
                 // do it.  Note this may need to be called more than once.
-                if (_detectEncoding && byteLen >= 2)
+                if (_detectEncoding && _byteLen >= 2)
                     DetectEncoding();
 
-                charLen += decoder.GetChars(byteBuffer, 0, byteLen, charBuffer, charLen);
-            } while (charLen == 0);
+                _charLen += _decoder.GetChars(_byteBuffer, 0, _byteLen, _charBuffer, _charLen);
+            } while (_charLen == 0);
             //Console.WriteLine("ReadBuffer called.  chars: "+charLen);
-            return charLen;
+            return _charLen;
         }
 
 
@@ -539,11 +539,11 @@ namespace TailBlazer.Domain.FileHandling
         // this on the first call to ReadBuffer.
         private int ReadBuffer(char[] userBuffer, int userOffset, int desiredChars, out bool readToUserBuffer)
         {
-            charLen = 0;
-            charPos = 0;
+            _charLen = 0;
+            _charPos = 0;
 
             if (!_checkPreamble)
-                byteLen = 0;
+                _byteLen = 0;
 
             int charsRead = 0;
 
@@ -564,46 +564,46 @@ namespace TailBlazer.Domain.FileHandling
             {
                 if (_checkPreamble)
                 {
-                    Contract.Assert(bytePos <= _preamble.Length, "possible bug in _compressPreamble.  Are two threads using this StreamReader at the same time?");
-                    int len = stream.Read(byteBuffer, bytePos, byteBuffer.Length - bytePos);
+                    Contract.Assert(_bytePos <= _preamble.Length, "possible bug in _compressPreamble.  Are two threads using this StreamReader at the same time?");
+                    int len = _stream.Read(_byteBuffer, _bytePos, _byteBuffer.Length - _bytePos);
                     Contract.Assert(len >= 0, "Stream.Read returned a negative number!  This is a bug in your stream class.");
 
                     if (len == 0)
                     {
                         // EOF but we might have buffered bytes from previous 
                         // attempts to detecting preamble that needs to decoded now
-                        if (byteLen > 0)
+                        if (_byteLen > 0)
                         {
                             if (readToUserBuffer)
                             {
-                                charsRead += decoder.GetChars(byteBuffer, 0, byteLen, userBuffer, userOffset + charsRead);
-                                charLen = 0;  // StreamReader's buffer is empty. 
+                                charsRead += _decoder.GetChars(_byteBuffer, 0, _byteLen, userBuffer, userOffset + charsRead);
+                                _charLen = 0;  // StreamReader's buffer is empty. 
                             }
                             else
                             {
-                                charsRead = decoder.GetChars(byteBuffer, 0, byteLen, charBuffer, charsRead);
-                                charLen += charsRead;  // Number of chars in StreamReader's buffer. 
+                                charsRead = _decoder.GetChars(_byteBuffer, 0, _byteLen, _charBuffer, charsRead);
+                                _charLen += charsRead;  // Number of chars in StreamReader's buffer. 
                             }
                         }
                         return charsRead;
                     }
 
-                    byteLen += len;
+                    _byteLen += len;
                 }
                 else
                 {
-                    Contract.Assert(bytePos == 0, "bytePos can be non zero only when we are trying to _checkPreamble.  Are two threads using this StreamReader at the same time?");
-                    byteLen = stream.Read(byteBuffer, 0, byteBuffer.Length);
-                    Contract.Assert(byteLen >= 0, "Stream.Read returned a negative number!  This is a bug in your stream class.");
+                    Contract.Assert(_bytePos == 0, "bytePos can be non zero only when we are trying to _checkPreamble.  Are two threads using this StreamReader at the same time?");
+                    _byteLen = _stream.Read(_byteBuffer, 0, _byteBuffer.Length);
+                    Contract.Assert(_byteLen >= 0, "Stream.Read returned a negative number!  This is a bug in your stream class.");
 
-                    if (byteLen == 0)  // EOF
+                    if (_byteLen == 0)  // EOF
                         return charsRead;
                 }
 
                 // _isBlocked == whether we read fewer bytes than we asked for.
                 // Note we must check it here because CompressBuffer or 
                 // DetectEncoding will change byteLen.
-                _isBlocked = (byteLen < byteBuffer.Length);
+                _isBlocked = (_byteLen < _byteBuffer.Length);
 
                 // Check for preamble before detect encoding. This is not to override the
                 // user suppplied Encoding for the one we implicitly detect. The user could 
@@ -614,23 +614,23 @@ namespace TailBlazer.Domain.FileHandling
                     continue;
 
                 // On the first call to ReadBuffer, if we're supposed to detect the encoding, do it. 
-                if (_detectEncoding && byteLen >= 2)
+                if (_detectEncoding && _byteLen >= 2)
                 {
                     DetectEncoding();
                     // DetectEncoding changes some buffer state.  Recompute this.
                     readToUserBuffer = desiredChars >= _maxCharsPerBuffer;
                 }
 
-                charPos = 0;
+                _charPos = 0;
                 if (readToUserBuffer)
                 {
-                    charsRead += decoder.GetChars(byteBuffer, 0, byteLen, userBuffer, userOffset + charsRead);
-                    charLen = 0;  // StreamReader's buffer is empty.
+                    charsRead += _decoder.GetChars(_byteBuffer, 0, _byteLen, userBuffer, userOffset + charsRead);
+                    _charLen = 0;  // StreamReader's buffer is empty.
                 }
                 else
                 {
-                    charsRead = decoder.GetChars(byteBuffer, 0, byteLen, charBuffer, charsRead);
-                    charLen += charsRead;  // Number of chars in StreamReader's buffer.
+                    charsRead = _decoder.GetChars(_byteBuffer, 0, _byteLen, _charBuffer, charsRead);
+                    _charLen += charsRead;  // Number of chars in StreamReader's buffer.
                 }
             } while (charsRead == 0);
 
@@ -648,48 +648,48 @@ namespace TailBlazer.Domain.FileHandling
         // value is null if the end of the input stream has been reached. 
         //
         [SecuritySafeCritical]  // auto-generated
-        public override String ReadLine()
+        public override string ReadLine()
         {
             //if (stream == null)
             //    __Error.ReaderClosed();
 
-            if (charPos == charLen)
+            if (_charPos == _charLen)
             {
                 if (ReadBuffer() == 0) return null;
             }
             StringBuilder sb = null;
             do
             {
-                int i = charPos;
+                int i = _charPos;
                 do
                 {
-                    char ch = charBuffer[i];
+                    char ch = _charBuffer[i];
                     // Note the following common line feed chars: 
                     // \n - UNIX   \r\n - DOS   \r - Mac 
                     if (ch == '\r' || ch == '\n')
                     {
-                        String s;
+                        string s;
                         if (sb != null)
                         {
-                            sb.Append(charBuffer, charPos, i - charPos);
+                            sb.Append(_charBuffer, _charPos, i - _charPos);
                             s = sb.ToString();
                         }
                         else
                         {
-                            s = new String(charBuffer, charPos, i - charPos);
+                            s = new string(_charBuffer, _charPos, i - _charPos);
                         }
-                        charPos = i + 1;
-                        if (ch == '\r' && (charPos < charLen || ReadBuffer() > 0))
+                        _charPos = i + 1;
+                        if (ch == '\r' && (_charPos < _charLen || ReadBuffer() > 0))
                         {
-                            if (charBuffer[charPos] == '\n') charPos++;
+                            if (_charBuffer[_charPos] == '\n') _charPos++;
                         }
                         return s;
                     }
                     i++;
-                } while (i < charLen);
-                i = charLen - charPos;
+                } while (i < _charLen);
+                i = _charLen - _charPos;
                 if (sb == null) sb = new StringBuilder(i + 80);
-                sb.Append(charBuffer, charPos, i);
+                sb.Append(_charBuffer, _charPos, i);
             } while (ReadBuffer() > 0);
             return sb.ToString();
         }
@@ -697,9 +697,9 @@ namespace TailBlazer.Domain.FileHandling
         public long AbsolutePosition()
         {
             // The number of bytes that the already-read characters need when encoded.
-            int numReadBytes = CurrentEncoding.GetByteCount(charBuffer, 0, charPos);
+            int numReadBytes = CurrentEncoding.GetByteCount(_charBuffer, 0, _charPos);
 
-            return BaseStream.Position - byteLen + numReadBytes;
+            return BaseStream.Position - _byteLen + numReadBytes;
         }
 
     }
