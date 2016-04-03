@@ -28,7 +28,7 @@ namespace TailBlazer.Fixtures
         public void GeneralOptions()
         {
 
-            var original = new GeneralOptions(Theme.Dark, false,0.5,125);
+            var original = new GeneralOptions(Theme.Dark, false,5,125);
             var converter = new GeneralOptionsConverter();
             var state = converter.Convert(original);
             var restored = converter.Convert(state);
