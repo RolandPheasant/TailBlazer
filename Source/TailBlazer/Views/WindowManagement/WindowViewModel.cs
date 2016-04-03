@@ -49,6 +49,8 @@ namespace TailBlazer.Views.WindowManagement
         
         public FileDropMonitor DropMonitor { get; } = new FileDropMonitor();
 
+        public static int OpenedFileCount { get; set; }
+
         public WindowViewModel(IObjectProvider objectProvider, 
             IWindowFactory windowFactory, 
             ILogger logger,
@@ -125,6 +127,52 @@ namespace TailBlazer.Views.WindowManagement
 
             foreach (var file in files)
                 OpenFile(new FileInfo(file));
+        }
+
+        private void OpenFile(IEnumerable<FileInfo> files)
+        {
+            OpenedFileCount = files.Count();
+            if (OpenedFileCount > 1)
+            {
+                var msgResult = MessageBox.Show("Would you like to tail these files?", "Tail files",
+                    MessageBoxButton.YesNo);
+                if (msgResult == MessageBoxResult.Yes)
+                {
+                    _schedulerProvider.Background.Schedule(() =>
+                    {
+                        try
+                        {
+                            _logger.Info($"Attempting to open '{files.Count()}' files");
+
+                            var factory = _objectProvider.Get<TailViewModelFactory>();
+                            var viewModel = factory.Create(files);
+
+                            var newItem = new ViewContainer(new FilesHeader(files), viewModel);
+
+                            _windowsController.Register(newItem);
+
+                            //_logger.Info($"Objects for '{file.FullName}' has been created.");
+                            //do the work on the ui thread
+                            _schedulerProvider.MainThread.Schedule(() =>
+                            {
+
+                                Views.Add(newItem);
+                                _logger.Info($"Opened '{files.Count()}' files");
+                                Selected = newItem;
+                            });
+                        }
+                        catch
+                        {
+                            // ignored
+                        }
+                    });
+                    return;
+                }
+            }
+            foreach (var fileInfo in files)
+            {
+                OpenFile(fileInfo);
+            }
         }
 
         private void OpenFile(FileInfo file)

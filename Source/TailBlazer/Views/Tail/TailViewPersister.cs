@@ -29,7 +29,7 @@ namespace TailBlazer.Views.Tail
                                         search.IgnoreCase
                                     ));
 
-            var tailViewState = new TailViewState(_tailView.Name,_tailView.SearchCollection.Selected.Text, searchItems);
+            var tailViewState = new TailViewState(_tailView.Names,_tailView.SearchCollection.Selected.Text, searchItems);
             var converter = new TailViewToStateConverter();
             return converter.Convert(tailViewState);
         }
@@ -107,7 +107,10 @@ namespace TailBlazer.Views.Tail
                 return State.Empty;
 
             var root = new XElement(new XElement(Structure.Root));
-            root.Add(new XElement(Structure.FileName, state.FileName));
+            foreach (var fileName in state.FilesName)
+            {
+                root.Add(new XElement(Structure.FileName, fileName));
+            }
             root.Add(new XElement(Structure.SelectedFilter, state.SelectedSearch));
 
             var list = new XElement(Structure.SearchList);

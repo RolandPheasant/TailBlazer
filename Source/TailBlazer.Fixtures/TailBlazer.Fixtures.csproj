@@ -111,12 +111,14 @@
     <Compile Include="FileNamerFixture.cs" />
     <Compile Include="MyUnitTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReorderingEventsTests.cs" />
     <Compile Include="SettingsConversion.cs" />
     <Compile Include="SchedulerEx.cs" />
     <Compile Include="IndexerFixture.cs" />
     <Compile Include="SettingsStoreFixture.cs" />
     <Compile Include="SplitFileByMatchingTextFixture.cs" />
     <Compile Include="TestFile.cs" />
+    <Compile Include="TestFileCollection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

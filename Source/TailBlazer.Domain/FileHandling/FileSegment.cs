@@ -1,4 +1,5 @@
 using System;
+using System.Security.AccessControl;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -11,6 +12,7 @@ namespace TailBlazer.Domain.FileHandling
         public long Size => End - Start;
         public FileSegmentKey Key { get; }
 
+
         public FileSegment(int index, long start, long end, FileSegmentType type)
         {
             Index = index;
@@ -20,6 +22,7 @@ namespace TailBlazer.Domain.FileHandling
             Key=new FileSegmentKey(index,type);
         }
 
+
         public FileSegment(FileSegment previous, long end)
         {
             Index = previous.Index;
@@ -28,6 +31,7 @@ namespace TailBlazer.Domain.FileHandling
             Type = previous.Type;
             Key = previous.Key;
         }
+
 
         #region Equality
 

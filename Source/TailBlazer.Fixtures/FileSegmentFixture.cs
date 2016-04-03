@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using FluentAssertions;
 using TailBlazer.Domain.FileHandling;
@@ -12,6 +15,44 @@ namespace TailBlazer.Fixtures
 {
     public class FileSegmentFixture
     {
+        [Fact]
+        public void MoreFileSegmentation()
+        {
+            TestFileCollection testFileCollection = new TestFileCollection();
+
+            for (int i = 0; i < 10; i++)
+            {
+                testFileCollection.Add(new TestFile());
+                testFileCollection[i].Append(
+                    Enumerable.Range(1, 1000).Select(j => $"This is line number {j.ToString("00000000")}").ToArray());
+            }
+
+            var refresher = new Subject<Unit>();
+            var segmenter = new FileSegmenter(testFileCollection.Select(t => t.Info.WatchFile(refresher)).Merge(), 1000);
+            FileSegmentCollection result = null;
+
+            using (var indexer = segmenter.Segments.Subscribe(segment => result = segment))
+            {
+                result.Should().NotBeNull();
+                var current = new FileSegmentCollection( result );
+                int depthOfLink = 0;
+                while (current != null)
+                {
+                    depthOfLink++;
+                    current = current.Link;
+                }
+                depthOfLink.Should().Be(10);
+                result.Segments.Select(fs => fs.Type).Should().Contain(FileSegmentType.Head);
+                result.Segments.Select(fs => fs.Type).Should().Contain(FileSegmentType.Tail);
+
+                testFileCollection.ForEach(t => t.Delete());
+            }
+
+            testFileCollection.ForEach(t => t.Delete());
+
+        }
+
+
         [Fact]
         public void FileChanged()
         {

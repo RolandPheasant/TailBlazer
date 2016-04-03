@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
 namespace TailBlazer.Domain.FileHandling
@@ -19,58 +20,51 @@ namespace TailBlazer.Domain.FileHandling
 
     public sealed class FileSegmenter
     {
-        private  FileInfo _info;
+        private FileInfo _info;
         private readonly int _initialTail;
         private readonly int _segmentSize;
 
         public IObservable<FileSegmentCollection> Segments { get; }
 
-        public FileSegmenter(IObservable<FileNotification> notifications, 
-                                int initialTail= 100000, 
-                                int segmentSize=25000000)
+        public FileSegmenter(IObservable<FileNotification> notifications,
+                                int initialTail = 100000,
+                                int segmentSize = 25000000)
         {
             if (notifications == null) throw new ArgumentNullException(nameof(notifications));
             _initialTail = initialTail;
             _segmentSize = segmentSize;
 
-
-
-
             //TODO: Re-segment as file grows + account for rollover
             Segments = notifications
-                //.notifications()
-                .Scan((FileSegmentCollection) null, (previous, current) =>
-                {
-                    if (previous == null || previous.FileLength == 0)
-                    {
-                        _info =(FileInfo) current;
+                .Scan((FileSegmentCollection)null, Accumulator)
+                .Replay(1).RefCount();
 
-                        var segments = LoadSegments().ToArray();
-                        return new FileSegmentCollection(_info, segments, current.Size);
-                    }
-                    var newLength = _info.Length;
+        }
 
-                    if (newLength < previous.FileLength)
-                    {
-                        var sizeDiff = newLength - previous.FileLength;
-                        var segments = LoadSegments().ToArray();
-                        return new FileSegmentCollection(_info, segments, sizeDiff);
-                    }
+        private FileSegmentCollection Accumulator(FileSegmentCollection previous, FileNotification current)
+        {
+            if (previous == null || previous.FileLength == 0)
+            {
+                _info = (FileInfo)current;
 
-                    return new FileSegmentCollection(newLength, previous);
-                }).Replay(1).RefCount();
+                var fileSegments = LoadSegments().ToArray();
+                return new FileSegmentCollection(_info, fileSegments, current.Size, true);
+            }
+
+            _info = (FileInfo)current;
+            return new FileSegmentCollection(previous, _info, LoadSegments().ToArray(), current.Size, false);
         }
 
         public IEnumerable<FileSegment> LoadSegments()
         {
-            using (var stream = File.Open(_info.FullName, FileMode.Open, FileAccess.Read,FileShare.Delete | FileShare.ReadWrite))
+            using (var stream = File.Open(_info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
                 var fileLength = stream.Length;
 
                 stream.Seek(0, SeekOrigin.Begin);
                 using (var reader = new StreamReaderExtended(stream, true))
                 {
-                    if (reader.EndOfStream ||  fileLength == 0)
+                    if (reader.EndOfStream || fileLength == 0)
                     {
                         yield return new FileSegment(0, 0, 0, FileSegmentType.Tail);
                         yield break;
@@ -104,7 +98,7 @@ namespace TailBlazer.Domain.FileHandling
                     } while (true);
 
 
-                    index ++;
+                    index++;
                     yield return new FileSegment(index, headStartsAt, fileLength, FileSegmentType.Tail);
                 }
             }

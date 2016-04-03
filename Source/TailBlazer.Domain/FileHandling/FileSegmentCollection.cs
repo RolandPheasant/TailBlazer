@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -6,22 +7,22 @@ namespace TailBlazer.Domain.FileHandling
 {
     public class FileSegmentCollection : IEquatable<FileSegmentCollection>
     {
-        private long sizeDiff;
-
         public FileInfo Info { get;  }
         public FileSegment[] Segments { get;  }
         public long TailStartsAt { get;  }
         public int Count { get;  }
         public FileSegmentChangedReason Reason { get; }
         public FileSegment Tail => Segments[Count - 1];
+        public FileSegmentCollection Link { get; private set; }
         public long FileLength => Tail.End;
+        public bool IsFirst { get; set; }
 
         public long FileSize { get; }
 
 
         public long SizeDiff { get; }
 
-        public FileSegmentCollection(FileInfo fileInfo, FileSegment[] segments, long sizeDiff)
+        public FileSegmentCollection(FileInfo fileInfo, FileSegment[] segments, long sizeDiff, bool isfirst)
         {
             if (segments.Length == 0)
                 throw new ArgumentException("Argument is empty collection", nameof(segments));
@@ -33,27 +34,22 @@ namespace TailBlazer.Domain.FileHandling
             FileSize = TailStartsAt;
             SizeDiff = sizeDiff;
             Reason = FileSegmentChangedReason.Loaded;
+            IsFirst = isfirst;
         }
 
-        public FileSegmentCollection(long newLength, FileSegmentCollection previous)
+        public FileSegmentCollection(FileSegmentCollection previous, FileInfo fileInfo, FileSegment[] segments,
+            long sizeDiff, bool isfirst)
+            : this(fileInfo, segments, sizeDiff, isfirst)
         {
-            SizeDiff = newLength - previous.FileLength;
-
-            //All this assumes it is the tail which has changed, but that may not be so
-            Reason = FileSegmentChangedReason.Tailed;
-            Info = previous.Info;
-
-            var last = previous.Tail;
-            TailStartsAt = last.End;
-
-            var segments = previous.Segments;
-            segments[segments.Length-1] = new FileSegment(last, newLength);
-            Segments = segments;
-            Count = Segments.Length;
-            FileSize = newLength;
-
+            Link = previous;
         }
-        
+
+        public FileSegmentCollection(FileSegmentCollection fileSegmentCollection)
+            : this(fileSegmentCollection.Info, fileSegmentCollection.Segments, fileSegmentCollection.SizeDiff, fileSegmentCollection.IsFirst)
+        {
+            Link = fileSegmentCollection.Link;
+        }
+
         #region Equality
 
         public bool Equals(FileSegmentCollection other)

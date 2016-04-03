@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Text;
 using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.Annotations;
@@ -25,21 +24,16 @@ namespace TailBlazer.Domain.FileHandling
         An alternative solution to what I got now is to do a triple index (as per point 3).
         In doing so it would make the rx easier and get rid of the need for the observable list
   */
+
     public class Indexer : IDisposable
     {
         private readonly IDisposable _cleanUp;
         private readonly ISourceList<Index> _indicies = new SourceList<Index>();
 
-        public Encoding Encoding { get; private set; }
-        public FileInfo Info { get; private set; }
-
-        public IObservable<IndexCollection> Result { get; }
-
         public Indexer([NotNull] IObservable<FileSegmentCollection> fileSegments,
             int compression = 10,
             int tailSize = 1000000,
-            int sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing= 250000000,
-            Encoding encoding = null,
+            int sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing = 250000000,
             IScheduler scheduler = null)
         {
             if (fileSegments == null) throw new ArgumentNullException(nameof(fileSegments));
@@ -49,38 +43,39 @@ namespace TailBlazer.Domain.FileHandling
             scheduler = scheduler ?? Scheduler.Default;
 
             var shared = fileSegments.Replay(1).RefCount();
-           
+
             //1. Get information from segment info
-            var infoSubscriber = shared.Select(segments => segments.Info)
-                .Take(1)
-                .Subscribe(info =>
-                {
-                    Info = info;
-                    Encoding = encoding ?? info.GetEncoding();
-                });
-           
+            var infoSubscriber = shared
+                .Select(segments => segments.Info)
+                .Subscribe(info => { Info = info; });
+
             //2. create  a resulting index object from the collection of index fragments
             Result = _indicies
                 .Connect()
                 .Sort(SortExpressionComparer<Index>.Ascending(si => si.Start))
                 .ToCollection()
-                .Scan((IndexCollection)null, (previous, notification) => new IndexCollection(notification, previous, Info, Encoding))
+                .Scan((IndexCollection) null,
+                    (previous, notification) => new IndexCollection(notification, previous, Info, Info.GetEncoding()))
                 .Replay(1).RefCount();
 
 
             //3. Scan the tail so results can be returned quickly
-            var tailScanner= shared.Select(segments => segments.Tail).DistinctUntilChanged()
-                .Scan((Index)null, (previous, current) =>
-               {
-                    if (previous == null)
+            FileInfo lastFileInfo = null;
+            var tailScanner = shared.Select(segments => segments.Tail)
+                .DistinctUntilChanged()
+                .Scan((Index) null, (previous, current) =>
+                {
+                    if (previous == null || (lastFileInfo != null && !lastFileInfo.Equals(Info)))
                     {
                         var initial = Scan(current.Start, -1, 1);
-                        return initial ?? new Index(0, 0,0,0,IndexType.Tail);
+                        lastFileInfo = Info;
+                        return initial ?? new Index(0, 0, 0, 0, IndexType.Tail);
                     }
-                    var latest=Scan(previous.End , -1, 1);
-                    return latest == null ? null : new Index(latest,previous);
+                    var latest = Scan(previous.End, -1, 1);
+                    lastFileInfo = Info;
+                    return latest == null ? null : new Index(latest, previous);
                 })
-                .Where(tail=>tail!=null)
+                .Where(tail => tail != null)
                 .Replay(1).RefCount();
 
             //4. estimate =
@@ -94,9 +89,9 @@ namespace TailBlazer.Domain.FileHandling
                 });
             });
 
-
+            
             //Scan the remainer of the file
-            var headSubscriber = tailScanner.FirstAsync()
+            var headSubscriber = tailScanner
                 .Subscribe(tail =>
                 {
                     if (tail.Start == 0) return;
@@ -112,43 +107,53 @@ namespace TailBlazer.Domain.FileHandling
                     //todo: index first and last segment for large sized file
 
                     scheduler.Schedule(() =>
+                    {
+                        var actual = Scan(0, tail.Start, compression);
+                        _indicies.Edit(innerList =>
                         {
-                            var actual = Scan(0, tail.Start, compression);
-                            _indicies.Edit(innerList =>
-                            {
-                                innerList.Remove(estimate);
-                                innerList.Add(actual);
-                            });
+                            innerList.Remove(estimate);
+                            innerList.Add(actual);
                         });
+                    });
                 });
 
 
-            _cleanUp = new CompositeDisposable(infoSubscriber,_indicies, tailSubscriber, tailSubscriber, headSubscriber);
+            _cleanUp = new CompositeDisposable(infoSubscriber, _indicies, tailSubscriber, tailSubscriber, headSubscriber);
+        }
+
+        public FileInfo Info { get; private set; }
+        public IObservable<IndexCollection> Result { get; }
+
+        public void Dispose()
+        {
+            _cleanUp.Dispose();
         }
 
         private int EstimateNumberOfLines(Index tail, FileInfo info)
         {
             //Calculate estimate line count
-            var averageLineLength = tail.Size / tail.LineCount;
-            var estimatedLines = (info.Length - tail.Size) / averageLineLength;
-            return (int)estimatedLines;
+            var averageLineLength = tail.Size/tail.LineCount;
+            var estimatedLines = (info.Length - tail.Size)/averageLineLength;
+            return (int) estimatedLines;
         }
 
-        private Index Scan( long start, long end, int compression)
+        private Index Scan(long start, long end, int compression)
         {
-            int count = 0;
+            var count = 0;
             long lastPosition = 0;
-            using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            using (
+                var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read,
+                    FileShare.Delete | FileShare.ReadWrite))
             {
                 long[] lines;
-                using (var reader = new StreamReaderExtended(stream, Encoding, false))
+                using (var reader = new StreamReaderExtended(stream, Info.GetEncoding(), false))
                 {
                     var currentPosition = reader.AbsolutePosition();
-                    if (currentPosition!= start)
+                    if (currentPosition != start)
                         stream.Seek(start, SeekOrigin.Begin);
                     if (reader.EndOfStream) return null;
 
-                    lines = ScanLines(reader,compression, i => i, (line, position) =>
+                    lines = ScanLines(reader, compression, i => i, (line, position) =>
                     {
                         var shouldBreak = end != -1 && lastPosition >= end;
                         if (!shouldBreak)
@@ -158,28 +163,27 @@ namespace TailBlazer.Domain.FileHandling
                             count++;
                         }
                         return shouldBreak;
-
                     }).ToArray();
                 }
 
-                if (end != -1 && lastPosition> end)
+                if (end != -1 && lastPosition > end)
                 {
                     count--;
                     lastPosition = end;
                     lines = lines.Take(lines.Length - 1).ToArray();
                 }
 
-                return new Index(start, lastPosition, lines, compression, count, end == -1 ? IndexType.Tail : IndexType.Page);
+                return new Index(start, lastPosition, lines, compression, count,
+                    end == -1 ? IndexType.Tail : IndexType.Page);
             }
         }
 
-        private  static IEnumerable<T> ScanLines<T>( StreamReaderExtended source,
-        int compression,
-        Func<long, T> selector,
-        Func<string, long, bool> shouldBreak)
+        private static IEnumerable<T> ScanLines<T>(StreamReaderExtended source,
+            int compression,
+            Func<long, T> selector,
+            Func<string, long, bool> shouldBreak)
         {
-
-            int i = 0;
+            var i = 0;
             if (source.EndOfStream) yield break;
 
             string line;
@@ -195,15 +199,8 @@ namespace TailBlazer.Domain.FileHandling
                 {
                     yield return selector(position);
                     i = 0;
-                };
-
-
+                }
             }
-        }
-
-        public void Dispose()
-        {
-            _cleanUp.Dispose();
         }
     }
 }
