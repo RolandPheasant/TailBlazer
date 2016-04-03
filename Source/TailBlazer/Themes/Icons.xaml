@@ -1,0 +1,244 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:TailBlazer.Controls">
+
+
+
+
+    <Style TargetType="{x:Type controls:SaveLayoutIcon}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:SaveLayoutIcon}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+
+                        <Path Data="M13,9H18.5L13,3.5V9M6,2H14L20,8V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V4C4,2.89 4.89,2 6,2M15.68,15C15.34,13.3 13.82,12 12,12C10.55,12 9.3,12.82 8.68,14C7.17,14.18 6,15.45 6,17A3,3 0 0,0 9,20H15.5A2.5,2.5 0 0,0 18,17.5C18,16.18 16.97,15.11 15.68,15Z" 
+                                        Stretch="Uniform"
+                                        Fill="{TemplateBinding Foreground}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type controls:ExitIcon}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:ExitIcon}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+
+                        <Path Data="M19,3H5C3.89,3 3,3.89 3,5V9H5V5H19V19H5V15H3V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M10.08,15.58L11.5,17L16.5,12L11.5,7L10.08,8.41L12.67,11H3V13H12.67L10.08,15.58Z" 
+                              Stretch="Uniform"
+                              Fill="{TemplateBinding Foreground}" />
+                    </Border>
+                 </ControlTemplate> 
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type controls:TextMatchedIcon}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:TextMatchedIcon}">
+                    <Border Background="{TemplateBinding Background}">
+
+                        <Viewbox Stretch="Uniform">
+                            <Path Data="M6.5,2.3399996 C4,2.3399999 2,4.3400001 2,6.8400001 2,9.3400001 4,11.34 6.5,11.34 9,11.34 11,9.3400001 11,6.8400001 11,4.3400001 9,2.3399999 6.5,2.3399996 z M6.5,0.33999999 C10.089851,0.33999987 13,3.250149 13,6.8400001 13,8.4499998 12.41,9.9300003 11.44,11.07 L11.71,11.34 12.5,11.34 17.5,16.34 16,17.84 11,12.84 11,12.05 10.73,11.78 C9.5900002,12.75 8.1099997,13.34 6.5,13.34 2.9101486,13.34 0,10.429851 0,6.8400001 0,3.250149 2.9101486,0.33999987 6.5,0.33999999 z M21.75,0 L27.17,5.42 21.75,10.84 20.093889,9.1838893 22.489091,6.7886872 16.33,6.7886872 16.33,4.0513134 22.489091,4.0513134 20.093889,1.656111 z"
+                                Fill="{TemplateBinding Foreground}" 
+                                Width="48"
+                                Height="48"
+                                Stroke="{TemplateBinding BorderBrush}"
+                                StrokeThickness="{TemplateBinding BorderThickness}"
+                                Stretch="Uniform"/>
+                        </Viewbox>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <Style TargetType="{x:Type controls:RegexMatchedIcon}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:RegexMatchedIcon}">
+                    <Border Background="{TemplateBinding Background}">
+                        <Viewbox Stretch="Uniform">
+                            <Path Data="M2,12 C3.1045694,12 4,12.89543 4,14 4,15.10457 3.1045694,16 2,16 0.89542961,16 0,15.10457 0,14 0,12.89543 0.89542961,12 2,12 z M23.5,5.1599997 L28.92,10.58 23.5,16 21.843889,14.343889 24.239091,11.948687 18.08,11.948687 18.08,9.2113132 24.239091,9.2113132 21.843889,6.8161112 z M10,0 C10.34,0 10.67,0.029999733 11,0.079999924 L11,3.5899998 13.5,1.1099997 C14,1.4999998 14.5,1.9999998 14.89,2.5 L12.41,4.9999997 15.92,4.9999997 C15.97,5.3299998 16,5.6599998 16,5.9999997 16,6.3399998 15.97,6.6699998 15.92,7 L12.41,7 14.89,9.5 C14.7,9.75 14.5,10 14.24,10.24 14,10.5 13.75,10.7 13.5,10.89 L11,8.4100001 11,11.92 C10.67,11.97 10.34,12 10,12 9.6599998,12 9.3299999,11.97 9,11.92 L9,8.4100001 6.5,10.89 C6,10.5 5.5,10 5.1099997,9.5 L7.5900002,7 4.0799999,7 C4.0299997,6.6699998 4,6.3399998 4,5.9999997 4,5.6599998 4.0299997,5.3299998 4.0799999,4.9999997 L7.5900002,4.9999997 5.1099997,2.5 C5.3000002,2.2499998 5.5,1.9999998 5.7600002,1.76 6,1.4999998 6.25,1.3 6.5,1.1099997 L9,3.5899998 9,0.079999924 C9.3299999,0.029999733 9.6599998,0 10,0 z"
+                                Width="48"
+                                Height="48"
+                                Fill="{TemplateBinding Foreground}"
+                                Stroke="{TemplateBinding BorderBrush}"
+                                StrokeThickness="{TemplateBinding BorderThickness}"
+                                Stretch="Uniform"/>
+                        </Viewbox>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type controls:SearchIcon}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:SearchIcon}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+
+                        <Path Data="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" 
+                              Stretch="Uniform"
+                              Fill="{TemplateBinding Foreground}" />
+                    </Border>
+                    
+                    
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type controls:RemoveIcon}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:RemoveIcon}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+
+                        <Path 
+                               Stretch="Uniform" 
+                               Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
+                               Fill="{TemplateBinding Foreground}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type controls:OpenFileIcon}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:OpenFileIcon}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+
+                        <!--<Path 
+                            Stretch="Uniform" 
+                            Fill="{TemplateBinding Foreground}" 
+                            Data="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z">
+
+                        </Path>-->
+
+                        <Path 
+                            Stretch="Uniform" 
+                            Fill="{TemplateBinding Foreground}" 
+                            Data="M13,9H18.5L13,3.5V9M6,2H14L20,8V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V4C4,2.89 4.89,2 6,2M11,4H6V20H11L18,20V11H11V4Z" >
+
+                        </Path>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type controls:SettingsIcon}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:SettingsIcon}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <Path 
+                            Stretch="Uniform" 
+                            Fill="{TemplateBinding Foreground}" 
+                            Data= "M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"  />
+
+
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type controls:FileIcon}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:FileIcon}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+
+
+                        <Path 
+                            Stretch="Uniform" 
+                            Fill="{TemplateBinding Foreground}" 
+                            Data="M13,9H18.5L13,3.5V9M6,2H14L20,8V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V4C4,2.89 4.89,2 6,2M15,18V16H6V18H15M18,14V12H6V14H18Z"/>
+
+
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type controls:TailBlazerIcon}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:TailBlazerIcon}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <Path 
+                            Stretch="Uniform" 
+                            Fill="{TemplateBinding Foreground}" 
+                            Data="M255.183 0l-40.84 26.79-48.353 32.02 16.336-30.386-30.712 16.663s-24.92 13.578-53.254 30.71c-28.335 17.134-59.677 37.19-75.798 53.91-28.994 28.992-28.994 75.554 0 104.548 28.993 28.993 75.555 28.993 104.55 0 16.132-16.133 34.54-43.203 49.333-66.977s25.81-44.106 25.81-44.106l13.396-24.177-26.137 9.474-3.92 1.306 43.453-68.61L255.183 0zm-69.917 71.224l-33.325 52.928-16.335 25.484 28.425-10.13 5.554-1.96c-4.324 7.417-4.84 8.55-11.11 18.624-14.48 23.273-32.925 50.242-46.065 63.383-21.19 21.19-53.956 21.19-75.146 0-21.19-21.19-21.19-53.955 0-75.145h.327c12.108-12.556 43.69-33.795 71.55-50.64 10.955-6.623 11.977-6.84 20.585-11.762l-2.288 3.92-19.93 36.92 34.96-23.198 42.8-28.424zm-111.41 79.392c-17.773 0-31.364 13.59-31.364 31.364s13.59 31.365 31.364 31.365 31.365-13.59 31.365-31.365c0-17.773-13.59-31.364-31.364-31.364z"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+
+
+    <Style TargetType="{x:Type controls:FilterIcon}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:FilterIcon}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+
+                        <Path Data="M3,2H21V2H21V4H20.92L15,9.92V22.91L9,16.91V9.91L3.09,4H3V2M11,16.08L13,18.08V9H13.09L18.09,4H5.92L10.92,9H11V16.08Z" 
+                              Stretch="Uniform"
+                              Fill="{TemplateBinding Foreground}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+
+    <Style TargetType="{x:Type controls:RegexIcon}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:RegexIcon}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+
+                        <Path Data="M16,16.92C15.67,16.97 15.34,17 15,17C14.66,17 14.33,16.97 14,16.92V13.41L11.5,15.89C11,15.5 10.5,15 10.11,14.5L12.59,12H9.08C9.03,11.67 9,11.34 9,11C9,10.66 9.03,10.33 9.08,10H12.59L10.11,7.5C10.3,7.25 10.5,7 10.76,6.76V6.76C11,6.5 11.25,6.3 11.5,6.11L14,8.59V5.08C14.33,5.03 14.66,5 15,5C15.34,5 15.67,5.03 16,5.08V8.59L18.5,6.11C19,6.5 19.5,7 19.89,7.5L17.41,10H20.92C20.97,10.33 21,10.66 21,11C21,11.34 20.97,11.67 20.92,12H17.41L19.89,14.5C19.7,14.75 19.5,15 19.24,15.24V15.24C19,15.5 18.75,15.7 18.5,15.89L16,13.41V16.92H16V16.92M5,19A2,2 0 0,1 7,17A2,2 0 0,1 9,19A2,2 0 0,1 7,21A2,2 0 0,1 5,19H5Z" 
+                               Stretch="Uniform"
+                              Fill="{TemplateBinding Foreground}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

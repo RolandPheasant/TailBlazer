@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 
 namespace TailBlazer.Domain.Infrastructure
 {
@@ -14,6 +14,12 @@ namespace TailBlazer.Domain.Infrastructure
 
     public static class ReactiveEx
     {
+
+        public static IDisposable SetAsComplete<T>(this ISubject<T> source)
+        {
+            return Disposable.Create(source.OnCompleted);
+        }
+
 
         public static IProperty<T> ForBinding<T>(this IObservable<T> source, PropertyType type = PropertyType.EagerSubscription)
         {
@@ -57,52 +63,39 @@ namespace TailBlazer.Domain.Infrastructure
             return source.StartWith(Unit.Default);
         }
 
-        public static IObservable<T> ObserveLatestOn<T>(this IObservable<T> source, IScheduler scheduler=null)
+        public static void Once(this ISubject<Unit> source)
         {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            source.OnNext(Unit.Default);
+        }
 
-            scheduler = scheduler ?? Scheduler.Default;
-            return Observable.Create<T>(observer =>
+        /// <summary>
+        /// from here http://haacked.com/archive/2012/10/08/writing-a-continueafter-method-for-rx.aspx/
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TRet"></typeparam>
+        /// <param name="observable"></param>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        public static IObservable<TRet> WithContinuation<T, TRet>(
+          this IObservable<T> observable, Func<IObservable<TRet>> selector)
+        {
+            return observable.AsCompletion().SelectMany(_ => selector());
+        }
+
+        public static IObservable<Unit> AsCompletion<T>(this IObservable<T> observable)
+        {
+            return Observable.Create<Unit>(observer =>
             {
-                Notification<T> outsideNotification = null;
-                var gate = new object();
-                bool active = false;
-                var cancelable = new SerialDisposable();
-                var disposable = source.Materialize().Subscribe(thisNotification =>
+                Action onCompleted = () =>
                 {
-                    bool wasNotAlreadyActive;
-                    lock (gate)
-                    {
-                        wasNotAlreadyActive = !active;
-                        active = true;
-                        outsideNotification = thisNotification;
-                    }
-
-                    if (wasNotAlreadyActive)
-                    {
-                        cancelable.Disposable = scheduler.Schedule(self =>
-                        {
-                            Notification<T> localNotification = null;
-                            lock (gate)
-                            {
-                                localNotification = outsideNotification;
-                                outsideNotification = null;
-                            }
-                            localNotification.Accept(observer);
-                            bool hasPendingNotification = false;
-                            lock (gate)
-                            {
-                                hasPendingNotification = active = (outsideNotification != null);
-                            }
-                            if (hasPendingNotification)
-                            {
-                                self();
-                            }
-                        });
-                    }
-                });
-                return new CompositeDisposable(disposable, cancelable);
+                    observer.OnNext(Unit.Default);
+                    observer.OnCompleted();
+                };
+                return observable.Subscribe(_ => { }, observer.OnError, onCompleted);
             });
         }
+
 
     }
 }

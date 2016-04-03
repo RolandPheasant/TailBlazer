@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
 using DynamicData.Kernel;
-using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -53,141 +50,101 @@ namespace TailBlazer.Domain.FileHandling
 
         public static IObservable<FileNotification> WatchFile(this FileInfo file, IObservable<Unit> pulse)
         {
-            return Observable.Create<FileNotification>(observer =>
-            {
-                 Func<IObservable<FileNotification>> poller = () => pulse.StartWith(Unit.Default)
+            return pulse.StartWith(Unit.Default)
 
-                    .Scan((FileNotification)null, (state, _) => state == null
-                       ? new FileNotification(file)
-                       : new FileNotification(state))
-                    .DistinctUntilChanged();
-
-                /*
-                    In theory, poll merrily away except slow down when there is an error.
-                */
-                return poller()
-                    .Catch<FileNotification, Exception>(ex => Observable.Return(new FileNotification(file, ex))
-                        .Concat(poller().DelaySubscription(TimeSpan.FromSeconds(10))))
-                    .SubscribeSafe(observer);
-            });
+                .Scan((FileNotification) null, (state, _) => state == null
+                    ? new FileNotification(file)
+                    : new FileNotification(state));
         }
-
 
 
         /// <summary>
-        /// Indexes all the lines of the specified file notificationn
+        /// Determines the encoding of a file
         /// </summary>
-        /// <param name="source">The source.</param>
         /// <returns></returns>
-        public static IObservable<IIndexCollection> Index(this IObservable<FileNotification> source)
-        {
-            return source
-                 .Where(n => n.NotificationType == FileNotificationType.Created)
-                 .Select(createdNotification =>
-                 {
-                     return Observable.Create<LineIndexCollection>(observer =>
-                     {
-                         var indexer = new LineIndexer((FileInfo) createdNotification);
-
-                         var notifier = source
-                             .Where(n => n.NotificationType == FileNotificationType.Changed)
-                             .StartWith(createdNotification)
-                             .Scan((LineIndexCollection) null, (state, notification) =>
-                             {
-                                 var lines = indexer.ReadToEnd().ToArray();
-                                 return new LineIndexCollection(lines, indexer.Encoding,  state);
-                             })
-                             .SubscribeSafe(observer);
-
-                         return new CompositeDisposable(indexer, notifier);;
-                     });
-                 }).Switch();
-        }
-
-        public static IObservable<IIndexCollection> IndexSparsely(this IObservable<FileNotification> source)
-        {
-            return source
-                 .Where(n => n.NotificationType == FileNotificationType.Created)
-                 .Select(createdNotification =>
-                 {
-                     return Observable.Create<SparseIndexCollection>(observer =>
-                     {
-                         var refresher = source
-                             .Where(n => n.NotificationType == FileNotificationType.Changed)
-                             .ToUnit();
-
-                         var indexer = new SparseIndexer((FileInfo)createdNotification, refresher);
-                         var notifier =indexer.Result.SubscribeSafe(observer);
-                         return new CompositeDisposable(indexer, notifier);
-                     });
-                 }).Switch();
-        }
-
-        public static IObservable<LineMatches> Match(this IObservable<FileNotification> source, Func<string,bool> predicate, Action<bool> isSearching=null)
-        {
-            return source
-                .Where(n => n.NotificationType == FileNotificationType.Created)
-                .Select(createdNotification =>
-                {
-                    return Observable.Create<LineMatches>(observer =>
-                    {
-                        var indexer = new LineMatcher((FileInfo) createdNotification, predicate);
-
-                        var notifier = source
-                            .Where(n => n.NotificationType == FileNotificationType.Changed)
-                            .StartWith(createdNotification)
-                            .Scan((LineMatches) null, (state, notification) =>
-                            {
-                                var shouldNotifyOfSearch = isSearching != null &&
-                                            notification.NotificationType == FileNotificationType.Created;
-                                try
-                                {
-                                    if (shouldNotifyOfSearch) isSearching(true);
-                                    var lines = indexer.ScanToEnd().ToArray();
-                                    return new LineMatches(lines, state);
-                                }
-                                finally
-                                {
-                                    if (shouldNotifyOfSearch) isSearching(false);
-                                }
-                            })
-                            .SubscribeSafe(observer);
-
-                        return new CompositeDisposable(indexer, notifier);
-                    });
-                }).Switch();
-        }
-
-        public static IEnumerable<Line> ReadLines(this FileInfo source, int[] lines, Func<int, bool> isEndOfTail = null)
+        public static Encoding GetEncoding(this FileInfo source)
         {
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
-                using (var reader = new StreamReaderExtended(stream, Encoding.Default, true))
+                using (var reader = new StreamReaderExtended(stream, true))
                 {
-                    string line;
-                    int position = 0;
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        position++;
-
-                        if (lines.Contains(position))
-                            yield return new Line(position,line, isEndOfTail==null ? null :(isEndOfTail(position)? DateTime.Now : (DateTime?)null));
-                    }
+                    var something = reader.Peek();
+                    return reader.CurrentEncoding;
                 }
             }
         }
 
-        public static long FindNextEndOfLinePosition(this FileInfo source, long initialPosition)
+
+        /// <summary>
+        /// Finds the delimiter by looking for the first line in the file and comparing chars
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <returns></returns>
+        public static int FindDelimiter(this FileInfo source)
         {
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
-                stream.Seek(initialPosition, SeekOrigin.Begin);
                 using (var reader = new StreamReaderExtended(stream, Encoding.Default, true))
                 {
-                    if (reader.EndOfStream) return -1;
-                    reader.ReadLine();
-                    return reader.AbsolutePosition();
+                    if (reader.EndOfStream)
+                        return -1;
+                    do
+                    {
+                        var ch = (char)reader.Read();
+
+                        // Note the following common line feed chars: 
+                        // \n - UNIX   \r\n - DOS   \r - Mac 
+                        switch (ch)
+                        {
+                            case '\r':
+                                var next = (char)reader.Peek();
+                                //with \n is WINDOWS delimiter. Otherwise mac
+                                return next == '\n' ? 2 : 1;
+                            case '\n':
+                                return 1;
+                        }
+                    } while (!reader.EndOfStream);
+                    return -1;
                 }
+            }
+        }
+
+        public static IEnumerable<Line> ReadLinesByPosition(this FileInfo source, long[] positions, Func<int, bool> isEndOfTail = null)
+        {
+            using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            {
+                using (var reader = new StreamReaderExtended(stream, Encoding.Default, true))
+                {
+                    foreach (var position in positions)
+                    {
+                        if (reader.AbsolutePosition() != position)
+                        {
+                            reader.DiscardBufferedData();
+                            stream.Seek(position, SeekOrigin.Begin);
+
+                        }
+                        var line = reader.ReadLine();
+                        yield return new Line((int)position, line,null);
+                    }
+                }
+            }
+        }
+        
+        public static long FindNextEndOfLinePosition(this StreamReaderExtended source, long initialPosition,
+            SeekOrigin origin= SeekOrigin.Begin)
+        {
+
+            if (source.EndOfStream) return -1;
+            source.BaseStream.Seek(initialPosition, origin);
+            source.ReadLine();
+            return source.AbsolutePosition();
+        }
+
+        public static long GetFileLength(this FileInfo source)
+        {
+            using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            {
+                return stream.Length;
             }
         }
     }

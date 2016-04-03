@@ -4,27 +4,49 @@ namespace TailBlazer.Domain.FileHandling
 {
     public class ScrollRequest : IEquatable<ScrollRequest>
     {
+        public static readonly ScrollRequest None= new ScrollRequest();
+
         public int PageSize { get;  }
         public int FirstIndex { get;  }
-        public ScrollingMode Mode { get; }
+
+        public long Position { get; }
+
+        public bool SpecifiedByPosition { get;  }
+
+        public ScrollReason Mode { get; }
         
         public ScrollRequest(int pageSize)
         {
             PageSize = pageSize;
-            Mode = ScrollingMode.Tail;
+            Mode = ScrollReason.Tail;
         }
-        public ScrollRequest(int pageSize, int firstIndex)
+
+        private ScrollRequest()
+        {
+        }
+
+        public ScrollRequest(int pageSize, long position)
+        {
+            PageSize = pageSize;
+            Position = position;
+            SpecifiedByPosition = true;
+            Mode = ScrollReason.User;
+        }
+
+        public ScrollRequest(int pageSize, int firstIndex, bool specifiedByPosition=false)
         {
             PageSize = pageSize;
             FirstIndex = firstIndex;
-            Mode = ScrollingMode.User;
+            SpecifiedByPosition = specifiedByPosition;
+            Mode = ScrollReason.User;
         }
 
-        public ScrollRequest(ScrollingMode mode, int pageSize, int firstIndex)
+        public ScrollRequest(ScrollReason mode, int pageSize, int firstIndex)
         {
             PageSize = pageSize;
             FirstIndex = firstIndex;
             Mode = mode;
+            SpecifiedByPosition = false;
         }
 
         #region Equality
@@ -34,17 +56,21 @@ namespace TailBlazer.Domain.FileHandling
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            if (Mode== ScrollingMode.Tail)
+            if (Mode == ScrollReason.Tail)
                 return PageSize == other.PageSize && Mode == other.Mode;
 
-            return PageSize == other.PageSize && FirstIndex == other.FirstIndex && Mode == other.Mode;
+            return PageSize == other.PageSize
+                && FirstIndex == other.FirstIndex
+                 && Position == other.Position
+                && Mode == other.Mode;
         }
+
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((ScrollRequest) obj);
         }
 
@@ -54,6 +80,8 @@ namespace TailBlazer.Domain.FileHandling
             {
                 var hashCode = PageSize;
                 hashCode = (hashCode*397) ^ FirstIndex;
+                hashCode = (hashCode*397) ^ Position.GetHashCode();
+                hashCode = (hashCode*397) ^ SpecifiedByPosition.GetHashCode();
                 hashCode = (hashCode*397) ^ (int) Mode;
                 return hashCode;
             }

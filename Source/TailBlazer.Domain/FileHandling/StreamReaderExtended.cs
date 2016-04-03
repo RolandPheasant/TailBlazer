@@ -3,6 +3,7 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using System.Security;
 using System.Text;
 
 namespace TailBlazer.Domain.FileHandling
@@ -11,7 +12,7 @@ namespace TailBlazer.Domain.FileHandling
     /// Pilferred from MS because they hide all the best fields 
     /// </summary>
     [Serializable]
-    [System.Runtime.InteropServices.ComVisible(true)]
+    [ComVisible(true)]
     public class StreamReaderExtended : TextReader
     {
         // StreamReader.Null is threadsafe. 
@@ -122,7 +123,7 @@ namespace TailBlazer.Domain.FileHandling
             _closable = closable;
         }
 
-        [System.Security.SecuritySafeCritical]  // auto-generated 
+        [SecuritySafeCritical]  // auto-generated 
         [ResourceExposure(ResourceScope.Machine)]
         [ResourceConsumption(ResourceScope.Machine)]
         public StreamReaderExtended(String path)
@@ -130,7 +131,7 @@ namespace TailBlazer.Domain.FileHandling
         {
         }
 
-        [System.Security.SecuritySafeCritical]  // auto-generated 
+        [SecuritySafeCritical]  // auto-generated 
         [ResourceExposure(ResourceScope.Machine)]
         [ResourceConsumption(ResourceScope.Machine)]
         public StreamReaderExtended(String path, bool detectEncodingFromByteOrderMarks)
@@ -138,7 +139,7 @@ namespace TailBlazer.Domain.FileHandling
         {
         }
 
-        [System.Security.SecuritySafeCritical]  // auto-generated
+        [SecuritySafeCritical]  // auto-generated
         [ResourceExposure(ResourceScope.Machine)]
         [ResourceConsumption(ResourceScope.Machine)]
         public StreamReaderExtended(String path, Encoding encoding)
@@ -146,7 +147,7 @@ namespace TailBlazer.Domain.FileHandling
         {
         }
 
-        [System.Security.SecuritySafeCritical]  // auto-generated
+        [SecuritySafeCritical]  // auto-generated
         [ResourceExposure(ResourceScope.Machine)]
         [ResourceConsumption(ResourceScope.Machine)]
         public StreamReaderExtended(String path, Encoding encoding, bool detectEncodingFromByteOrderMarks)
@@ -154,7 +155,7 @@ namespace TailBlazer.Domain.FileHandling
         {
         }
 
-        [System.Security.SecuritySafeCritical]  // auto-generated
+        [SecuritySafeCritical]  // auto-generated
         [ResourceExposure(ResourceScope.Machine)]
         [ResourceConsumption(ResourceScope.Machine)]
         public StreamReaderExtended(String path, Encoding encoding, bool detectEncodingFromByteOrderMarks, int bufferSize)
@@ -269,7 +270,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public bool EndOfStream
         {
-            [System.Security.SecuritySafeCritical]  // auto-generated
+            [SecuritySafeCritical]  // auto-generated
             get
             {
 
@@ -283,7 +284,7 @@ namespace TailBlazer.Domain.FileHandling
         }
 
         [Pure]
-        [System.Security.SecuritySafeCritical]  // auto-generated
+        [SecuritySafeCritical]  // auto-generated
         public override int Peek()
         {
 
@@ -294,7 +295,7 @@ namespace TailBlazer.Domain.FileHandling
             return charBuffer[charPos];
         }
 
-        [System.Security.SecuritySafeCritical]  // auto-generated 
+        [SecuritySafeCritical]  // auto-generated 
         public override int Read()
         {
 
@@ -307,7 +308,7 @@ namespace TailBlazer.Domain.FileHandling
             return result;
         }
 
-        [System.Security.SecuritySafeCritical]  // auto-generated
+        [SecuritySafeCritical]  // auto-generated
         public override int Read([In, Out] char[] buffer, int index, int count)
         {
             if (buffer == null)
@@ -343,12 +344,12 @@ namespace TailBlazer.Domain.FileHandling
             return charsRead;
         }
 
-        [System.Security.SecuritySafeCritical]  // auto-generated
+        [SecuritySafeCritical]  // auto-generated
         public override String ReadToEnd()
         {
 
             // Call ReadBuffer, then pull data out of charBuffer. 
-            StringBuilder sb = new StringBuilder(charLen - charPos);
+            var sb = new StringBuilder(charLen - charPos);
             do
             {
                 sb.Append(charBuffer, charPos, charLen - charPos);
@@ -417,8 +418,7 @@ namespace TailBlazer.Domain.FileHandling
                 changedEncoding = true; 
             } 
 #endif
-            else if (byteLen == 2)
-                _detectEncoding = true;
+            else _detectEncoding |= byteLen == 2;
             // Note: in the future, if we change this algorithm significantly,
             // we can support checking for the preamble of the given encoding.
 
@@ -647,7 +647,7 @@ namespace TailBlazer.Domain.FileHandling
         // contain the terminating carriage return and/or line feed. The returned
         // value is null if the end of the input stream has been reached. 
         //
-        [System.Security.SecuritySafeCritical]  // auto-generated
+        [SecuritySafeCritical]  // auto-generated
         public override String ReadLine()
         {
             //if (stream == null)
@@ -697,7 +697,7 @@ namespace TailBlazer.Domain.FileHandling
         public long AbsolutePosition()
         {
             // The number of bytes that the already-read characters need when encoded.
-            int numReadBytes = this.CurrentEncoding.GetByteCount(charBuffer, 0, charPos);
+            int numReadBytes = CurrentEncoding.GetByteCount(charBuffer, 0, charPos);
 
             return BaseStream.Position - byteLen + numReadBytes;
         }
