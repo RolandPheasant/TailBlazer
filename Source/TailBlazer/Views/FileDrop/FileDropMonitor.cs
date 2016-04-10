@@ -17,10 +17,15 @@ namespace TailBlazer.Views.FileDrop
     {
         private readonly SerialDisposable _cleanUp = new SerialDisposable();
         private readonly ISubject<FileInfo> _fileDropped = new Subject<FileInfo>();
-        private readonly ISubject<DragEventArgs> _dragging  = new Subject<DragEventArgs>();
+        private bool isLoaded = false;
 
         public void Receive(DependencyObject value)
         {
+            if (isLoaded)
+                return;
+
+            isLoaded = true;
+
             var control = (UIElement) value;
             control.AllowDrop = true;
 
@@ -45,6 +50,7 @@ namespace TailBlazer.Views.FileDrop
                 {
                     if (adorner == null) return;
                     adorner.Detatch();
+
                     adorner = null;
                 });
 

@@ -30,7 +30,6 @@ namespace TailBlazer
             tempWindowToGetDispatcher.Close();
 
             var layoutServce = container.GetInstance<ILayoutService>();
-           // layoutServce.Restore();
 
             var appStatePublisher = container.GetInstance<IApplicationStatePublisher>();
             app.Exit += (sender, e) => appStatePublisher.Publish(ApplicationState.ShuttingDown);
@@ -38,9 +37,6 @@ namespace TailBlazer
             app.Run();
         }
 
-        private static void App_Exit(object sender, ExitEventArgs e)
-        {
 
-        }
     }
 }

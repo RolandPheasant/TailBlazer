@@ -19,6 +19,7 @@ namespace TailBlazer.Domain.Formatting
         public GeneralOptions Convert(State state)
         {
             var defaults = this.GetDefaultValue();
+            if (state== State.Empty) return defaults;
 
             var doc = XDocument.Parse(state.Value);
             var root = doc.ElementOrThrow(Structure.Root);
