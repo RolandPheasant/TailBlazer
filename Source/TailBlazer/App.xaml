@@ -5,6 +5,7 @@
              xmlns:fileDrop="clr-namespace:TailBlazer.Views.FileDrop"
              xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
              xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
+             xmlns:dialog="clr-namespace:TailBlazer.Views.Dialog"
              xmlns:settings="clr-namespace:TailBlazer.Settings">
     <Application.Resources>
         <ResourceDictionary>
@@ -17,6 +18,10 @@
                 <settings:SearchOptionsView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type dialog:DialogViewModel}">
+                <dialog:DialogView/>
+            </DataTemplate>
+            
             <DataTemplate DataType="{x:Type searching:IconSelector}">
                 <searching:IconSelectorView/>
             </DataTemplate>

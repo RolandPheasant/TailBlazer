@@ -13,6 +13,7 @@
         xmlns:recent="clr-namespace:TailBlazer.Views.Recent"
         xmlns:options="clr-namespace:TailBlazer.Views.Options"
         xmlns:windowManagement="clr-namespace:TailBlazer.Views.WindowManagement"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
@@ -43,13 +44,60 @@
             </ResourceDictionary.MergedDictionaries>
 
             <DataTemplate DataType="{x:Type infrastucture:FileHeader}">
-                <TextBlock Margin="6 2 2 2" 
+
+
+                <StackPanel Orientation="Horizontal" IsHitTestVisible="True" MouseDown="StackPanel_MouseDown">
+                    <StackPanel.Resources>
+                        <Style TargetType="{x:Type Thumb}" x:Key="InvisibleThumbStyle">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Grid Background="{TemplateBinding Background}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </StackPanel.Resources>
+
+                    <Grid>
+                        <TextBlock Margin="6 2 2 2" 
                            IsHitTestVisible="True"
                            ToolTipService.ShowOnDisabled="True"
                            ToolTip="{Binding FullName}"
                            Text="{Binding  DisplayName}" />
+                        <Thumb Style="{DynamicResource InvisibleThumbStyle}" dragablz:DragablzItem.IsCustomThumb="True" />
+                    </Grid>
 
-            </DataTemplate>
+                    <Button x:Name="pin" Content="Pin"                         
+                            MouseDown="pin_MouseDown"
+                            PreviewMouseDown="pin_MouseDown">
+
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="isMouseOver">
+                                <i:InvokeCommandAction 
+                        Command="{Binding Pinning}" 
+                        CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type infrastucture:FileHeader}}, Path=Content}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="#FF4CAF50"></Setter>
+                                <Setter Property="BorderBrush" Value="Transparent"></Setter>
+
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="false">
+                                        <Setter Property="Foreground" Value="Transparent"></Setter>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                </StackPanel>
+
+            </DataTemplate><!-- TODO-->
 
             <DataTemplate DataType="{x:Type infrastucture:FilesHeader}">
                 <TextBlock Margin="6 2 2 2" 

@@ -1,0 +1,60 @@
+﻿<wpf:DialogHost
+      x:Class="TailBlazer.Views.Dialog.DialogView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:dialog="clr-namespace:TailBlazer.Views.Dialog"
+      mc:Ignorable="d" 
+     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+      d:DesignHeight="300" d:DesignWidth="300"
+      d:DataContext="{d:DesignInstance dialog:DialogViewModel}">
+
+    <Grid Height="150" Width="300">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.ColumnSpan="2"
+                   Margin="6 6 0 0"
+                   FontSize="16"
+                   FontWeight="DemiBold" 
+                   Text="{Binding text}"/>
+
+        <Button Grid.Row="3" IsDefault="True"
+                Margin="0 0 6 0"
+                HorizontalAlignment="Center"     
+                Width="75"
+                Content="Yes"     
+                Command="{x:Static wpf:DialogHost.CloseDialogCommand}"
+                >
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Click">
+                    <i:InvokeCommandAction 
+                        Command="{Binding ButtonClickEvent}" 
+                        CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}, Path=Content}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </Button>
+
+        <Button Grid.Row="3" Grid.Column="4" IsDefault="True"
+                Margin="0 0 6 0"
+                HorizontalAlignment="Center"
+                Width="75"
+                Content="No"
+                Command="{x:Static wpf:DialogHost.CloseDialogCommand}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Click">
+                    <i:InvokeCommandAction 
+                        Command="{Binding ButtonClickEvent}" 
+                        CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}, Path=Content}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </Button>
+    </Grid>
+</wpf:DialogHost>

@@ -7,6 +7,12 @@ namespace TailBlazer.Infrastucture
     {
         private readonly FileInfo _info;
         private  string _displayName;
+        private bool _isPinned = false;
+
+        public bool IsPinned {
+            get { return _isPinned; }
+            set { SetAndRaise(ref _isPinned, value); }
+        }
 
         public string FullName => _info.FullName;
 

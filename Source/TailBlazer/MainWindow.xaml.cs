@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel;
 using MahApps.Metro.Controls;
 using TailBlazer.Views.WindowManagement;
+using System.Windows;
+using System.Windows.Input;
+using System;
 
 namespace TailBlazer
 {
@@ -26,5 +29,19 @@ namespace TailBlazer
             var windowsModel = DataContext as WindowViewModel;
             windowsModel?.OnWindowClosing();
         }
+
+
+        private void StackPanel_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = false;
+        }
+
+
+        private void pin_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+
     }
 }

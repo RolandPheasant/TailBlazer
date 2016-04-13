@@ -22,6 +22,9 @@ using TailBlazer.Views.Layout;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Recent;
 using TailBlazer.Views.Tail;
+using TailBlazer.Views.Dialog;
+using MaterialDesignThemes.Wpf;
+using Microsoft.Expression.Interactivity.Core;
 
 namespace TailBlazer.Views.WindowManagement
 {
@@ -35,6 +38,7 @@ namespace TailBlazer.Views.WindowManagement
         private ViewContainer _selected;
         private bool _isEmpty;
         private bool _menuIsOpen;
+        public ICommand Pinning { get; set; }
         public ObservableCollection<ViewContainer> Views { get; } = new ObservableCollection<ViewContainer>();
         public RecentFilesViewModel RecentFiles { get; }
         public GeneralOptionsViewModel GeneralOptions { get; }
@@ -51,25 +55,36 @@ namespace TailBlazer.Views.WindowManagement
 
         public static int OpenedFileCount { get; set; }
 
+        public DialogViewModel Dialog { get; set; }
+
         public WindowViewModel(IObjectProvider objectProvider, 
             IWindowFactory windowFactory, 
             ILogger logger,
             IWindowsController windowsController,
             RecentFilesViewModel recentFilesViewModel,
             GeneralOptionsViewModel generalOptionsViewModel,
-            ISchedulerProvider schedulerProvider)
+            ISchedulerProvider schedulerProvider,
+            DialogViewModel dialogviewmodel)
         {
+            Pinning = new ActionCommand(o =>
+            {
+                var content = o as string;
+
+            });
             _logger = logger;
             _windowsController = windowsController;
             RecentFiles = recentFilesViewModel;
             GeneralOptions = generalOptionsViewModel;
+            Dialog = dialogviewmodel;
             _schedulerProvider = schedulerProvider;
             _objectProvider = objectProvider;
             InterTabClient = new InterTabClient(windowFactory);
             OpenFileCommand =  new Command(OpenFile);
             ShowInGitHubCommand = new Command(()=>   Process.Start("https://github.com/RolandPheasant"));
 
-            ZoomOutCommand= new Command(()=> { GeneralOptions.Scale = GeneralOptions.Scale + 5; });
+            Views.CollectionChanged += Views_CollectionChanged;
+
+            ZoomOutCommand = new Command(()=> { GeneralOptions.Scale = GeneralOptions.Scale + 5; });
             ZoomInCommand = new Command(() => { GeneralOptions.Scale = GeneralOptions.Scale - 5; });
             SaveLayoutCommand = new Command(WalkTheLayout);
             ExitCommmand = new Command(() => Application.Current.Shutdown());
@@ -104,6 +119,7 @@ namespace TailBlazer.Views.WindowManagement
                 }));
         }
 
+
         private void WalkTheLayout()
         {
             var analyser = new LayoutAnalyser();
@@ -129,12 +145,52 @@ namespace TailBlazer.Views.WindowManagement
                 OpenFile(new FileInfo(file));
         }
 
-        private void OpenFile(IEnumerable<FileInfo> files)
+        private async void OpenFile(IEnumerable<FileInfo> files)
         {
             OpenedFileCount = files.Count();
             if (OpenedFileCount > 1)
             {
-                var msgResult = MessageBox.Show("Would you like to tail these files?", "Tail files",
+                //Here we can set the dialog window's message
+                Dialog.text = "Would you like to tail these files?";
+                //Showing the dialog window
+                var msgResult = await DialogHost.Show(Dialog, DialogNames.EntireWindow);
+               //Testing the pushed button
+                if (Dialog.Button)
+                {
+                    //Tailing multiple files
+                    _schedulerProvider.Background.Schedule(() =>
+                    {
+                        try
+                        {
+                            _logger.Info($"Attempting to open '{files.Count()}' files");
+
+                            var factory = _objectProvider.Get<TailViewModelFactory>();
+                            var viewModel = factory.Create(files);
+
+                            var newItem = new ViewContainer(new FilesHeader(files), viewModel);
+
+                            _windowsController.Register(newItem);
+
+                            //_logger.Info($"Objects for '{file.FullName}' has been created.");
+                            //do the work on the ui thread
+                            _schedulerProvider.MainThread.Schedule(() =>
+                            {
+
+                                Views.Add(newItem);
+                                _logger.Info($"Opened '{files.Count()}' files");
+                                Selected = newItem;
+                            });
+                        }
+                        catch
+                        {
+                            // ignored
+                        }
+
+                    });
+                    return;
+                }
+                //The OLD method
+                /*MessageBox.Show("Would you like to tail these files?", "Tail files",
                     MessageBoxButton.YesNo);
                 if (msgResult == MessageBoxResult.Yes)
                 {
@@ -167,12 +223,18 @@ namespace TailBlazer.Views.WindowManagement
                         }
                     });
                     return;
-                }
+                }*/
             }
+            //Simple file opening
             foreach (var fileInfo in files)
             {
                 OpenFile(fileInfo);
             }
+        }
+
+        private void Views_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            //throw new NotImplementedException();
         }
 
         private void OpenFile(FileInfo file)
