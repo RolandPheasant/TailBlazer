@@ -1,0 +1,99 @@
+﻿<wpf:DialogHost x:Class="TailBlazer.Views.FileOpen.FileOpenView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TailBlazer.Views.FileOpen"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:io="clr-namespace:System.IO;assembly=mscorlib"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:tailBlazer="clr-namespace:TailBlazer"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance local:FileOpenViewModel}">
+    <Grid
+
+      Margin="6 6 6 6"    
+        Width="600"
+        Height="450">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="6*"/>
+            <ColumnDefinition Width="4*"/>
+        </Grid.ColumnDefinitions>
+
+
+            <TreeView x:Name="foldersItem" Grid.Row="1"  Grid.Column ="0" Width="Auto">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectedItemChanged">
+                    <i:InvokeCommandAction Command="{Binding SelectedItemChangedCommand}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TreeView}}}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <TreeView.Resources>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="HeaderTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Name="img"  Width="20" Height="20" Stretch="Fill" 
+                                       Source="{Binding 
+                                       RelativeSource={RelativeSource 
+                                       Mode=FindAncestor, 
+                                       AncestorType={x:Type TreeViewItem}}, 
+                                       Path=Header, 
+                                       Converter={x:Static local:HeaderToImageConverter.Instance}}"       
+                                       />
+                                    <TextBlock Text="{Binding}" Margin="5,0" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Foreground" Value="LightGray"/>
+                </Style>
+            </TreeView.Resources>
+        </TreeView>
+        <ListBox ItemsSource="{Binding FilesAndIcons, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedItem, Mode=TwoWay }" SelectionMode="Single" x:Name="listView" Grid.Column="1" Grid.Row="1" Background="Transparent">
+            <ListBox.ItemTemplate >
+               <DataTemplate DataType="{x:Type local:FileInfoWithIcon}">
+                   <StackPanel Orientation="Horizontal">
+                        <Image Width="20" Height="20" Stretch="Fill" Source="{Binding ImageSource, UpdateSourceTrigger=PropertyChanged}"/>
+                       <TextBlock Text="{Binding FileInfo.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                   </StackPanel>
+               </DataTemplate> 
+             </ListBox.ItemTemplate >
+      </ListBox>
+        <Button 
+            Grid.Column="1"
+            Grid.Row="2"
+            IsDefault="True"
+            Margin="0 0 6 0"
+            HorizontalAlignment="Right"
+            Style="{DynamicResource MaterialDesignFlatButton}"
+            Content="Open"
+            Command="{Binding OpenSelectedItemCommand}" 
+            CommandParameter="{x:Static wpf:DialogHost.CloseDialogCommand}"/>
+        <!--<Button 
+            Grid.Column="1"
+            Grid.Row="0"
+            IsDefault="True"
+            HorizontalAlignment="Right"
+            Content="X"
+            Command="{x:Static wpf:DialogHost.CloseDialogCommand}" />-->
+        <StackPanel VerticalAlignment="Top" Height="30" Margin="-6 -6 -6 0" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Background="{DynamicResource WindowTitleColorBrush}">
+            <DockPanel LastChildFill="True">
+                <TextBlock>
+                <Button 
+
+            IsDefault="True"
+            Content="X"
+            Command="{x:Static wpf:DialogHost.CloseDialogCommand}"/>
+            </TextBlock>
+                </DockPanel>
+        </StackPanel>
+    </Grid>
+</wpf:DialogHost>

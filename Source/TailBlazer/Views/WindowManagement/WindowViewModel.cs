@@ -14,10 +14,11 @@ using System.Windows.Input;
 using Dragablz;
 using DynamicData;
 using DynamicData.Binding;
-using Microsoft.Win32;
+using MaterialDesignThemes.Wpf;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
 using TailBlazer.Views.FileDrop;
+using TailBlazer.Views.FileOpen;
 using TailBlazer.Views.Layout;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Recent;
@@ -39,7 +40,9 @@ namespace TailBlazer.Views.WindowManagement
         public RecentFilesViewModel RecentFiles { get; }
         public GeneralOptionsViewModel GeneralOptions { get; }
         public IInterTabClient InterTabClient { get; }
-        public ICommand OpenFileCommand { get; }
+        public FileOpenViewModel FileOpen { get; }
+        public ICommand FileOpenDialogCommand { get; }
+
         public Command ShowInGitHubCommand { get; }
         public string Version { get; }
         public ICommand SaveLayoutCommand { get; }
@@ -63,11 +66,14 @@ namespace TailBlazer.Views.WindowManagement
             _windowsController = windowsController;
             RecentFiles = recentFilesViewModel;
             GeneralOptions = generalOptionsViewModel;
+
             _schedulerProvider = schedulerProvider;
             _objectProvider = objectProvider;
             InterTabClient = new InterTabClient(windowFactory);
-            OpenFileCommand =  new Command(OpenFile);
-            ShowInGitHubCommand = new Command(()=>   Process.Start("https://github.com/RolandPheasant"));
+            FileOpenDialogCommand = new Command(OpenFileDialog);
+            FileOpen = new FileOpenViewModel(OpenFile);
+
+            ShowInGitHubCommand = new Command(() => Process.Start("https://github.com/RolandPheasant"));
 
             ZoomOutCommand= new Command(()=> { GeneralOptions.Scale = GeneralOptions.Scale + 5; });
             ZoomInCommand = new Command(() => { GeneralOptions.Scale = GeneralOptions.Scale - 5; });
@@ -83,14 +89,14 @@ namespace TailBlazer.Views.WindowManagement
                                     .StartWith(0)
                                     .Select(count=>count==0)
                                     .Subscribe(isEmpty=> IsEmpty = isEmpty);
-
+            
             var openRecent = recentFilesViewModel.OpenFileRequest
                                 .Subscribe(file =>
                                 {
                                     MenuIsOpen = false;
                                     OpenFile(file);
                                 });
-            
+
             _cleanUp = new CompositeDisposable(recentFilesViewModel,
                 isEmptyChecker,
                 fileDropped,
@@ -98,10 +104,15 @@ namespace TailBlazer.Views.WindowManagement
                 openRecent,
                 Disposable.Create(() =>
                 {
-                     Views.Select(vc => vc.Content)
-                            .OfType<IDisposable>()
-                            .ForEach(d=>d.Dispose());
+                    Views.Select(vc => vc.Content)
+                        .OfType<IDisposable>()
+                        .ForEach(d => d.Dispose());
                 }));
+        }
+
+        private async void OpenFileDialog()
+        {
+            await DialogHost.Show(FileOpen, DialogNames.EntireWindow);
         }
 
         private void WalkTheLayout()
@@ -109,16 +120,6 @@ namespace TailBlazer.Views.WindowManagement
             var analyser = new LayoutAnalyser();
             var root = analyser.QueryLayouts();
             Console.WriteLine(root);
-        }
-
-        private void OpenFile()
-        {
-            // open dialog to select file [get rid of this shit and create a material design file selector]
-            var dialog = new OpenFileDialog {Filter = "All files (*.*)|*.*"};
-            var result = dialog.ShowDialog();
-            if (result != true) return;
-
-            OpenFile(new FileInfo(dialog.FileName));
         }
 
         public void OpenFiles(IEnumerable<string> files=null)
@@ -166,13 +167,22 @@ namespace TailBlazer.Views.WindowManagement
                             // ignored
                         }
                     });
-                    return;
+
+                }
+                else
+                {
+                    foreach (var fileInfo in files)
+                    {
+                        OpenFile(fileInfo);
+                    }
                 }
             }
-            foreach (var fileInfo in files)
+            else
             {
-                OpenFile(fileInfo);
+                OpenFile(files.ElementAt(0));
             }
+            
+           
         }
 
         private void OpenFile(FileInfo file)

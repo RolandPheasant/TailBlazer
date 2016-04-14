@@ -5,13 +5,19 @@
              xmlns:fileDrop="clr-namespace:TailBlazer.Views.FileDrop"
              xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
              xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
-             xmlns:settings="clr-namespace:TailBlazer.Settings">
+             xmlns:settings="clr-namespace:TailBlazer.Settings"
+             xmlns:fileopen ="clr-namespace:TailBlazer.Views.FileOpen">
+    
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Colours.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <DataTemplate DataType="{x:Type fileopen:FileOpenViewModel}">
+                <fileopen:FileOpenView/>
+            </DataTemplate>
 
             <DataTemplate DataType="{x:Type searching:SearchOptionsViewModel}">
                 <settings:SearchOptionsView/>
