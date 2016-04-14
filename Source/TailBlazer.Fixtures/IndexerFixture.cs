@@ -62,7 +62,7 @@ namespace TailBlazer.Fixtures
         {
             var pulse = new Subject<Unit>();
             var scheduler = new TestScheduler();
-
+            
             using (var file = new TestFile())
             {
                 file.Append(Enumerable.Range(1, 100).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());

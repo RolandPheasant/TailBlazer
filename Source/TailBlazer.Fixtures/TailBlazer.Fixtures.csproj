@@ -101,6 +101,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileOpenFixture.cs" />
     <Compile Include="FileSearchFixture.cs" />
     <Compile Include="FileSegmentFixture.cs" />
     <Compile Include="FileSegmentUsingExtensionFixture.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="IndexerFixture.cs" />
     <Compile Include="SettingsStoreFixture.cs" />
     <Compile Include="SplitFileByMatchingTextFixture.cs" />
+    <Compile Include="TestDirectory.cs" />
     <Compile Include="TestFile.cs" />
     <Compile Include="TestFileCollection.cs" />
   </ItemGroup>

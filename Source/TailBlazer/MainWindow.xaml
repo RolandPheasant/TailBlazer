@@ -186,7 +186,7 @@
                 </Button>
 
                 <Button  Margin="6 0 0 0"
-                    Command ="{Binding OpenFileCommand}"
+                    Command ="{Binding FileOpenDialogCommand}"
                     ToolTipService.ShowOnDisabled="True"
                     ToolTip="Open file">
                     <controls1:FileIcon Width="14" Height="14" Foreground="White"/>
