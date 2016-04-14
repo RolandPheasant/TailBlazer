@@ -59,11 +59,12 @@ namespace TailBlazer.Views.Searching
                                 .Select(svm => svm.Text)
                                 .Replay(1).RefCount();
 
-           Latest = this.WhenValueChanged(sc => sc.Selected)
-                .Where(x=>x!=null)
+            Latest = this.WhenValueChanged(sc => sc.Selected)
+                .Where(x => x != null)
                 .Select(svm => svm.Latest)
                 .Switch()
-                .Replay(1).RefCount();
+                .Replay(1)
+                .RefCount();
 
 
             _cleanUp = new CompositeDisposable(viewModels, binderLoader, counter, removed, autoSelector);

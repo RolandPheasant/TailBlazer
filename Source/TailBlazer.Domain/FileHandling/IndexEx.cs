@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
@@ -8,7 +9,7 @@ namespace TailBlazer.Domain.FileHandling
 {
     public static class IndexEx
     {
-        public static IObservable<ILineProvider> Index(this IObservable<FileSegmentCollection> source)
+        public static IObservable<ILineProvider> Index(this IObservable<FileSegmentCollection> source, int tailSize = 1000000, IScheduler scheduler = null)
         {
             var indexFactory = source
                 .Publish(shared =>
@@ -17,7 +18,7 @@ namespace TailBlazer.Domain.FileHandling
 
                     var idx = Observable.Create<IndexCollection>(observer =>
                     {
-                        var indexer = new Indexer(shared);
+                        var indexer = new Indexer(shared,scheduler: scheduler, tailSize: tailSize);
                         var notifier = indexer.Result.SubscribeSafe(observer);
                         return new CompositeDisposable(indexer, notifier);
                     });

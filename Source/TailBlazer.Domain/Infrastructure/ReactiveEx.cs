@@ -17,7 +17,18 @@ namespace TailBlazer.Domain.Infrastructure
 
     public static class ReactiveEx
     {
-        public static IObservable<T> MaxSequenceOfSource<T, TKey, TExceptedType>(this IObservable<T> source, Func<T, TKey> selector)
+
+        public static IObservable<T> MakeResettable<T>(this IObservable<T> source)
+        {
+            var _resetter = new Subject<Unit>();
+            return _resetter
+                .StartWith(Unit.Default)
+                .Select(_ => Defer(() => source))
+                .Switch()
+                .Publish().RefCount();
+        }
+
+        public static IObservable<T> MaxSequenceOfSource<T, TKey>(this IObservable<T> source, Func<T, TKey> selector)
             where TKey : IComparable<TKey>, IEquatable<TKey>
         {
             return Create<T>(observer =>
@@ -30,12 +41,8 @@ namespace TailBlazer.Domain.Infrastructure
                     .GroupBy(t => t)
                     .Select(t =>
                     {
-                        if (typeof(TExceptedType).IsEquivalentTo(t.Key.GetType()))
-                        {
-                            countOfTailedFile++;
-                            return new {t.Key, Counter = countOfTailedFile};
-                        }
-                        return null;
+                        countOfTailedFile++;
+                        return new { t.Key, Counter = countOfTailedFile };
                     })
                     .Where(t => t != null)
                     .Subscribe(obj =>
@@ -45,7 +52,7 @@ namespace TailBlazer.Domain.Infrastructure
                         {
                             largestT = obj.Key;
                         }
-                        
+
                         if (obj.Counter == counter)
                         {
                             observer.OnNext(largestT);

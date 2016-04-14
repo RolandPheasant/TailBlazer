@@ -66,13 +66,13 @@ namespace TailBlazer.Domain.FileHandling
                 {
                     if (reader.EndOfStream || fileLength == 0)
                     {
-                        yield return new FileSegment(0, 0, 0, FileSegmentType.Tail);
+                        yield return new FileSegment(0, 0, 0, FileSegmentType.Tail, _info);
                         yield break;
                     }
 
                     if (fileLength < _initialTail)
                     {
-                        yield return new FileSegment(0, 0, fileLength, FileSegmentType.Tail);
+                        yield return new FileSegment(0, 0, fileLength, FileSegmentType.Tail, _info);
                         yield break;
                     }
 
@@ -86,11 +86,11 @@ namespace TailBlazer.Domain.FileHandling
                         var approximateEndOfPage = currentEnfOfPage + _segmentSize;
                         if (approximateEndOfPage >= headStartsAt)
                         {
-                            yield return new FileSegment(index, previousEndOfPage, headStartsAt, FileSegmentType.Head);
+                            yield return new FileSegment(index, previousEndOfPage, headStartsAt, FileSegmentType.Head, _info);
                             break;
                         }
                         currentEnfOfPage = reader.FindNextEndOfLinePosition(approximateEndOfPage);
-                        yield return new FileSegment(index, previousEndOfPage, currentEnfOfPage, FileSegmentType.Head);
+                        yield return new FileSegment(index, previousEndOfPage, currentEnfOfPage, FileSegmentType.Head, _info);
 
                         index++;
                         previousEndOfPage = currentEnfOfPage;
@@ -99,7 +99,7 @@ namespace TailBlazer.Domain.FileHandling
 
 
                     index++;
-                    yield return new FileSegment(index, headStartsAt, fileLength, FileSegmentType.Tail);
+                    yield return new FileSegment(index, headStartsAt, fileLength, FileSegmentType.Tail, _info);
                 }
             }
         }

@@ -45,7 +45,6 @@ namespace TailBlazer.Domain.FileHandling
             var shared = fileSegments.Replay(1).RefCount();
 
             var infoSubscriber = shared.Select(segments => segments.Info)
-                .Take(1)
                 .Subscribe(info =>
                 {
                     Info = info;
@@ -63,9 +62,11 @@ namespace TailBlazer.Domain.FileHandling
             SearchResult = searchData.Connect()
                 .Flatten()
                 .Select(change=>change.Current)
-                .Scan((FileSearchResult)null, (previous, current) => previous==null 
-                                ? new FileSearchResult(current, Info, Encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered) 
-                                : new FileSearchResult(previous, current, Info, Encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
+                .Scan((FileSearchResult)null, (previous, current) => previous == null
+                    ? new FileSearchResult(current, Info, Encoding,
+                        _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered)
+                    : new FileSearchResult(previous, current, Info, Encoding,
+                        _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
                 .StartWith(FileSearchResult.None)
                 .Replay(1).RefCount();
 
@@ -76,17 +77,20 @@ namespace TailBlazer.Domain.FileHandling
                 .PopulateInto(searchData);
 
             //scan end of file, then tail
+            FileInfo fi = null;
             var tailSearch = segmentCache.WatchValue(FileSegmentKey.Tail)
                 .Scan((FileSegmentSearch) null, (previous, current) =>
                 {
-                    if (previous == null)
+                    if (previous == null || !Info.Equals(fi))
                     {
                         var result = Search(current.Start, current.End);
+                        fi = Info;
                         return new FileSegmentSearch(current, result);
                     }
                     else
                     {
                         var result = Search(previous.Segment.End, current.End);
+                        fi = Info;
                         return result == null ? previous : new FileSegmentSearch(previous, result);
                     }
                 })
@@ -94,10 +98,13 @@ namespace TailBlazer.Domain.FileHandling
                 .Publish();
             
             //start tailing
-            var tailSubscriber = tailSearch.Subscribe(tail => searchData.AddOrUpdate(tail));
+            var tailSubscriber = tailSearch.Subscribe(tail =>
+            {
+                searchData.AddOrUpdate(tail);
+            });
 
             //load the rest of the file segment by segment, reporting status after each search
-            var headSubscriber = tailSearch.Take(1).WithContinuation(() =>
+            var headSubscriber = tailSearch.WithContinuation(() =>
             {
                 var locker = new object();
 

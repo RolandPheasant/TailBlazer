@@ -19,36 +19,39 @@ namespace TailBlazer.Views.Searching
         private int _segmentsSearched;
         private string _countText;
 
-        public ICommand  RemoveCommand { get; }
+        public ICommand RemoveCommand { get; }
 
         public string Text => _info.SearchText;
 
         public string RemoveTooltip => $"Get rid of {Text}?";
 
-        public bool IsUserDefined => _info.SearchType == SearchType.User ;
+        public bool IsUserDefined => _info.SearchType == SearchType.User;
 
-        public SearchType SearchType => _info.SearchType ;
+        public SearchType SearchType => _info.SearchType;
 
         public IObservable<ILineProvider> Latest => _info.Latest;
 
         public SearchViewModel(SearchInfo info, Action<SearchViewModel> removeAction)
         {
             _info = info;
-            RemoveCommand = new Command(()=> removeAction(this));
+            RemoveCommand = new Command(() => removeAction(this));
             var counter = _info.Latest
-                .Select(lp => lp.Count)
+                .GroupBy(t => t)
+                .Select(t => t.Key.Count)
+                .Scan(0, (i, lp) => i + lp)
                 .Subscribe(count => Count = count);
 
             var counterTextFormatter = _info.Latest
-                .Select(lp =>
+                .GroupBy(t => t)
+                .Select(t => t.Key)
+                .Scan(0, (i, lp) =>
                 {
                     var limited = lp as IHasLimitationOfLines;
-                    if (limited == null) return $"{lp.Count.ToString("#,###0")}";
-                    return limited.HasReachedLimit 
-                                ? $"{limited.Maximum.ToString("#,###0")}+" 
-                                : $"{lp.Count.ToString("#,###0")}";
+                    if (limited == null) return i + lp.Count;
+                    return limited.HasReachedLimit ? i + limited.Maximum : i + lp.Count;
                 })
-                 .Subscribe(countText => CountText = countText); ;
+                .Select(count => count.ToString("#,###0"))
+                 .Subscribe(countText => CountText = countText);
 
 
             var progressMonitor = _info.Latest.OfType<IProgressInfo>().Subscribe(result =>

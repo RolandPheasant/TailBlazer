@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -116,7 +117,7 @@ namespace TailBlazer.Views.Tail
                 .Select(t => t.Latest)
                 .Merge()
                 .Select(t => t.Size)
-                .Scan(0f, (previousSize, currentSize) => previousSize + currentSize/2f)
+                .Scan(0f, (previousSize, currentSize) => previousSize + currentSize / 2f)
                 .Select(t => ((long)t).FormatWithAbbreviation())
                 .DistinctUntilChanged()
                 .ForBinding();
@@ -144,15 +145,31 @@ namespace TailBlazer.Views.Tail
             //monitor matching lines and start index,
             Count = searchInfoCollection.All
                 .GroupBy(t => t)
-                .Scan(0, (i, provider) => i + provider.Key.Count)
+                .Select(groupedProvider => groupedProvider.Key.Count)
+                .Scan(0, (i, providerCount) => i + providerCount)
                 .ForBinding();
             CountText = searchInfoCollection.All
                 .GroupBy(t => t)
-                .Scan(0L, (i, provider) => i + provider.Key.Count)
-                .Select(latestCount => $"{latestCount.ToString("##,###")} lines").ForBinding();
+                .Select(groupedProvider => groupedProvider.Key.Count)
+                .Scan(0, (i, providerCount) => i + providerCount)
+                .Select(latestCount => $"{latestCount.ToString("##,###")} lines")
+                .ForBinding();
+            //iterate over every items to evaluate the lines' count 
             LatestCount = SearchCollection.Latest
                 .GroupBy(t => t)
-                .Scan(0, (i, provider) => i + provider.Key.Count)
+                .Do(Console.WriteLine)
+                .Scan(0, (acc, provider) =>
+                {
+                    if (provider.Key is IndexCollection && provider.Key.NumberOfPreviousProvider == 0)
+                    {
+                        acc = 0;
+                    }
+                    else if (provider.Key is FileSearchResult && provider.Key.NumberOfPreviousProvider == 0)
+                    {
+                        acc = 0;
+                    }
+                    return provider.Key.Count + acc;
+                })
                 .ForBinding();
 
             ////track first visible index

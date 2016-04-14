@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Security.AccessControl;
 
 namespace TailBlazer.Domain.FileHandling
@@ -11,14 +12,15 @@ namespace TailBlazer.Domain.FileHandling
         public FileSegmentType Type { get;  }
         public long Size => End - Start;
         public FileSegmentKey Key { get; }
+        public FileInfo Info { get; }
 
-
-        public FileSegment(int index, long start, long end, FileSegmentType type)
+        public FileSegment(int index, long start, long end, FileSegmentType type, FileInfo info)
         {
             Index = index;
             Start = start;
             End = end;
             Type = type;
+            Info = info;
             Key=new FileSegmentKey(index,type);
         }
 
@@ -29,6 +31,7 @@ namespace TailBlazer.Domain.FileHandling
             Start = previous.Start;
             End = end;
             Type = previous.Type;
+            Info = previous.Info;
             Key = previous.Key;
         }
 
@@ -39,7 +42,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Index == other.Index && Start == other.Start && End == other.End && Type == other.Type && Key.Equals(other.Key);
+            return Index == other.Index && Start == other.Start && End == other.End && Type == other.Type && Key.Equals(other.Key) && Info.Equals(other.Info);
         }
 
         public override bool Equals(object obj)
@@ -59,6 +62,7 @@ namespace TailBlazer.Domain.FileHandling
                 hashCode = (hashCode*397) ^ End.GetHashCode();
                 hashCode = (hashCode*397) ^ (int) Type;
                 hashCode = (hashCode*397) ^ Key.GetHashCode();
+                hashCode = (hashCode*397) ^ Info.GetHashCode();
                 return hashCode;
             }
         }
