@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.IO;
+using System.Threading;
 using FluentAssertions;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Recent;
@@ -28,8 +30,20 @@ namespace TailBlazer.Fixtures
         }
 
         [Fact]
-        public void GeneralOptions()
+        public void GeneralOptionsWithCultureDeDe()
         {
+            SerializeAndDeserializeWithCulture("de-DE");
+        }
+
+        [Fact]
+        public void GeneralOptionsWithCultureEnUs()
+        {
+            SerializeAndDeserializeWithCulture("en-Us");
+        }
+
+        private void SerializeAndDeserializeWithCulture(string cultureName)
+        {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo(cultureName);
 
             var original = new GeneralOptions(Theme.Dark, false,0.5,125);
             var converter = new GeneralOptionsConverter();
