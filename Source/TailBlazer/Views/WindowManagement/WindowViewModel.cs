@@ -39,7 +39,9 @@ namespace TailBlazer.Views.WindowManagement
         private bool _isEmpty;
         private bool _menuIsOpen;
         public ICommand Pinning { get; set; }
-        public ObservableCollection<ViewContainer> Views { get; } = new ObservableCollection<ViewContainer>();
+        public int PinnedNumber { get; set; } = -1;
+        public int PinnedNumber2 { get; set; } = 0;
+        public ObservableCollection<ViewContainer> Views { get; set; } = new ObservableCollection<ViewContainer>();
         public RecentFilesViewModel RecentFiles { get; }
         public GeneralOptionsViewModel GeneralOptions { get; }
         public IInterTabClient InterTabClient { get; }
@@ -68,7 +70,40 @@ namespace TailBlazer.Views.WindowManagement
         {
             Pinning = new ActionCommand(o =>
             {
-                var content = o as string;
+                var viewsarray = Views.ToList();
+
+                var pinnedone = Views.FirstOrDefault(c => c.Header.Equals(o));
+                var pinnedindex = Views.IndexOf(pinnedone);
+                ((FileHeader)pinnedone.Header).IsPinned=!((FileHeader)pinnedone.Header).IsPinned;
+
+                if (((FileHeader)pinnedone.Header).IsPinned)
+                {
+                    PinnedNumber += 1;
+                    PinnedNumber2 += 1;
+
+                    var help = Views[pinnedindex];
+                    var help0 = Views[PinnedNumber];
+
+                    viewsarray.Remove(viewsarray[pinnedindex]);
+                    viewsarray.Insert(PinnedNumber, help);
+                }
+                else
+                {
+                    PinnedNumber -= 1;
+                    PinnedNumber2 -= 1;
+
+                    var help = Views[pinnedindex];
+                    var help0 = Views[PinnedNumber2];
+
+                    viewsarray.Remove(viewsarray[pinnedindex]);
+                    viewsarray.Insert(PinnedNumber2, help);
+                }
+
+                Views = new ObservableCollection<ViewContainer>(viewsarray);
+
+                OnPropertyChanged("Views");
+                OnPropertyChanged("PinnedNumber2");
+
 
             });
             _logger = logger;
@@ -235,7 +270,9 @@ namespace TailBlazer.Views.WindowManagement
         private void Views_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             //throw new NotImplementedException();
+
         }
+        
 
         private void OpenFile(FileInfo file)
         {

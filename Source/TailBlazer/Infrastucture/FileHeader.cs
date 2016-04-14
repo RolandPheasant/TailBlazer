@@ -11,7 +11,7 @@ namespace TailBlazer.Infrastucture
 
         public bool IsPinned {
             get { return _isPinned; }
-            set { SetAndRaise(ref _isPinned, value); }
+            set { SetAndRaise(ref _isPinned, value);}
         }
 
         public string FullName => _info.FullName;
