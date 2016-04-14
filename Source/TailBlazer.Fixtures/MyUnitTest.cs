@@ -66,7 +66,7 @@ namespace TailBlazer.Fixtures
         [Fact]
         public void FileSegment_Test()
         {
-            var fs = new FileSegment(1, 2, 10, FileSegmentType.Tail);
+            var fs = new FileSegment(1, 2, 10, FileSegmentType.Tail, null);
             var fs2 = new FileSegment(fs, 15);
 
             fs2.Index.ShouldBeEquivalentTo(fs.Index);

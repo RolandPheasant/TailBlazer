@@ -1,9 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace TailBlazer.Fixtures
 {
-    public class TestFileCollection : IList<TestFile>
+    public class TestFileCollection : IList<TestFile>, IDisposable
     {
         private readonly List<TestFile> _list;
 
@@ -69,6 +70,14 @@ namespace TailBlazer.Fixtures
         {
             get { return _list[index]; }
             set { _list[index] = value; }
+        }
+
+        public void Dispose()
+        {
+            foreach (var testFile in _list)
+            {
+                testFile.Dispose();
+            }
         }
     }
 }

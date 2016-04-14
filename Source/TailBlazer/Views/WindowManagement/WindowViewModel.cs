@@ -14,10 +14,11 @@ using System.Windows.Input;
 using Dragablz;
 using DynamicData;
 using DynamicData.Binding;
-using Microsoft.Win32;
+using MaterialDesignThemes.Wpf;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
 using TailBlazer.Views.FileDrop;
+using TailBlazer.Views.FileOpen;
 using TailBlazer.Views.Layout;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Recent;
@@ -28,7 +29,7 @@ using Microsoft.Expression.Interactivity.Core;
 
 namespace TailBlazer.Views.WindowManagement
 {
-    public class WindowViewModel: AbstractNotifyPropertyChanged, IDisposable
+    public class WindowViewModel : AbstractNotifyPropertyChanged, IDisposable
     {
         private readonly ILogger _logger;
         private readonly IWindowsController _windowsController;
@@ -45,22 +46,24 @@ namespace TailBlazer.Views.WindowManagement
         public RecentFilesViewModel RecentFiles { get; }
         public GeneralOptionsViewModel GeneralOptions { get; }
         public IInterTabClient InterTabClient { get; }
-        public ICommand OpenFileCommand { get; }
+        public FileOpenViewModel FileOpen { get; }
+        public ICommand FileOpenDialogCommand { get; }
+
         public Command ShowInGitHubCommand { get; }
         public string Version { get; }
         public ICommand SaveLayoutCommand { get; }
         public ICommand ExitCommmand { get; }
         public ICommand ZoomInCommand { get; }
         public ICommand ZoomOutCommand { get; }
-        
+
         public FileDropMonitor DropMonitor { get; } = new FileDropMonitor();
 
         public static int OpenedFileCount { get; set; }
 
         public DialogViewModel Dialog { get; set; }
 
-        public WindowViewModel(IObjectProvider objectProvider, 
-            IWindowFactory windowFactory, 
+        public WindowViewModel(IObjectProvider objectProvider,
+            IWindowFactory windowFactory,
             ILogger logger,
             IWindowsController windowsController,
             RecentFilesViewModel recentFilesViewModel,
@@ -114,12 +117,14 @@ namespace TailBlazer.Views.WindowManagement
             _schedulerProvider = schedulerProvider;
             _objectProvider = objectProvider;
             InterTabClient = new InterTabClient(windowFactory);
-            OpenFileCommand =  new Command(OpenFile);
-            ShowInGitHubCommand = new Command(()=>   Process.Start("https://github.com/RolandPheasant"));
+            FileOpenDialogCommand = new Command(OpenFileDialog);
+            FileOpen = new FileOpenViewModel(OpenFile);
+
+            ShowInGitHubCommand = new Command(() => Process.Start("https://github.com/RolandPheasant"));
 
             Views.CollectionChanged += Views_CollectionChanged;
 
-            ZoomOutCommand = new Command(()=> { GeneralOptions.Scale = GeneralOptions.Scale + 5; });
+            ZoomOutCommand = new Command(() => { GeneralOptions.Scale = GeneralOptions.Scale + 5; });
             ZoomInCommand = new Command(() => { GeneralOptions.Scale = GeneralOptions.Scale - 5; });
             SaveLayoutCommand = new Command(WalkTheLayout);
             ExitCommmand = new Command(() => Application.Current.Shutdown());
@@ -129,10 +134,10 @@ namespace TailBlazer.Views.WindowManagement
             var fileDropped = DropMonitor.Dropped.Subscribe(OpenFile);
             var isEmptyChecker = Views.ToObservableChangeSet()
                                     .ToCollection()
-                                    .Select(items=>items.Count)
+                                    .Select(items => items.Count)
                                     .StartWith(0)
-                                    .Select(count=>count==0)
-                                    .Subscribe(isEmpty=> IsEmpty = isEmpty);
+                                    .Select(count => count == 0)
+                                    .Subscribe(isEmpty => IsEmpty = isEmpty);
 
             var openRecent = recentFilesViewModel.OpenFileRequest
                                 .Subscribe(file =>
@@ -140,7 +145,7 @@ namespace TailBlazer.Views.WindowManagement
                                     MenuIsOpen = false;
                                     OpenFile(file);
                                 });
-            
+
             _cleanUp = new CompositeDisposable(recentFilesViewModel,
                 isEmptyChecker,
                 fileDropped,
@@ -148,12 +153,16 @@ namespace TailBlazer.Views.WindowManagement
                 openRecent,
                 Disposable.Create(() =>
                 {
-                     Views.Select(vc => vc.Content)
-                            .OfType<IDisposable>()
-                            .ForEach(d=>d.Dispose());
+                    Views.Select(vc => vc.Content)
+                        .OfType<IDisposable>()
+                        .ForEach(d => d.Dispose());
                 }));
         }
 
+        private async void OpenFileDialog()
+        {
+            await DialogHost.Show(FileOpen, DialogNames.EntireWindow);
+        }
 
         private void WalkTheLayout()
         {
@@ -162,22 +171,12 @@ namespace TailBlazer.Views.WindowManagement
             Console.WriteLine(root);
         }
 
-        private void OpenFile()
-        {
-            // open dialog to select file [get rid of this shit and create a material design file selector]
-            var dialog = new OpenFileDialog {Filter = "All files (*.*)|*.*"};
-            var result = dialog.ShowDialog();
-            if (result != true) return;
-
-            OpenFile(new FileInfo(dialog.FileName));
-        }
-
-        public void OpenFiles(IEnumerable<string> files=null)
+        public void OpenFiles(IEnumerable<string> files = null)
         {
             if (files == null) return;
 
             foreach (var file in files)
-                OpenFile(new FileInfo(file));
+                OpenFile(new[] { new FileInfo(file) });
         }
 
         private async void OpenFile(IEnumerable<FileInfo> files)
@@ -189,7 +188,7 @@ namespace TailBlazer.Views.WindowManagement
                 Dialog.text = "Would you like to tail these files?";
                 //Showing the dialog window
                 var msgResult = await DialogHost.Show(Dialog, DialogNames.EntireWindow);
-               //Testing the pushed button
+                //Testing the pushed button
                 if (Dialog.Button)
                 {
                     //Tailing multiple files
@@ -222,48 +221,18 @@ namespace TailBlazer.Views.WindowManagement
                         }
 
                     });
-                    return;
                 }
-                //The OLD method
-                /*MessageBox.Show("Would you like to tail these files?", "Tail files",
-                    MessageBoxButton.YesNo);
-                if (msgResult == MessageBoxResult.Yes)
+                else
                 {
-                    _schedulerProvider.Background.Schedule(() =>
+                    foreach (var fileInfo in files)
                     {
-                        try
-                        {
-                            _logger.Info($"Attempting to open '{files.Count()}' files");
-
-                            var factory = _objectProvider.Get<TailViewModelFactory>();
-                            var viewModel = factory.Create(files);
-
-                            var newItem = new ViewContainer(new FilesHeader(files), viewModel);
-
-                            _windowsController.Register(newItem);
-
-                            //_logger.Info($"Objects for '{file.FullName}' has been created.");
-                            //do the work on the ui thread
-                            _schedulerProvider.MainThread.Schedule(() =>
-                            {
-
-                                Views.Add(newItem);
-                                _logger.Info($"Opened '{files.Count()}' files");
-                                Selected = newItem;
-                            });
-                        }
-                        catch
-                        {
-                            // ignored
-                        }
-                    });
-                    return;
-                }*/
+                        OpenFile(fileInfo);
+                    }
+                }
             }
-            //Simple file opening
-            foreach (var fileInfo in files)
+            else
             {
-                OpenFile(fileInfo);
+                OpenFile(files.ElementAt(0));
             }
         }
 
@@ -290,14 +259,14 @@ namespace TailBlazer.Views.WindowManagement
 
                     //2. Display it
                     var newItem = new ViewContainer(new FileHeader(file), viewModel);
-                    
+
                     _windowsController.Register(newItem);
 
                     _logger.Info($"Objects for '{file.FullName}' has been created.");
                     //do the work on the ui thread
                     _schedulerProvider.MainThread.Schedule(() =>
                     {
-                        
+
                         Views.Add(newItem);
                         _logger.Info($"Opened '{file.FullName}'");
                         Selected = newItem;

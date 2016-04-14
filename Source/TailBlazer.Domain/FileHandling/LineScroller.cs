@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive;
@@ -53,6 +54,7 @@ namespace TailBlazer.Domain.FileHandling
                     {
                         if (removed.Any()) innerCache.Remove(removed);
                         if (added.Any()) innerCache.AddOrUpdate(added);
+                        
                     });
                 });
 
@@ -75,21 +77,10 @@ namespace TailBlazer.Domain.FileHandling
             scrollRequest = scrollRequest.Synchronize(locker);
             latest = latest.Synchronize(locker);
 
-
             var aggregator = latest
-                .MaxSequenceOfSource<ILineProvider, int, IndexCollection>(
-                    provider =>
-                    {
-                        var ic = provider as IndexCollection;
-                        int summarizedCounter = 0;
-                        while (ic != null)
-                        {
-                            summarizedCounter += ic.Count;
-                            ic = ic.Next;
-                        }
-                        return summarizedCounter;
-                    })
-                .CombineLatest(scrollRequest, (currentLines, scroll) => new { currentLines, scroll })
+                .GroupBy(provider => provider)
+                .Select(groupedProv => groupedProv.Key)
+                .CombineLatest(scrollRequest, (currentLines, scroll) => new {currentLines, scroll})
                 .Sample(TimeSpan.FromMilliseconds(50))
                 .Select(x =>
                 {
