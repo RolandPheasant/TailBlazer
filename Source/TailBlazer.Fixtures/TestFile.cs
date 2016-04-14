@@ -28,9 +28,9 @@ namespace TailBlazer.Fixtures
 
         public void EditText(string newText, int lineToEdit)
         {
-            string[] arrLine = File.ReadAllLines(Name);
+            string[] arrLine = File.ReadAllLines(FullName);
             arrLine[lineToEdit - 1] = newText;
-            File.WriteAllLines(Name, arrLine);
+            File.WriteAllLines(FullName, arrLine);
         }
 
         public void Delete()
