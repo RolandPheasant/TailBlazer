@@ -24,7 +24,7 @@ namespace TailBlazer.Fixtures
             {
                 testFileCollection.Add(new TestFile());
                 testFileCollection[i].Append(
-                    Enumerable.Range(1, 1000).Select(j => $"This is line number {j.ToString("00000000")}").ToArray());
+                    Enumerable.Range(1, 1000).Select(j => $"{i}. file and this is line number {j.ToString("00000000")}").ToArray());
             }
 
             var refresher = new Subject<Unit>();
@@ -51,7 +51,6 @@ namespace TailBlazer.Fixtures
             testFileCollection.ForEach(t => t.Delete());
 
         }
-
 
         [Fact]
         public void FileChanged()

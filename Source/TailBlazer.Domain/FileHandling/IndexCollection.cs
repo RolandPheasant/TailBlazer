@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Microsoft.SqlServer.Server;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -18,7 +16,7 @@ namespace TailBlazer.Domain.FileHandling
             Info = info;
             Encoding = encoding;
             Count = latest.Select(idx => idx.LineCount).Sum();
-            Indicies = latest.ToArray();
+            Indicies = latest/*.GroupBy(c => c.LineCount).Select(g => g.FirstOrDefault())*/.ToArray();
             Diff = Count - (previous?.Count ?? 0);
 
             //need to check whether
@@ -35,7 +33,28 @@ namespace TailBlazer.Domain.FileHandling
                     : LinesChangedReason.Paged;
 
                 TailInfo = new TailInfo(previous.Indicies.Max(idx => idx.End));
-                Next = previous;
+
+                Previous = previous;
+                previous.Next = this;
+                NumberOfPreviousProvider = previous.NumberOfPreviousProvider + 1;
+
+                //var prevPointer = previous;
+                ////find the modified file and replace from the list
+                //while (prevPointer != null)
+                //{
+                //    var lastPrevPointer = prevPointer;
+                //    if (prevPointer.Info.FullName == Info.FullName)
+                //    {
+                //        Next = prevPointer.Next;
+                //        Previous = prevPointer.Previous;
+                //        lastPrevPointer.Previous = this;
+                //        prevPointer.Previous = null;
+                //        prevPointer.Next = null;
+                //        NumberOfPreviousProvider = prevPointer.NumberOfPreviousProvider;
+                //        return;
+                //    }
+                //    prevPointer = prevPointer.Previous as IndexCollection;
+                //}
             }
         }
 
@@ -48,7 +67,8 @@ namespace TailBlazer.Domain.FileHandling
             Diff = indexCollection.Diff;
             ChangedReason = indexCollection.ChangedReason;
             TailInfo = indexCollection.TailInfo;
-            Next = indexCollection.Next;
+            Previous = indexCollection.Previous;
+            NumberOfPreviousProvider = indexCollection.NumberOfPreviousProvider;
         }
 
         public int Diff { get; }
@@ -58,7 +78,9 @@ namespace TailBlazer.Domain.FileHandling
         public FileInfo Info { get; }
         private Encoding Encoding { get; }
         public TailInfo TailInfo { get; }
-        public IndexCollection Next { get; private set; }
+        public ILineProvider Previous { get; set; }
+        public ILineProvider Next { get; set; }
+        public int NumberOfPreviousProvider { get; }
         public int Count { get; }
 
         /// <summary>
@@ -75,31 +97,26 @@ namespace TailBlazer.Domain.FileHandling
             }
             else
             {
-                
                 foreach (var line in ReadLinesByIndex(scroll))
                     yield return line;
             }
         }
 
-        struct LastValueWrapper
-        {
-            public long LastEndPosition { get; set; }
-            public int LastPageIndex { get; set; }
-        }
-
         private IEnumerable<Line> ReadLinesByIndex(ScrollRequest scroll)
         {
             var current = this;
-            LastValueWrapper lastValueWrapper = new LastValueWrapper();
+            var lastValueWrapper = new LastValueWrapper();
             var iterationCounter = 0;
             var page = GetPage(scroll, current);
             var relativeIndex = CalculateRelativeIndex(page.Start, ref current, lastValueWrapper);
-            
+
             while (relativeIndex != null && current != null)
             {
                 if (current.Indicies.Length > 0 && current.Indicies.Any(t => t.Indicies.Count == 0))
                 {
-                    yield break;
+                    iterationCounter++;
+                    current = current.Previous as IndexCollection;
+                    continue;
                 }
                 if (lastValueWrapper.LastPageIndex == page.Start + page.Size)
                 {
@@ -113,7 +130,7 @@ namespace TailBlazer.Domain.FileHandling
                     using (var reader = new StreamReaderExtended(stream, current.Encoding, false))
                     {
                         //go to starting point
-                        stream.Seek((iterationCounter > 0)? 0 : relativeIndex.Start, SeekOrigin.Begin);
+                        stream.Seek((iterationCounter > 0) ? 0 : relativeIndex.Start, SeekOrigin.Begin);
                         if (iterationCounter == 0 && offset > 0)
                         {
                             //skip number of lines offset
@@ -128,12 +145,14 @@ namespace TailBlazer.Domain.FileHandling
                         {
                             reader.ReadLine();
                         }
-                        
-                        foreach (var i in Enumerable.Range((iterationCounter > 0) ? lastValueWrapper.LastPageIndex : page.Start, page.Size))
+
+                        foreach (
+                            var i in
+                                Enumerable.Range((iterationCounter > 0) ? lastValueWrapper.LastPageIndex : page.Start,
+                                    page.Size))
                         {
                             if (i == page.Start + page.Size)
                             {
-                                lastValueWrapper.LastPageIndex = i;
                                 yield break;
                             }
                             var startPosition = reader.AbsolutePosition() + lastValueWrapper.LastEndPosition;
@@ -160,7 +179,7 @@ namespace TailBlazer.Domain.FileHandling
                     }
                 }
                 iterationCounter++;
-                current = current.Next;
+                current = current.Previous as IndexCollection;
             }
         }
 
@@ -179,7 +198,7 @@ namespace TailBlazer.Domain.FileHandling
                 using (var reader = new StreamReaderExtended(stream, Encoding, false))
                 {
                     var startPosition = scroll.Position;
-                    var first = (int) CalculateIndexByPositon(startPosition);
+                    var first = (int)CalculateIndexByPositon(startPosition);
                     reader.BaseStream.Seek(startPosition, SeekOrigin.Begin);
 
                     do
@@ -193,7 +212,7 @@ namespace TailBlazer.Domain.FileHandling
                         var ontail = endPosition >= TailInfo.TailStartsAt &&
                                      DateTime.Now.Subtract(TailInfo.LastTail).TotalSeconds < 1
                             ? DateTime.Now
-                            : (DateTime?) null;
+                            : (DateTime?)null;
 
                         yield return new Line(info, line, ontail);
 
@@ -214,11 +233,11 @@ namespace TailBlazer.Domain.FileHandling
             {
                 if (indexCollection.Indicies.Length > 0 && indexCollection.Indicies.Any(t => t.Indicies.Count == 0))
                 {
-                    indexCollection = indexCollection.Next;
+                    indexCollection = indexCollection.Previous as IndexCollection;
                     continue;
                 }
                 indexCollectionsCount += indexCollection.Count;
-                indexCollection = indexCollection.Next;
+                indexCollection = indexCollection.Previous as IndexCollection;
             }
 
             if (scroll.Mode == ScrollReason.Tail)
@@ -250,9 +269,9 @@ namespace TailBlazer.Domain.FileHandling
                     {
                         var lines = sparseIndex.LineCount;
                         var bytes = sparseIndex.End - sparseIndex.Start;
-                        var bytesPerLine = bytes/lines;
+                        var bytesPerLine = bytes / lines;
 
-                        return position/bytesPerLine;
+                        return position / bytesPerLine;
                     }
 
 
@@ -263,19 +282,19 @@ namespace TailBlazer.Domain.FileHandling
 
                     //find nearest, then work out offset
                     var nearest = sparseIndex.Indicies.Data
-                        .Select((value, index) => new {value, index})
+                        .Select((value, index) => new { value, index })
                         .OrderByDescending(x => x.value)
                         .FirstOrDefault(i => i.value <= position);
 
                     if (nearest != null)
                     {
                         //index depends of how far in container
-                        var relativeIndex = nearest.index*sparseIndex.Compression;
+                        var relativeIndex = nearest.index * sparseIndex.Compression;
 
                         //remaining size
                         var size = (sparseIndex.End - sparseIndex.Start);
                         var offset = (position - nearest.value);
-                        var estimateOffset = (offset/size)*sparseIndex.Compression;
+                        var estimateOffset = (offset / size) * sparseIndex.Compression;
                         return firstLineInContainer + relativeIndex + estimateOffset;
                     }
                     else
@@ -286,7 +305,7 @@ namespace TailBlazer.Domain.FileHandling
                         //remaining size
                         var size = (sparseIndex.End - sparseIndex.Start);
                         var offset = position;
-                        var estimateOffset = (offset/size)*sparseIndex.Compression;
+                        var estimateOffset = (offset / size) * sparseIndex.Compression;
                         return firstLineInContainer + relativeIndex + estimateOffset;
                     }
                 }
@@ -295,7 +314,8 @@ namespace TailBlazer.Domain.FileHandling
             return -1;
         }
 
-        private RelativeIndex CalculateRelativeIndex(int index, ref IndexCollection indexCollection, LastValueWrapper lastValueWrapper)
+        private RelativeIndex CalculateRelativeIndex(int index, ref IndexCollection indexCollection,
+            LastValueWrapper lastValueWrapper)
         {
             var firstLineInContainer = 0;
             var lastLineInContainer = 0;
@@ -337,10 +357,17 @@ namespace TailBlazer.Domain.FileHandling
                     .Where(localIndex => localIndex.IndexCount > 0)
                     .Sum(localIndex => localIndex.Indicies[localIndex.IndexCount - 1]);
 
-                indexCollection = indexCollection.Next;
+                indexCollection = indexCollection.Previous as IndexCollection;
             }
-            
+
             return null;
+        }
+
+        public override string ToString()
+        {
+            return TailInfo == TailInfo.None
+                ? "<None>"
+                : $"Count: {Count}, Indicies: {Indicies.Length}, Diff: {Diff}, Previous: {NumberOfPreviousProvider}";
         }
 
         private class RelativeIndex
@@ -357,25 +384,6 @@ namespace TailBlazer.Domain.FileHandling
             public long Start { get; }
             public int LinesOffset { get; }
             public bool IsEstimate { get; }
-        }
-
-        public int CompareTo(object obj)
-        {
-            var it = this;
-            int counter = 0;
-            while (it != null)
-            {
-                counter++;
-                it = it.Next;
-            }
-            var ic = obj as IndexCollection;
-            int objCounter = 0;
-            while (ic != null)
-            {
-                objCounter++;
-                ic = ic.Next;
-            }
-            return counter.CompareTo(objCounter);
         }
     }
 }
