@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using Microsoft.Expression.Interactivity.Core;
 using System.Drawing;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
@@ -19,7 +20,9 @@ namespace TailBlazer.Views.FileOpen
     /// </summary>
     public class FileOpenViewModel : AbstractNotifyPropertyChanged, IDisposable
     {
+        public Guid Id { get; } = Guid.NewGuid();
         private readonly IDisposable _cleanUp;
+        private string _selectedTreeViewItemPath;
         public FileInfoWithIcon SelectedItem { get; set; }
         /// <summary>
         /// The content of this list will display on the right side of the Open Dialog
@@ -28,7 +31,7 @@ namespace TailBlazer.Views.FileOpen
         public ICommand SelectedItemChangedCommand { get; set; }    
         public ICommand OpenSelectedItemCommand { get; set; }
 
-        public FileOpenViewModel(Action<IEnumerable<FileInfo>> openFile)
+        public FileOpenViewModel(Func<IEnumerable<FileInfo>, Task> openFile)
         {
             SelectedItemChangedCommand = new ActionCommand(treeview => SelectedItemChangedCommandMethod(treeview as TreeView));
             OpenSelectedItemCommand = new ActionCommand(closeCommand => OpenSelectedItemCommandMethod(openFile, closeCommand as RoutedCommand));
@@ -40,10 +43,23 @@ namespace TailBlazer.Views.FileOpen
         /// </summary>
         /// <param name="openFile"></param>
         /// <param name="closeCommand"></param>
-        private void OpenSelectedItemCommandMethod(Action<IEnumerable<FileInfo>> openFile, RoutedCommand closeCommand)
+        private async void OpenSelectedItemCommandMethod(Func<IEnumerable<FileInfo>, Task> openFile, RoutedCommand closeCommand)
         {
-            openFile(FileAndDirectoryValidator(SelectedItem.FileInfo.FullName));
-            closeCommand?.Execute(null, null);
+
+            if (SelectedItem?.FileInfo?.FullName != null)
+            {
+                await openFile(FileAndDirectoryValidator(SelectedItem.FileInfo.FullName));
+                closeCommand?.Execute(null, null);
+            }
+            else if (!string.IsNullOrEmpty(_selectedTreeViewItemPath))
+            {
+                await openFile(FileAndDirectoryValidator(_selectedTreeViewItemPath));
+                closeCommand?.Execute(null, null);
+            }
+            else
+            {
+                //TODO: Notify user to select a folder or file
+            }
         }
 
         /// <summary>
@@ -55,11 +71,11 @@ namespace TailBlazer.Views.FileOpen
             var temp = ((TreeViewItem) tree.SelectedItem);
             if (temp != null)
             {
-                var selectedImagePath = GenerateFilePath(temp);
+                _selectedTreeViewItemPath = GenerateFilePath(temp);
 
                 FilesAndIcons = new List<FileInfoWithIcon>();
-                GetDirecotries(selectedImagePath);
-                GetFiles(selectedImagePath);
+                FilesAndIcons.AddRange(GetDirecotries(_selectedTreeViewItemPath));
+                FilesAndIcons.AddRange(GetFiles(_selectedTreeViewItemPath));
 
                 OnPropertyChanged("FilesAndIcons");
             }
@@ -69,8 +85,9 @@ namespace TailBlazer.Views.FileOpen
         /// Gets all files from the given path.
         /// </summary>
         /// <param name="selectedImagePath"></param>
-        private void GetFiles(string selectedImagePath)
+        private List<FileInfoWithIcon> GetFiles(string selectedImagePath)
         {
+            List<FileInfoWithIcon> fiwiList = new List<FileInfoWithIcon>();
             foreach (var fileName in new DirectoryInfo(selectedImagePath)
                 .GetFiles()
                 // Skipping hidden and system files. 
@@ -91,17 +108,19 @@ namespace TailBlazer.Views.FileOpen
                             BitmapSizeOptions.FromEmptyOptions())
                     };
                     
-                    FilesAndIcons.Add(fai);
+                    fiwiList.Add(fai);
                 }
             }
+            return fiwiList;
         }
 
         /// <summary>
         /// Gets all dictionaries from the given path.
         /// </summary>
         /// <param name="selectedImagePath"></param>
-        private void GetDirecotries(string selectedImagePath)
+        private List<FileInfoWithIcon> GetDirecotries(string selectedImagePath)
         {
+            List<FileInfoWithIcon> fiwiList = new List<FileInfoWithIcon>();
             foreach (var fileName in Directory.GetDirectories(selectedImagePath)
                 .Where(d => !new DirectoryInfo(d).Attributes.HasFlag(FileAttributes.Hidden | FileAttributes.System)))
             {
@@ -114,8 +133,9 @@ namespace TailBlazer.Views.FileOpen
                     ImageSource = new BitmapImage(uri)
                 };
 
-                FilesAndIcons.Add(fai);
+                fiwiList.Add(fai);
             }
+            return fiwiList;
         }
 
         /// <summary>
@@ -161,7 +181,7 @@ namespace TailBlazer.Views.FileOpen
             try
             {
                 var attr = File.GetAttributes(fileOrDirectoryPath);
-                return attr.HasFlag(FileAttributes.Directory) ? new DirectoryInfo(fileOrDirectoryPath).GetFiles() : new[] {new FileInfo(fileOrDirectoryPath)};
+                return attr.HasFlag(FileAttributes.Directory) ? GetFiles(fileOrDirectoryPath).Select(t => t.FileInfo).ToArray() : new[] {new FileInfo(fileOrDirectoryPath)};
             }
             catch (Exception ex)
             {

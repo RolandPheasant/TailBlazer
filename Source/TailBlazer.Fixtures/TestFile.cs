@@ -8,10 +8,9 @@ namespace TailBlazer.Fixtures
     {
         public string FullName { get; }
         public FileInfo Info { get; }
-
+        
         public TestFile()
         {
-
             FullName = Path.GetTempFileName();
             Info = new FileInfo(FullName);
         }

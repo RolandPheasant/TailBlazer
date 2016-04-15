@@ -12,6 +12,7 @@ namespace TailBlazer.Views.Dialog
     //This class is responsible for displaying custom dialog windows
     public class DialogViewModel : AbstractNotifyPropertyChanged, IDisposable
     {
+        public Guid Id { get; } = Guid.NewGuid();
         //The text of the dialog window
         public String text { get; set; }
         public ICommand ButtonClickEvent { get; set; }

@@ -9,7 +9,9 @@
       mc:Ignorable="d" 
      xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
       d:DesignHeight="300" d:DesignWidth="300"
-      d:DataContext="{d:DesignInstance dialog:DialogViewModel}">
+      d:DataContext="{d:DesignInstance dialog:DialogViewModel}"
+  Identifier="{Binding Id}"
+    >
 
     <Grid Height="150" Width="300">
         <Grid.RowDefinitions>

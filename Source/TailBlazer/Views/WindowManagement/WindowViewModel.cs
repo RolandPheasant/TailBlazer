@@ -9,6 +9,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Dragablz;
@@ -67,7 +68,8 @@ namespace TailBlazer.Views.WindowManagement
             RecentFilesViewModel recentFilesViewModel,
             GeneralOptionsViewModel generalOptionsViewModel,
             ISchedulerProvider schedulerProvider,
-            DialogViewModel dialogviewmodel)
+            DialogViewModel dialogviewmodel,
+            FileOpenViewModel fileopenviewmodel)
         {
             Pinning = new ActionCommand(o =>
             {
@@ -96,7 +98,7 @@ namespace TailBlazer.Views.WindowManagement
 
             Version = $"v{Assembly.GetEntryAssembly().GetName().Version.ToString(3)}";
 
-            var fileDropped = DropMonitor.Dropped.Subscribe(OpenFile);
+            var fileDropped = DropMonitor.Dropped.Subscribe(async t => await OpenFile(t));
             var isEmptyChecker = Views.ToObservableChangeSet()
                                     .ToCollection()
                                     .Select(items => items.Count)
@@ -144,7 +146,7 @@ namespace TailBlazer.Views.WindowManagement
                 OpenFile(new[] { new FileInfo(file) });
         }
 
-        private async void OpenFile(IEnumerable<FileInfo> files)
+        private async Task<bool> OpenFile(IEnumerable<FileInfo> files)
         {
             OpenedFileCount = files.Count();
             if (OpenedFileCount > 1)
@@ -152,13 +154,15 @@ namespace TailBlazer.Views.WindowManagement
                 //Here we can set the dialog window's message
                 Dialog.text = "Would you like to tail these files?";
                 //Showing the dialog window
-                var msgResult = await DialogHost.Show(Dialog, DialogNames.EntireWindow);
+                await DialogHost.Show(Dialog, FileOpen.Id);
+
                 //Testing the pushed button
                 if (Dialog.Button)
                 {
                     //Tailing multiple files
                     _schedulerProvider.Background.Schedule(() =>
                     {
+                        //await DialogHost.Show(Dialog, DialogNames.EntireWindow);
                         try
                         {
                             _logger.Info($"Attempting to open '{files.Count()}' files");
@@ -199,6 +203,8 @@ namespace TailBlazer.Views.WindowManagement
             {
                 OpenFile(files.ElementAt(0));
             }
+
+            return true;
         }
 
         private void Views_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

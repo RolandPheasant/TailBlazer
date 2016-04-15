@@ -22,7 +22,6 @@ namespace TailBlazer.Fixtures
             using (var file = new TestFile())
             {
                 file.Append("testLine");
-
                 new FileOpenViewModel(null).FileAndDirectoryValidator(file.Info.FullName).Select(f => f.FullName).First().Should().Be(file.Info.FullName);
             }
         }

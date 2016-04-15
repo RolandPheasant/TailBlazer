@@ -11,7 +11,9 @@
              xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:tailBlazer="clr-namespace:TailBlazer"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance local:FileOpenViewModel}">
+             d:DataContext="{d:DesignInstance local:FileOpenViewModel}"
+                      Identifier="{Binding Id}"
+                >
     <Grid
 
       Margin="6 6 6 6"    
