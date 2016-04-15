@@ -31,11 +31,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             _defaultIconSelector = defaultIconSelector;
 
             //Add a complete file display
-            All = _filesWatcher
-                .Select(t => t.Latest)
-                .Index()
-                .Replay(1)
-                .RefCount();
+            All = _filesWatcher.Select(t => t.Latest).Index();
 
             //create a collection with 1 item, which is used to show entire file
             var systemSearches = new SourceCache<SearchInfo, string>(t => t.SearchText);
@@ -48,9 +44,9 @@ namespace TailBlazer.Domain.FileHandling.Search
                 .Transform(meta =>
                 {
                     var latest = _filesWatcher
-                        .Select(t => t.Latest
-                            .Search(meta.BuildPredicate()))
-                        .Merge().Replay(1).RefCount();
+                        .Select(t => t.Latest)
+                        .Merge()
+                        .Search(meta.BuildPredicate());
 
                     return new SearchInfo(meta.SearchText, latest, SearchType.User);
                 });

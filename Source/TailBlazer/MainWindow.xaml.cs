@@ -15,7 +15,6 @@ namespace TailBlazer
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-
         public MainWindow()
         {
             InitializeComponent();
@@ -28,18 +27,6 @@ namespace TailBlazer
 
             var windowsModel = DataContext as WindowViewModel;
             windowsModel?.OnWindowClosing();
-        }
-
-
-        private void StackPanel_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            e.Handled = false;
-        }
-
-
-        private void pin_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            e.Handled = true;
         }
 
 

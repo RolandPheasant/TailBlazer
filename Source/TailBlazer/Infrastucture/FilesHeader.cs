@@ -11,6 +11,13 @@ namespace TailBlazer.Infrastucture
     public class FilesHeader : AbstractNotifyPropertyChanged
     {
         private string _displayName;
+        private bool _isPinned = false;
+
+        public bool IsPinned
+        {
+            get { return _isPinned; }
+            set { SetAndRaise(ref _isPinned, value); }
+        }
 
         public string FullName { get; }
 

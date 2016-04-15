@@ -6,6 +6,7 @@ using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
 {
+    [Flags]
     public enum FileStatus
     {
         Loading,
