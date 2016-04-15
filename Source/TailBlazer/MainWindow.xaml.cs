@@ -30,17 +30,5 @@ namespace TailBlazer
         }
 
 
-        private void StackPanel_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            e.Handled = false;
-        }
-
-
-        private void pin_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            e.Handled = true;
-        }
-
-
     }
 }

@@ -71,35 +71,47 @@ namespace TailBlazer.Views.WindowManagement
             ISchedulerProvider schedulerProvider,
             DialogViewModel dialogviewmodel)
         {
+            //This function handles the pinning
+            //If the user decides to pin a tab the function will lock that tab and reorder the effected tabs
             Pinning = new ActionCommand(o =>
             {
                 var viewsarray = Views.ToList();
-
                 var pinnedone = Views.FirstOrDefault(c => c.Header.Equals(o));
                 var pinnedindex = Views.IndexOf(pinnedone);
-                ((FileHeader)pinnedone.Header).IsPinned=!((FileHeader)pinnedone.Header).IsPinned;
+                bool actualpinned = false;
+                ViewContainer oldtab = null;
 
-                if (((FileHeader)pinnedone.Header).IsPinned)
+                if (o.GetType().IsEquivalentTo(typeof(FilesHeader)))
+                {
+                    ((FilesHeader)pinnedone.Header).IsPinned = !((FilesHeader)pinnedone.Header).IsPinned;
+                    actualpinned = ((FilesHeader)pinnedone.Header).IsPinned;
+                }
+                else
+                {
+                    ((FileHeader)pinnedone.Header).IsPinned = !((FileHeader)pinnedone.Header).IsPinned;
+                    actualpinned = ((FileHeader)pinnedone.Header).IsPinned;
+                }
+                    
+
+                if (actualpinned)
                 {
                     PinnedNumber += 1;
                     PinnedNumber2 += 1;
 
-                    var help = Views[pinnedindex];
-                    var help0 = Views[PinnedNumber];
+                    oldtab = Views[pinnedindex];
 
                     viewsarray.Remove(viewsarray[pinnedindex]);
-                    viewsarray.Insert(PinnedNumber, help);
+                    viewsarray.Insert(PinnedNumber, oldtab);
                 }
                 else
                 {
                     PinnedNumber -= 1;
                     PinnedNumber2 -= 1;
 
-                    var help = Views[pinnedindex];
-                    var help0 = Views[PinnedNumber2];
+                    oldtab = Views[pinnedindex];
 
                     viewsarray.Remove(viewsarray[pinnedindex]);
-                    viewsarray.Insert(PinnedNumber2, help);
+                    viewsarray.Insert(PinnedNumber2, oldtab);
                 }
 
                 Views = new ObservableCollection<ViewContainer>(viewsarray);

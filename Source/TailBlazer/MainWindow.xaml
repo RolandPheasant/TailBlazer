@@ -108,11 +108,64 @@
             <!-- TODO-->
 
             <DataTemplate DataType="{x:Type infrastucture:FilesHeader}">
-                <TextBlock Margin="6 2 2 2" 
+                <DockPanel Name="SPanel" LastChildFill="True" IsHitTestVisible="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <DockPanel.Resources>
+                        <Style TargetType="{x:Type Thumb}" x:Key="InvisibleThumbStyle">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Grid Background="{TemplateBinding Background}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DockPanel.Resources>
+
+                    <Grid>
+                        <TextBlock Margin="6 2 2 2" 
                            IsHitTestVisible="True"
                            ToolTipService.ShowOnDisabled="True"
                            ToolTip="{Binding FullName}"
-                           Text="{Binding DisplayName}" />
+                           Text="{Binding  DisplayName}" />
+                        <Thumb Style="{DynamicResource InvisibleThumbStyle}" dragablz:DragablzItem.IsCustomThumb="True"/>
+                    </Grid>
+
+                    <ToggleButton x:Name="pin"
+                            Margin="5 0 0 0"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            BorderThickness="0"
+                            Command="{Binding DataContext.Pinning, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:MetroWindow}}}"
+                            CommandParameter="{Binding}">
+
+                        <Image
+                            Width="16"
+                            Height="16"
+                            RenderOptions.BitmapScalingMode="NearestNeighbor"
+                            Source="/Resources/pin-2.png"/>
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger 
+                                        Binding="{Binding RelativeSource=
+                                        {RelativeSource Mode=FindAncestor, AncestorType=
+                                        {x:Type dragablz:DragablzItem }}, Path=IsMouseOver}" 
+                                        Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                    <DataTrigger
+                                        Binding="{Binding IsPinned, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                        Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
+
+                </DockPanel>
 
             </DataTemplate>
 
@@ -253,7 +306,7 @@
                             FixedHeaderCount="{Binding PinnedNumber2}"
                         >
                                 <dragablz:TabablzControl.InterTabController>
-                            <dragablz:InterTabController InterTabClient="{Binding InterTabClient}" MouseDown="StackPanel_MouseDown"  />
+                            <dragablz:InterTabController InterTabClient="{Binding InterTabClient}"   />
                         </dragablz:TabablzControl.InterTabController>
 
                     </dragablz:TabablzControl>

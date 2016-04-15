@@ -3,6 +3,7 @@ using Microsoft.Expression.Interactivity.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -15,6 +16,7 @@ namespace TailBlazer.Views.Dialog
         //The text of the dialog window
         public String text { get; set; }
         public ICommand ButtonClickEvent { get; set; }
+        private readonly IDisposable _cleanUp;
         public bool Button { get; set; } 
 
         public DialogViewModel()
@@ -37,11 +39,14 @@ namespace TailBlazer.Views.Dialog
                     }
                 }
             });
+
+            _cleanUp = new CompositeDisposable();
+
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            _cleanUp.Dispose();
         }
     }
 }
