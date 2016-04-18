@@ -40,7 +40,7 @@ namespace TailBlazer.Views.Tail
         private LineProxy _selectedLine;
         private bool _showInline;
 
-        public KeyboardNavigationHandler KeyboardNavigationHandler { get; } = new KeyboardNavigationHandler();
+        public IKeyboardNavigationHandler KeyboardNavigationHandler { get; } = new KeyboardNavigationHandler();
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         public Guid Id { get; }= Guid.NewGuid();
@@ -132,109 +132,71 @@ namespace TailBlazer.Views.Tail
             
             //An observable which acts as a scroll command
 
-            var userScroll = KeyboardNavigationHandler.NavigationKeys
-                .Subscribe(keys =>
+            var keyNavigation = KeyboardNavigationHandler.NavigationKeys
+                .Do(key =>
                 {
-
-                    if (keys == KeyboardNavigationType.PageUp)
+                    AutoTail = key == KeyboardNavigationType.End ? true : false;
+                })
+                .Select(keys =>
+                {
+                    switch (keys)
                     {
-                      //  AutoTail = false;
-                        _userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User,PageSize,FirstIndex- PageSize));
+                        case KeyboardNavigationType.Up:
+                            return new ScrollRequest(ScrollReason.User, PageSize, FirstIndex - 1);
+                        case KeyboardNavigationType.Down:
+                            return new ScrollRequest(ScrollReason.User, PageSize, FirstIndex + 1); 
+                        case KeyboardNavigationType.PageUp:
+                            return new ScrollRequest(ScrollReason.User, PageSize, FirstIndex - PageSize);
+                        case KeyboardNavigationType.PageDown:
+                            return new ScrollRequest(ScrollReason.User, PageSize, FirstIndex + PageSize);
+                        case KeyboardNavigationType.Home:
+                            return new ScrollRequest(ScrollReason.User, PageSize, 0);
+                        case KeyboardNavigationType.End:
+                            return new ScrollRequest(PageSize);
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(keys), keys, null);
                     }
-
-                    if (keys == KeyboardNavigationType.Up)
-                    {
-                        AutoTail = false;
-                        _userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User, PageSize, FirstIndex - 1));
-                    }
-
-                    if (keys == KeyboardNavigationType.PageDown)
-                    {
-                          AutoTail = false;
-                        _userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User, PageSize, FirstIndex + PageSize));
-                    }
-
-                    if (keys == KeyboardNavigationType.Down)
-                    {
-                        //  AutoTail = false;
-                        _userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User, PageSize, FirstIndex + 1));
-                    }
-
-                });
+                }).SubscribeSafe(_userScrollRequested);
 
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
-            var scroller = _userScrollRequested.CombineLatest(autoChanged, (user, auto) =>
-                        {
-                            var mode = AutoTail ? ScrollReason.Tail : ScrollReason.User;
-                            return  new ScrollRequest(mode, user.PageSize, user.FirstIndex);
-                        })
-                        .Do(x=>logger.Info("Scrolling to {0}/{1}", x.FirstIndex,x.PageSize))
-                        .DistinctUntilChanged();
+            var scroller = (_userScrollRequested).CombineLatest(autoChanged, (user, auto) =>
+            {
+                var mode = AutoTail ? ScrollReason.Tail : ScrollReason.User;
+                return new ScrollRequest(mode, user.PageSize, user.FirstIndex);
+            }).Do(x => logger.Info("Scrolling to {0}/{1}", x.FirstIndex, x.PageSize)).DistinctUntilChanged();
 
             FileStatus = fileWatcher.Status.ForBinding();
 
             //command to add the current search to the tail collection
-            var searchInvoker = SearchHints.SearchRequested.Subscribe(request =>
-            {
-                searchInfoCollection.Add(request.Text, request.UseRegEx);
-            });
+            var searchInvoker = SearchHints.SearchRequested.Subscribe(request => { searchInfoCollection.Add(request.Text, request.UseRegEx); });
 
             //User feedback to show file size
-            FileSizeText = fileWatcher.Latest.Select(fn=>fn.Size)
-                .Select(size => size.FormatWithAbbreviation())
-                .DistinctUntilChanged()
-                .ForBinding();
+            FileSizeText = fileWatcher.Latest.Select(fn => fn.Size).Select(size => size.FormatWithAbbreviation()).DistinctUntilChanged().ForBinding();
 
             //tailer is the main object used to tail, scroll and filter in a file
             var lineScroller = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
-            
-            MaximumChars = lineScroller.MaximumLines()
-                            .ObserveOn(schedulerProvider.MainThread)
-                            .ForBinding();
+
+            MaximumChars = lineScroller.MaximumLines().ObserveOn(schedulerProvider.MainThread).ForBinding();
 
             //load lines into observable collection
             var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection), new LineMatches(searchMetadataCollection), horizonalScrollArgs.DistinctUntilChanged(), themeProvider);
 
-            var loader = lineScroller.Lines.Connect()
-                .LogChanges(logger, "Received")
-                .Transform(lineProxyFactory.Create, new ParallelisationOptions(ParallelType.Ordered, 3))
-                .LogChanges(logger, "Sorting")
-                .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
-                .ObserveOn(schedulerProvider.MainThread)
-                .Bind(out _data,100)
-                .LogChanges(logger, "Bound")
-                .DisposeMany()
-                .LogErrors(logger)
-                .Subscribe();
-            
+            var loader = lineScroller.Lines.Connect().LogChanges(logger, "Received").Transform(lineProxyFactory.Create, new ParallelisationOptions(ParallelType.Ordered, 3)).LogChanges(logger, "Sorting").Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy)).ObserveOn(schedulerProvider.MainThread).Bind(out _data, 100).LogChanges(logger, "Bound").DisposeMany().LogErrors(logger).Subscribe();
+
             //monitor matching lines and start index,
-            Count = searchInfoCollection.All.Select(latest=>latest.Count).ForBinding();
+            Count = searchInfoCollection.All.Select(latest => latest.Count).ForBinding();
             CountText = searchInfoCollection.All.Select(latest => $"{latest.Count.ToString("##,###")} lines").ForBinding();
             LatestCount = SearchCollection.Latest.Select(latest => latest.Count).ForBinding();
 
             ////track first visible index
-            var firstIndexMonitor = lineScroller.Lines.Connect()
-                .Buffer(TimeSpan.FromMilliseconds(25)).FlattenBufferResult()
-                .ToCollection()
-                .Select(lines => lines.Count == 0 ? 0 : lines.Select(l => l.Index).Max() - lines.Count + 1)
-                .ObserveOn(schedulerProvider.MainThread)
-                .Subscribe(first =>
-                {
-                    FirstIndex = first;
-                });
+            var firstIndexMonitor = lineScroller.Lines.Connect().Buffer(TimeSpan.FromMilliseconds(25)).FlattenBufferResult().ToCollection().Select(lines => lines.Count == 0 ? 0 : lines.Select(l => l.Index).Max() - lines.Count + 1).ObserveOn(schedulerProvider.MainThread).Subscribe(first => { FirstIndex = first; });
 
 
             //Create objects required for inline viewing
-            var isUserDefinedChanged = SearchCollection.WhenValueChanged(sc => sc.Selected)
-                .Where(selected=> selected!=null)
-                .Select(selected => selected.IsUserDefined)
-                .DistinctUntilChanged()
-                .Replay(1)
-                .RefCount();
-            
-            var inlineViewerVisible = isUserDefinedChanged.CombineLatest(this.WhenValueChanged(vm => vm.ShowInline),
-                                                            (userDefined, showInline) => userDefined && showInline);
-            
+            var isUserDefinedChanged = SearchCollection.WhenValueChanged(sc => sc.Selected).Where(selected => selected != null).Select(selected => selected.IsUserDefined).DistinctUntilChanged().Replay(1).RefCount();
+
+            var inlineViewerVisible = isUserDefinedChanged.CombineLatest(this.WhenValueChanged(vm => vm.ShowInline), (userDefined, showInline) => userDefined && showInline);
+
             CanViewInline = isUserDefinedChanged.ForBinding();
             InlineViewerVisible = inlineViewerVisible.ForBinding();
 
@@ -243,40 +205,40 @@ namespace TailBlazer.Views.Tail
 
             InlineViewer = inlineViewerFactory.Create(inline, this.WhenValueChanged(vm => vm.SelectedItem), searchMetadataCollection);
 
-            _cleanUp = new CompositeDisposable(lineScroller,
-                loader,
-                firstIndexMonitor,
-                FileStatus,
-                Count,
-                LatestCount,
-                FileSizeText,
-                CanViewInline,
-                InlineViewer,
-                InlineViewerVisible,
-                SearchCollection,
-                searchInfoCollection,
-                HighlightTail,
-                UsingDarkTheme,
-                searchHints,
-                searchMetadataCollection,
-                SelectionMonitor,
-                SearchOptions,
-                searchInvoker,
+            _cleanUp = new CompositeDisposable(lineScroller, loader, firstIndexMonitor, 
+                FileStatus, 
+                Count, 
+                LatestCount, 
+                FileSizeText, 
+                CanViewInline, 
+                InlineViewer, 
+                InlineViewerVisible, 
+                SearchCollection, 
+                searchInfoCollection, 
+                HighlightTail, 
+                UsingDarkTheme, 
+                searchHints, 
+                searchMetadataCollection, 
+                SelectionMonitor, 
+                SearchOptions, 
+                searchInvoker, 
                 MaximumChars,
-                _stateMonitor,
-                horizonalScrollArgs.SetAsComplete(),
-                _userScrollRequested.SetAsComplete());
+                _stateMonitor, 
+                horizonalScrollArgs.SetAsComplete(), 
+                _userScrollRequested.SetAsComplete(), 
+                KeyboardNavigationHandler,
+                keyNavigation);
         }
 
-     
+
         public TextScrollDelegate HorizonalScrollChanged { get; }
 
 
         private async void OpenSearchOptions()
         {
-           await DialogHost.Show(SearchOptions, Id);
+            await DialogHost.Show(SearchOptions, Id);
         }
-        
+
         public LineProxy SelectedItem
         {
             get { return _selectedLine; }
@@ -288,7 +250,7 @@ namespace TailBlazer.Views.Tail
             get { return _autoTail; }
             set { SetAndRaise(ref _autoTail, value); }
         }
-        
+
         public int PageSize
         {
             get { return _pageSize; }
@@ -308,7 +270,7 @@ namespace TailBlazer.Views.Tail
         }
 
         #region Interact with scroll panel
-        
+
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
         {
             if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));
@@ -323,7 +285,6 @@ namespace TailBlazer.Views.Tail
                 each time I have tried to remove it all hell has broken loose
             */
             _userScrollRequested.OnNext(new ScrollRequest(mode, boundsArgs.PageSize, boundsArgs.FirstIndex));
-
         }
 
         void IScrollReceiver.ScrollChanged(ScrollChangedArgs scrollChangedArgs)
@@ -344,7 +305,7 @@ namespace TailBlazer.Views.Tail
         public void ApplySettings()
         {
             //this controller responsible for loading and persisting user search stuff as the user changes stuff
-            _stateMonitor.Disposable = _tailViewStateControllerFactory.Create(this,true);
+            _stateMonitor.Disposable = _tailViewStateControllerFactory.Create(this, true);
         }
 
 
@@ -359,15 +320,14 @@ namespace TailBlazer.Views.Tail
             _persister.Restore(state);
 
             //this controller responsible for loading and persisting user search stuff as the user changes stuff
-            _stateMonitor.Disposable = _tailViewStateControllerFactory.Create(this,false);
+            _stateMonitor.Disposable = _tailViewStateControllerFactory.Create(this, false);
         }
 
         #endregion
-        
+
         public void Dispose()
         {
             _cleanUp.Dispose();
         }
-
     }
 }

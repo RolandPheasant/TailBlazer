@@ -10,7 +10,7 @@ using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Native
 {
-    public class KeyboardNavigationHandler: IDependencyObjectReceiver
+    public class KeyboardNavigationHandler: IDependencyObjectReceiver, IKeyboardNavigationHandler
     {
         private readonly SerialDisposable _keySubscriber = new SerialDisposable();
         private readonly IDisposable _cleanUp;
@@ -27,7 +27,7 @@ namespace TailBlazer.Native
             });
         }
 
-        public void Receive(DependencyObject value)
+        void IDependencyObjectReceiver.Receive(DependencyObject value)
         {
             var control = (Control) value;
 
@@ -65,6 +65,11 @@ namespace TailBlazer.Native
                 default:
                     return Optional<KeyboardNavigationType>.None;
             }
+        }
+
+        public void Dispose()
+        {
+            _cleanUp.Dispose();
         }
     }
 }

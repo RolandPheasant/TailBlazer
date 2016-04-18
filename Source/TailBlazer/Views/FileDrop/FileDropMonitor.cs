@@ -15,9 +15,20 @@ namespace TailBlazer.Views.FileDrop
 {
     public class FileDropMonitor : IDependencyObjectReceiver, IDisposable
     {
-        private readonly SerialDisposable _cleanUp = new SerialDisposable();
+        private readonly IDisposable _cleanUp;
+        private readonly SerialDisposable _monitorDisposable = new SerialDisposable();
         private readonly ISubject<FileInfo> _fileDropped = new Subject<FileInfo>();
         private readonly ISubject<DragEventArgs> _dragging  = new Subject<DragEventArgs>();
+
+        public FileDropMonitor()
+        {
+            _cleanUp = Disposable.Create(() =>
+            {
+                _monitorDisposable.Dispose();
+                _fileDropped.OnCompleted();
+                _dragging.OnCompleted();
+            });
+        }
 
         public void Receive(DependencyObject value)
         {
@@ -72,13 +83,12 @@ namespace TailBlazer.Views.FileDrop
                 .SubscribeSafe(_fileDropped);
 
 
-            _cleanUp.Disposable = Disposable.Create(() =>
+            _monitorDisposable.Disposable = Disposable.Create(() =>
             {
                 updatePositionOfAdornment.Dispose();
                 clearAdorner.Dispose();
                 createAdorner.Dispose();
                 dropped.Dispose();
-                _fileDropped.OnCompleted();
             });
         }
 

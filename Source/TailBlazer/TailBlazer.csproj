@@ -161,6 +161,7 @@
     <Compile Include="Infrastucture\ViewFactoryService.cs" />
     <Compile Include="Infrastucture\Virtualisation\VirtualizingWrapPanel.cs" />
     <Compile Include="Infrastucture\WindowAssist.cs" />
+    <Compile Include="Native\IKeyboardNavigationHandler.cs" />
     <Compile Include="Native\KeyboardNavigationType.cs" />
     <Compile Include="Native\KeyboardNavigationHandler.cs" />
     <Compile Include="Views\Formatting\DefaultColourSelector.cs" />
