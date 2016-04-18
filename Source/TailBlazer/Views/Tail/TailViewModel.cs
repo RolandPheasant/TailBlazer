@@ -19,6 +19,7 @@ using TailBlazer.Domain.Settings;
 using TailBlazer.Domain.StateHandling;
 using TailBlazer.Infrastucture;
 using TailBlazer.Infrastucture.Virtualisation;
+using TailBlazer.Native;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Searching;
 
@@ -38,6 +39,8 @@ namespace TailBlazer.Views.Tail
         private int _pageSize;
         private LineProxy _selectedLine;
         private bool _showInline;
+
+        public KeyboardNavigationHandler KeyboardNavigationHandler { get; } = new KeyboardNavigationHandler();
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         public Guid Id { get; }= Guid.NewGuid();
@@ -128,6 +131,37 @@ namespace TailBlazer.Views.Tail
             _persister = new TailViewPersister(this, restorer);
             
             //An observable which acts as a scroll command
+
+            var userScroll = KeyboardNavigationHandler.NavigationKeys
+                .Subscribe(keys =>
+                {
+
+                    if (keys == KeyboardNavigationType.PageUp)
+                    {
+                      //  AutoTail = false;
+                        _userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User,PageSize,FirstIndex- PageSize));
+                    }
+
+                    if (keys == KeyboardNavigationType.Up)
+                    {
+                        AutoTail = false;
+                        _userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User, PageSize, FirstIndex - 1));
+                    }
+
+                    if (keys == KeyboardNavigationType.PageDown)
+                    {
+                          AutoTail = false;
+                        _userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User, PageSize, FirstIndex + PageSize));
+                    }
+
+                    if (keys == KeyboardNavigationType.Down)
+                    {
+                        //  AutoTail = false;
+                        _userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User, PageSize, FirstIndex + 1));
+                    }
+
+                });
+
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
             var scroller = _userScrollRequested.CombineLatest(autoChanged, (user, auto) =>
                         {

@@ -119,24 +119,24 @@ namespace TailBlazer.Infrastucture
 
                 });
 
-            //clear selection when the mouse is clicked and no other key is pressed
-            var mouseDownHandler = Observable.FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(
-                                    h => selector.PreviewMouseDown += h,
-                                    h => selector.PreviewMouseDown -= h)
-                                    .Select(evt => evt.EventArgs)
-                                    .Where(mouseArgs=> mouseArgs.ChangedButton==MouseButton.Left)
-                                    .Subscribe(mouseArgs =>
-                                    {
-                                        var isKeyDown = (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)
-                                         || Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightCtrl));
+            ////clear selection when the mouse is clicked and no other key is pressed
+            //var mouseDownHandler = Observable.FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(
+            //                        h => selector.PreviewMouseDown += h,
+            //                        h => selector.PreviewMouseDown -= h)
+            //                        .Select(evt => evt.EventArgs)
+            //                        .Where(mouseArgs=> mouseArgs.ChangedButton==MouseButton.Left)
+            //                        .Subscribe(mouseArgs =>
+            //                        {
+            //                            var isKeyDown = (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)
+            //                             || Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightCtrl));
 
-                                        if (!isKeyDown)
-                                        {
-                                           ClearAllSelections();
-                                        }
+            //                            if (!isKeyDown)
+            //                            {
+            //                               ClearAllSelections();
+            //                            }
 
 
-                                    });
+            //                        });
 
             var mouseUpHandler = Observable.FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(
                         h => selector.MouseUp += h,
@@ -159,55 +159,56 @@ namespace TailBlazer.Infrastucture
 
             ////Handle selecting multiple rows with the mouse
             //// TODO: Scroll up when the mouse it at the top of the screen
-            var mouseDragSelector = selectedChanged.CombineLatest(mouseDown, (slct, down) => new { slct, down })
-                    .Scan(new ImmutableList<LineProxy>(), (state, latest) =>
-                    {
+            //var mouseDragSelector = selectedChanged.CombineLatest(mouseDown, (slct, down) => new { slct, down })
+            //        .Scan(new ImmutableList<LineProxy>(), (state, latest) =>
+            //        {
 
-                        if (latest.slct.AddedItems.Count!=0)
-                            state =  state.Add(latest.slct.AddedItems.OfType<LineProxy>().ToList());
-                        return state;
+            //            if (latest.slct.AddedItems.Count!=0)
+            //                state =  state.Add(latest.slct.AddedItems.OfType<LineProxy>().ToList());
+            //            return state;
 
 
-                    }).Select(list => list.Data.Distinct().ToArray())
-                    .TakeUntil(mouseUpHandler)
-                    .Repeat()
-                    .Where(selection => selection.Length > 0)
-                    .Subscribe(selection =>
-                    {
+            //        }).Select(list => list.Data.Distinct().ToArray())
+            //        .TakeUntil(mouseUpHandler)
+            //        .Repeat()
+            //        .Where(selection => selection.Length > 0)
+            //        .Subscribe(selection =>
+            //        {
 
-                        //DISABLE FOR NOW AT IT IS CAUSING ISSUES WITH MULTI-SELECTION
-                        //return;
+            //            //DISABLE FOR NOW AT IT IS CAUSING ISSUES WITH MULTI-SELECTION
+            //            //return;
 
-                        if (_isSelecting)
-                            return;
-                        try
-                        {
-                            _isSelecting = true;
+            //            if (_isSelecting)
+            //                return;
+            //            try
+            //            {
+            //                _isSelecting = true;
 
-                            var first = selection.OrderBy(proxy => proxy.Start).First();
-                            var last = selection.OrderBy(proxy => proxy.Start).Last();
+            //                var first = selection.OrderBy(proxy => proxy.Start).First();
+            //                var last = selection.OrderBy(proxy => proxy.Start).Last();
 
-                            var fromCurrentPage = _selector.Items.OfType<LineProxy>()
-                                .Where(lp => lp.Start >= first.Start && lp.Start <= last.Start)
-                                .ToArray();
+            //                var fromCurrentPage = _selector.Items.OfType<LineProxy>()
+            //                    .Where(lp => lp.Start >= first.Start && lp.Start <= last.Start)
+            //                    .ToArray();
 
-                            foreach (var item in fromCurrentPage)
-                                _selector.SelectedItems.Add(item);
+            //                foreach (var item in fromCurrentPage)
+            //                    _selector.SelectedItems.Add(item);
 
-                            _logger.Debug($"{selection.Length} selected. Page={fromCurrentPage.Length}");
-                        }
-                        finally
-                        {
-                            _isSelecting = false;
-                        }
+            //                _logger.Debug($"{selection.Length} selected. Page={fromCurrentPage.Length}");
+            //            }
+            //            finally
+            //            {
+            //                _isSelecting = false;
+            //            }
 
-                    });
+            //        });
 
 
             var selectionChanged = selectedChanged.Subscribe(OnSelectedItemsChanged);
 
-            _controlSubscriber.Disposable =new CompositeDisposable(mouseDownHandler, 
-                mouseDragSelector, 
+            _controlSubscriber.Disposable =new CompositeDisposable(
+                //mouseDownHandler, 
+                //mouseDragSelector, 
                 selectionChanged, 
                 itemsAdded, 
                 itemsRemoved,
@@ -225,7 +226,7 @@ namespace TailBlazer.Infrastucture
 
         private void OnSelectedItemsChanged(SelectionChangedEventArgs args)
         {
-           
+            return;
 
             //Logic - by default when items scroll out of view they are no longer selected.
             //this is because the panel is virtualised and and automatically unselected due
@@ -275,7 +276,7 @@ namespace TailBlazer.Infrastucture
                                 _lastSelected = lineProxy;
                                 innerList.Add(lineProxy);
                             }
-                              args.Handled = true;
+                             // args.Handled = true;
                             return;
                         }
 
@@ -297,7 +298,7 @@ namespace TailBlazer.Infrastucture
                             return;
                         }
 
-                        args.Handled = true;
+                        //args.Handled = true;
                         var maxOfRecent = toAdd.Max(lp => lp.Index);
 
 

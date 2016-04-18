@@ -48,12 +48,12 @@
       <HintPath>..\packages\Dragablz.0.0.3.157\lib\net45\Dragablz.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DynamicData, Version=4.5.0.1112, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DynamicData.4.5.0.1112\lib\net45\DynamicData.dll</HintPath>
+    <Reference Include="DynamicData, Version=4.6.0.1134, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DynamicData.4.6.0.1134-beta\lib\net45\DynamicData.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DynamicData.Plinq, Version=4.5.0.1112, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DynamicData.Plinq.4.5.0.1112\lib\net45\DynamicData.Plinq.dll</HintPath>
+    <Reference Include="DynamicData.Plinq, Version=4.6.0.1134, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DynamicData.Plinq.4.6.0.1134-beta\lib\net45\DynamicData.Plinq.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
@@ -161,11 +161,8 @@
     <Compile Include="Infrastucture\ViewFactoryService.cs" />
     <Compile Include="Infrastucture\Virtualisation\VirtualizingWrapPanel.cs" />
     <Compile Include="Infrastucture\WindowAssist.cs" />
-    <Compile Include="Native\IInterceptKeys.cs" />
-    <Compile Include="Native\InterceptKeyArgs.cs" />
-    <Compile Include="Native\InterceptKeys.cs" />
-    <Compile Include="Native\KeyDirection.cs" />
-    <Compile Include="Native\Win32Methods.cs" />
+    <Compile Include="Native\KeyboardNavigationType.cs" />
+    <Compile Include="Native\KeyboardNavigationHandler.cs" />
     <Compile Include="Views\Formatting\DefaultColourSelector.cs" />
     <Compile Include="Views\Formatting\IconDescription.cs" />
     <Compile Include="Views\Formatting\IIconProvider.cs" />

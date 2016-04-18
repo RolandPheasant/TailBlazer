@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace Carnac.Logic.KeyMonitor
 {
-    public class InterceptKeyArgs 
+    public sealed class InterceptKeyArgs 
     {
         public InterceptKeyArgs(Keys key, KeyDirection keyDirection, bool altPressed, bool controlPressed, bool shiftPressed)
         {

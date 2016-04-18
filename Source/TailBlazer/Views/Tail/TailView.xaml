@@ -13,11 +13,11 @@
              xmlns:fileHandling="clr-namespace:TailBlazer.Domain.FileHandling;assembly=TailBlazer.Domain"
              xmlns:converters="clr-namespace:Dragablz.Converters;assembly=Dragablz"
              xmlns:virtualisation="clr-namespace:TailBlazer.Infrastucture.Virtualisation"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
                 Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
              x:Name="Control"
              mc:Ignorable="d" 
+              infrastucture:DependencyObjectHook.Receiver="{Binding KeyboardNavigationHandler}"
               FocusManager.FocusedElement="{Binding ElementName= SearchTextBox}"
              d:DataContext="{d:DesignInstance tail:TailViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="400" d:DesignWidth="400">
@@ -324,6 +324,7 @@
                     ItemsSource="{Binding Lines}" 
                     SelectedItem="{Binding SelectedItem}"
                     Style="{StaticResource LinesListBoxStyle}"
+                   
                     infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}">
 
                     <ListBox.ItemsPanel>
