@@ -276,8 +276,12 @@ namespace TailBlazer.Views.Tail
             if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));
             var mode = AutoTail ? ScrollReason.Tail : ScrollReason.User;
 
+
+
+
             PageSize = boundsArgs.PageSize;
             FirstIndex = boundsArgs.FirstIndex;
+
 
             /*
                 I need to get rid of this subject as I prefer functional over imperative. 
@@ -295,7 +299,7 @@ namespace TailBlazer.Views.Tail
 
         void IScrollReceiver.ScrollDiff(int linesChanged)
         {
-            _userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User, PageSize, FirstIndex + linesChanged));
+            //_userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User, PageSize, FirstIndex + linesChanged));
         }
 
         #endregion
