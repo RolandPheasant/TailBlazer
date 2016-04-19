@@ -73,7 +73,7 @@ namespace TailBlazer.Infrastucture
         void IAttachedListBox.Receive(ListBox selector)
         {
             _selector = selector;
-         //  return;
+           return;
 
 
             var dataSource = ((ReadOnlyObservableCollection<LineProxy>) selector.ItemsSource)
@@ -119,24 +119,24 @@ namespace TailBlazer.Infrastucture
 
                 });
 
-            ////clear selection when the mouse is clicked and no other key is pressed
-            //var mouseDownHandler = Observable.FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(
-            //                        h => selector.PreviewMouseDown += h,
-            //                        h => selector.PreviewMouseDown -= h)
-            //                        .Select(evt => evt.EventArgs)
-            //                        .Where(mouseArgs=> mouseArgs.ChangedButton==MouseButton.Left)
-            //                        .Subscribe(mouseArgs =>
-            //                        {
-            //                            var isKeyDown = (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)
-            //                             || Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightCtrl));
+            //clear selection when the mouse is clicked and no other key is pressed
+            var mouseDownHandler = Observable.FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(
+                                    h => selector.PreviewMouseDown += h,
+                                    h => selector.PreviewMouseDown -= h)
+                                    .Select(evt => evt.EventArgs)
+                                    .Where(mouseArgs => mouseArgs.ChangedButton == MouseButton.Left)
+                                    .Subscribe(mouseArgs =>
+                                    {
+                                        var isKeyDown = (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)
+                                         || Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightCtrl));
 
-            //                            if (!isKeyDown)
-            //                            {
-            //                               ClearAllSelections();
-            //                            }
+                                        if (!isKeyDown)
+                                        {
+                                            ClearAllSelections();
+                                        }
 
 
-            //                        });
+                                    });
 
             var mouseUpHandler = Observable.FromEventPattern<MouseButtonEventHandler, MouseButtonEventArgs>(
                         h => selector.MouseUp += h,
@@ -163,8 +163,8 @@ namespace TailBlazer.Infrastucture
             //        .Scan(new ImmutableList<LineProxy>(), (state, latest) =>
             //        {
 
-            //            if (latest.slct.AddedItems.Count!=0)
-            //                state =  state.Add(latest.slct.AddedItems.OfType<LineProxy>().ToList());
+            //            if (latest.slct.AddedItems.Count != 0)
+            //                state = state.Add(latest.slct.AddedItems.OfType<LineProxy>().ToList());
             //            return state;
 
 
@@ -226,7 +226,7 @@ namespace TailBlazer.Infrastucture
 
         private void OnSelectedItemsChanged(SelectionChangedEventArgs args)
         {
-            return;
+        //    return;
 
             //Logic - by default when items scroll out of view they are no longer selected.
             //this is because the panel is virtualised and and automatically unselected due
@@ -276,7 +276,7 @@ namespace TailBlazer.Infrastucture
                                 _lastSelected = lineProxy;
                                 innerList.Add(lineProxy);
                             }
-                             // args.Handled = true;
+                              args.Handled = true;
                             return;
                         }
 

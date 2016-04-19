@@ -14,10 +14,11 @@ using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
 using TailBlazer.Infrastucture.Virtualisation;
+using TailBlazer.Native;
 
 namespace TailBlazer.Views.Tail
 {
-    public class InlineViewer : AbstractNotifyPropertyChanged, ILinesVisualisation
+    public class InlineViewer : AbstractNotifyPropertyChanged, ILinesVisualisation, IPageProvider
     {
         private readonly IDisposable _cleanUp;
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
@@ -31,11 +32,13 @@ namespace TailBlazer.Views.Tail
         public ICommand CopyToClipboardCommand { get; }
         public IProperty<int> MaximumChars { get; }
         public ISelectionMonitor SelectionMonitor { get; }
+        public IKeyboardNavigationHandler KeyboardNavigationHandler { get;  }
 
         public InlineViewer([NotNull] InlineViewerArgs args,
             [NotNull] IClipboardHandler clipboardHandler,
             [NotNull] ISchedulerProvider schedulerProvider, 
-            [NotNull] ISelectionMonitor selectionMonitor,
+            [NotNull] ISelectionMonitor selectionMonitor, 
+            [NotNull] IKeyboardNavigationHandler keyboardNavigationHandler,
             [NotNull] ILogger logger, 
             [NotNull] IThemeProvider themeProvider)
         {
@@ -43,8 +46,10 @@ namespace TailBlazer.Views.Tail
             if (clipboardHandler == null) throw new ArgumentNullException(nameof(clipboardHandler));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (selectionMonitor == null) throw new ArgumentNullException(nameof(selectionMonitor));
+            if (keyboardNavigationHandler == null) throw new ArgumentNullException(nameof(keyboardNavigationHandler));
             if (themeProvider == null) throw new ArgumentNullException(nameof(themeProvider));
             SelectionMonitor = selectionMonitor;
+            KeyboardNavigationHandler = keyboardNavigationHandler;
             CopyToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
 
             _isSettingScrollPosition = false;
@@ -57,14 +62,17 @@ namespace TailBlazer.Views.Tail
             var scrollSelected = selectedChanged
                     .CombineLatest(lineProvider, pageSize, (proxy, lp, pge) => proxy == null ? new ScrollRequest(pge,0) : new ScrollRequest(pge, proxy.Start))
                     .DistinctUntilChanged();
-
-
-
+            
             var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
             HorizonalScrollChanged = hargs =>
             {
                 horizonalScrollArgs.OnNext(hargs);
             };
+
+            //populate next scroll request when navigating by keyboard
+            var keyNavigation = KeyboardNavigationHandler.NavigationKeys
+                .ToScrollRequest(this)
+                .SubscribeSafe(_userScrollRequested);
 
             var scrollUser = _userScrollRequested
                 .Where(x => !_isSettingScrollPosition)
@@ -119,6 +127,7 @@ namespace TailBlazer.Views.Tail
                         firstIndexMonitor,
                         SelectionMonitor,
                          MaximumChars,
+                         KeyboardNavigationHandler,
                         horizonalScrollArgs.SetAsComplete(),
                         _userScrollRequested.SetAsComplete());
         }

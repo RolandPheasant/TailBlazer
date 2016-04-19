@@ -20,12 +20,11 @@ using TailBlazer.Domain.StateHandling;
 using TailBlazer.Infrastucture;
 using TailBlazer.Infrastucture.Virtualisation;
 using TailBlazer.Native;
-using TailBlazer.Views.Options;
 using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {
-    public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentView
+    public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentView, IPageProvider
     {
         private readonly IDisposable _cleanUp;
         private readonly SingleAssignmentDisposable _stateMonitor= new SingleAssignmentDisposable();
@@ -40,11 +39,11 @@ namespace TailBlazer.Views.Tail
         private LineProxy _selectedLine;
         private bool _showInline;
 
-        public IKeyboardNavigationHandler KeyboardNavigationHandler { get; } = new KeyboardNavigationHandler();
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         public Guid Id { get; }= Guid.NewGuid();
         public ISelectionMonitor SelectionMonitor { get; }
+        public IKeyboardNavigationHandler KeyboardNavigationHandler { get; }
         private SearchOptionsViewModel SearchOptions { get;  }
         public SearchHints SearchHints { get;  }
         public SearchCollection SearchCollection { get; }
@@ -70,7 +69,8 @@ namespace TailBlazer.Views.Tail
         public TailViewModel([NotNull] ILogger logger,
             [NotNull] ISchedulerProvider schedulerProvider,
             [NotNull] IFileWatcher fileWatcher,
-            [NotNull] ISelectionMonitor selectionMonitor, 
+            [NotNull] ISelectionMonitor selectionMonitor,
+            [NotNull] IKeyboardNavigationHandler keyboardNavigationHandler,
             [NotNull] IClipboardHandler clipboardHandler, 
             [NotNull] ISearchInfoCollection searchInfoCollection, 
             [NotNull] IInlineViewerFactory inlineViewerFactory, 
@@ -100,6 +100,7 @@ namespace TailBlazer.Views.Tail
 
             Name = fileWatcher.FullName;
             SelectionMonitor = selectionMonitor;
+            KeyboardNavigationHandler = keyboardNavigationHandler;
             SearchOptions = searchOptionsViewModel;
             SearchHints = searchHints;
             SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
@@ -130,34 +131,22 @@ namespace TailBlazer.Views.Tail
             //this deals with state when loading the system at start up and at shut-down
             _persister = new TailViewPersister(this, restorer);
             
-            //An observable which acts as a scroll command
-
+            //populate next scroll request when navigating by keyboard
             var keyNavigation = KeyboardNavigationHandler.NavigationKeys
                 .Do(key =>
                 {
-                    AutoTail = key == KeyboardNavigationType.End ? true : false;
-                })
-                .Select(keys =>
-                {
-                    switch (keys)
+                    if (key == KeyboardNavigationType.PageUp || key == KeyboardNavigationType.Up)
                     {
-                        case KeyboardNavigationType.Up:
-                            return new ScrollRequest(ScrollReason.User, PageSize, FirstIndex - 1);
-                        case KeyboardNavigationType.Down:
-                            return new ScrollRequest(ScrollReason.User, PageSize, FirstIndex + 1); 
-                        case KeyboardNavigationType.PageUp:
-                            return new ScrollRequest(ScrollReason.User, PageSize, FirstIndex - PageSize);
-                        case KeyboardNavigationType.PageDown:
-                            return new ScrollRequest(ScrollReason.User, PageSize, FirstIndex + PageSize);
-                        case KeyboardNavigationType.Home:
-                            return new ScrollRequest(ScrollReason.User, PageSize, 0);
-                        case KeyboardNavigationType.End:
-                            return new ScrollRequest(PageSize);
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(keys), keys, null);
+                        AutoTail = false;
                     }
-                }).SubscribeSafe(_userScrollRequested);
+                    else if (key == KeyboardNavigationType.End) //Should end be left / right scrolling
+                    {
+                        AutoTail = true;
+                    }
+                }).ToScrollRequest(this)
+                .SubscribeSafe(_userScrollRequested);
 
+            //An observable which acts as a scroll command
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
             var scroller = (_userScrollRequested).CombineLatest(autoChanged, (user, auto) =>
             {

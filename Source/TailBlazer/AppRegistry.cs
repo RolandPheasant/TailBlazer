@@ -7,6 +7,7 @@ using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Infrastucture.AppState;
+using TailBlazer.Native;
 using TailBlazer.Views.Tail;
 using ILogger = TailBlazer.Domain.Infrastructure.ILogger;
 
@@ -32,6 +33,7 @@ namespace TailBlazer.Infrastucture
             }
             For<ILogger>().Use<Log4NetLogger>().Ctor<Type>("type").Is(x => x.ParentType).AlwaysUnique();
 
+            For<IKeyboardNavigationHandler>().Use<KeyboardNavigationHandler>();
             For<ISelectionMonitor>().Use<SelectionMonitor>();
             For<ISearchInfoCollection>().Use<SearchInfoCollection>();
             For<ISearchMetadataCollection>().Use<SearchMetadataCollection>().Transient();
@@ -68,6 +70,7 @@ namespace TailBlazer.Infrastucture
 
                 //to do, need a auto-exclude these from AppConventions
                 scanner.ExcludeType<SelectionMonitor>();
+                scanner.ExcludeType<KeyboardNavigationHandler>();
                 scanner.ExcludeType<SearchInfoCollection>();
                 scanner.ExcludeType<SearchMetadataCollection>();
                 scanner.ExcludeType<ITextFormatter>();

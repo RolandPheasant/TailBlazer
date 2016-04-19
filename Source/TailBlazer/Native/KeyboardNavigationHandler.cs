@@ -29,7 +29,7 @@ namespace TailBlazer.Native
 
         void IDependencyObjectReceiver.Receive(DependencyObject value)
         {
-            var control = (Control) value;
+            var control = (Border) value;
 
             _keySubscriber.Disposable = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(
                                 h => control.PreviewKeyDown += h, 

@@ -438,19 +438,19 @@ namespace TailBlazer.Infrastucture.Virtualisation
 
             InvokeStartIndexCommand(diff);
 
-            ////stop the control from losing focus on page up / down
-            //Observable.Timer(TimeSpan.FromMilliseconds(25))
-            //    .ObserveOn(Dispatcher)
-            //    .Subscribe(_ =>
-            //    {
-            //        if (_itemsControl.Items.Count == 0) return;
+            //stop the control from losing focus on page up / down
+            Observable.Timer(TimeSpan.FromMilliseconds(25))
+                .ObserveOn(Dispatcher)
+                .Subscribe(_ =>
+                {
+                    if (_itemsControl.Items.Count == 0) return;
 
-            //        var index = diff < 0 ? 0 : _itemsControl.Items.Count - 1;
-            //        var generator = (ItemContainerGenerator)_itemsGenerator;
-            //        _itemsControl?.Focus();
-            //        var item = generator.ContainerFromIndex(index) as UIElement;
-            //        item?.Focus();
-            //    });
+                    //var index = diff < 0 ? 0 : _itemsControl.Items.Count - 1;
+                    //var generator = (ItemContainerGenerator)_itemsGenerator;
+                    _itemsControl?.Focus();
+                    //var item = generator.ContainerFromIndex(index) as UIElement;
+                    //item?.Focus();
+                });
         }
 
         private void NotifyHorizonalScroll(ExtentInfo extentInfo)
@@ -543,13 +543,13 @@ namespace TailBlazer.Infrastucture.Virtualisation
         public void LineUp()
         {
             // InvokeStartIndexCommand(-1);
-            ScrollReceiver?.ScrollDiff(-1);
+          //  ScrollReceiver?.ScrollDiff(-1);
         }
         public void LineDown()
         {
             //  InvokeStartIndexCommand(1);
 
-            ScrollReceiver?.ScrollDiff(1);
+           // ScrollReceiver?.ScrollDiff(1);
         }
 
         public void LineLeft()

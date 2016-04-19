@@ -17,7 +17,7 @@
                 Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
              x:Name="Control"
              mc:Ignorable="d" 
-              infrastucture:DependencyObjectHook.Receiver="{Binding KeyboardNavigationHandler}"
+            
               FocusManager.FocusedElement="{Binding ElementName= SearchTextBox}"
              d:DataContext="{d:DesignInstance tail:TailViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="400" d:DesignWidth="400">
@@ -317,6 +317,9 @@
                             BorderThickness="0 0 0 1" BorderBrush="{DynamicResource PrimaryHueMidBrush}"/>
 
 
+                <Border IsHitTestVisible="True"
+                        Grid.Row="1" 
+                        infrastucture:DependencyObjectHook.Receiver="{Binding KeyboardNavigationHandler}" >
                 <ListBox Margin="0 4 0 2"
                     Grid.Row="1" 
                     VerticalAlignment="Stretch"
@@ -324,7 +327,7 @@
                     ItemsSource="{Binding Lines}" 
                     SelectedItem="{Binding SelectedItem}"
                     Style="{StaticResource LinesListBoxStyle}"
-                   
+                    
                     infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}">
 
                     <ListBox.ItemsPanel>
@@ -358,7 +361,7 @@
                         </ContextMenu>
                     </ListBox.ContextMenu>
                 </ListBox>
-
+                </Border>
                 <GridSplitter Grid.Row="2"
                           Height="5" 
                           ResizeDirection="Rows"
