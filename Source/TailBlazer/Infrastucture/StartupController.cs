@@ -31,7 +31,6 @@ namespace TailBlazer.Infrastucture
             objectProvider.Get<FileHeaderNamingJob>();
             objectProvider.Get<UhandledExceptionHandler>();
 
-
             var settingsRegister = objectProvider.Get<ISettingsRegister>();
             settingsRegister.Register(new GeneralOptionsConverter(), "GeneralOptions");
             settingsRegister.Register(new RecentFilesToStateConverter(), "RecentFiles");

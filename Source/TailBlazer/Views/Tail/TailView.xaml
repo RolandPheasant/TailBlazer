@@ -298,7 +298,8 @@
                             TabIndex="3"
                             IsChecked="{Binding AutoTail}"
                             Margin="4 0 4 0"
-                            Content="Follow Tail"/>
+                            Content="Follow Tail"
+                            Name="TailCheckBox"/>
 
                         <CheckBox Visibility="{Binding CanViewInline.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
                             HorizontalAlignment="Left"
