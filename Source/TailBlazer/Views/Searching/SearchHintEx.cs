@@ -22,6 +22,9 @@ namespace TailBlazer.Views.Searching
             if (!source.UseRegEx && source.Text.Contains(@"\"))
                 return new SearchHintMessage(false, "Text contains illegal characters");
 
+            if (!(source.Text.Trim().Length > 0))
+                return new SearchHintMessage(false, "Text contains illegal characters");
+
             try
             {
                 var test = new Regex(source.Text);
