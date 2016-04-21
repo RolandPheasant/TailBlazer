@@ -141,7 +141,16 @@ namespace TailBlazer.Domain.Formatting
                 if (string.IsNullOrEmpty(current))
                 {
                     //Get original string back as the user may have searched in a different case
-                    var originalString = input.Substring(currentLength, tomatch.Length);
+                    var originalString = "";
+                    try
+                    {
+                        originalString = input.Substring(currentLength, tomatch.Length);
+                    }
+                    catch (ArgumentOutOfRangeException e)
+                    {
+                        //TODO
+                        
+                    }
                     yield return new MatchedString(originalString, meta);
 
                     currentLength = current.Length + currentLength + tomatch.Length;
