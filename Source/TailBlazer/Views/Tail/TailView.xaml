@@ -149,6 +149,7 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
 
@@ -279,6 +280,20 @@
                     <Button Grid.Column="4" 
                             TabIndex="2"
                         Style="{StaticResource MaterialDesignFlatButton}"
+                        Command="{Binding ClearFileCommand}"
+                        HorizontalAlignment="Left"
+                        ToolTip="Clear file"
+                        Width="24" Height="24"
+                        Padding="0"
+                        VerticalAlignment="Center">
+                        <controls:ClearFileIcon  Width="14" Height="14"/>
+
+                    </Button>
+
+
+                    <Button Grid.Column="5" 
+                            TabIndex="2"
+                        Style="{StaticResource MaterialDesignFlatButton}"
                         Command="{Binding OpenSearchOptionsCommand}"
                         HorizontalAlignment="Left"
                         ToolTip="Search options"
@@ -291,7 +306,7 @@
 
                     <StackPanel    
                         VerticalAlignment="Center"
-                        Grid.Column="5" Margin="4 0 4 0" Orientation="Vertical">
+                        Grid.Column="6" Margin="4 0 4 0" Orientation="Vertical">
 
                         <CheckBox HorizontalAlignment="Left"
                             VerticalAlignment="Center"
