@@ -60,6 +60,7 @@ namespace TailBlazer.Views.Tail
         public ICommand CopyToClipboardCommand { get; }
         public ICommand OpenFileCommand { get; }
         public ICommand OpenFolderCommand { get; }
+        public ICommand CopyPathToClipboardCommand { get; }
         public ICommand OpenSearchOptionsCommand => new Command(OpenSearchOptions);
         public ICommand ClearFileCommand { get; }
 
@@ -104,6 +105,7 @@ namespace TailBlazer.Views.Tail
             CopyToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
             OpenFileCommand = new Command(() => Process.Start(fileWatcher.FullName));
             OpenFolderCommand = new Command(() => Process.Start(fileWatcher.Folder));
+            CopyPathToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(fileWatcher.FullName));
             SearchMetadataCollection = searchMetadataCollection;
             ClearFileCommand = new Command(() => ClearFile(fileWatcher.FullName));
 

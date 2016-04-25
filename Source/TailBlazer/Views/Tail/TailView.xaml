@@ -448,6 +448,7 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
 
                                 <Button Command="{Binding OpenFileCommand}">
@@ -456,7 +457,7 @@
                                                 VerticalAlignment="Center"
                                                 Kind="FileOutline" 
                                                 Width="14" Height="14"/>
-                                        <TextBlock  Text="Open file"/>
+                                        <TextBlock Text="Open file"/>
                                     </StackPanel>
                                 </Button>
 
@@ -466,9 +467,20 @@
                                             VerticalAlignment="Center"
                                             Kind="Folder" 
                                             Width="14" Height="14"/>
-                                        <TextBlock  Text="Open folder"/>
+                                        <TextBlock Text="Open folder"/>
                                     </StackPanel>
                                 </Button>
+
+                                <Button Grid.Row="2" Command="{Binding CopyPathToClipboardCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <wpf:PackIcon 
+                                                VerticalAlignment="Center"
+                                                Kind="ClipboardOutline" 
+                                                Width="14" Height="14"/>
+                                        <TextBlock Text="Copy path to clipboard"/>
+                                    </StackPanel>
+                                </Button>
+
                             </Grid>
 
 
