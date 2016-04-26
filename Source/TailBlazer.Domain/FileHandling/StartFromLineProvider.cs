@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -30,6 +28,7 @@ namespace TailBlazer.Domain.FileHandling
             var offset = startPosition + scroll.Position;
 
             var startFromScroll = new ScrollRequest(scroll.Mode, scroll.PageSize, offset);
+
             return source
                 .ReadLines(startFromScroll)
                 .Select(RepositionLine)
@@ -39,7 +38,12 @@ namespace TailBlazer.Domain.FileHandling
         private Line RepositionLine(Line line, int index)
         {
             return new Line(
-                lineInfo: new LineInfo(index + 1, index, line.LineInfo.Start - startPosition, line.LineInfo.End - startPosition, line.LineInfo.EndOfTail),
+                lineInfo: new LineInfo(
+                    line: index + 1, 
+                    index: index,
+                    startPosition: line.LineInfo.Start - startPosition, 
+                    endPosition: line.LineInfo.End - startPosition, 
+                    endOfTail: line.LineInfo.EndOfTail),
                 text: line.Text,
                 timestamp: line.Timestamp
                 );            
