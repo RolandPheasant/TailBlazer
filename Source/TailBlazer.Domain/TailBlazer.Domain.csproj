@@ -118,6 +118,8 @@
     <Compile Include="FileHandling\Search\SearchMetadataCollection.cs" />
     <Compile Include="FileHandling\Search\SearchMetadataFactory.cs" />
     <Compile Include="FileHandling\Search\SearchType.cs" />
+    <Compile Include="FileHandling\StartFromEx.cs" />
+    <Compile Include="FileHandling\StartFromLineProvider.cs" />
     <Compile Include="FileHandling\StreamReaderExtended.cs" />
     <Compile Include="FileHandling\Search\SearchInfoCollection.cs" />
     <Compile Include="FileHandling\Search\SearchInfo.cs" />
