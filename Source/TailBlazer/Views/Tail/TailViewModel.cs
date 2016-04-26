@@ -62,7 +62,6 @@ namespace TailBlazer.Views.Tail
         public ICommand OpenFolderCommand { get; }
         public ICommand CopyPathToClipboardCommand { get; }
         public ICommand OpenSearchOptionsCommand => new Command(OpenSearchOptions);
-        public ICommand ClearFileCommand { get; }
 
         public string Name { get; }
 
@@ -107,8 +106,7 @@ namespace TailBlazer.Views.Tail
             OpenFolderCommand = new Command(() => Process.Start(fileWatcher.Folder));
             CopyPathToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(fileWatcher.FullName));
             SearchMetadataCollection = searchMetadataCollection;
-            ClearFileCommand = new Command(() => ClearFile(fileWatcher.FullName));
-
+            
             var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
             HorizonalScrollChanged = args =>
             {
@@ -212,7 +210,7 @@ namespace TailBlazer.Views.Tail
             var inline = searchInfoCollection.All.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : new EmptyLineProvider());
 
             InlineViewer = inlineViewerFactory.Create(inline, this.WhenValueChanged(vm => vm.SelectedItem), searchMetadataCollection);
-            
+
             _cleanUp = new CompositeDisposable(lineScroller,
                 loader,
                 firstIndexMonitor,
@@ -241,16 +239,6 @@ namespace TailBlazer.Views.Tail
      
         public TextScrollDelegate HorizonalScrollChanged { get; }
 
-        private void ClearFile(string fileName)
-        {
-            try
-            {
-                System.IO.File.Delete(fileName);
-            }            
-            catch(Exception)
-            {            
-            }
-        }
 
         private async void OpenSearchOptions()
         {
