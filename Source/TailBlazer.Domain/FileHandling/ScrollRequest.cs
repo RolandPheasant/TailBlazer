@@ -42,6 +42,14 @@ namespace TailBlazer.Domain.FileHandling
             Mode = ScrollReason.User;
         }
 
+        public ScrollRequest(ScrollReason mode, int pageSize, long position)
+        {
+            PageSize = pageSize;
+            Mode = mode;
+            Position = position;
+            SpecifiedByPosition = true;
+        }
+
         public ScrollRequest(ScrollReason mode, int pageSize, int firstIndex)
         {
             PageSize = pageSize;
