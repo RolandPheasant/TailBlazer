@@ -1,16 +1,14 @@
-﻿using Microsoft.Reactive.Testing;
+﻿
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reactive.Subjects;
-using System.Text;
-using System.Threading.Tasks;
 using TailBlazer.Domain.FileHandling;
 using Xunit;
 using FluentAssertions;
 using System.Reactive;
+using Microsoft.Reactive.Testing;
 using TailBlazer.Domain.Infrastructure;
-using System.IO;
 
 namespace TailBlazer.Fixtures
 {
@@ -18,77 +16,75 @@ namespace TailBlazer.Fixtures
     {
         [Fact]
         public void EmptyForEmptyFile()
-        {                        
-            ILineProvider result = null;
+        {
+            FileNotification result = null;
 
-            var pulse = new Subject<Unit>();            
+            var scheduler = new TestScheduler();            
 
             using (var file = new TestFile())
+
             using (file.Info
-                .WatchFile(pulse)
-                .Index()
-                .StartFrom(0)
+                .WatchFile(scheduler: scheduler)
+                .ScanFrom(0, scheduler: scheduler)
                 .Subscribe(x => result = x))
             {
-                pulse.Once();
-                
-                var lines = result.ReadLines(new ScrollRequest(10, 0L));
+                scheduler.AdvanceByMilliSeconds(1000);
+
+                var lines = File.ReadAllLines(result.FullName).ToArray();
                 lines.Should().HaveCount(0);                                
             }
         }
+
+        [Fact]
+        public void startAfterEndOfFileShouldReturnNothing()
+        {
+            FileNotification result = null;
+
+            var scheduler = new TestScheduler();
+
+            using (var file = new TestFile())
+
+            using (file.Info
+                .WatchFile(scheduler: scheduler)
+                .ScanFrom(10000, scheduler: scheduler)
+                .Subscribe(x => result = x))
+            {
+                file.Append("A");
+                file.Append("B");
+                file.Append("C");
+                scheduler.AdvanceByMilliSeconds(1000);
+
+                var lines = File.ReadAllLines(result.FullName).ToArray();
+                lines.Should().HaveCount(0);
+            }
+        }
+
 
         [Fact]
         public void StartFromFirstPosition()
         {
             var firstLine = "This is the first line";
 
-            ILineProvider result = null;
+            FileNotification result = null;
 
-            var pulse = new Subject<Unit>();
+            var scheduler = new TestScheduler();
 
             using (var file = new TestFile())
             using (file.Info
-                .WatchFile(pulse)
-                .Index()
-                .StartFrom(0)
+                .WatchFile(scheduler: scheduler)
+                .ScanFrom(0, scheduler: scheduler)
                 .Subscribe(x => result = x))
             {
                 file.Append(firstLine);
 
-                pulse.Once();
+                scheduler.AdvanceByMilliSeconds(1000);
 
-                var lines = result.ReadLines(new ScrollRequest(10, 0L));
+                var lines = File.ReadAllLines(result.FullName).ToArray();
                 lines.Should().HaveCount(1);
-                lines.Single().Text.Should().Be(firstLine);
+                lines.Single().Should().Be(firstLine);
             }
         }        
 
-        [Fact]
-        public void NotATestJustTestingStuffOut()
-        {
-            var firstLine = "This is the first line";
-            var secondLine = "This is the first line";
-
-            ILineProvider result = null;
-
-            var pulse = new Subject<Unit>();
-
-            using (var file = new TestFile())
-            using (file.Info
-                .WatchFile(pulse)
-                .Index()
-                .Subscribe(x => result = x))
-            {
-
-                file.Append(firstLine);
-                file.Append(secondLine);
-
-                pulse.Once();
-
-                var lines = result.ReadLines(new ScrollRequest(10)).ToArray();
-                
-            }
-        }
 
         [Fact]
         public void SkipFirstLine()
@@ -97,62 +93,31 @@ namespace TailBlazer.Fixtures
             var secondLine = "This is the second line";
             var startPosition = (firstLine + Environment.NewLine).Length;
 
-            ILineProvider result = null;
+            FileNotification result = null;
 
-            var pulse = new Subject<Unit>();
+            var scheduler = new TestScheduler();
 
             using (var file = new TestFile())
             using (file.Info
-                .WatchFile(pulse)
-                .Index()
-                .StartFrom(startPosition)
+                .WatchFile(scheduler: scheduler)
+                .ScanFrom(startPosition, scheduler: scheduler)
                 .Subscribe(x => result = x))
             {
                 
                 file.Append(firstLine);
-                file.Append(secondLine);                
-
-                pulse.Once();
-
-                var lines = result.ReadLines(new ScrollRequest(10,0L)).ToArray();
-                lines.Should().HaveCount(1);
-                lines.Single().Text.Should().Be(secondLine);                
-            }
-        }
-
-        [Fact]
-        public void RelativeToOriginalScrollRequestPosition()
-        {
-            var firstLine = "This is the first line";
-            var secondLine = "This is the second line";
-            var startPosition = (firstLine + Environment.NewLine).Length;
-            long originalScrollRequestPosition = 3;
-
-            ILineProvider result = null;
-
-            var pulse = new Subject<Unit>();
-
-            using (var file = new TestFile())
-            using (file.Info
-                .WatchFile(pulse)
-                .Index()
-                .StartFrom(startPosition)
-                .Subscribe(x => result = x))
-            {
-
-                file.Append(firstLine);
                 file.Append(secondLine);
 
-                pulse.Once();
+                scheduler.AdvanceByMilliSeconds(1000);
 
-                var lines = result.ReadLines(new ScrollRequest(10, originalScrollRequestPosition)).ToArray();
+                var lines = File.ReadAllLines(result.FullName).ToArray();
                 lines.Should().HaveCount(1);
-                lines.Single().Text.Should().Be(secondLine.Substring((int)originalScrollRequestPosition));
+                lines.Single().Should().Be(secondLine);                
             }
         }
 
+
         [Fact]
-        public void PageSize()
+        public void StartFromSecondLine()
         {
             var firstLine = "This is the first line";
             var secondLine = "This is the second line";
@@ -160,16 +125,19 @@ namespace TailBlazer.Fixtures
             var fourthLine = "This is the fourth line";
 
             var startPosition = (firstLine + Environment.NewLine).Length;
+            var length = (firstLine + Environment.NewLine
+                + secondLine + Environment.NewLine
+                + thirdLine + Environment.NewLine
+                + fourthLine + Environment.NewLine).Length - startPosition;
 
-            ILineProvider result = null;
+            FileNotification result = null;
 
-            var pulse = new Subject<Unit>();
+            var scheduler = new TestScheduler();
 
             using (var file = new TestFile())
             using (file.Info
-                .WatchFile(pulse)
-                .Index()
-                .StartFrom(startPosition)
+                .WatchFile(scheduler: scheduler)
+                .ScanFrom(startPosition, scheduler: scheduler)
                 .Subscribe(x => result = x))
             {
 
@@ -178,33 +146,33 @@ namespace TailBlazer.Fixtures
                 file.Append(thirdLine);
                 file.Append(fourthLine);
 
-                pulse.Once();
-
-                var lines = result.ReadLines(new ScrollRequest(2, 0)).ToArray();
-                lines.Should().HaveCount(2);
-                lines.First().Text.Should().Be(secondLine);
-                lines.Last().Text.Should().Be(thirdLine);
+                scheduler.AdvanceByMilliSeconds(1000);
+                result.Size.Should().Be(length);
+                var lines = File.ReadAllLines(result.FullName).ToArray();
+                lines.Should().HaveCount(3);
+ 
             }
         }
 
         [Fact]
-        public void IndexFromLineOnStartPosition()
+        public void StartFromBegining()
         {
             var firstLine = "This is the first line";
             var secondLine = "This is the second line";
             var thirdLine = "This is the third line";
 
-            var startPosition = (firstLine + Environment.NewLine).Length;
 
-            ILineProvider result = null;
+            var length = (firstLine + Environment.NewLine
+                + secondLine + Environment.NewLine
+                + thirdLine + Environment.NewLine).Length;
+            FileNotification result = null;
 
-            var pulse = new Subject<Unit>();
+            var scheduler = new TestScheduler();
 
             using (var file = new TestFile())
             using (file.Info
-                .WatchFile(pulse)
-                .Index()
-                .StartFrom(startPosition)
+                .WatchFile(scheduler: scheduler)
+                .ScanFrom(0, scheduler: scheduler)
                 .Subscribe(x => result = x))
             {
 
@@ -212,99 +180,14 @@ namespace TailBlazer.Fixtures
                 file.Append(secondLine);
                 file.Append(thirdLine);
 
-                pulse.Once();
+                scheduler.AdvanceByMilliSeconds(1000);
 
-                var lines = result.ReadLines(new ScrollRequest(2, 0L)).ToArray();
-
-                for (int index = 0; index < lines.Length; index++)
-                {
-                    lines[index].Index.Should().Be(index);
-                }
-
+                var lines = File.ReadAllLines(result.FullName).ToArray();
+                result.Size.Should().Be(length);
+                lines.Should().HaveCount(3);
             }
         }
 
-        [Fact]
-        public void LineNumbering()
-        {
-            var firstLine = "This is the first line";
-            var secondLine = "This is the second line";
-            var thirdLine = "This is the third line";
-
-            var startPosition = (firstLine + Environment.NewLine).Length;
-
-            ILineProvider result = null;
-
-            var pulse = new Subject<Unit>();
-
-            using (var file = new TestFile())
-            using (file.Info
-                .WatchFile(pulse)
-                .Index()
-                .StartFrom(startPosition)
-                .Subscribe(x => result = x))
-            {
-
-                file.Append(firstLine);
-                file.Append(secondLine);
-                file.Append(thirdLine);
-
-                pulse.Once();
-
-                var lines = result.ReadLines(new ScrollRequest(2, 0L)).ToArray();
-
-                for (int index = 0; index < lines.Length; index++)
-                {
-                    var expectedLineNumber = index + 1;
-                    lines[index].Number.Should().Be(expectedLineNumber);
-                }
-
-            }
-        }
-
-        [Fact]
-        public void LineStartAndEnd()
-        {
-            var firstLine = "This is the first line";
-            var secondLine = "This is the second line";
-            var thirdLine = "This is the third line";
-
-            var startPosition = (firstLine + Environment.NewLine).Length;
-
-            ILineProvider result = null;
-
-            var pulse = new Subject<Unit>();
-
-            using (var file = new TestFile())
-            using (file.Info
-                .WatchFile(pulse)
-                .Index()
-                .StartFrom(startPosition)
-                .Subscribe(x => result = x))
-            {
-
-                file.Append(firstLine);
-                file.Append(secondLine);
-                file.Append(thirdLine);
-
-                pulse.Once();
-
-                var lines = result.ReadLines(new ScrollRequest(2, 0L)).ToArray();
-
-                var expectedFirstLineStart = 0;
-                var expectedFirstLineEnd = (secondLine + Environment.NewLine).Length;
-
-                lines[0].LineInfo.Start.Should().Be(expectedFirstLineStart);
-                lines[0].LineInfo.End.Should().Be(expectedFirstLineEnd);
-
-                var expectedSecondLineStart = expectedFirstLineEnd;
-                var expectedSecondLineEnd = expectedFirstLineEnd + (thirdLine + Environment.NewLine).Length;
-
-                lines[1].LineInfo.Start.Should().Be(expectedSecondLineStart);
-                lines[1].LineInfo.End.Should().Be(expectedSecondLineEnd);
-
-            }
-        }      
     }
     
 }

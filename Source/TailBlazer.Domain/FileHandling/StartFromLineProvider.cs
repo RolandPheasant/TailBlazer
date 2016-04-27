@@ -31,8 +31,7 @@ namespace TailBlazer.Domain.FileHandling
 
             return source
                 .ReadLines(startFromScroll)
-                .Select(RepositionLine)
-                ;              
+                .Select(RepositionLine);              
         }
 
         private Line RepositionLine(Line line, int index)

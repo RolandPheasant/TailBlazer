@@ -79,11 +79,5 @@ namespace System.Collections
                 yield return $"{delimiter}{item}";
 
         }
-
-        //public static T[] AsArray<T>(this IEnumerable<T> source)
-        //{
-        //    return source as T[] ?? source.ToArray();
-        //}
-
     }
 }

@@ -67,6 +67,7 @@
     <Compile Include="CaseInsensitiveString.cs" />
     <Compile Include="FileHandling\EmptyLineProvider.cs" />
     <Compile Include="FileHandling\FileInfoEx.cs" />
+    <Compile Include="FileHandling\FileRewriter.cs" />
     <Compile Include="FileHandling\FileSearcher.cs" />
     <Compile Include="FileHandling\FileSearchEx.cs" />
     <Compile Include="FileHandling\FileSearchResult.cs" />

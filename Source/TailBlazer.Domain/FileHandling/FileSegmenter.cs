@@ -35,10 +35,7 @@ namespace TailBlazer.Domain.FileHandling
             if (notifications == null) throw new ArgumentNullException(nameof(notifications));
             _initialTail = initialTail;
             _segmentSize = segmentSize;
-
-
-
-
+            
             //TODO: Re-segment as file grows + account for rollover
             Segments = notifications
                 //.notifications()
@@ -64,7 +61,7 @@ namespace TailBlazer.Domain.FileHandling
                 }).Replay(1).RefCount();
         }
 
-        public IEnumerable<FileSegment> LoadSegments()
+        private IEnumerable<FileSegment> LoadSegments()
         {
             using (var stream = File.Open(_info.FullName, FileMode.Open, FileAccess.Read,FileShare.Delete | FileShare.ReadWrite))
             {
