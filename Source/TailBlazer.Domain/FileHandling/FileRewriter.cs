@@ -5,8 +5,6 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DynamicData.Kernel;
 using TailBlazer.Domain.Annotations;
 
@@ -20,6 +18,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             if (fileWatcher == null) throw new ArgumentNullException(nameof(fileWatcher));
             
+            //TODO: Do we need to specifically handle errors?
             Notifications = Observable.Create<FileNotification>(observer =>
             {
                 var newFile =  Path.GetTempFileName();
@@ -29,10 +28,9 @@ namespace TailBlazer.Domain.FileHandling
                 var fileWriter = fileWatcher.Scan(new FileReadResult(Enumerable.Empty<string>(), startFrom), (state, notification) =>
                 {
                     return ReadLines(notification.FullName, state.EndPosition);
-
                 }).Subscribe(result =>
                 {
-                    //Write lines to the file
+                   //Write lines to the file
                     var lines = result.Lines.AsArray();
 
                     if (lines.Any())
@@ -64,15 +62,12 @@ namespace TailBlazer.Domain.FileHandling
                     {
                         list.Add(line);
                     }
-
                     endPosition = reader.AbsolutePosition();
                 }
             }
-
             return new FileReadResult(list, endPosition);
         }
-
-
+        
         private class FileReadResult
         {
             public IEnumerable<string> Lines { get;  }
@@ -84,11 +79,5 @@ namespace TailBlazer.Domain.FileHandling
                 EndPosition = endPosition;
             }
         }
-
-        private void WriteToFile()
-        {
-            
-        }
-
     }
 }
