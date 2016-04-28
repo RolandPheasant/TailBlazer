@@ -63,6 +63,7 @@ namespace TailBlazer.Views.Tail
         public ICommand OpenFileCommand { get; }
         public ICommand OpenFolderCommand { get; }
         public ICommand CopyPathToClipboardCommand { get; }
+        public ICommand KeyAutoTail { get; }
         public ICommand OpenSearchOptionsCommand => new Command(OpenSearchOptions);
 
 
@@ -108,6 +109,7 @@ namespace TailBlazer.Views.Tail
             OpenFileCommand = new Command(() => Process.Start(fileWatcher.FullName));
             OpenFolderCommand = new Command(() => Process.Start(fileWatcher.Folder));
             CopyPathToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(fileWatcher.FullName));
+            KeyAutoTail  = new Command(() => { AutoTail = true; });
             SearchMetadataCollection = searchMetadataCollection;
             
             var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
@@ -247,19 +249,6 @@ namespace TailBlazer.Views.Tail
         {
            await DialogHost.Show(SearchOptions, Id);
         }
-
-        public ICommand KeyAutoTail
-        {
-            get
-            {
-                return _keyAutoTail
-                    ?? (_keyAutoTail = new Command(() =>
-                    {
-                        AutoTail = true;
-                    }));
-            }
-        }
-        
         public LineProxy SelectedItem
         {
             get { return _selectedLine; }
