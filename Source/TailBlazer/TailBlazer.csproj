@@ -193,6 +193,7 @@
     <Compile Include="Views\Searching\SearchOptionsViewModel.cs" />
     <Compile Include="Views\FileDrop\FileDropContainer.cs" />
     <Compile Include="Views\FileDrop\FileDropMonitor.cs" />
+    <Compile Include="Views\Tail\ActionAutoTail.cs" />
     <Compile Include="Views\Tail\ILinesVisualisation.cs" />
     <Compile Include="Views\Searching\ISearchStateToMetadataMapper.cs" />
     <Compile Include="Views\Tail\ITailViewStateControllerFactory.cs" />

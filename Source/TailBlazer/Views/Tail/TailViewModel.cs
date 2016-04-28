@@ -39,6 +39,8 @@ namespace TailBlazer.Views.Tail
         private LineProxy _selectedLine;
         private bool _showInline;
 
+        private ICommand _keyAutoTail;
+
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         public Guid Id { get; }= Guid.NewGuid();
         public ISelectionMonitor SelectionMonitor { get; }
@@ -62,6 +64,7 @@ namespace TailBlazer.Views.Tail
         public ICommand OpenFolderCommand { get; }
         public ICommand CopyPathToClipboardCommand { get; }
         public ICommand OpenSearchOptionsCommand => new Command(OpenSearchOptions);
+
 
         public string Name { get; }
 
@@ -243,6 +246,18 @@ namespace TailBlazer.Views.Tail
         private async void OpenSearchOptions()
         {
            await DialogHost.Show(SearchOptions, Id);
+        }
+
+        public ICommand KeyAutoTail
+        {
+            get
+            {
+                return _keyAutoTail
+                    ?? (_keyAutoTail = new ActionAutoTail(() =>
+                    {
+                        AutoTail = true;
+                    }));
+            }
         }
         
         public LineProxy SelectedItem
