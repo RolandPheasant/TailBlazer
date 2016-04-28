@@ -39,6 +39,8 @@ namespace TailBlazer.Views.Tail
         private LineProxy _selectedLine;
         private bool _showInline;
 
+        private ICommand _keyAutoTail;
+
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         public Guid Id { get; }= Guid.NewGuid();
         public ISelectionMonitor SelectionMonitor { get; }
@@ -61,7 +63,9 @@ namespace TailBlazer.Views.Tail
         public ICommand OpenFileCommand { get; }
         public ICommand OpenFolderCommand { get; }
         public ICommand CopyPathToClipboardCommand { get; }
+        public ICommand KeyAutoTail { get; }
         public ICommand OpenSearchOptionsCommand => new Command(OpenSearchOptions);
+
 
         public string Name { get; }
 
@@ -105,6 +109,7 @@ namespace TailBlazer.Views.Tail
             OpenFileCommand = new Command(() => Process.Start(fileWatcher.FullName));
             OpenFolderCommand = new Command(() => Process.Start(fileWatcher.Folder));
             CopyPathToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(fileWatcher.FullName));
+            KeyAutoTail  = new Command(() => { AutoTail = true; });
             SearchMetadataCollection = searchMetadataCollection;
             
             var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
@@ -244,7 +249,6 @@ namespace TailBlazer.Views.Tail
         {
            await DialogHost.Show(SearchOptions, Id);
         }
-        
         public LineProxy SelectedItem
         {
             get { return _selectedLine; }
