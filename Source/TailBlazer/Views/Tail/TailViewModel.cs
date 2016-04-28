@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -30,6 +32,7 @@ namespace TailBlazer.Views.Tail
         private readonly SingleAssignmentDisposable _stateMonitor= new SingleAssignmentDisposable();
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
         private readonly ISubject<ScrollRequest> _userScrollRequested = new ReplaySubject<ScrollRequest>(1);
+        private readonly ISubject<long> _scanFrom = new Subject<long>();
         private readonly IPersistentView _persister;
         private readonly ITailViewStateControllerFactory _tailViewStateControllerFactory;
 
@@ -57,11 +60,13 @@ namespace TailBlazer.Views.Tail
         public IProperty<bool> HighlightTail { get; }
         public IProperty<bool> UsingDarkTheme { get; }
         public IProperty<int> MaximumChars { get; }
+
         public ICommand CopyToClipboardCommand { get; }
         public ICommand OpenFileCommand { get; }
         public ICommand OpenFolderCommand { get; }
         public ICommand CopyPathToClipboardCommand { get; }
         public ICommand OpenSearchOptionsCommand => new Command(OpenSearchOptions);
+        public ICommand ClearCommand => new Command(Clear);
 
         public string Name { get; }
 
@@ -112,7 +117,7 @@ namespace TailBlazer.Views.Tail
             {
                 horizonalScrollArgs.OnNext(args);
             };
-
+            
             _tailViewStateControllerFactory = tailViewStateControllerFactory;
             
             //Move these 2 highlight fields to a service as all views require them
@@ -154,7 +159,16 @@ namespace TailBlazer.Views.Tail
                 .ForBinding();
 
             //tailer is the main object used to tail, scroll and filter in a file
-            var lineScroller = new LineScroller(SearchCollection.Latest.ObserveOn(schedulerProvider.Background), scroller);
+            //Inject CLEAR Here
+            var selectedProvider = SearchCollection.Latest.ObserveOn(schedulerProvider.Background);
+            //var scrollSource = _scanFrom
+            //    .Select(start => start == 0 ? selectedProvider : selectedProvider.StartFrom(start))
+            //    .Switch()
+            //    .ObserveOn(schedulerProvider.Background);
+
+            var xxx = _scanFrom.Subscribe(l => fileWatcher.ScanFrom(l));
+
+            var lineScroller = new LineScroller(selectedProvider, scroller);
             
             MaximumChars = lineScroller.MaximumLines()
                             .ObserveOn(schedulerProvider.MainThread)
@@ -190,7 +204,6 @@ namespace TailBlazer.Views.Tail
                 {
                     FirstIndex = first;
                 });
-
 
             //Create objects required for inline viewing
             var isUserDefinedChanged = SearchCollection.WhenValueChanged(sc => sc.Selected)
@@ -235,7 +248,6 @@ namespace TailBlazer.Views.Tail
                 horizonalScrollArgs.SetAsComplete(),
                 _userScrollRequested.SetAsComplete());
         }
-
      
         public TextScrollDelegate HorizonalScrollChanged { get; }
 
@@ -244,7 +256,14 @@ namespace TailBlazer.Views.Tail
         {
            await DialogHost.Show(SearchOptions, Id);
         }
-        
+
+        private void Clear()
+        {
+            //TODO: Discover end from file info, + allow clear from
+            var position = _data.Max(proxy => proxy.Line.LineInfo.End);
+            _scanFrom.OnNext(position);
+        }
+
         public LineProxy SelectedItem
         {
             get { return _selectedLine; }
@@ -276,7 +295,7 @@ namespace TailBlazer.Views.Tail
         }
 
         #region Interact with scroll panel
-        
+
         void IScrollReceiver.ScrollBoundsChanged(ScrollBoundsArgs boundsArgs)
         {
             if (boundsArgs == null) throw new ArgumentNullException(nameof(boundsArgs));

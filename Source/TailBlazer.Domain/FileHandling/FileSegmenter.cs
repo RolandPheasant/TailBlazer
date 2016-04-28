@@ -38,13 +38,14 @@ namespace TailBlazer.Domain.FileHandling
             
             //TODO: Re-segment as file grows + account for rollover
             Segments = notifications
-                //.notifications()
                 .Scan((FileSegmentCollection) null, (previous, current) =>
                 {
+                    _info = (FileInfo)current;
+
                     if (previous == null || previous.FileLength == 0)
                     {
-                        _info =(FileInfo) current;
-
+                    
+                       
                         var segments = LoadSegments().ToArray();
                         return new FileSegmentCollection(_info, segments, current.Size);
                     }

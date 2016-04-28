@@ -23,7 +23,11 @@ namespace TailBlazer.Domain.FileHandling
             {
                 var newFile =  Path.GetTempFileName();
                 var info = new FileInfo(newFile);
-                var resultStream = info.WatchFile(refreshPeriod,scheduler).SubscribeSafe(observer);
+
+              //  var watcher = info.WatchFile(refreshPeriod, scheduler)
+                var resultStream = info.WatchFile(refreshPeriod,scheduler)
+                
+                .SubscribeSafe(observer);
 
                 var fileWriter = fileWatcher.Scan(new FileReadResult(Enumerable.Empty<string>(), startFrom), (state, notification) =>
                 {
@@ -34,16 +38,16 @@ namespace TailBlazer.Domain.FileHandling
                     var lines = result.Lines.AsArray();
 
                     if (lines.Any())
-                        File.WriteAllLines(newFile, lines);
+                        File.AppendAllLines(newFile, lines);
                 });
                 
                 return Disposable.Create(() =>
                 {
-                    fileWriter.Dispose();
                     resultStream.Dispose();
-                    File.Delete(newFile);
+                    fileWriter.Dispose();
+                    //File.Delete(newFile);
                 });
-            });
+            }).Replay(1).RefCount();
         }
 
         private FileReadResult ReadLines(string file, long firstPosition)

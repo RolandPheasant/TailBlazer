@@ -7,13 +7,15 @@ using TailBlazer.Domain.Formatting;
 
 namespace TailBlazer.Domain.FileHandling.Search
 {
+
+    //TODO: Contruct with observable which clears from end
+    //Perhaps a broker which can be invoked from Tail View
+
     public sealed class SearchInfoCollection : ISearchInfoCollection
     {
         private readonly ISearchMetadataCollection _metadataCollection;
         private readonly ISearchMetadataFactory _searchMetadataFactory;
-        private readonly IColourProvider _colourProvider;
         private readonly IFileWatcher _fileWatcher;
-        private readonly IDefaultIconSelector _defaultIconSelector;
         private readonly IDisposable _cleanUp;
 
         public IObservableCache<SearchInfo, string> Searches { get; }
@@ -22,18 +24,14 @@ namespace TailBlazer.Domain.FileHandling.Search
         
         public SearchInfoCollection(ISearchMetadataCollection searchMetadataCollection,
             ISearchMetadataFactory searchMetadataFactory,
-            IColourProvider colourProvider,
-            IFileWatcher fileWatcher,
-            IDefaultIconSelector defaultIconSelector)
+            IFileWatcher fileWatcher)
         {
             _metadataCollection = searchMetadataCollection;
             _searchMetadataFactory = searchMetadataFactory;
-            _colourProvider = colourProvider;
             _fileWatcher = fileWatcher;
-            _defaultIconSelector = defaultIconSelector;
 
             //Add a complete file display
-            All = fileWatcher.Latest.Index().Replay(1).RefCount();
+            All = _fileWatcher.Latest.Index().Replay(1).RefCount();
 
             //create a collection with 1 item, which is used to show entire file
             var systemSearches = new SourceCache<SearchInfo, string>(t => t.SearchText);

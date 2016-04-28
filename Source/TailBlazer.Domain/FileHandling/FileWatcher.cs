@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
@@ -29,18 +30,27 @@ namespace TailBlazer.Domain.FileHandling
 
         public string Extension => FileInfo.Extension;
 
+        private readonly ISubject<long> _scanFrom = new BehaviorSubject<long>(0);
+
         public FileWatcher([NotNull] FileInfo fileInfo, IScheduler scheduler=null)
         {
             FileInfo = fileInfo;
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
 
-            var shared = fileInfo.WatchFile(scheduler: scheduler ?? Scheduler.Default);
-
+            scheduler = scheduler ?? Scheduler.Default;
+            
+            //var shared = fileInfo.WatchFile(scheduler: scheduler ?? Scheduler.Default);
+            var shared = _scanFrom.Select(start => start == 0
+                ? fileInfo.WatchFile(scheduler: scheduler)
+                : fileInfo.WatchFile(scheduler: scheduler).ScanFrom(start).StartWith(new FileNotification(fileInfo)))
+                .Switch()
+                .Replay(1).RefCount();
+            
             Latest = shared
                         .TakeWhile(notification => notification.Exists)
                         .Repeat();
-
-            Status = shared.Select(notificiation =>
+            
+            Status = fileInfo.WatchFile(scheduler: scheduler).Select(notificiation =>
             {
                 if (!notificiation.Exists || notificiation.Error != null)
                     return FileStatus.Error;
@@ -49,6 +59,17 @@ namespace TailBlazer.Domain.FileHandling
             })
             .StartWith(FileStatus.Loading)
             .DistinctUntilChanged();
+        }
+
+        public void ScanFrom(long scanFrom)
+        {
+            _scanFrom.OnNext(FileInfo.Length);
+         //     _scanFrom.OnNext(scanFrom);
+        }
+
+        public void Reset()
+        {
+            _scanFrom.OnNext(0);
         }
     }
 }

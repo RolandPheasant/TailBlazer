@@ -56,12 +56,6 @@ namespace TailBlazer.Domain.FileHandling
                     : new FileNotification(state));
         }
 
-        public static IObservable<FileNotification> ScanFrom(this IObservable<FileNotification> source, long startFrom, 
-            TimeSpan? refreshPeriod = null,
-            IScheduler scheduler = null)
-        {
-            return new FileRewriter(source, startFrom, refreshPeriod, scheduler).Notifications;
-        }
 
 
         /// <summary>

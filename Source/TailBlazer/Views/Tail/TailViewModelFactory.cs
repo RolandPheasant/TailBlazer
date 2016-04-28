@@ -31,7 +31,7 @@ namespace TailBlazer.Views.Tail
             [NotNull] IIconProvider iconProvider,
             [NotNull] ITailViewStateControllerFactory tailViewStateControllerFactory,
             [NotNull] ITextAssociationCollection textAssociationCollection,
-           [NotNull]  IThemeProvider themeProvider) 
+            [NotNull]  IThemeProvider themeProvider) 
         {
             if (objectProvider == null) throw new ArgumentNullException(nameof(objectProvider));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
