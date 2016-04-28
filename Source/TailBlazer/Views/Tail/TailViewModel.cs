@@ -253,7 +253,7 @@ namespace TailBlazer.Views.Tail
             get
             {
                 return _keyAutoTail
-                    ?? (_keyAutoTail = new ActionAutoTail(() =>
+                    ?? (_keyAutoTail = new Command(() =>
                     {
                         AutoTail = true;
                     }));
