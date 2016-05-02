@@ -69,7 +69,8 @@ namespace TailBlazer.Domain.FileHandling
 
 
             //3. Scan the tail so results can be returned quickly
-            var tailScanner= shared.Select(segments => segments.Tail).DistinctUntilChanged()
+            var tailScanner= shared.Select(segments => segments.Tail)
+                .DistinctUntilChanged()
                 .Scan((Index)null, (previous, current) =>
                {
                     if (previous == null)
@@ -120,8 +121,7 @@ namespace TailBlazer.Domain.FileHandling
                             });
                         });
                 });
-
-
+            
             _cleanUp = new CompositeDisposable(infoSubscriber,_indicies, tailSubscriber, tailSubscriber, headSubscriber);
         }
 
@@ -194,9 +194,7 @@ namespace TailBlazer.Domain.FileHandling
                 {
                     yield return selector(position);
                     i = 0;
-                };
-
-
+                }
             }
         }
 

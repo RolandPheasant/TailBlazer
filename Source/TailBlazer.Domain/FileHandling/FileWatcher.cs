@@ -64,7 +64,6 @@ namespace TailBlazer.Domain.FileHandling
         public void ScanFrom(long scanFrom)
         {
             _scanFrom.OnNext(FileInfo.Length);
-         //     _scanFrom.OnNext(scanFrom);
         }
 
         public void Reset()

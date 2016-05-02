@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,36 +19,57 @@ namespace TailBlazer.Domain.FileHandling
         {
             if (fileWatcher == null) throw new ArgumentNullException(nameof(fileWatcher));
             
+            var locker = new object();
+
             //TODO: Do we need to specifically handle errors?
             Notifications = Observable.Create<FileNotification>(observer =>
             {
                 var newFile =  Path.GetTempFileName();
                 var info = new FileInfo(newFile);
 
-              //  var watcher = info.WatchFile(refreshPeriod, scheduler)
+                //Watch the new file
                 var resultStream = info.WatchFile(refreshPeriod,scheduler)
-                
-                .SubscribeSafe(observer);
+                    .Synchronize(locker)
+                    .SubscribeSafe(observer);
 
-                var fileWriter = fileWatcher.Scan(new FileReadResult(Enumerable.Empty<string>(), startFrom), (state, notification) =>
-                {
-                    return ReadLines(notification.FullName, state.EndPosition);
-                }).Subscribe(result =>
-                {
-                   //Write lines to the file
-                    var lines = result.Lines.AsArray();
-
-                    if (lines.Any())
-                        File.AppendAllLines(newFile, lines);
-                });
+                var fileWriter = fileWatcher
+                    .Synchronize(locker)
+                    .Scan(new FileReadResult(Enumerable.Empty<string>(), startFrom), (state, notification) =>
+                    {
+                        return ReadLines(notification.FullName, state.EndPosition);
+                    })
+                    .Subscribe(result =>
+                    {
+                       //Write lines to the file
+                        WriteLines(newFile, result.Lines.AsArray());
+                    });
                 
                 return Disposable.Create(() =>
                 {
                     resultStream.Dispose();
                     fileWriter.Dispose();
-                    //File.Delete(newFile);
+                    File.Delete(newFile);
                 });
             }).Replay(1).RefCount();
+        }
+
+
+        private void WriteLines(string file, string[] lines)
+        {
+            if (!lines.Any())
+                return;
+
+            using (var stream = File.Open(file, FileMode.Open, FileAccess.Write, FileShare.Delete | FileShare.ReadWrite))
+            {
+                using (StreamWriter sw = new StreamWriter(stream))
+                {
+                    sw.BaseStream.Seek(0, SeekOrigin.End);
+                    lines.ForEach(line =>
+                    {
+                        sw.WriteLine(line);
+                    });
+                }
+            }
         }
 
         private FileReadResult ReadLines(string file, long firstPosition)

@@ -113,10 +113,7 @@ namespace TailBlazer.Views.Tail
             SearchMetadataCollection = searchMetadataCollection;
             
             var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
-            HorizonalScrollChanged = args =>
-            {
-                horizonalScrollArgs.OnNext(args);
-            };
+            HorizonalScrollChanged = args => horizonalScrollArgs.OnNext(args);
             
             _tailViewStateControllerFactory = tailViewStateControllerFactory;
             
@@ -147,10 +144,7 @@ namespace TailBlazer.Views.Tail
             FileStatus = fileWatcher.Status.ForBinding();
 
             //command to add the current search to the tail collection
-            var searchInvoker = SearchHints.SearchRequested.Subscribe(request =>
-            {
-                searchInfoCollection.Add(request.Text, request.UseRegEx);
-            });
+            var searchInvoker = SearchHints.SearchRequested.Subscribe(request => searchInfoCollection.Add(request.Text, request.UseRegEx));
 
             //User feedback to show file size
             FileSizeText = fileWatcher.Latest.Select(fn=>fn.Size)
@@ -166,7 +160,7 @@ namespace TailBlazer.Views.Tail
             //    .Switch()
             //    .ObserveOn(schedulerProvider.Background);
 
-            var xxx = _scanFrom.Subscribe(l => fileWatcher.ScanFrom(l));
+            var clearer = _scanFrom.Subscribe(fileWatcher.ScanFrom);
 
             var lineScroller = new LineScroller(selectedProvider, scroller);
             
@@ -226,6 +220,7 @@ namespace TailBlazer.Views.Tail
 
             _cleanUp = new CompositeDisposable(lineScroller,
                 loader,
+                clearer,
                 firstIndexMonitor,
                 FileStatus,
                 Count,
@@ -259,6 +254,9 @@ namespace TailBlazer.Views.Tail
 
         private void Clear()
         {
+            if (!_data.Any())
+                return;
+
             //TODO: Discover end from file info, + allow clear from
             var position = _data.Max(proxy => proxy.Line.LineInfo.End);
             _scanFrom.OnNext(position);
