@@ -31,12 +31,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DynamicData, Version=4.6.0.1134, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DynamicData.4.6.0.1134-beta\lib\net45\DynamicData.dll</HintPath>
+    <Reference Include="DynamicData, Version=4.7.1.1153, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DynamicData.4.7.1.1153\lib\net45\DynamicData.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DynamicData.Plinq, Version=4.6.0.1134, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DynamicData.Plinq.4.6.0.1134-beta\lib\net45\DynamicData.Plinq.dll</HintPath>
+    <Reference Include="DynamicData.Plinq, Version=4.7.1.1153, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DynamicData.Plinq.4.7.1.1153\lib\net45\DynamicData.Plinq.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />

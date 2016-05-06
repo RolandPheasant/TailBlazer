@@ -80,7 +80,8 @@ namespace TailBlazer.Views.Searching
 
             //combine system with user choice.
             var defaultHue = this.WhenValueChanged(vm => vm.HighlightHue)
-                    .CombineLatest(themeProvider.Accent, (user, system) => user == Hue.NotSpecified ? system : user).Publish();
+                    .CombineLatest(themeProvider.Accent, (user, system) => user == Hue.NotSpecified ? system : user)
+                    .Publish();
 
             Foreground = defaultHue.Select(h => h.ForegroundBrush).ForBinding();
             Background = defaultHue.Select(h => h.BackgroundBrush).ForBinding();
@@ -194,7 +195,7 @@ namespace TailBlazer.Views.Searching
 
         public override string ToString()
         {
-            return $"SearchMetadata: {_searchMetadata}";
+            return $"SearchOptionsProxy: {_searchMetadata}";
         }
 
         public void Dispose()
