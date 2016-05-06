@@ -15,7 +15,7 @@ namespace TailBlazer.Domain.FileHandling
     {
         public IObservable<FileNotification> Notifications { get; }
 
-        public FileRewriter([NotNull] IObservable<FileNotification> fileWatcher, long startFrom, TimeSpan? refreshPeriod=null, IScheduler scheduler=null)
+        public FileRewriter([NotNull] IObservable<FileNotification> fileWatcher, long startFrom = -1, TimeSpan? refreshPeriod=null, IScheduler scheduler=null)
         {
             if (fileWatcher == null) throw new ArgumentNullException(nameof(fileWatcher));
             
@@ -29,12 +29,14 @@ namespace TailBlazer.Domain.FileHandling
 
                 //Watch the new file
                 var resultStream = info.WatchFile(refreshPeriod,scheduler)
+                    .TakeWhile(notification => notification.Exists).Repeat()
                     .Synchronize(locker)
                     .SubscribeSafe(observer);
 
                 var fileWriter = fileWatcher
                     .Synchronize(locker)
-                    .Scan(new FileReadResult(Enumerable.Empty<string>(), startFrom), (state, notification) =>
+                    .TakeWhile(notification => notification.Exists).Repeat()
+                    .Scan(new FileReadResult(Enumerable.Empty<string>(), -1), (state, notification) =>
                     {
                         return ReadLines(notification.FullName, state.EndPosition);
                     })
@@ -48,7 +50,7 @@ namespace TailBlazer.Domain.FileHandling
                 {
                     resultStream.Dispose();
                     fileWriter.Dispose();
-                    File.Delete(newFile);
+                   // File.Delete(newFile);
                 });
             }).Replay(1).RefCount();
         }
@@ -56,8 +58,7 @@ namespace TailBlazer.Domain.FileHandling
 
         private void WriteLines(string file, string[] lines)
         {
-            if (!lines.Any())
-                return;
+            if (!lines.Any()) return;
 
             using (var stream = File.Open(file, FileMode.Open, FileAccess.Write, FileShare.Delete | FileShare.ReadWrite))
             {
@@ -81,7 +82,15 @@ namespace TailBlazer.Domain.FileHandling
                 using (var reader = new StreamReaderExtended(stream))
                 {
                     //go to starting point
-                    stream.Seek(firstPosition, SeekOrigin.Begin);
+                    if (firstPosition == -1)
+                    {
+                        stream.Seek(0, SeekOrigin.End);
+                    }
+                    else
+                    {
+                        stream.Seek(firstPosition, SeekOrigin.Begin);
+                    }
+
 
                     string line;
                     while ((line = reader.ReadLine()) != null)

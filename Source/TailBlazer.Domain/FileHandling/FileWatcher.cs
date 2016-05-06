@@ -39,17 +39,17 @@ namespace TailBlazer.Domain.FileHandling
 
             scheduler = scheduler ?? Scheduler.Default;
             
-            //var shared = fileInfo.WatchFile(scheduler: scheduler ?? Scheduler.Default);
             var shared = _scanFrom.Select(start => start == 0
                 ? fileInfo.WatchFile(scheduler: scheduler)
-                : fileInfo.WatchFile(scheduler: scheduler).ScanFrom(start).StartWith(new FileNotification(fileInfo)))
-                .Switch()
-                .Replay(1).RefCount();
+                : fileInfo.WatchFile(scheduler: scheduler).ScanFromEnd())
+                .Switch();
             
             Latest = shared
-                        .TakeWhile(notification => notification.Exists)
-                        .Repeat();
-            
+                .TakeWhile(notification => notification.Exists)
+                .Repeat()
+                .Replay(1).RefCount();
+                        
+
             Status = fileInfo.WatchFile(scheduler: scheduler).Select(notificiation =>
             {
                 if (!notificiation.Exists || notificiation.Error != null)

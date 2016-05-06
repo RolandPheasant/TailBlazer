@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
 namespace TailBlazer.Domain.FileHandling
@@ -17,6 +18,13 @@ namespace TailBlazer.Domain.FileHandling
             IScheduler scheduler = null)
         {
             return new FileRewriter(source, startFrom, refreshPeriod, scheduler).Notifications;
+        }
+
+        public static IObservable<FileNotification> ScanFromEnd(this IObservable<FileNotification> source,
+            TimeSpan? refreshPeriod = null,
+            IScheduler scheduler = null)
+        {
+             return new FileRewriter(source, refreshPeriod: refreshPeriod, scheduler: scheduler).Notifications;
         }
     }
 }
