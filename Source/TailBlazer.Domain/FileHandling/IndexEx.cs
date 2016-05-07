@@ -8,6 +8,11 @@ namespace TailBlazer.Domain.FileHandling
     {
         public static IObservable<ILineProvider> Index(this IObservable<FileSegmentCollection> source)
         {
+            //TODO: SHARE THIS + DO SAME FOR FILTERED
+            var nameChanged = source.Select(fsc => fsc.Info.Name)
+                .DistinctUntilChanged()
+                .Skip(1);
+
             var indexFactory = source
                 .Publish(shared =>
                 {
@@ -25,6 +30,7 @@ namespace TailBlazer.Domain.FileHandling
 
             //this is the beast which allows the indexer to be recreated when a log file rolls
             return indexFactory
+                .TakeUntil(nameChanged)
                 .TakeWhile(x => x.sizeDiff >= 0).Repeat()
                 .Select(x => x.index);
 
@@ -33,8 +39,5 @@ namespace TailBlazer.Domain.FileHandling
         {
             return source.WithSegments().Index();
         }
-
-
-
     }
 }

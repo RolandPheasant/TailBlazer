@@ -32,7 +32,7 @@ namespace TailBlazer.Fixtures
         }
 
         [Fact]
-        public void startAfterEndOfFileShouldReturnNothing()
+        public void StartAfterEndOfFileShouldReturnNothing()
         {
             FileNotification result = null;
 

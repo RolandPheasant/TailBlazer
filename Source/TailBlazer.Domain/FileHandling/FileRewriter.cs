@@ -24,20 +24,25 @@ namespace TailBlazer.Domain.FileHandling
             //TODO: Do we need to specifically handle errors?
             Notifications = Observable.Create<FileNotification>(observer =>
             {
-                var newFile =  Path.GetTempFileName();
+
+                var newFile = Path.GetTempFileName();
+
+                Console.WriteLine("created {0}", newFile);
                 var info = new FileInfo(newFile);
 
                 //Watch the new file
                 var resultStream = info.WatchFile(refreshPeriod,scheduler)
-                    .TakeWhile(notification => notification.Exists).Repeat()
+                   // .TakeWhile(notification => notification.Exists).Repeat()
                     .Synchronize(locker)
                     .SubscribeSafe(observer);
-
+                
+                //Create a new file from the old one, starting at the spcified index
                 var fileWriter = fileWatcher
                     .Synchronize(locker)
                     .TakeWhile(notification => notification.Exists).Repeat()
-                    .Scan(new FileReadResult(Enumerable.Empty<string>(), -1), (state, notification) =>
+                    .Scan(new FileReadResult(Enumerable.Empty<string>(), startFrom), (state, notification) =>
                     {
+                        //read lines from the source file.
                         return ReadLines(notification.FullName, state.EndPosition);
                     })
                     .Subscribe(result =>
@@ -48,19 +53,20 @@ namespace TailBlazer.Domain.FileHandling
                 
                 return Disposable.Create(() =>
                 {
-                    resultStream.Dispose();
+                    Console.WriteLine("deleting {0}", newFile);
                     fileWriter.Dispose();
-                   // File.Delete(newFile);
+                    resultStream.Dispose();
+             
+                    File.Delete(newFile);
                 });
             }).Replay(1).RefCount();
         }
-
 
         private void WriteLines(string file, string[] lines)
         {
             if (!lines.Any()) return;
 
-            using (var stream = File.Open(file, FileMode.Open, FileAccess.Write, FileShare.Delete | FileShare.ReadWrite))
+            using (var stream = File.Open(file, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Delete | FileShare.ReadWrite))
             {
                 using (StreamWriter sw = new StreamWriter(stream))
                 {
@@ -90,7 +96,6 @@ namespace TailBlazer.Domain.FileHandling
                     {
                         stream.Seek(firstPosition, SeekOrigin.Begin);
                     }
-
 
                     string line;
                     while ((line = reader.ReadLine()) != null)

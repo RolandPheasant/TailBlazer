@@ -14,7 +14,6 @@ namespace TailBlazer.Domain.FileHandling
 {
     /// <summary>
     /// Responsive and flexible file searching.
-    /// 
     /// See https://github.com/RolandPheasant/TailBlazer/issues/42
     /// </summary>
     public class FileSearcher: IDisposable
@@ -45,7 +44,7 @@ namespace TailBlazer.Domain.FileHandling
             var shared = fileSegments.Replay(1).RefCount();
 
             var infoSubscriber = shared.Select(segments => segments.Info)
-                .Take(1)
+            //    .Take(1)
                 .Subscribe(info =>
                 {
                     Info = info;
@@ -137,7 +136,8 @@ namespace TailBlazer.Domain.FileHandling
                 tailSubscriber,
                 headSubscriber,
                 tailSearch.Connect(),
-                infoSubscriber);
+                infoSubscriber,
+                searchData);
         }
 
         private FileSegmentSearchResult Search(long start, long end)

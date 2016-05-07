@@ -45,8 +45,7 @@ namespace TailBlazer.Domain.FileHandling
                 .Switch();
             
             Latest = shared
-                .TakeWhile(notification => notification.Exists)
-                .Repeat()
+                .TakeWhile(notification => notification.Exists).Repeat()
                 .Replay(1).RefCount();
                         
 
@@ -63,9 +62,14 @@ namespace TailBlazer.Domain.FileHandling
 
         public void ScanFrom(long scanFrom)
         {
-            _scanFrom.OnNext(FileInfo.Length);
+            _scanFrom.OnNext(scanFrom);
         }
 
+        public void Clear()
+        {
+            _scanFrom.OnNext(FileInfo.Length);
+        }
+        
         public void Reset()
         {
             _scanFrom.OnNext(0);

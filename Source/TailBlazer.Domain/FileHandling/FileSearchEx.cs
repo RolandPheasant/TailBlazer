@@ -4,26 +4,23 @@ using System.IO;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using TailBlazer.Domain.FileHandling.Search;
 
 namespace TailBlazer.Domain.FileHandling
 {
     public static class FileSearchEx
     {
-        public static IObservable<FileSearchResult> Search(this FileInfo source, Func<string, bool> predicate,
-            IScheduler scheduler = null)
+        public static IObservable<FileSearchResult> Search(this FileInfo source, Func<string, bool> predicate, IScheduler scheduler = null)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
             return source.WatchFile(scheduler: scheduler)
-               
+
                 .WithSegments()
                 .Search(predicate, scheduler);
         }
 
-        public static IObservable<FileSearchResult> Search(this IObservable<FileNotification> source,
-            Func<string, bool> predicate, IScheduler scheduler = null)
+        public static IObservable<FileSearchResult> Search(this IObservable<FileNotification> source, Func<string, bool> predicate, IScheduler scheduler = null)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
@@ -31,8 +28,7 @@ namespace TailBlazer.Domain.FileHandling
             return source.WithSegments().Search(predicate, scheduler);
         }
 
-        public static IObservable<FileSearchResult> Search(this IObservable<FileSegmentCollection> source,
-            Func<string, bool> predicate, IScheduler scheduler = null)
+        public static IObservable<FileSearchResult> Search(this IObservable<FileSegmentCollection> source, Func<string, bool> predicate, IScheduler scheduler = null)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
@@ -48,7 +44,7 @@ namespace TailBlazer.Domain.FileHandling
                         var publisher = fileSearch.SearchResult.SubscribeSafe(observer);
                         return new CompositeDisposable(publisher, fileSearch);
                     });
-                    return searcher.CombineLatest(diff, (search, sizeDiff) => new { search, sizeDiff});
+                    return searcher.CombineLatest(diff, (search, sizeDiff) => new {search, sizeDiff});
                 });
 
             //this is the magic which allows the search to be recreated when a log file rolls
@@ -56,10 +52,10 @@ namespace TailBlazer.Domain.FileHandling
                 .TakeWhile(x => x.sizeDiff >= 0).Repeat()
                 .Select(x => x.search);
         }
-    
 
 
-    public static IEnumerable<T> SearchLines<T>(this StreamReaderExtended source,
+
+        public static IEnumerable<T> SearchLines<T>(this StreamReaderExtended source,
             Func<string, bool> predicate,
             Func<long, T> selector,
             Func<string, long, bool> shouldBreak)

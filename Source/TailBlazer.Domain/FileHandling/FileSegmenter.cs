@@ -38,11 +38,10 @@ namespace TailBlazer.Domain.FileHandling
                 .Scan((FileSegmentCollection) null, (previous, current) =>
                 {
                     _info = (FileInfo)current;
+                    var nameHasChanged = previous != null && (previous.Info.Name != current.Name);
 
-                    if (previous == null || previous.FileLength == 0)
+                    if (previous == null || previous.FileLength == 0 || nameHasChanged)
                     {
-                    
-                       
                         var segments = LoadSegments().ToArray();
                         return new FileSegmentCollection(_info, segments, current.Size);
                     }

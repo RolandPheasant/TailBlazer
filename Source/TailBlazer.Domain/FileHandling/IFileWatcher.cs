@@ -11,5 +11,7 @@ namespace TailBlazer.Domain.FileHandling
         string Folder { get; }
 
         void ScanFrom(long scanFrom);
+        void Clear();
+        void Reset();
     }
 }

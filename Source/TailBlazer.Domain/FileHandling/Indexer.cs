@@ -52,13 +52,17 @@ namespace TailBlazer.Domain.FileHandling
            
             //1. Get information from segment info
             var infoSubscriber = shared.Select(segments => segments.Info)
-                .Take(1)
+                //.Take(1)
                 .Subscribe(info =>
                 {
-                    Info = info;
-                    Encoding = encoding ?? info.GetEncoding();
+                    if (Info == null || Info.Name != info.Name)
+                    {
+                        Info = info;
+                        Encoding = encoding ?? info.GetEncoding();
+                    }
                 });
-           
+
+
             //2. create  a resulting index object from the collection of index fragments
             Result = _indicies
                 .Connect()
@@ -122,7 +126,7 @@ namespace TailBlazer.Domain.FileHandling
                         });
                 });
             
-            _cleanUp = new CompositeDisposable(infoSubscriber,_indicies, tailSubscriber, tailSubscriber, headSubscriber);
+            _cleanUp = new CompositeDisposable(infoSubscriber, _indicies, tailSubscriber, tailSubscriber, headSubscriber);
         }
 
         private int EstimateNumberOfLines(Index tail, FileInfo info)

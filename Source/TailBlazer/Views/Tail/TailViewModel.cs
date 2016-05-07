@@ -32,7 +32,6 @@ namespace TailBlazer.Views.Tail
         private readonly SingleAssignmentDisposable _stateMonitor= new SingleAssignmentDisposable();
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
         private readonly ISubject<ScrollRequest> _userScrollRequested = new ReplaySubject<ScrollRequest>(1);
-        private readonly ISubject<long> _scanFrom = new Subject<long>();
         private readonly IPersistentView _persister;
         private readonly ITailViewStateControllerFactory _tailViewStateControllerFactory;
 
@@ -66,7 +65,8 @@ namespace TailBlazer.Views.Tail
         public ICommand OpenFolderCommand { get; }
         public ICommand CopyPathToClipboardCommand { get; }
         public ICommand OpenSearchOptionsCommand => new Command(OpenSearchOptions);
-        public ICommand ClearCommand => new Command(Clear);
+        public ICommand ClearCommand { get; }
+        public ICommand UnClearCommand { get; }
 
         public string Name { get; }
 
@@ -110,6 +110,8 @@ namespace TailBlazer.Views.Tail
             OpenFileCommand = new Command(() => Process.Start(fileWatcher.FullName));
             OpenFolderCommand = new Command(() => Process.Start(fileWatcher.Folder));
             CopyPathToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(fileWatcher.FullName));
+            UnClearCommand = new Command(fileWatcher.Reset);
+            ClearCommand = new Command(fileWatcher.Clear);
             SearchMetadataCollection = searchMetadataCollection;
             
             var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
@@ -155,12 +157,7 @@ namespace TailBlazer.Views.Tail
             //tailer is the main object used to tail, scroll and filter in a file
             //Inject CLEAR Here
             var selectedProvider = SearchCollection.Latest.ObserveOn(schedulerProvider.Background);
-            //var scrollSource = _scanFrom
-            //    .Select(start => start == 0 ? selectedProvider : selectedProvider.StartFrom(start))
-            //    .Switch()
-            //    .ObserveOn(schedulerProvider.Background);
 
-            var clearer = _scanFrom.Subscribe(fileWatcher.ScanFrom);
 
             var lineScroller = new LineScroller(selectedProvider, scroller);
             
@@ -220,7 +217,6 @@ namespace TailBlazer.Views.Tail
 
             _cleanUp = new CompositeDisposable(lineScroller,
                 loader,
-                clearer,
                 firstIndexMonitor,
                 FileStatus,
                 Count,
@@ -250,16 +246,6 @@ namespace TailBlazer.Views.Tail
         private async void OpenSearchOptions()
         {
            await DialogHost.Show(SearchOptions, Id);
-        }
-
-        private void Clear()
-        {
-            if (!_data.Any())
-                return;
-
-            //TODO: Discover end from file info, + allow clear from
-            var position = _data.Max(proxy => proxy.Line.LineInfo.End);
-            _scanFrom.OnNext(position);
         }
 
         public LineProxy SelectedItem
