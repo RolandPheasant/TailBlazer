@@ -67,6 +67,7 @@ namespace TailBlazer.Views.Tail
         public ICommand OpenSearchOptionsCommand => new Command(OpenSearchOptions);
         public ICommand ClearCommand { get; }
         public ICommand UnClearCommand { get; }
+        public ICommand KeyAutoTail { get; }
 
         public string Name { get; }
 
@@ -105,13 +106,16 @@ namespace TailBlazer.Views.Tail
             SelectionMonitor = selectionMonitor;
             SearchOptions = searchOptionsViewModel;
             SearchHints = searchHints;
-            SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
+
             CopyToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
             OpenFileCommand = new Command(() => Process.Start(fileWatcher.FullName));
             OpenFolderCommand = new Command(() => Process.Start(fileWatcher.Folder));
             CopyPathToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(fileWatcher.FullName));
             UnClearCommand = new Command(fileWatcher.Reset);
             ClearCommand = new Command(fileWatcher.Clear);
+            KeyAutoTail = new Command(() => { AutoTail = true; });
+
+            SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
             SearchMetadataCollection = searchMetadataCollection;
             
             var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
