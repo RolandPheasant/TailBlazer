@@ -8,16 +8,13 @@ namespace TailBlazer.Domain.FileHandling
     {
         public static IObservable<ILineProvider> Index(this IObservable<FileSegmentCollection> source)
         {
-            //TODO: SHARE THIS + DO SAME FOR FILTERED
-            var nameChanged = source.Select(fsc => fsc.Info.Name)
-                .DistinctUntilChanged()
-                .Skip(1);
+            var published = source.Replay(1).RefCount();
 
-            var indexFactory = source
+            var nameChanged = published.Select(fsc => fsc.Info.Name).DistinctUntilChanged().Skip(1);
+            var indexFactory = published
                 .Publish(shared =>
                 {
                     var diff = shared.Select(fsc => fsc.SizeDiff);
-
                     var idx = Observable.Create<IndexCollection>(observer =>
                     {
                         var indexer = new Indexer(shared);
@@ -35,6 +32,7 @@ namespace TailBlazer.Domain.FileHandling
                 .Select(x => x.index);
 
         }
+
         public static IObservable<ILineProvider> Index(this IObservable<FileNotification> source)
         {
             return source.WithSegments().Index();
