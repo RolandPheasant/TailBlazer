@@ -496,10 +496,34 @@
                     Grid.Column="2"
                             HorizontalAlignment="Right"
                             Orientation="Horizontal">
+
+                        <Button  Width="22" Height="22"
+                                 Margin="4 0 0 0" 
+                                 Padding="0"
+                                 Opacity="0.76"
+                                 ToolTip="Clear to monitor tail only"
+                                 Foreground="White"
+                                Style="{StaticResource MaterialDesignFlatButton}" 
+                                Command="{Binding ClearCommand}">
+                            <wpf:PackIcon Kind="Eraser" Width="16" Height="16"/>
+                        </Button>
+
+                        <Button Width="22" Height="22"
+                                Margin="4 0 0 0" 
+                                Padding="0"
+                                Foreground="White"
+                                Opacity="0.76"
+                                ToolTip="Un-clear to monitor entire file"
+                                Style="{StaticResource MaterialDesignFlatButton}" 
+                                Command="{Binding UnClearCommand}">
+                            <wpf:PackIcon Kind="Undo" Width="16" Height="16"/>
+                        </Button>
+
+
                         <TextBlock  
-                        Margin="4 0 0 0"
-                        Text="{Binding  CountText.Value, StringFormat='\{0}.'}"
-                        VerticalAlignment="Center"/>
+                            Margin="4 0 0 0"
+                            Text="{Binding  CountText.Value, StringFormat='\{0}.'}"
+                            VerticalAlignment="Center"/>
 
 
                         <TextBlock Margin="6 0 0 0" Text="{Binding FileSizeText.Value}" />

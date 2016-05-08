@@ -21,7 +21,7 @@ namespace TailBlazer.Domain.FileHandling
             
             var locker = new object();
 
-            //TODO: Do we need to specifically handle errors?
+            //TODO: WHEN ORIGINAL FILE HAS ROLLED OVER, WE NEED TO CLEAR OUT THE LOCAL TEMP FILE
             Notifications = Observable.Create<FileNotification>(observer =>
             {
 
