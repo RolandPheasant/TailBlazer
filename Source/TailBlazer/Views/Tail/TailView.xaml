@@ -296,10 +296,14 @@
                         <CheckBox HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             TabIndex="3"
-                            IsChecked="{Binding AutoTail}"
+                            IsChecked="{Binding AutoTail, Mode=TwoWay}"
                             Margin="4 0 4 0"
-                            Content="Follow Tail"
-                            Name="TailCheckBox"/>
+                            Content="Follow Tail">
+                            <CheckBox.InputBindings>
+                                <KeyBinding Key="Space"
+                                Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyAutoTail}"/>
+                            </CheckBox.InputBindings>
+                        </CheckBox>
 
                         <CheckBox Visibility="{Binding CanViewInline.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
                             HorizontalAlignment="Left"
