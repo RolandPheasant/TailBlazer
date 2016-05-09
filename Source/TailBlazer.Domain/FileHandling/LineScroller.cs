@@ -5,6 +5,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
+using DynamicData.Kernel;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.Infrastructure;
 
@@ -38,6 +39,7 @@ namespace TailBlazer.Domain.FileHandling
 
 
             var aggregator = latest.CombineLatest(scrollRequest, (currentLines, scroll) => currentLines.ReadLines(scroll).ToArray())
+                .RetryWithBackOff<Line[], Exception>((ex,i)=>TimeSpan.FromSeconds(1))
                 .Subscribe(currentPage =>
                 {
                     var previous = lines.Items.ToArray();
@@ -79,6 +81,7 @@ namespace TailBlazer.Domain.FileHandling
 
                     return x.currentLines.ReadLines(x.scroll).ToArray();
                 })
+                .RetryWithBackOff<Line[], Exception>((ex, i) => TimeSpan.FromSeconds(1))
                 .Subscribe(currentPage =>
                 {
                     var previous = lines.Items.ToArray();

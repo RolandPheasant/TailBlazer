@@ -3,14 +3,9 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
 using TailBlazer.Domain.Annotations;
-using TailBlazer.Domain.Formatting;
 
 namespace TailBlazer.Domain.FileHandling.Search
 {
-
-    //TODO: Contruct with observable which clears from end
-    //Perhaps a broker which can be invoked from Tail View
-
     public sealed class SearchInfoCollection : ISearchInfoCollection
     {
         private readonly ISearchMetadataCollection _metadataCollection;

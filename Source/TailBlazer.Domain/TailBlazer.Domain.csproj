@@ -89,6 +89,7 @@
     <Compile Include="FileHandling\ILineScroller.cs" />
     <Compile Include="FileHandling\IndexEx.cs" />
     <Compile Include="FileHandling\IndexType.cs" />
+    <Compile Include="FileHandling\IProgressInfo.cs" />
     <Compile Include="FileHandling\LineKey.cs" />
     <Compile Include="FileHandling\Search\IDefaultColourSelector.cs" />
     <Compile Include="FileHandling\Search\IconTypeSelector.cs" />
@@ -120,7 +121,6 @@
     <Compile Include="FileHandling\Search\SearchMetadataFactory.cs" />
     <Compile Include="FileHandling\Search\SearchType.cs" />
     <Compile Include="FileHandling\StartFromEx.cs" />
-    <Compile Include="FileHandling\StartFromLineProvider.cs" />
     <Compile Include="FileHandling\StreamReaderExtended.cs" />
     <Compile Include="FileHandling\Search\SearchInfoCollection.cs" />
     <Compile Include="FileHandling\Search\SearchInfo.cs" />
