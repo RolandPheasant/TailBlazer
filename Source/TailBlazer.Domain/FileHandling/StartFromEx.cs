@@ -23,25 +23,6 @@ namespace TailBlazer.Domain.FileHandling
             TimeSpan? refreshPeriod = null,
             IScheduler scheduler = null)
         {
-
-            Func<IObservable<FileNotification>> factory = () => new FileRewriter(source, refreshPeriod: refreshPeriod, scheduler: scheduler).Notifications;
-
-
-            return factory().Scan((FileNotification) null, (state, notification) =>
-            {
-                if (state==null)
-                    return notification;
-
-                if (notification.Name != state.Name)
-                {
-                    Console.WriteLine();
-                }
-                return notification;
-
-            });
-
-
-
              return new FileRewriter(source, refreshPeriod: refreshPeriod, scheduler: scheduler).Notifications;
         }
     }

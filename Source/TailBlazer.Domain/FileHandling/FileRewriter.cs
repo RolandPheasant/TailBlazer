@@ -24,21 +24,22 @@ namespace TailBlazer.Domain.FileHandling
             //TODO: WHEN ORIGINAL FILE HAS ROLLED OVER, WE NEED TO CLEAR OUT THE LOCAL TEMP FILE
             Notifications = Observable.Create<FileNotification>(observer =>
             {
-
                 var newFile = Path.GetTempFileName();
 
                 Console.WriteLine("created {0}", newFile);
                 var info = new FileInfo(newFile);
 
+                var origStream = fileWatcher.Synchronize(locker).Publish();
+                var newStream = info.WatchFile(refreshPeriod, scheduler).Synchronize(locker);
+
                 //Watch the new file
-                var resultStream = info.WatchFile(refreshPeriod,scheduler)
-                   // .TakeWhile(notification => notification.Exists).Repeat()
-                    .Synchronize(locker)
-                    .SubscribeSafe(observer);
-                
+                var resultStream = newStream.CombineLatest(origStream, (NewStream, OldStream) =>
+                {
+                    return !OldStream.Exists ? OldStream : NewStream;
+                }) .SubscribeSafe(observer);
+
                 //Create a new file from the old one, starting at the spcified index
-                var fileWriter = fileWatcher
-                    .Synchronize(locker)
+                var fileWriter = origStream
                     .TakeWhile(notification => notification.Exists).Repeat()
                     .Scan(new FileReadResult(Enumerable.Empty<string>(), startFrom), (state, notification) =>
                     {
@@ -50,10 +51,14 @@ namespace TailBlazer.Domain.FileHandling
                        //Write lines to the file
                         WriteLines(newFile, result.Lines.AsArray());
                     });
-                
+
+                var connected = origStream.Connect();
+
+
                 return Disposable.Create(() =>
                 {
                     Console.WriteLine("deleting {0}", newFile);
+                    connected.Dispose();
                     fileWriter.Dispose();
                     resultStream.Dispose();
              
