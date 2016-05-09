@@ -178,7 +178,7 @@
                 <TextBox Grid.Column="1" 
                         Margin="0 4 0 0"
                         Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                        wpf:TextFieldAssist.Hint="{Binding SearchHints.Message.Value}" 
+                        wpf:HintAssist.Hint="{Binding SearchHints.Message.Value}" 
                         VerticalAlignment="Center"
                         wpf:ValidationAssist.UsePopup="False"
                         Style="{StaticResource FloatingHintAndErrorTextBox}"

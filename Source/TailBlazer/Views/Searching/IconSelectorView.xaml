@@ -44,7 +44,7 @@
             
                 <TextBox x:Name="SearchBox"
                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                    materialDesign:TextFieldAssist.Hint="Enter text to find icon" 
+                    materialDesign:HintAssist.Hint="Enter text to find icon" 
                     VerticalAlignment="Center"
                     materialDesign:ValidationAssist.UsePopup="False"                   
                     MinWidth="200">

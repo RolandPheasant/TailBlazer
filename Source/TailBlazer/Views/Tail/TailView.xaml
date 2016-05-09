@@ -35,7 +35,7 @@
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Buttons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ToggleButtons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/TextBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ComboBox.xaml" />
+                <!--<ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ComboBox.xaml" />-->
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Lines.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
@@ -178,7 +178,7 @@
                             TabIndex="0"
                              x:Name="SearchTextBox"
                             Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                            wpf:TextFieldAssist.Hint="{Binding SearchHints.Message.Value}" 
+                            wpf:HintAssist.Hint="{Binding SearchHints.Message.Value}" 
                             VerticalAlignment="Bottom"
                             wpf:ValidationAssist.UsePopup="False"
                             Style="{StaticResource FloatingHintAndErrorTextBox}"

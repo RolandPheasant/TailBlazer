@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="clr-namespace:TailBlazer.Controls"
                     xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
-                    xmlns:controlzEx="clr-namespace:ControlzEx;assembly=MaterialDesignThemes.Wpf">
+                    xmlns:controlzEx="clr-namespace:ControlzEx;assembly=MaterialDesignThemes.Wpf"
+                    xmlns:converters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
@@ -87,8 +88,10 @@
   </ControlTemplate>
 
   <Style x:Key="FloatingHintAndErrorTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignTextBox}">
-    <Setter Property="wpf:TextFieldAssist.Text" Value="{Binding RelativeSource={RelativeSource Self}, Path=Text}" />
-    <Setter Property="wpf:TextFieldAssist.Managed" Value="{Binding RelativeSource={RelativeSource Self}}" />
+        <Setter Property="wpf:HintAssist.Hint" Value="{Binding RelativeSource={RelativeSource Self}, Path=Text}" />
+        <Setter Property="wpf:HintAssist.IsFloating" Value="True"/>
+
+        <!--<Setter Property="wpf:HintAssist.Managed" Value="{Binding RelativeSource={RelativeSource Self}}" />-->
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="TextBox">
@@ -177,16 +180,13 @@
                               SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                               UseLayoutRounding="{TemplateBinding UseLayoutRounding}"
                                               />
-                <TextBlock Text="{Binding Path=(wpf:TextFieldAssist.Hint), RelativeSource={RelativeSource TemplatedParent}}"
-                           IsHitTestVisible="False"
-                           FontSize="{TemplateBinding FontSize}"
-                           HorizontalAlignment="Left"
-                           VerticalAlignment="Top"
-       
-                           x:Name="Hint"
-                           Margin="1 0 1 0"
-                           Opacity="{Binding Path=(wpf:TextFieldAssist.HintOpacity), RelativeSource={RelativeSource TemplatedParent}}"
-                                           />
+                                <wpf:SmartHint x:Name="Hint"
+                                               Hint="{Binding Path=(wpf:HintAssist.Hint), RelativeSource={RelativeSource TemplatedParent}}"
+                                               HintProxy="{Binding RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static converters:HintProxyFabricConverter.Instance}}"
+                                               FontSize="{TemplateBinding FontSize}"
+                                               HintOpacity="{Binding Path=(wpf:HintAssist.HintOpacity), RelativeSource={RelativeSource TemplatedParent}}"
+                                               UseFloating="{Binding Path=(wpf:HintAssist.IsFloating), RelativeSource={RelativeSource TemplatedParent}}"
+                                               />
               </Grid>
             </Border>
             <wpf:Underline x:Name="Underline" Visibility="{Binding Path=(wpf:TextFieldAssist.DecorationVisibility), RelativeSource={RelativeSource TemplatedParent}}"/>
@@ -194,8 +194,8 @@
           <ControlTemplate.Triggers>
             <MultiTrigger>
               <MultiTrigger.Conditions>
-                <Condition Property="wpf:TextFieldAssist.IsNullOrEmpty" Value="False" />
-                <Condition Property="IsKeyboardFocused" Value="True" />
+                    <Condition SourceName="Hint" Property="IsContentNullOrEmpty" Value="False" />
+                    <Condition Property="IsKeyboardFocused" Value="True" />
               </MultiTrigger.Conditions>
               <Setter TargetName="Hint" Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}" />
             </MultiTrigger>
