@@ -81,16 +81,16 @@ namespace TailBlazer.Domain.FileHandling
 
                     return x.currentLines.ReadLines(x.scroll).ToArray();
                 })
-                .RetryWithBackOff<Line[], Exception>((ex, i) => TimeSpan.FromSeconds(1))
+              //  .RetryWithBackOff<Line[], Exception>((ex, i) => TimeSpan.FromSeconds(1))
                 .Subscribe(currentPage =>
                 {
                     var previous = lines.Items.ToArray();
                     var added = currentPage.Except(previous, Line.TextStartComparer).ToArray();
                     var removed = previous.Except(currentPage, Line.TextStartComparer).ToArray();
 
-
                     lines.Edit(innerCache =>
                     {
+                        if (currentPage.Length == 0) innerCache.Clear();
                         if (removed.Any()) innerCache.Remove(removed);
                         if (added.Any()) innerCache.AddOrUpdate(added);
                     });

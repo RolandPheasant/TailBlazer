@@ -43,10 +43,10 @@ namespace TailBlazer.Domain.FileHandling
                 ? fileInfo.WatchFile(scheduler: scheduler)
                 : fileInfo.WatchFile(scheduler: scheduler).ScanFromEnd())
                 .Switch();
-            
+
             Latest = shared
-                .TakeWhile(notification => notification.Exists).Repeat()
-                .Replay(1).RefCount();
+                .TakeWhile(notification => notification.Exists).Repeat();
+                //.Replay(1).RefCount();
                         
 
             Status = fileInfo.WatchFile(scheduler: scheduler).Select(notificiation =>
