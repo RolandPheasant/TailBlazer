@@ -52,14 +52,12 @@ namespace TailBlazer.Domain.FileHandling
            
             //1. Get information from segment info
             var infoSubscriber = shared.Select(segments => segments.Info)
-                //.Take(1)
                 .Subscribe(info =>
                 {
                     Info = info;
-                    if (Encoding == null || Info.Name != info.Name)
-                    {
+
+                    if (Encoding == null || info.Name != Info.Name)
                         Encoding = encoding ?? info.GetEncoding();
-                    }
                 });
 
 

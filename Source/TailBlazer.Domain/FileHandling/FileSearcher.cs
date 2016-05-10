@@ -44,7 +44,6 @@ namespace TailBlazer.Domain.FileHandling
             var shared = fileSegments.Replay(1).RefCount();
 
             var infoSubscriber = shared.Select(segments => segments.Info)
-            //    .Take(1)
                 .Subscribe(info =>
                 {
                    Info = info;
