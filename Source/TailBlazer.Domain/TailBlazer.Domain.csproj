@@ -82,6 +82,7 @@
     <Compile Include="FileHandling\FileSegmentSearch.cs" />
     <Compile Include="FileHandling\FileSegmentSearchStatus.cs" />
     <Compile Include="FileHandling\FileSegmentType.cs" />
+    <Compile Include="FileHandling\FileStatus.cs" />
     <Compile Include="FileHandling\FileWatcher.cs" />
     <Compile Include="FileHandling\IFileWatcher.cs" />
     <Compile Include="FileHandling\IHasLimitationOfLines.cs" />

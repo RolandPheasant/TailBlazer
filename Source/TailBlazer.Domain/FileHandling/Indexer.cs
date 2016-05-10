@@ -55,9 +55,9 @@ namespace TailBlazer.Domain.FileHandling
                 //.Take(1)
                 .Subscribe(info =>
                 {
-                    if (Info == null || Info.Name != info.Name)
+                    Info = info;
+                    if (Encoding == null || Info.Name != info.Name)
                     {
-                        Info = info;
                         Encoding = encoding ?? info.GetEncoding();
                     }
                 });
