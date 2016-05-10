@@ -99,8 +99,6 @@ namespace TailBlazer.Domain.FileHandling
 
         public IEnumerable<Line> ReadLines(ScrollRequest scroll)
         {
-
-
             var page = GetPage(scroll);
 
             if (page.Size == 0) yield break;

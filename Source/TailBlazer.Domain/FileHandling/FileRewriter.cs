@@ -36,7 +36,9 @@ namespace TailBlazer.Domain.FileHandling
                 var resultStream = newStream.CombineLatest(origStream, (NewStream, OldStream) =>
                 {
                     return !OldStream.Exists ? OldStream : NewStream;
-                }) .SubscribeSafe(observer);
+                }).SubscribeSafe(observer);
+
+             //   var resultStream = newStream.SubscribeSafe(observer);
 
                 //Create a new file from the old one, starting at the spcified index
                 var fileWriter = origStream
@@ -64,7 +66,7 @@ namespace TailBlazer.Domain.FileHandling
              
                     File.Delete(newFile);
                 });
-            }).Replay(1).RefCount();
+            });
         }
 
         private void WriteLines(string file, string[] lines)

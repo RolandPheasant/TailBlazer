@@ -55,7 +55,7 @@ namespace TailBlazer.Domain.FileHandling
                     }
 
                     return new FileSegmentCollection(newLength, previous);
-                }).Replay(1).RefCount();
+                });
         }
 
         private IEnumerable<FileSegment> LoadSegments()

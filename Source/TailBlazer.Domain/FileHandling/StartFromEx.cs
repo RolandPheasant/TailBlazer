@@ -18,7 +18,13 @@ namespace TailBlazer.Domain.FileHandling
             TimeSpan? refreshPeriod = null,
             IScheduler scheduler = null)
         {
-             return new FileRewriter(source, refreshPeriod: refreshPeriod, scheduler: scheduler).Notifications;
+
+            return Observable.Create<FileNotification>(observer =>
+            {
+                return new FileRewriter(source, refreshPeriod: refreshPeriod, scheduler: scheduler)
+                .Notifications
+                .SubscribeSafe(observer);
+            }).Replay(1).RefCount();
         }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -21,7 +19,6 @@ using TailBlazer.Domain.Settings;
 using TailBlazer.Domain.StateHandling;
 using TailBlazer.Infrastucture;
 using TailBlazer.Infrastucture.Virtualisation;
-using TailBlazer.Views.Options;
 using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
@@ -42,7 +39,7 @@ namespace TailBlazer.Views.Tail
         private bool _showInline;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
-        public Guid Id { get; }= Guid.NewGuid();
+        public Guid Id { get; } = Guid.NewGuid();
         public ISelectionMonitor SelectionMonitor { get; }
         private SearchOptionsViewModel SearchOptions { get;  }
         public SearchHints SearchHints { get;  }
@@ -68,7 +65,6 @@ namespace TailBlazer.Views.Tail
         public ICommand ClearCommand { get; }
         public ICommand UnClearCommand { get; }
         public ICommand KeyAutoTail { get; }
-
         public string Name { get; }
 
         public TailViewModel([NotNull] ILogger logger,
@@ -159,10 +155,8 @@ namespace TailBlazer.Views.Tail
                 .ForBinding();
 
             //tailer is the main object used to tail, scroll and filter in a file
-            //Inject CLEAR Here
             var selectedProvider = SearchCollection.Latest.ObserveOn(schedulerProvider.Background);
-
-
+            
             var lineScroller = new LineScroller(selectedProvider, scroller);
             
             MaximumChars = lineScroller.MaximumLines()
@@ -207,9 +201,9 @@ namespace TailBlazer.Views.Tail
                 .DistinctUntilChanged()
                 .Replay(1)
                 .RefCount();
-            
-            var inlineViewerVisible = isUserDefinedChanged.CombineLatest(this.WhenValueChanged(vm => vm.ShowInline),
-                                                            (userDefined, showInline) => userDefined && showInline);
+
+            var showInline = this.WhenValueChanged(vm => vm.ShowInline);
+            var inlineViewerVisible = isUserDefinedChanged.CombineLatest(showInline, (userDefined, showInlne) => userDefined && showInlne);
             
             CanViewInline = isUserDefinedChanged.ForBinding();
             InlineViewerVisible = inlineViewerVisible.ForBinding();
@@ -245,8 +239,7 @@ namespace TailBlazer.Views.Tail
         }
      
         public TextScrollDelegate HorizonalScrollChanged { get; }
-
-
+        
         private async void OpenSearchOptions()
         {
            await DialogHost.Show(SearchOptions, Id);
@@ -321,7 +314,6 @@ namespace TailBlazer.Views.Tail
             //this controller responsible for loading and persisting user search stuff as the user changes stuff
             _stateMonitor.Disposable = _tailViewStateControllerFactory.Create(this,true);
         }
-
 
         ViewState IPersistentView.CaptureState()
         {

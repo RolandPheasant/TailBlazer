@@ -1,4 +1,5 @@
 using System;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
 
@@ -6,28 +7,17 @@ namespace TailBlazer.Domain.FileHandling
 {
     public static class FileSegmentEx
     {
-        public static IObservable<FileSegmentCollection> WithSegments(this IObservable<FileNotification> source,int initialTail= 100000)
+        public static IObservable<FileSegmentCollection> WithSegments(this IObservable<FileNotification> source, int initialTail= 100000)
         {
+            var shared = source.Replay(1).RefCount();
 
-            return source.Where(n=>(n.NotificationType == FileNotificationType.Changed || n.NotificationType == FileNotificationType.CreatedOrOpened))
-                .Publish(shared =>
-                {
-                     return Observable.Create<FileSegmentCollection>(observer =>
-                    {
-                        var segmenter = new FileSegmenter(shared, initialTail);
-                        return segmenter.Segments.SubscribeSafe(observer);
-                    });
-                });
-
-        }
-
-        public static IObservable<T> RepeatWhenFileShrinks<T>(this IObservable<FileSegmentCollection> source,
-            Func<IObservable<FileSegmentCollection>, IObservable<T>> observableFactory)
-        {
-            return source
-                .TakeWhile(fsc=>fsc.SizeDiff>0)
-                .Publish(observableFactory)
-                .Repeat();
+            return Observable.Create<FileSegmentCollection>(observer =>
+            {
+                var filtered = source.Where(f=>f.Exists);
+                var segmenter = new FileSegmenter(filtered, initialTail);
+                return segmenter.Segments.SubscribeSafe(observer);
+            })
+            .TakeUntil(shared.Where(f => !f.Exists));
         }
     }
 }

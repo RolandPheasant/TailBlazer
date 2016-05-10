@@ -81,7 +81,7 @@ namespace TailBlazer.Domain.FileHandling
 
                     return x.currentLines.ReadLines(x.scroll).ToArray();
                 })
-              //  .RetryWithBackOff<Line[], Exception>((ex, i) => TimeSpan.FromSeconds(1))
+                .RetryWithBackOff<Line[], Exception>((ex, i) => TimeSpan.FromSeconds(1))
                 .Subscribe(currentPage =>
                 {
                     var previous = lines.Items.ToArray();
