@@ -50,6 +50,7 @@ namespace TailBlazer.Domain.FileHandling
         // to decide what the encoding might be from the byte order marks, IF they
         // exist.  But that's all we'll do. 
         private bool _detectEncoding;
+        private bool _encodingDetected = false;
 
         // Whether we must still check for the encoding's given preamble at the 
         // beginning of this file.
@@ -169,8 +170,8 @@ namespace TailBlazer.Domain.FileHandling
             if (bufferSize <= 0)
                 throw new ArgumentOutOfRangeException("bufferSize");
 
-            Stream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultFileStreamBufferSize, FileOptions.SequentialScan);
-            Init(stream, encoding, detectEncodingFromByteOrderMarks, bufferSize);
+            Stream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultFileStreamBufferSize, FileOptions.SequentialScan);
+            Init(fileStream, encoding, detectEncodingFromByteOrderMarks, bufferSize);
         }
 
         private void Init(Stream stream, Encoding encoding, bool detectEncodingFromByteOrderMarks, int bufferSize)
@@ -232,7 +233,13 @@ namespace TailBlazer.Domain.FileHandling
 
         public virtual Encoding CurrentEncoding
         {
-            get { return encoding; }
+            get
+            {
+                if (_detectEncoding && !_encodingDetected)
+                    ReadBuffer();
+
+                return encoding;
+            }
         }
 
         public virtual Stream BaseStream
@@ -428,6 +435,8 @@ namespace TailBlazer.Domain.FileHandling
                 _maxCharsPerBuffer = encoding.GetMaxCharCount(byteBuffer.Length);
                 charBuffer = new char[_maxCharsPerBuffer];
             }
+
+            _encodingDetected = true;
         }
 
         // Trims the preamble bytes from the byteBuffer. This routine can be called multiple times
@@ -648,7 +657,7 @@ namespace TailBlazer.Domain.FileHandling
         // value is null if the end of the input stream has been reached. 
         //
         [System.Security.SecuritySafeCritical]  // auto-generated
-        public override String ReadLine()
+        public override string ReadLine()
         {
             //if (stream == null)
             //    __Error.ReaderClosed();
@@ -668,7 +677,7 @@ namespace TailBlazer.Domain.FileHandling
                     // \n - UNIX   \r\n - DOS   \r - Mac 
                     if (ch == '\r' || ch == '\n')
                     {
-                        String s;
+                        string s;
                         if (sb != null)
                         {
                             sb.Append(charBuffer, charPos, i - charPos);
@@ -676,7 +685,7 @@ namespace TailBlazer.Domain.FileHandling
                         }
                         else
                         {
-                            s = new String(charBuffer, charPos, i - charPos);
+                            s = new string(charBuffer, charPos, i - charPos);
                         }
                         charPos = i + 1;
                         if (ch == '\r' && (charPos < charLen || ReadBuffer() > 0))
