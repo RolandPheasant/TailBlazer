@@ -554,12 +554,12 @@ namespace TailBlazer.Infrastucture.Virtualisation
 
         public void LineLeft()
         {
-            SetHorizontalOffset(HorizontalOffset + ScrollLineAmount);
+            SetHorizontalOffset(HorizontalOffset - ScrollLineAmount);
         }
 
         public void LineRight()
         {
-            SetHorizontalOffset(HorizontalOffset - ScrollLineAmount);
+            SetHorizontalOffset(HorizontalOffset + ScrollLineAmount);
         }
 
         public void PageUp()
