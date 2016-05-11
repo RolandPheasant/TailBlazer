@@ -97,6 +97,12 @@
         </ResourceDictionary>
     </Control.Resources>
 
+    <UserControl.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Find"
+                        Executed="ApplicationCommandFind_Executed"
+                        />
+    </UserControl.CommandBindings>
+    
     <wpf:DialogHost Identifier="{Binding Id}"
                                  TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
                 Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
