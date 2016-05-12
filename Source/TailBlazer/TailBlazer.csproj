@@ -200,6 +200,7 @@
     <Compile Include="Views\Tail\LineMatchProxy.cs" />
     <Compile Include="Views\Searching\SearchState.cs" />
     <Compile Include="Views\Searching\SearchStateToMetadataMapper.cs" />
+    <Compile Include="Views\Tail\SearchMetadataToStateConverter.cs" />
     <Compile Include="Views\Tail\TailViewModelConstants.cs" />
     <Compile Include="Views\Tail\TailViewPersister.cs" />
     <Compile Include="Views\Tail\TailViewState.cs" />

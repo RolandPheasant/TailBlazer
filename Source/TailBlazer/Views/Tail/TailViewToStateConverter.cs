@@ -11,6 +11,8 @@ namespace TailBlazer.Views.Tail
 {
     public class TailViewToStateConverter : IConverter<TailViewState>
     {
+        public SearchMetadataToStateConverter SearchMetadataToStateConverter { get; }  = new SearchMetadataToStateConverter();
+
         private static class Structure
         {
             public const string Root = "TailView";
@@ -67,25 +69,8 @@ namespace TailBlazer.Views.Tail
             var root = doc.ElementOrThrow(Structure.Root);
             var filename = root.ElementOrThrow(Structure.FileName);
             var selectedFilter = root.ElementOrThrow(Structure.SelectedFilter);
-
-            var searchStates = root.Element(Structure.SearchList)
-                .Elements(Structure.SearchItem)
-                .Select((element,index) =>
-                {
-                    var text = ((XElement) element).ElementOrThrow(Structure.Text);
-                    var position = element.Attribute(Structure.Filter).Value.ParseInt().ValueOr(() => index);
-                    var filter = element.Attribute(Structure.Filter).Value.ParseBool().ValueOr(() => true);
-                    var useRegEx = element.Attribute(Structure.UseRegEx).Value.ParseBool().ValueOr(() => false);
-                    var highlight = element.Attribute(Structure.Highlight).Value.ParseBool().ValueOr(() => true);
-                    var alert = element.Attribute(Structure.Alert).Value.ParseBool().ValueOr(() => false);
-                    var ignoreCase = element.Attribute(Structure.IgnoreCase).Value.ParseBool().ValueOr(() => true);
-
-                    var swatch = element.Attribute(Structure.Swatch).Value;
-                    var hue = element.Attribute(Structure.Hue).Value;
-                    var icon = element.Attribute(Structure.Icon).Value;
-
-                    return new SearchState(text, position, useRegEx,highlight,filter,alert,ignoreCase,swatch,icon,hue);
-                }).ToArray();
+            
+            var searchStates = SearchMetadataToStateConverter.Convert(root);
             return new TailViewState(filename, selectedFilter, searchStates);
         }
 

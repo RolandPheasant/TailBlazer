@@ -7,7 +7,6 @@ using TailBlazer.Domain.Formatting;
 
 namespace TailBlazer.Domain.FileHandling.Search
 {
-    //public static class K
 
     public class SearchMetadata : IEquatable<SearchMetadata>
     {
