@@ -68,7 +68,6 @@ namespace TailBlazer.Domain.FileHandling
             {
                 using (var reader = new StreamReaderExtended(stream, true))
                 {
-                    var something = reader.Peek();
                     return reader.CurrentEncoding;
                 }
             }
