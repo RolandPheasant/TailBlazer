@@ -88,8 +88,7 @@ namespace TailBlazer.Views.Searching
         {
             if (string.IsNullOrEmpty(searchText)) return trade => true;
 
-            return recentSearch => recentSearch.Text.StartsWith(searchText, StringComparison.OrdinalIgnoreCase) ||
-                                   recentSearch.Text.StartsWith(searchText, StringComparison.OrdinalIgnoreCase);
+            return recentSearch => recentSearch.Text.StartsWith(searchText, StringComparison.OrdinalIgnoreCase);
         }
         
         public string SearchText
