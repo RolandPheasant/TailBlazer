@@ -20,6 +20,7 @@ using TailBlazer.Domain.StateHandling;
 using TailBlazer.Infrastucture;
 using TailBlazer.Infrastucture.Virtualisation;
 using TailBlazer.Views.Searching;
+using System.Threading.Tasks;
 
 namespace TailBlazer.Views.Tail
 {
@@ -61,7 +62,7 @@ namespace TailBlazer.Views.Tail
         public ICommand OpenFileCommand { get; }
         public ICommand OpenFolderCommand { get; }
         public ICommand CopyPathToClipboardCommand { get; }
-        public ICommand OpenSearchOptionsCommand => new Command(OpenSearchOptions);
+        public ICommand OpenSearchOptionsCommand => new Command(async () => await OpenSearchOptions());
         public ICommand ClearCommand { get; }
         public ICommand UnClearCommand { get; }
         public ICommand KeyAutoTail { get; }
@@ -240,7 +241,7 @@ namespace TailBlazer.Views.Tail
      
         public TextScrollDelegate HorizonalScrollChanged { get; }
         
-        private async void OpenSearchOptions()
+        private async Task OpenSearchOptions()
         {
            await DialogHost.Show(SearchOptions, Id);
         }
