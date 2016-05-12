@@ -118,6 +118,7 @@
     <Compile Include="StateBucketFixture.cs" />
     <Compile Include="SettingsStoreFixture.cs" />
     <Compile Include="SplitFileByMatchingTextFixture.cs" />
+    <Compile Include="StringExFixture.cs" />
     <Compile Include="TestFile.cs" />
   </ItemGroup>
   <ItemGroup>
