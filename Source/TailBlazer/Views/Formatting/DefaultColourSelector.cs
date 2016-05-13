@@ -11,14 +11,11 @@ namespace TailBlazer.Views.Formatting
     public sealed class DefaultColourSelector : IDefaultColourSelector
     {
         private readonly IColourProvider _colourProvider;
-        private readonly Dictionary<HueKey, Hue> _hues;
-      //  private readonly Hue _defaultHighlight;
         private readonly DefaultHue[] _defaults;
 
         public DefaultColourSelector(IColourProvider colourProvider)
         {
             _colourProvider = colourProvider;
-            _hues = colourProvider.Hues.ToDictionary(h => h.Key);
             _defaults = Load().ToArray();
         }
         
@@ -34,7 +31,7 @@ namespace TailBlazer.Views.Formatting
 
         public Hue Lookup(HueKey key)
         {
-            return _hues.Lookup(key).ValueOr(() => _colourProvider.DefaultAccent);
+            return _colourProvider.Lookup(key).ValueOr(() => _colourProvider.DefaultAccent);
         }
 
         private IEnumerable<DefaultHue> Load()
@@ -50,7 +47,7 @@ namespace TailBlazer.Views.Formatting
 
         private Hue Lookup(string swatch, string name)
         {
-            return _hues.Lookup(new HueKey(swatch, name))
+            return _colourProvider.Lookup(new HueKey(swatch, name))
                 .ValueOrThrow(() => new MissingKeyException(swatch + "."+ name + " is invalid"));
         }
 
@@ -60,14 +57,12 @@ namespace TailBlazer.Views.Formatting
             public Hue Hue { get; }
             public bool MatchTextOnCase { get; }
 
-
             public DefaultHue(string text, Hue hue, bool matchTextOnCase = false)
             {
                 Text = text;
                 Hue = hue;
                 MatchTextOnCase = matchTextOnCase;
             }
-
         }
     }
 }
