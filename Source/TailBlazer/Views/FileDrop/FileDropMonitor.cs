@@ -26,7 +26,10 @@ namespace TailBlazer.Views.FileDrop
 
             isLoaded = true;
 
-            var control = (UIElement) value;
+            var control = value as UIElement;
+            if (null == control)
+                return;
+
             control.AllowDrop = true;
 
             var window = Window.GetWindow(value);

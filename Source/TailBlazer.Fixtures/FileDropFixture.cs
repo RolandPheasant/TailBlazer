@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Windows;
 using TailBlazer.Views.FileDrop;
 using Xunit;
 using FluentAssertions;
-
+using System.Reactive.Subjects;
+using System.IO;
 
 namespace TailBlazer.Fixtures
 {
@@ -57,6 +54,30 @@ namespace TailBlazer.Fixtures
 
             monitor.Receive(null);
 
+        }
+
+        [Fact]
+        public void FileDropMonitorShouldOnlyUseUiElement()
+        {
+            var monitor = new FileDropMonitor();
+
+            monitor.Receive(new DependencyObject());
+
+            monitor.Dropped.Should().BeOfType<Subject<FileInfo>>();
+
+            ((Subject<FileInfo>)monitor.Dropped).HasObservers.Should().Be(false);
+        }
+
+        [Fact]
+        public void FileDropMonitorShouldOnlyObserveWithUiElement()
+        {
+            var monitor = new FileDropMonitor();
+
+            monitor.Receive(new UIElement());
+
+            monitor.Dropped.Should().BeOfType<Subject<FileInfo>>();
+
+            ((Subject<FileInfo>)monitor.Dropped).HasObservers.Should().Be(false);
         }
     }
 }
