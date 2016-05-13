@@ -21,7 +21,7 @@ namespace TailBlazer.Views.FileDrop
 
         public void Receive(DependencyObject value)
         {
-            if (isLoaded)
+            if (isLoaded || null == value)
                 return;
 
             isLoaded = true;
@@ -54,14 +54,11 @@ namespace TailBlazer.Views.FileDrop
                     adorner = null;
                 });
 
-
-
             var updatePositionOfAdornment = Observable.FromEventPattern<DragEventHandler, DragEventArgs>
                     (h => control.PreviewDragOver += h, h => control.PreviewDragOver -= h)
                     .Select(ev => ev.EventArgs)
                     .Where(_=>adorner!=null)
                     .Subscribe(e => adorner.MousePosition = e.GetPosition(window));
-
 
             var dropped = Observable.FromEventPattern<DragEventHandler, DragEventArgs>
                 (h => control.Drop += h, h => control.Drop -= h)
@@ -76,7 +73,6 @@ namespace TailBlazer.Views.FileDrop
                     return files.Select(f => new FileInfo(f));
                 })
                 .SubscribeSafe(_fileDropped);
-
 
             _cleanUp.Disposable = Disposable.Create(() =>
             {
