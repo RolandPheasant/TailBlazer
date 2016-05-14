@@ -14,15 +14,22 @@ namespace TailBlazer.Views.Tail
             InitializeComponent();
             IsVisibleChanged += (sender, e) =>
             {
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
+                FocusSearchTextBox();
+            };            
+        }
 
-                    this.SearchTextBox.Focus();
-                    MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
-                }));
+        private void FocusSearchTextBox()
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                this.SearchTextBox.Focus();
+                MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
+            }));
+        }
 
-
-            };
-        }       
+        private void ApplicationCommandFind_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            FocusSearchTextBox();
+        }
     }
 }
