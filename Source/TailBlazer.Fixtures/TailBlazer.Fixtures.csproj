@@ -99,6 +99,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColourProviderFixture.cs" />
+    <Compile Include="DefaultColourSelectorFixture.cs" />
     <Compile Include="DisplayTextFixture.cs" />
     <Compile Include="FileDropFixture.cs" />
     <Compile Include="StartFromFixture.cs" />
