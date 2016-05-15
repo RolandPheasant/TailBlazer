@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using DynamicData;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.Infrastructure;
 

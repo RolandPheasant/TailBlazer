@@ -26,7 +26,7 @@ namespace TailBlazer.Domain
 
         public bool Equals(CaseInsensitiveString other)
         {
-            return Comparer.Equals(this, other);
+            return Comparer.Equals(_original, other);
 
         }
 
