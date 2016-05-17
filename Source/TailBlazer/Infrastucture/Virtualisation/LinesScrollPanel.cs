@@ -398,8 +398,9 @@ namespace TailBlazer.Infrastucture.Virtualisation
             var verticalOffset = (StartIndex / (double)TotalItems) * maxVerticalOffset;
 
             //widest width
-            var extentWidth = (TotalCharacters * CharacterWidth)+22;
-            var maximumChars = Math.Ceiling((viewPortSize.Width)/ CharacterWidth);
+            //TOO: Big fat hack 39 = Icon column width + scrollbar width: DO IT PROPERLY
+            var extentWidth = (TotalCharacters * CharacterWidth) + 39;
+            var maximumChars = Math.Ceiling((viewPortSize.Width - 39) / CharacterWidth);
             var maxHorizontalOffset = extentWidth ;
 
             return new ExtentInfo(TotalItems, 
