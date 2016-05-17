@@ -4,17 +4,21 @@ using System.Windows.Threading;
 using StructureMap;
 using TailBlazer.Infrastucture;
 using TailBlazer.Infrastucture.AppState;
-using TailBlazer.Views;
 using TailBlazer.Views.Layout;
 using TailBlazer.Views.WindowManagement;
+using System.Runtime.InteropServices;
 
 namespace TailBlazer
 {
     public class BootStrap
     {
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool FreeConsole();
+
         [STAThread]
         public static void Main(string[] args)
         {
+            FreeConsole();
 
             var app = new App { ShutdownMode = ShutdownMode.OnLastWindowClose };
             app.InitializeComponent();
@@ -36,7 +40,5 @@ namespace TailBlazer
             window.Show();
             app.Run();
         }
-
-
     }
 }

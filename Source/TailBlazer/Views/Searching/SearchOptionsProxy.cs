@@ -13,6 +13,7 @@ using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
 using Hue = TailBlazer.Domain.Formatting.Hue;
+using System.Threading.Tasks;
 
 namespace TailBlazer.Views.Searching
 {
@@ -68,7 +69,7 @@ namespace TailBlazer.Views.Searching
             Hues = colourProvider.Hues;
             HighlightHue = searchMetadata.HighlightHue;
 
-            ShowIconSelectorCommand = new Command(ShowIconSelector);
+            ShowIconSelectorCommand = new Command(async () => await ShowIconSelector());
             RemoveCommand = new Command(() => removeAction(searchMetadata));
             HighlightCommand = new Command<Hue>(newHue =>
             {
@@ -88,10 +89,11 @@ namespace TailBlazer.Views.Searching
 
             _cleanUp = new CompositeDisposable(IconSelector,Foreground,Background, defaultHue.Connect());
         }
-        
-        private async void ShowIconSelector()
+
+        private async Task ShowIconSelector()
         {
             var dialogResult = await DialogHost.Show(IconSelector, ParentId);
+
             var result = (IconSelectorResult)dialogResult;
             if (result == IconSelectorResult.UseDefault)
             {
@@ -103,8 +105,8 @@ namespace TailBlazer.Views.Searching
             {
                 IconKind = IconSelector.Selected.Type;
             }
-         }
-        
+        }
+
         public PackIconKind IconKind
         {
             get { return _iconKind; }

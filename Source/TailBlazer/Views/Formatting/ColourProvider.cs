@@ -45,6 +45,9 @@ namespace TailBlazer.Views.Formatting
 
         public Optional<Hue> Lookup(HueKey key)
         {
+            if (null == key.Name || null == key.Swatch)
+                return new Optional<Hue>();
+
             return HueCache.Lookup(key);
         }
 
