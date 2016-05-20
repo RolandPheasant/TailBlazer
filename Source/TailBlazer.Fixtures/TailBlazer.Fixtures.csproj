@@ -50,6 +50,14 @@
       <HintPath>..\packages\FluentAssertions.4.5.0\lib\net45\FluentAssertions.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MaterialDesignColors, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignColors.1.1.2\lib\net45\MaterialDesignColors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=1.5.0.523, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.1.5.0.523\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Reactive.Testing, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Rx-Testing.2.2.5\lib\net45\Microsoft.Reactive.Testing.dll</HintPath>
       <Private>True</Private>
@@ -101,8 +109,11 @@
   <ItemGroup>
     <Compile Include="ColourProviderFixture.cs" />
     <Compile Include="DefaultColourSelectorFixture.cs" />
+    <Compile Include="DefaultIconSelectorFixture.cs" />
     <Compile Include="DisplayTextFixture.cs" />
     <Compile Include="FileDropFixture.cs" />
+    <Compile Include="IconDescriptionFixture.cs" />
+    <Compile Include="IconProviderFixture.cs" />
     <Compile Include="StartFromFixture.cs" />
     <Compile Include="FileSearchFixture.cs" />
     <Compile Include="FileSegmentFixture.cs" />
