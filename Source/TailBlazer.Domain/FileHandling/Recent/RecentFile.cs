@@ -11,7 +11,7 @@ namespace TailBlazer.Domain.FileHandling.Recent
         public RecentFile(FileInfo fileInfo)
         {
             Name = fileInfo.FullName;
-            Timestamp = DateTime.Now;
+            Timestamp = DateTime.UtcNow;
         }
 
         public RecentFile(DateTime timestamp, string name)

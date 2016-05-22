@@ -23,7 +23,7 @@ namespace TailBlazer.Infrastucture
             applicationStatePublisher.Publish(ApplicationState.Startup);
 
             logger.Info($"Starting Tail Blazer version v{Assembly.GetEntryAssembly().GetName().Version}");
-            logger.Info($"at {DateTime.Now}");
+            logger.Info($"at {DateTime.UtcNow}");
 
 
             //run start up jobs
