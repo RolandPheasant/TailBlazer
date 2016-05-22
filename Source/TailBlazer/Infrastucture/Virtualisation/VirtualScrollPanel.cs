@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using TimeSpan = System.TimeSpan;
 
 namespace TailBlazer.Infrastucture.Virtualisation
 {
@@ -19,7 +20,7 @@ namespace TailBlazer.Infrastucture.Virtualisation
     {
         private const double ScrollLineAmount = 16.0;
         private Size _extentSize;
-        private ExtentInfo _extentInfo = new ExtentInfo();
+        private ExtentInfo _extentInfo;
         private Size _viewportSize;
         private Point _offset;
         private ItemsControl _itemsControl;
@@ -372,23 +373,22 @@ namespace TailBlazer.Infrastucture.Virtualisation
             var diff = (int) ((offset - _extentInfo.VerticalOffset)/ItemHeight);
 
             InvokeStartIndexCommand(diff);
-           
+
             //stop the control from losing focus on page up / down
             Observable.Timer(TimeSpan.FromMilliseconds(125))
-                .ObserveOn(Dispatcher)
-                .Subscribe(_ =>
+                .ObserveOn(Dispatcher).Subscribe(l =>
                 {
-                    if (_itemsControl.Items.Count==0) return;
+                    if (_itemsControl.Items.Count == 0) return;
 
                     var index = diff < 0 ? 0 : _itemsControl.Items.Count - 1;
-                    var generator = (ItemContainerGenerator)_itemsGenerator;
+                    var generator = (ItemContainerGenerator) _itemsGenerator;
                     _itemsControl?.Focus();
                     var item = generator.ContainerFromIndex(index) as UIElement;
                     item?.Focus();
                 });
         }
 
-        
+
         private double Clamp(double value, double min, double max)
         {
             return Math.Min(Math.Max(value, min), max);

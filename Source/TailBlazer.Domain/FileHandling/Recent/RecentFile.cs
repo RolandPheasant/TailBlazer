@@ -41,7 +41,7 @@ namespace TailBlazer.Domain.FileHandling.Recent
         {
             unchecked
             {
-                return (Timestamp.GetHashCode()*397) ^ (Name != null ? Name.GetHashCode() : 0);
+                return (Timestamp.GetHashCode()*397) ^ (Name?.GetHashCode() ?? 0);
             }
         }
 

@@ -47,10 +47,9 @@
                     materialDesign:HintAssist.Hint="Enter text to find icon" 
                     VerticalAlignment="Center"
                     materialDesign:ValidationAssist.UsePopup="False"                   
-                    MinWidth="200">
-                </TextBox>
+                    MinWidth="200" />
 
-            </StackPanel>
+        </StackPanel>
 
             <ListBox Grid.Row="2" 
                      SelectedItem="{Binding Selected}"
@@ -120,3 +119,4 @@
     </Grid>
  
 </UserControl>
+

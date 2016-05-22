@@ -6,7 +6,6 @@ using DynamicData.Kernel;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 
-
 namespace TailBlazer.Domain.FileHandling.TextAssociations
 {
     public class TextAssociationCollection : ITextAssociationCollection, IDisposable
@@ -32,7 +31,7 @@ namespace TailBlazer.Domain.FileHandling.TextAssociations
                 {
                     //all files are loaded when state changes, so only add new ones
                     var newItems = files
-                        .Where(f => !innerCache.Lookup((CaseInsensitiveString)f.Text).HasValue)
+                        .Where(f => !innerCache.Lookup(f.Text).HasValue)
                         .ToArray();
 
                     innerCache.AddOrUpdate(newItems);

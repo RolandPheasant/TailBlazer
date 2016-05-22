@@ -9,7 +9,6 @@ using TailBlazer.Domain.Settings;
 using TailBlazer.Domain.StateHandling;
 using TailBlazer.Infrastucture.AppState;
 using TailBlazer.Views.Formatting;
-using TailBlazer.Views.Options;
 using TailBlazer.Views.Recent;
 using TailBlazer.Views.Tail;
 using TailBlazer.Views.WindowManagement;

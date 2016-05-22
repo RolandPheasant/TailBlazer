@@ -21,7 +21,7 @@ namespace TailBlazer.Domain.Formatting
             "pink",
             "red",
             "purple",
-            "deeppurple",
+            "deeppurple"
         };
 
 

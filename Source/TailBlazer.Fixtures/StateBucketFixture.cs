@@ -19,7 +19,7 @@ namespace TailBlazer.Fixtures
             var buckets = new[]
             {
                 new StateBucket("TestType1","123",new State(1,"SomeThingOrOther"), DateTime.Now.AddMinutes(-1)),
-                new StateBucket("TestType2","124",new State(1,"Type 2 State"), DateTime.Now),
+                new StateBucket("TestType2","124",new State(1,"Type 2 State"), DateTime.Now)
             };
             
             var state = converter.Convert(buckets);

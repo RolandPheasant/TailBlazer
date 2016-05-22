@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-using FluentAssertions;
-using TailBlazer.Views.Formatting;
+﻿using FluentAssertions;
 using MaterialDesignThemes.Wpf;
+using TailBlazer.Views.Formatting;
+using Xunit;
 
 namespace TailBlazer.Fixtures
 {

@@ -30,7 +30,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             unchecked
             {
-                return ((_text != null ? _text.GetHashCode() : 0)*397) ^ _start.GetHashCode();
+                return ((_text?.GetHashCode() ?? 0)*397) ^ _start.GetHashCode();
             }
         }
 

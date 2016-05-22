@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Linq;
 using System.Xml.Linq;
 using DynamicData.Kernel;
 using TailBlazer.Domain.FileHandling.Search;
+using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Views.Searching;
 
@@ -54,7 +54,7 @@ namespace TailBlazer.Views.Tail
                     )).ToArray();
 
             var tailViewState = new TailViewState(fileName, selectedSearch, searchItems);
-            return this.Convert(tailViewState);
+            return Convert(tailViewState);
         }
 
         public TailViewState Convert(State state)
@@ -72,7 +72,7 @@ namespace TailBlazer.Views.Tail
                 .Elements(Structure.SearchItem)
                 .Select((element,index) =>
                 {
-                    var text = ((XElement) element).ElementOrThrow(Structure.Text);
+                    var text = element.ElementOrThrow(Structure.Text);
                     var position = element.Attribute(Structure.Filter).Value.ParseInt().ValueOr(() => index);
                     var filter = element.Attribute(Structure.Filter).Value.ParseBool().ValueOr(() => true);
                     var useRegEx = element.Attribute(Structure.UseRegEx).Value.ParseBool().ValueOr(() => false);

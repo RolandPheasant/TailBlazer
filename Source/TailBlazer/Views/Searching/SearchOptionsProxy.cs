@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
 using DynamicData.Binding;
@@ -12,8 +13,6 @@ using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
-using Hue = TailBlazer.Domain.Formatting.Hue;
-using System.Threading.Tasks;
 
 namespace TailBlazer.Views.Searching
 {

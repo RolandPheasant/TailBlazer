@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.Xml.Linq;
 using DynamicData.Kernel;
+using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 
 namespace TailBlazer.Domain.FileHandling.TextAssociations

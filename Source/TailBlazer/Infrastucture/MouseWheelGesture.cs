@@ -44,7 +44,7 @@ namespace TailBlazer.Infrastucture
         {
             None,
             Up,
-            Down,
+            Down
         }
 
     }

@@ -22,7 +22,7 @@ namespace TailBlazer.Views.Tail
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                this.SearchTextBox.Focus();
+                SearchTextBox.Focus();
                 MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
             }));
         }

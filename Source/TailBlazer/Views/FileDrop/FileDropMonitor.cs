@@ -17,7 +17,7 @@ namespace TailBlazer.Views.FileDrop
     {
         private readonly SerialDisposable _cleanUp = new SerialDisposable();
         private readonly ISubject<FileInfo> _fileDropped = new Subject<FileInfo>();
-        private bool isLoaded = false;
+        private bool isLoaded;
 
         public void Receive(DependencyObject value)
         {
