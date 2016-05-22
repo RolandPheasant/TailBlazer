@@ -43,7 +43,7 @@ namespace TailBlazer.Domain.FileHandling.TextAssociations
                                 var icon = element.Attribute(Structure.Icon).Value;
                                 var dateTime = element.Attribute(Structure.Date).Value;
 
-                                return new TextAssociation( text, ignoreCase, useRegEx, swatch,icon,hue, DateTime.Parse(dateTime));
+                                return new TextAssociation( text, ignoreCase, useRegEx, swatch,icon,hue, DateTime.Parse(dateTime).ToUniversalTime());
                             }).ToArray();
             return files;
         }

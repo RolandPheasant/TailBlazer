@@ -44,7 +44,7 @@ namespace TailBlazer.Domain.StateHandling
                                                     .ValueOr(()=>1);
 
 
-                                return new StateBucket(type,id,new State(stateVersion, stateValue), DateTime.Parse(dateTime));
+                                return new StateBucket(type,id,new State(stateVersion, stateValue), DateTime.Parse(dateTime).ToUniversalTime());
                             }).ToArray();
             return files;
         }
