@@ -260,7 +260,7 @@ namespace TailBlazer.Infrastucture.Virtualisation
                 FirstRealizedItemIndex = firstRealizedIndex,
                 FirstRealizedItemLeft = firstRealizedItemLeft,
                 FirstRealizedLineTop = firstRealizedItemTop,
-                LastRealizedItemIndex = lastRealizedIndex,
+                LastRealizedItemIndex = lastRealizedIndex
             };
         }
 
@@ -275,12 +275,12 @@ namespace TailBlazer.Infrastucture.Virtualisation
             var totalLines = (int)Math.Ceiling((double)_itemsControl.Items.Count / itemsPerLine);
             var extentHeight = Math.Max(totalLines * ItemHeight, viewPortSize.Height);
 
-            return new ExtentInfo()
+            return new ExtentInfo
             {
                 ItemsPerLine = itemsPerLine,
                 TotalLines = totalLines,
                 ExtentHeight = extentHeight,
-                MaxVerticalOffset = extentHeight - viewPortSize.Height,
+                MaxVerticalOffset = extentHeight - viewPortSize.Height
             };
         }
 
@@ -437,10 +437,7 @@ namespace TailBlazer.Infrastucture.Virtualisation
 
         private void InvalidateScrollInfo()
         {
-            if (ScrollOwner != null)
-            {
-                ScrollOwner.InvalidateScrollInfo();
-            }
+            ScrollOwner?.InvalidateScrollInfo();
         }
 
         private static void HandleItemDimensionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

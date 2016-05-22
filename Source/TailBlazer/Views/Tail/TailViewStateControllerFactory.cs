@@ -2,7 +2,6 @@ using System;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.StateHandling;
-using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {

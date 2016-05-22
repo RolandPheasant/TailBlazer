@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-using FluentAssertions;
+﻿using FluentAssertions;
 using TailBlazer.Views.Formatting;
+using Xunit;
 
 namespace TailBlazer.Fixtures
 {
@@ -15,7 +10,7 @@ namespace TailBlazer.Fixtures
             InlineData("DEBUG", false),
             InlineData("DEBUG", true),
             InlineData(null, true),
-            InlineData(null, false),
+            InlineData(null, false)
             ]
         public void GetIconForShouldWork(string text, bool useRegex)
         {
@@ -32,7 +27,7 @@ namespace TailBlazer.Fixtures
             InlineData("DEBUG", true, "xxxxxxx"),
             InlineData("DEBUG", false, "xxxxxxx"),
             InlineData("Bug", false, "xxxxxxx"),
-            InlineData("DEBUG", false, "xxxxxxx"),
+            InlineData("DEBUG", false, "xxxxxxx")
             ]
         public void GetIconOrDefaultShouldWork(string text, bool useRegex, string iconKind)
         {

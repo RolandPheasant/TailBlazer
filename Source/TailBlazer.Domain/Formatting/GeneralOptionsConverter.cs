@@ -1,6 +1,6 @@
-using System;
 using System.Xml.Linq;
 using DynamicData.Kernel;
+using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 
 namespace TailBlazer.Domain.Formatting
@@ -18,7 +18,7 @@ namespace TailBlazer.Domain.Formatting
 
         public GeneralOptions Convert(State state)
         {
-            var defaults = this.GetDefaultValue();
+            var defaults = GetDefaultValue();
             if (state== State.Empty) return defaults;
 
             var doc = XDocument.Parse(state.Value);

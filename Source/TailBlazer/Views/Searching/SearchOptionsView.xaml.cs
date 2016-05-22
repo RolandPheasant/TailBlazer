@@ -1,7 +1,7 @@
 ﻿
 using System.Windows.Controls;
 
-namespace TailBlazer.Settings
+namespace TailBlazer.Views.Searching
 {
     /// <summary>
     /// Interaction logic for SearchOptionsView.xaml

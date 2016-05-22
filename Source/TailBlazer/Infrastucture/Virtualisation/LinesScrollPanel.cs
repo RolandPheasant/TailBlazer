@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using TailBlazer.Controls;
 
 namespace TailBlazer.Infrastucture.Virtualisation
 
@@ -39,7 +37,7 @@ namespace TailBlazer.Infrastucture.Virtualisation
     {
         private const double ScrollLineAmount = 16.0;
         private Size _extentSize;
-        private ExtentInfo _extentInfo = new ExtentInfo();
+        private ExtentInfo _extentInfo;
         private Size _viewportSize;
         private Point _offset;
         private ItemsControl _itemsControl;
@@ -465,9 +463,9 @@ namespace TailBlazer.Infrastucture.Virtualisation
         }
         private void CalculateHorizonalScrollInfo()
         {
-            _extentInfo = GetExtentInfo(this.RenderSize);
+            _extentInfo = GetExtentInfo(RenderSize);
 
-            UpdateScrollInfo(this.RenderSize, _extentInfo);
+            UpdateScrollInfo(RenderSize, _extentInfo);
             EnsureScrollOffsetIsWithinConstrains(_extentInfo);
 
             NotifyHorizonalScroll(_extentInfo);

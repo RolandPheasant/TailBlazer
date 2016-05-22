@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using Xunit;
 using FluentAssertions;
 using TailBlazer.Views.Formatting;
+using Xunit;
 
 namespace TailBlazer.Fixtures
 {

@@ -1,9 +1,9 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Reactive.Subjects;
+using System.Windows;
+using FluentAssertions;
 using TailBlazer.Views.FileDrop;
 using Xunit;
-using FluentAssertions;
-using System.Reactive.Subjects;
-using System.IO;
 
 namespace TailBlazer.Fixtures
 {
