@@ -48,7 +48,7 @@ namespace TailBlazer.Views.Searching
                                 ? $"{limited.Maximum.ToString("#,###0")}+" 
                                 : $"{lp.Count.ToString("#,###0")}";
                 })
-                 .Subscribe(countText => CountText = countText); ;
+                 .Subscribe(countText => CountText = countText);
 
 
             var progressMonitor = _info.Latest.OfType<IProgressInfo>().Subscribe(result =>

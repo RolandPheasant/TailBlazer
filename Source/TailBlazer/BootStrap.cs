@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Threading;
 using StructureMap;
@@ -6,7 +7,6 @@ using TailBlazer.Infrastucture;
 using TailBlazer.Infrastucture.AppState;
 using TailBlazer.Views.Layout;
 using TailBlazer.Views.WindowManagement;
-using System.Runtime.InteropServices;
 
 namespace TailBlazer
 {

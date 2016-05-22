@@ -52,7 +52,7 @@ namespace TailBlazer.Domain.StateHandling
         
         public void Write(string type, string id, State state)
         {
-            _cache.AddOrUpdate(new StateBucket(type, id, state,DateTime.Now));
+            _cache.AddOrUpdate(new StateBucket(type, id, state,DateTime.UtcNow));
         }
 
         public Optional<State> Lookup(string type, string id)

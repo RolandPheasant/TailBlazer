@@ -57,7 +57,7 @@ namespace TailBlazer.Views.Formatting
             var swatch = Swatches.Lookup(colour);
 
             return swatch.Convert(s=> new Hue(s.Name, s.AccentExemplarHue.Name, s.AccentExemplarHue.Foreground, s.AccentExemplarHue.Color))
-                        .ValueOrThrow(()=> new ArgumentOutOfRangeException(colour.ToString()));
+                        .ValueOrThrow(()=> new ArgumentOutOfRangeException(colour));
         }
 
     }

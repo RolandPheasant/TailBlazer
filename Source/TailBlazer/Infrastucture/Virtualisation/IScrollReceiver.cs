@@ -1,6 +1,4 @@
-﻿using TailBlazer.Controls;
-
-namespace TailBlazer.Infrastucture.Virtualisation
+﻿namespace TailBlazer.Infrastucture.Virtualisation
 {
     public interface IScrollReceiver
     {

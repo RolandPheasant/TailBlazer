@@ -58,7 +58,7 @@ namespace DynamicData.Binding
                         Func<ChangeSet<T>> initialChangeSet = () =>
                         {
                             var initial = new Change<T>(ListChangeReason.AddRange, source.ToList());
-                            return new ChangeSet<T>() { initial };
+                            return new ChangeSet<T> { initial };
                         };
 
                         //populate local cache, otherwise there is no way to deal with a reset
@@ -96,7 +96,7 @@ namespace DynamicData.Binding
                                         case NotifyCollectionChangedAction.Reset:
                                         {
                                             var cleared = new Change<T>(ListChangeReason.Clear, cloneOfList.Items.ToList(), 0);
-                                            var clearedChangeSet = new ChangeSet<T>() { cleared };
+                                            var clearedChangeSet = new ChangeSet<T> { cleared };
                                             return clearedChangeSet.Concat(initialChangeSet());
                                         }
 
