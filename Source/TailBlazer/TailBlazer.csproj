@@ -164,7 +164,7 @@
     <Compile Include="Views\Formatting\IconDescription.cs" />
     <Compile Include="Views\Formatting\IIconProvider.cs" />
     <Compile Include="Views\Formatting\DefaultIconSelector.cs" />
-    <Compile Include="Views\Formatting\ThemeSetterJob.cs" />
+    <Compile Include="Views\Formatting\SystemSetterJob.cs" />
     <Compile Include="Views\IViewFactory.cs" />
     <Compile Include="Views\Layout\ILayoutConverter.cs" />
     <Compile Include="Views\Layout\ILayoutService.cs" />

@@ -42,7 +42,7 @@ namespace TailBlazer.Infrastucture
             var viewFactoryRegister = objectProvider.Get<IViewFactoryRegister>();
             viewFactoryRegister.Register<TailViewModelFactory>();
 
-            objectProvider.Get<ThemeSetterJob>();
+            objectProvider.Get<SystemSetterJob>();
 
             logger.Info("Starting complete");
         }

@@ -4,15 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:options="clr-namespace:TailBlazer.Views.Options"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
                d:DataContext="{d:DesignInstance options:GeneralOptionsViewModel, IsDesignTimeCreatable=False}"
-             d:DesignHeight="300" >
+            >
 
 
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                     <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Slider.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Button.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -27,8 +29,22 @@
 
         <TextBlock  Text="Look And Feel" FontSize="16" FontWeight="SemiBold"/>
         <Grid Grid.Row="1" Margin="8">
+            <Grid.Resources>
+                <Style TargetType="{x:Type Slider}" BasedOn="{StaticResource MaterialDesignSlider}">
+                    <Setter Property="Width" Value="150"/>
+                    <Setter Property="Margin" Value="6 6 4 6"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                </Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Margin" Value="4 6 4 6"/>
+                </Style> 
+            </Grid.Resources>
 
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -37,37 +53,67 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <!--<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Theme</TextBlock>-->
             <StackPanel  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
                          Orientation="Horizontal"      
                          Margin="0 8 4 8">
-                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left">Light</TextBlock>
                 <ToggleButton Margin="8 0 16 0" IsChecked="{Binding UseDarkTheme}"  />
                 <TextBlock VerticalAlignment="Center">Dark</TextBlock>
             </StackPanel>
 
-
-
-            <TextBlock Grid.Row="1" Grid.Column="0" 
-                           VerticalAlignment="Center">Zoom</TextBlock>
-         
-            <!--Style="{StaticResource MaterialDesignDiscreteSlider}"-->
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Zoom" />
             <Slider Grid.Row="1" 
-                        Grid.Column="1" Minimum="50" Maximum="250" 
-                   Width="200"
-                        Margin="6 4 4 4"
-                        SmallChange="5"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        LargeChange="10"
-                        Value="{Binding Scale}"/>
+                        Grid.Column="1" Minimum="80" Maximum="200" 
 
-            <TextBlock  Grid.Row="1" Grid.Column="2"  
-                          
-                            VerticalAlignment="Center" 
-                            Text="{Binding ScaleText.Value}"/>
+                        SmallChange="5"
+                        LargeChange="5"
+                        Value="{Binding Scale}"/>
+            <TextBlock Grid.Row="1" Grid.Column="2"  Text="{Binding ScaleText.Value}"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0"  Text="Refresh Rate" />
+            <Slider Grid.Row="2" 
+                        Grid.Column="1" Minimum="0.25" Maximum="1.5" 
+                        SmallChange="0.25"
+                        Value="{Binding RefreshPeriod}"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="2"  Text="{Binding RefreshPeriod, StringFormat='\{0} seconds'}" />
+
+            <TextBlock Grid.Row="3" Grid.Column="0"  Text="Frame Rate" />
+            <Slider Grid.Row="3" 
+                        Grid.Column="1" Minimum="15" Maximum="90" 
+                        SmallChange="5"
+                        LargeChange="5"
+                        Value="{Binding FrameRate}"/>
+            
+            <Grid Grid.Row="3" Grid.Column="2">
+                
+                <Button Style="{StaticResource MaterialDesignFlatButton}"
+                        HorizontalAlignment="Left"
+                        Padding="2"
+                        Visibility="{Binding RequiresRestart.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Command="{Binding RestartCommand}">
+                    
+                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                        <materialDesign:PackIcon
+                            Width="22" Height="22"
+                            Margin="0 3"
+                            Kind="BackupRestore"/>
+
+                        <TextBlock Text="Restart to apply" 
+                                   FontSize="12"
+                                   VerticalAlignment="Center"
+                                   
+                                   Foreground="{DynamicResource MaterialDesignBody}" />
+                    </StackPanel>
+
+                </Button>
+            </Grid>
+            
+            <!--<TextBlock Grid.Row="1" Grid.Column="2" Padding="0 0 0 6" Text="{Binding ScaleText.Value}" VerticalAlignment="Bottom"/>-->
+
+
         </Grid>
 
         <TextBlock Grid.Row="2" Text="Highlight" 
