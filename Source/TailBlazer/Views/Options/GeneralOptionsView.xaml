@@ -89,7 +89,7 @@
             Margin="0 8 0 0"
             Text="Performance" Grid.Row="2"  FontSize="16" FontWeight="SemiBold"/>
 
-        <Grid Grid.Row="3"  Margin="8 8 8 0" >
+        <Grid Grid.Row="3"  Margin="8 8 8 0" Height="32">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -113,7 +113,7 @@
                 <Button  Style="{StaticResource MaterialDesignFlatButton}"
                         Command="{Binding RestartCommand}"
                         HorizontalAlignment="Left"
-                  
+                        Margin="0 -2 0 0"
                         Padding="1 0 1 0">
                     <materialDesign:PackIcon 
                            Width="22" Height="22"
@@ -122,10 +122,10 @@
                 </Button>
 
                 <TextBlock Text="Restart to apply"
-                           Margin="6 0 0 0"
-                                   FontSize="12"
-                                   VerticalAlignment="Center"
-                                   Foreground="{DynamicResource MaterialDesignBody}" />
+                    Margin="4 0 0 0"
+                    FontSize="12"
+                    VerticalAlignment="Center"
+                    Foreground="{DynamicResource MaterialDesignBody}" />
             </StackPanel>
 
         </Grid>
