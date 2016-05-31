@@ -4,6 +4,8 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using TailBlazer.Domain.Annotations;
+using TailBlazer.Domain.Ratings;
+using TailBlazer.Domain.Settings;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -25,16 +27,20 @@ namespace TailBlazer.Domain.FileHandling
 
         private readonly ISubject<long> _scanFrom = new BehaviorSubject<long>(0);
 
-        public FileWatcher([NotNull] FileInfo fileInfo, IScheduler scheduler=null)
+        public FileWatcher([NotNull] FileInfo fileInfo, IRatingService ratingsMetrics, IScheduler scheduler=null)
         {
             FileInfo = fileInfo;
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
 
             scheduler = scheduler ?? Scheduler.Default;
-            
+
+            var refreshRate = ratingsMetrics.Metrics.Take(1)
+                .Select(metrics=> TimeSpan.FromMilliseconds(metrics.RefreshRate))
+                .Wait();
+
             var shared = _scanFrom.Select(start => start == 0
-                ? fileInfo.WatchFile(scheduler: scheduler)
-                : fileInfo.WatchFile(scheduler: scheduler).ScanFromEnd())
+                ? fileInfo.WatchFile(scheduler: scheduler, refreshPeriod: refreshRate)
+                : fileInfo.WatchFile(scheduler: scheduler, refreshPeriod: refreshRate).ScanFromEnd())
                 .Switch();
 
             Latest = shared

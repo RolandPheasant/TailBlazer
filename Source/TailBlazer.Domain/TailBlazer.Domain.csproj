@@ -167,12 +167,17 @@
     <Compile Include="Infrastructure\ReactiveEx.cs" />
     <Compile Include="FileHandling\Line.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Ratings\IRatingService.cs" />
+    <Compile Include="Ratings\RatingService.cs" />
     <Compile Include="Settings\IConverter.cs" />
+    <Compile Include="Ratings\IRatingsMetricsLookup.cs" />
     <Compile Include="Settings\ISetting.cs" />
     <Compile Include="Settings\ISettingFactory.cs" />
     <Compile Include="Settings\ISettingsRegister.cs" />
     <Compile Include="Settings\ISettingsStore.cs" />
     <Compile Include="Settings\IPersistentView.cs" />
+    <Compile Include="Ratings\RatingsMetaData.cs" />
+    <Compile Include="Ratings\RatingsMetricsLookup.cs" />
     <Compile Include="Settings\Setting.cs" />
     <Compile Include="Settings\SettingFactory.cs" />
     <Compile Include="Settings\SettingsException.cs" />

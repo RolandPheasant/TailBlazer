@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using DynamicData.Kernel;
+using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.Infrastructure
 {
@@ -96,6 +99,38 @@ namespace TailBlazer.Domain.Infrastructure
             });
         }
 
+        public static IObservable<bool> HasChanged<T>([NotNull] this IObservable<T> source)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            
+            return source.Scan((InitialAndCurrent<T>)null, (acc, current) =>
+            {
+                return acc==null ? new InitialAndCurrent<T>(current) : new InitialAndCurrent<T>(acc.Initial, current);
+            })
+            .Select(initalAndCurrent =>
+            {
+                if (!initalAndCurrent.Latest.HasValue) return false;
+                return !initalAndCurrent.Initial.Equals(initalAndCurrent.Latest.Value);
+            });
+        }
+
+        private class InitialAndCurrent<T>
+        {
+            public Optional<T> Latest { get; }
+            public T Initial { get; }
+
+            public InitialAndCurrent(T initial, Optional<T> current)
+            {
+                Latest = current;
+                Initial = initial;
+            }
+
+            public InitialAndCurrent(T initial)
+            {
+                Latest = Optional<T>.None;
+                Initial = initial;
+            }
+        }
 
     }
 }

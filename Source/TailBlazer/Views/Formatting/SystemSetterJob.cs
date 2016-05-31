@@ -1,11 +1,13 @@
 using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Concurrency;
 using System.Windows;
 using System.Windows.Media.Animation;
 using MaterialDesignThemes.Wpf;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
+using TailBlazer.Domain.Ratings;
 using TailBlazer.Domain.Settings;
 
 namespace TailBlazer.Views.Formatting
@@ -13,8 +15,10 @@ namespace TailBlazer.Views.Formatting
     public sealed class SystemSetterJob: IDisposable
     {
         private readonly IDisposable _cleanUp;
-
-        public SystemSetterJob(ISetting<GeneralOptions> setting, ISchedulerProvider schedulerProvider)
+        
+        public SystemSetterJob(ISetting<GeneralOptions> setting,
+            IRatingService ratingService,
+            ISchedulerProvider schedulerProvider)
         {
              var themeSetter =  setting.Value.Select(options => options.Theme)
                 .DistinctUntilChanged()
@@ -26,21 +30,22 @@ namespace TailBlazer.Views.Formatting
 
                     paletteHelper.SetLightDark(dark);
                     paletteHelper.ReplaceAccentColor(theme.GetAccentColor());
-
                 });
 
-            var frameRateSetter = setting.Value.Select(options => options.FrameRate)
-               .DistinctUntilChanged()
-               .Take(1)
-               .ObserveOn(schedulerProvider.MainThread)
-               .Subscribe(frameRate =>
-               {
-                   Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata {DefaultValue = frameRate });
+            var frameRate = ratingService.Metrics
+                .Take(1)
+                .Select(metrics => metrics.FrameRate)
+                .Wait();
 
-               });
+            schedulerProvider.MainThread.Schedule(() =>
+            {
+                Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = frameRate });
 
-            _cleanUp = new CompositeDisposable(themeSetter, frameRateSetter);
+            });
+
+            _cleanUp = new CompositeDisposable( themeSetter);
         }
+
 
         public void Dispose()
         {

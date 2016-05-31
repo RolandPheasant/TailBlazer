@@ -8,6 +8,7 @@ using DynamicData.Binding;
 using Microsoft.Expression.Interactivity.Core;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
+using TailBlazer.Domain.Ratings;
 using TailBlazer.Domain.Settings;
 
 namespace TailBlazer.Views.Options
@@ -21,10 +22,11 @@ namespace TailBlazer.Views.Options
         private double _highlightDuration;
         private int _scale;
         private bool _useDarkTheme;
-        private int _frameRate;
-        private double _refreshPeriod;
+        private int _rating;
 
-        public GeneralOptionsViewModel(ISetting<GeneralOptions> setting, ISchedulerProvider schedulerProvider)
+        public GeneralOptionsViewModel(ISetting<GeneralOptions> setting, 
+            IRatingService ratingService,
+            ISchedulerProvider schedulerProvider)
         {
             var reader = setting.Value.Subscribe(options =>
             {
@@ -32,15 +34,11 @@ namespace TailBlazer.Views.Options
                 HighlightTail = options.HighlightTail;
                 HighlightDuration = options.HighlightDuration;
                 Scale = options.Scale;
-                RefreshPeriod = options.RefreshPeriod;
-                FrameRate = options.FrameRate;
+                Rating = options.Rating;
             });
 
-            RequiresRestart = setting.Value.Select(options => options.FrameRate)
-                                    .DistinctUntilChanged()
-                                    .Select(_=> true)
-                                    .Skip(1)
-                                    .StartWith(false)
+            RequiresRestart = setting.Value.Select(options => options.Rating)
+                                    .HasChanged()
                                     .ForBinding();
 
             RestartCommand = new ActionCommand(() =>
@@ -52,7 +50,7 @@ namespace TailBlazer.Views.Options
             var writter = this.WhenAnyPropertyChanged()
                 .Subscribe(vm =>
                 {
-                    setting.Write(new GeneralOptions(UseDarkTheme ? Theme.Dark : Theme.Light, HighlightTail, HighlightDuration, Scale, FrameRate, RefreshPeriod));
+                    setting.Write(new GeneralOptions(UseDarkTheme ? Theme.Dark : Theme.Light, HighlightTail, HighlightDuration, Scale, Rating));
                 });
             
             HighlightDurationText = this.WhenValueChanged(vm=>vm.HighlightDuration)
@@ -101,28 +99,18 @@ namespace TailBlazer.Views.Options
             set { SetAndRaise(ref _highlightDuration, value); }
         }
 
-        public int FrameRate
+        public int Rating
         {
-            get { return _frameRate; }
-            set { SetAndRaise(ref _frameRate, value); }
+            get { return _rating; }
+            set { SetAndRaise(ref _rating, value); }
         }
-
-
-        public double RefreshPeriod
-        {
-            get { return _refreshPeriod; }
-            set { SetAndRaise(ref _refreshPeriod, value); }
-        }
-
 
         public int Scale
         {
             get { return _scale; }
             set { SetAndRaise(ref _scale, value); }
         }
-
-
-
+        
         void IDisposable.Dispose()
         {
             _cleanUp.Dispose();

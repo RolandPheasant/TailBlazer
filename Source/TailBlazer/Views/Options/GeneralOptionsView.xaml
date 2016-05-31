@@ -24,6 +24,9 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
 
@@ -43,9 +46,9 @@
             </Grid.Resources>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="32"/>
+                <RowDefinition Height="32"/>
+                <RowDefinition Height="32"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
@@ -58,8 +61,9 @@
 
             <StackPanel  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
                          Orientation="Horizontal"      
-                         Margin="0 8 4 8">
-                <ToggleButton Margin="8 0 16 0" IsChecked="{Binding UseDarkTheme}"  />
+                        >
+                <TextBlock VerticalAlignment="Center">Light</TextBlock>
+                <ToggleButton Margin="12 0 16 0" IsChecked="{Binding UseDarkTheme}" HorizontalAlignment="Center" />
                 <TextBlock VerticalAlignment="Center">Dark</TextBlock>
             </StackPanel>
 
@@ -72,55 +76,63 @@
                         Value="{Binding Scale}"/>
             <TextBlock Grid.Row="1" Grid.Column="2"  Text="{Binding ScaleText.Value}"/>
 
-            <TextBlock Grid.Row="2" Grid.Column="0"  Text="Refresh Rate" />
-            <Slider Grid.Row="2" 
-                        Grid.Column="1" Minimum="0.25" Maximum="1.5" 
-                        SmallChange="0.25"
-                        Value="{Binding RefreshPeriod}"/>
-
-            <TextBlock Grid.Row="2" Grid.Column="2"  Text="{Binding RefreshPeriod, StringFormat='\{0} seconds'}" />
-
-            <TextBlock Grid.Row="3" Grid.Column="0"  Text="Frame Rate" />
-            <Slider Grid.Row="3" 
-                        Grid.Column="1" Minimum="15" Maximum="90" 
-                        SmallChange="5"
-                        LargeChange="5"
-                        Value="{Binding FrameRate}"/>
-            
-            <Grid Grid.Row="3" Grid.Column="2">
-                
-                <Button Style="{StaticResource MaterialDesignFlatButton}"
-                        HorizontalAlignment="Left"
-                        Padding="2"
-                        Visibility="{Binding RequiresRestart.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
-                        Command="{Binding RestartCommand}">
-                    
-                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
-                        <materialDesign:PackIcon
-                            Width="22" Height="22"
-                            Margin="0 3"
-                            Kind="BackupRestore"/>
-
-                        <TextBlock Text="Restart to apply" 
-                                   FontSize="12"
-                                   VerticalAlignment="Center"
-                                   
-                                   Foreground="{DynamicResource MaterialDesignBody}" />
-                    </StackPanel>
-
-                </Button>
-            </Grid>
-            
-            <!--<TextBlock Grid.Row="1" Grid.Column="2" Padding="0 0 0 6" Text="{Binding ScaleText.Value}" VerticalAlignment="Bottom"/>-->
 
 
+            <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Highlight Tail?</TextBlock>
+            <CheckBox  Grid.Row="2" Grid.Column="1" 
+                           VerticalAlignment="Center" 
+                           Margin="4"
+                           IsChecked="{Binding  HighlightTail}"/>
         </Grid>
 
-        <TextBlock Grid.Row="2" Text="Highlight" 
-                   FontSize="16"
-                   Margin="0 12 0 0"
-                   FontWeight="SemiBold"/>
-        <Grid Grid.Row="3" Margin="8">
+        <TextBlock  
+            Margin="0 8 0 0"
+            Text="Performance" Grid.Row="2"  FontSize="16" FontWeight="SemiBold"/>
+
+        <Grid Grid.Row="3"  Margin="8 8 8 0" Height="32">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Rate this computer" VerticalAlignment="Center"/>
+            <materialDesign:RatingBar Margin="6 0 0 0" 
+                                      Grid.Column="1" 
+                                      VerticalAlignment="Center"
+                                      Value="{Binding Rating, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Max="5"
+                                      />
+            <TextBlock Margin="6 0 0 0" Grid.Column="2" Text="(Lower rating uses less CPU)" VerticalAlignment="Center"/>
+           
+            <StackPanel  Grid.Column="3" 
+                     Margin="6 2 4 4"
+                    Visibility="{Binding RequiresRestart.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
+                     HorizontalAlignment="Left" Orientation="Horizontal">
+
+                <Button  Style="{StaticResource MaterialDesignFlatButton}"
+                     Command="{Binding RestartCommand}"
+                     HorizontalAlignment="Left"
+                     Padding="2">
+                    <materialDesign:PackIcon  Foreground="{DynamicResource SecondaryAccentBrush}"
+                            Width="22" Height="22"
+                            Margin="4 2 4 2"
+                            Kind="BackupRestore"/>
+
+                </Button>
+
+                <TextBlock Text="Restart to apply" 
+                                   FontSize="12"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource MaterialDesignBody}" />
+            </StackPanel>
+
+        </Grid>
+ 
+
+
+
+        <Grid Grid.Row="5" Margin="8">
             
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -133,12 +145,6 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-
-            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Highlight Tail?</TextBlock>
-            <CheckBox  Grid.Row="0" Grid.Column="1" 
-                           VerticalAlignment="Center" 
-                           Margin="4"
-                           IsChecked="{Binding  HighlightTail}"/>
 
             <TextBlock Grid.Row="1" Grid.Column="0" 
                         Visibility="Collapsed"

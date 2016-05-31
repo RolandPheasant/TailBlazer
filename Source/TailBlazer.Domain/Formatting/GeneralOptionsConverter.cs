@@ -14,8 +14,7 @@ namespace TailBlazer.Domain.Formatting
             public const string HighlightTail = "HighlightTail";
             public const string Duration = "Duration";
             public const string Scale = "Scale";
-            public const string FrameRate = "FrameRate";
-            public const string RefreshPeriod = "RefreshPeriod";
+            public const string Rating = "FrameRate";
         }
 
         public GeneralOptions Convert(State state)
@@ -30,10 +29,8 @@ namespace TailBlazer.Domain.Formatting
             var duration = root.ElementOrThrow(Structure.Duration).ParseDouble().ValueOr(()=>defaults.HighlightDuration);
             var scale = root.ElementOrThrow(Structure.Scale).ParseInt().ValueOr(()=>defaults.Scale);
 
-            var frameRate = root.OptionalElement(Structure.FrameRate).ConvertOr(rate=>rate.ParseInt().Value, () => defaults.FrameRate);
-            var refreshPeriod = root.OptionalElement(Structure.RefreshPeriod).ConvertOr(rate => rate.ParseDouble().Value, () => defaults.RefreshPeriod);
-            
-            return new GeneralOptions(theme,highlight, duration,scale, frameRate, refreshPeriod);
+            var frameRate = root.OptionalElement(Structure.Rating).ConvertOr(rate=>rate.ParseInt().Value, () => defaults.Rating);
+            return new GeneralOptions(theme,highlight, duration,scale, frameRate);
         }
 
         public State Convert(GeneralOptions options)
@@ -43,8 +40,7 @@ namespace TailBlazer.Domain.Formatting
             root.Add(new XElement(Structure.HighlightTail, options.HighlightTail));
             root.Add(new XElement(Structure.Duration, options.HighlightDuration));
             root.Add(new XElement(Structure.Scale, options.Scale));
-            root.Add(new XElement(Structure.RefreshPeriod, options.RefreshPeriod));
-            root.Add(new XElement(Structure.FrameRate, options.FrameRate));
+            root.Add(new XElement(Structure.Rating, options.Rating));
             var doc = new XDocument(root);
             var value= doc.ToString();
             return new State(1, value);
@@ -52,7 +48,7 @@ namespace TailBlazer.Domain.Formatting
 
         public GeneralOptions GetDefaultValue()
         {
-            return new GeneralOptions(Theme.Light, true, 5, 100, 60, 0.25);
+            return new GeneralOptions(Theme.Light, true, 5, 100, 5);
         }
     }
 }
