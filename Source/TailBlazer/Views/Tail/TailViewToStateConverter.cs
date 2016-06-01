@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Linq;
+﻿using System.Linq;
 using System.Xml.Linq;
-using DynamicData.Kernel;
 using TailBlazer.Domain.FileHandling.Search;
-using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Views.Searching;
 
@@ -11,7 +8,7 @@ namespace TailBlazer.Views.Tail
 {
     public class TailViewToStateConverter : IConverter<TailViewState>
     {
-        private readonly static SearchMetadataToStateConverter SearchMetadataToStateConverter = new SearchMetadataToStateConverter();
+        private static readonly SearchMetadataToStateConverter SearchMetadataToStateConverter = new SearchMetadataToStateConverter();
 
         private static class Structure
         {
@@ -72,7 +69,7 @@ namespace TailBlazer.Views.Tail
             var list = SearchMetadataToStateConverter.ConvertToElement(state.SearchItems.ToArray());
             root.Add(list);
 
-            XDocument doc = new XDocument(root);
+            var doc = new XDocument(root);
             return new State(1, doc.ToString());
         }
 

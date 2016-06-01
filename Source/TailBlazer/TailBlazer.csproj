@@ -177,10 +177,12 @@
     <Compile Include="Views\Options\GeneralOptionsViewModel.cs" />
     <Compile Include="Views\Formatting\ColourProvider.cs" />
     <Compile Include="Views\Formatting\IconProvider.cs" />
+    <Compile Include="Views\Searching\GlobalSearchOptions.cs" />
     <Compile Include="Views\Searching\IconSelector.cs" />
     <Compile Include="Views\Searching\IconSelectorView.xaml.cs">
       <DependentUpon>IconSelectorView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Searching\IGlobalSearchOptions.cs" />
     <Compile Include="Views\Searching\IRecentSearchCollection.cs" />
     <Compile Include="Views\Recent\RecentSearch.cs" />
     <Compile Include="Views\Recent\RecentSearchCollection.cs" />
