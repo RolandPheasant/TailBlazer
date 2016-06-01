@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using DynamicData.Kernel;
+using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Views.Searching;
 
@@ -43,8 +45,8 @@ namespace TailBlazer.Views.Tail
                 .Elements(Structure.SearchItem)
                 .Select((element, index) =>
                 {
-                    var text = ((XElement)element).ElementOrThrow(Structure.Text);
-                    var position = ParseEx.ParseInt(element.Attribute(Structure.Filter).Value).ValueOr(() => index);
+                    var text = element.ElementOrThrow(Structure.Text);
+                    var position = element.Attribute(Structure.Filter).Value.ParseInt().ValueOr(() => index);
                     var filter = element.Attribute(Structure.Filter).Value.ParseBool().ValueOr(() => true);
                     var useRegEx = element.Attribute(Structure.UseRegEx).Value.ParseBool().ValueOr(() => false);
                     var highlight = element.Attribute(Structure.Highlight).Value.ParseBool().ValueOr(() => true);
@@ -61,6 +63,13 @@ namespace TailBlazer.Views.Tail
 
         public State Convert(SearchState[] state)
         {
+            var list = ConvertToElement(state);
+            XDocument doc = new XDocument(list);
+            return new State(1, doc.ToString());
+        }
+
+        public XElement ConvertToElement(SearchState[] state)
+        {
             var list = new XElement(Structure.SearchList);
 
             var searchItemsArray = state.Select(f => new XElement(Structure.SearchItem,
@@ -75,9 +84,7 @@ namespace TailBlazer.Views.Tail
                 new XAttribute(Structure.Icon, f.Icon)));
 
             searchItemsArray.ForEach(list.Add);
-
-            XDocument doc = new XDocument(list);
-            return new State(1, doc.ToString());
+            return list;
         }
 
         public SearchState[] GetDefaultValue()
