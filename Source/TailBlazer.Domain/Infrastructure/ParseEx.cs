@@ -1,7 +1,8 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using DynamicData.Kernel;
 
-namespace System
+namespace TailBlazer.Domain.Infrastructure
 {
     public static class ParseEx
     {

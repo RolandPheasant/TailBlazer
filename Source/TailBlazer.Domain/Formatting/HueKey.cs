@@ -9,8 +9,8 @@ namespace TailBlazer.Domain.Formatting
 
         public HueKey(string swatch, string name)
         {
-            Swatch = (CaseInsensitiveString)swatch;
-            Name = (CaseInsensitiveString)name;
+            Swatch = swatch;
+            Name = name;
         }
 
         #region Equality

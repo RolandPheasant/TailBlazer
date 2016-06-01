@@ -1,7 +1,6 @@
 using System;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Search;
-using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Views.Tail

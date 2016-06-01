@@ -1,8 +1,5 @@
-﻿
-using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Controls
@@ -79,7 +76,7 @@ namespace TailBlazer.Controls
 
         private void UpdateVisualState(bool useTransitions)
         {
-            switch (this.Status)
+            switch (Status)
             {
                 case SearchResultIndicatorStatus.Regex:
                     var x = VisualStateManager.GoToState(this, SearchResultIndicatorStates.Regex, useTransitions);

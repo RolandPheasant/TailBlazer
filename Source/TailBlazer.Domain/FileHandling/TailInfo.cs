@@ -14,7 +14,7 @@ namespace TailBlazer.Domain.FileHandling
         public TailInfo(long tailStartsAt)
         {
             TailStartsAt = tailStartsAt;
-            LastTail = DateTime.Now;
+            LastTail = DateTime.UtcNow;
         }
 
         private TailInfo()

@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace TailBlazer.Domain.FileHandling.Search
 {
     //public class IconTypeSelector

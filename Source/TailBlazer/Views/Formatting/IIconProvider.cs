@@ -1,6 +1,5 @@
 using DynamicData;
 using TailBlazer.Domain.FileHandling.Search;
-using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Formatting
 {

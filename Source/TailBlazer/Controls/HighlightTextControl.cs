@@ -133,8 +133,8 @@ namespace TailBlazer.Controls
 
                         if (ft.Hue == Hue.NotSpecified)
                         {
-                            run.Background = this.HighlightBackgroundBrush;
-                            run.Foreground = this.HighlightForegroundBrush;
+                            run.Background = HighlightBackgroundBrush;
+                            run.Foreground = HighlightForegroundBrush;
                         }
                         else
                         {
