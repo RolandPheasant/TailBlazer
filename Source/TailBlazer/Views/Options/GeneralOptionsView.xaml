@@ -103,7 +103,7 @@
                                       Value="{Binding Rating, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                       Max="5"
                                       />
-            <TextBlock Margin="6 0 0 0" Grid.Column="2" Text="(Lower rating uses less CPU)" VerticalAlignment="Center"/>
+            <TextBlock Margin="6 0 0 0" Grid.Column="2" Text="(Reduce for lower CPU usage)" VerticalAlignment="Center"/>
            
             <StackPanel  Grid.Column="3" 
                      Margin="6 2 4 4"
