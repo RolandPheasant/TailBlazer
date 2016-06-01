@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
@@ -20,7 +21,6 @@ using TailBlazer.Domain.StateHandling;
 using TailBlazer.Infrastucture;
 using TailBlazer.Infrastucture.Virtualisation;
 using TailBlazer.Views.Searching;
-using System.Threading.Tasks;
 
 namespace TailBlazer.Views.Tail
 {
@@ -169,7 +169,7 @@ namespace TailBlazer.Views.Tail
 
             var loader = lineScroller.Lines.Connect()
                 .LogChanges(logger, "Received")
-                .Transform(lineProxyFactory.Create, new ParallelisationOptions(ParallelType.Ordered, 3))
+                .Transform(lineProxyFactory.Create)
                 .LogChanges(logger, "Sorting")
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
                 .ObserveOn(schedulerProvider.MainThread)

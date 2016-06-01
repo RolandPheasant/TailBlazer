@@ -1,6 +1,4 @@
-﻿
-
-namespace TailBlazer.Domain.Formatting
+﻿namespace TailBlazer.Domain.Formatting
 {
     public class  GeneralOptions
     {
@@ -8,13 +6,16 @@ namespace TailBlazer.Domain.Formatting
         public bool HighlightTail { get; }
         public double HighlightDuration { get; }
         public int Scale { get; }
+        public int Rating { get; }
 
-        public GeneralOptions(Theme theme, bool highlightTail, double highlightTailDuration, int scale)
+        public GeneralOptions(Theme theme, bool highlightTail, double highlightTailDuration, int scale, int rating)
         {
             Theme = theme;
             HighlightTail = highlightTail;
             HighlightDuration = highlightTailDuration;
             Scale = scale;
+            Rating = rating;
         }
+
     }
 }

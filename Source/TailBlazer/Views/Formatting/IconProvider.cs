@@ -4,7 +4,6 @@ using System.Reactive.Disposables;
 using DynamicData;
 using MaterialDesignThemes.Wpf;
 using TailBlazer.Domain.FileHandling.Search;
-using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Formatting
 {

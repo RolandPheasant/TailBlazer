@@ -17,7 +17,7 @@ namespace TailBlazer.Infrastucture
             if (execute == null) throw new ArgumentNullException(nameof(execute));
 
             _execute = execute;
-            _canExecute = canExecute ?? ((t) => true);
+            _canExecute = canExecute ?? (t => true);
         }
 
 

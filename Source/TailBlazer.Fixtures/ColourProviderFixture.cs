@@ -1,9 +1,9 @@
-﻿using Xunit;
-using FluentAssertions;
-using TailBlazer.Views.Formatting;
-using TailBlazer.Domain.Formatting;
+﻿using System;
 using System.Linq;
-using System;
+using FluentAssertions;
+using TailBlazer.Domain.Formatting;
+using TailBlazer.Views.Formatting;
+using Xunit;
 
 namespace TailBlazer.Fixtures
 {

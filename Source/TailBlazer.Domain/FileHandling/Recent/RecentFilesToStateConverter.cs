@@ -30,13 +30,13 @@ namespace TailBlazer.Domain.FileHandling.Recent
             var doc = XDocument.Parse(state.Value);
 
             var root = doc.ElementOrThrow(Structure.Root);
-         
+
             var files = root.Elements(Structure.File)
                             .Select(element =>
                             {
                                 var name = element.Attribute(Structure.Name).Value;
                                 var dateTime = element.Attribute(Structure.Date).Value;
-                                return new RecentFile(DateTime.Parse(dateTime),name);
+                                return new RecentFile(DateTime.Parse(dateTime).ToUniversalTime(),name);
                             }).ToArray();
             return files;
         }

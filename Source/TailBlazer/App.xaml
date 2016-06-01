@@ -4,8 +4,7 @@
              xmlns:controls="clr-namespace:TailBlazer.Controls"
              xmlns:fileDrop="clr-namespace:TailBlazer.Views.FileDrop"
              xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
-             xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
-             xmlns:settings="clr-namespace:TailBlazer.Settings">
+             xmlns:searching="clr-namespace:TailBlazer.Views.Searching">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -14,7 +13,7 @@
             </ResourceDictionary.MergedDictionaries>
 
             <DataTemplate DataType="{x:Type searching:SearchOptionsViewModel}">
-                <settings:SearchOptionsView/>
+                <searching:SearchOptionsView/>
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type searching:IconSelector}">

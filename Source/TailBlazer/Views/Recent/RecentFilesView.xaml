@@ -66,8 +66,7 @@
                                 Style="{StaticResource CloseButtonStyle}"
                                 VerticalAlignment="Center"
                                 Command="{Binding RemoveCommand}"
-                                ToolTip="{Binding RemoveToolTip}">
-                            </Button>
+                                ToolTip="{Binding RemoveToolTip}" />
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
@@ -75,3 +74,4 @@
         </ScrollViewer>
     </Grid>
 </UserControl>
+

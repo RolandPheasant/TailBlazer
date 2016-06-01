@@ -10,7 +10,7 @@ namespace TailBlazer.Views.Recent
         public RecentSearch(string seaarchText)
         {
             Text = seaarchText;
-            Timestamp = DateTime.Now;
+            Timestamp = DateTime.UtcNow;
         }
 
         public RecentSearch(DateTime timestamp, string text)

@@ -62,7 +62,7 @@ namespace TailBlazer.Views.Searching
                     
                     var textAssociationChanged = iconChanged.Merge(colourChanged).Merge(ignoreCaseChanged)
                                 .Throttle(TimeSpan.FromMilliseconds(250))
-                                .Select(_=> new TextAssociation(so.Text, so.IgnoreCase, so.UseRegex, so.HighlightHue.Swatch, so.IconKind.ToString(), so.HighlightHue.Name, DateTime.Now))
+                                .Select(_=> new TextAssociation(so.Text, so.IgnoreCase, so.UseRegex, so.HighlightHue.Swatch, so.IconKind.ToString(), so.HighlightHue.Name, DateTime.UtcNow))
                                 .Subscribe(textAssociationCollection.MarkAsChanged);
                     
                     return new CompositeDisposable(anyPropertyHasChanged, textAssociationChanged);

@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using FluentAssertions;
 using TailBlazer.Domain.Formatting;
-using TailBlazer.Infrastucture;
 using TailBlazer.Infrastucture.Virtualisation;
 using Xunit;
 
@@ -53,7 +52,7 @@ namespace TailBlazer.Fixtures
             var expected = new[]
             {
                 new MatchedString("t "),
-                new MatchedString("on the m"),
+                new MatchedString("on the m")
             }
             .Select(ms => new DisplayText(ms))
             .ToArray();

@@ -9,7 +9,6 @@ using TailBlazer.Domain.Settings;
 using TailBlazer.Domain.StateHandling;
 using TailBlazer.Infrastucture.AppState;
 using TailBlazer.Views.Formatting;
-using TailBlazer.Views.Options;
 using TailBlazer.Views.Recent;
 using TailBlazer.Views.Tail;
 using TailBlazer.Views.WindowManagement;
@@ -24,7 +23,7 @@ namespace TailBlazer.Infrastucture
             applicationStatePublisher.Publish(ApplicationState.Startup);
 
             logger.Info($"Starting Tail Blazer version v{Assembly.GetEntryAssembly().GetName().Version}");
-            logger.Info($"at {DateTime.Now}");
+            logger.Info($"at {DateTime.UtcNow}");
 
 
             //run start up jobs
@@ -42,7 +41,7 @@ namespace TailBlazer.Infrastucture
             var viewFactoryRegister = objectProvider.Get<IViewFactoryRegister>();
             viewFactoryRegister.Register<TailViewModelFactory>();
 
-            objectProvider.Get<ThemeSetterJob>();
+            objectProvider.Get<SystemSetterJob>();
 
             logger.Info("Starting complete");
         }

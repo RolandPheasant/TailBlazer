@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-
-namespace TailBlazer.Domain.FileHandling
+﻿namespace TailBlazer.Domain.FileHandling
 {
     public static class LineReaderEx
     {

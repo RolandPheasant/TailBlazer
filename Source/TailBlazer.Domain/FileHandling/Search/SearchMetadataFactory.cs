@@ -1,5 +1,4 @@
 using System;
-using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling.TextAssociations;
 using TailBlazer.Domain.Formatting;
 

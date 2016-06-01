@@ -3,6 +3,7 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using System.Security;
 using System.Text;
 
 namespace TailBlazer.Domain.FileHandling
@@ -50,7 +51,7 @@ namespace TailBlazer.Domain.FileHandling
         // to decide what the encoding might be from the byte order marks, IF they
         // exist.  But that's all we'll do. 
         private bool _detectEncoding;
-        private bool _encodingDetected = false;
+        private bool _encodingDetected;
 
         // Whether we must still check for the encoding's given preamble at the 
         // beginning of this file.
@@ -168,7 +169,7 @@ namespace TailBlazer.Domain.FileHandling
             if (path.Length == 0)
                 throw new ArgumentException("Path is empty");
             if (bufferSize <= 0)
-                throw new ArgumentOutOfRangeException("bufferSize");
+                throw new ArgumentOutOfRangeException(nameof(bufferSize));
 
             Stream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultFileStreamBufferSize, FileOptions.SequentialScan);
             Init(fileStream, encoding, detectEncodingFromByteOrderMarks, bufferSize);
@@ -212,8 +213,8 @@ namespace TailBlazer.Domain.FileHandling
             {
                 // Note that Stream.Close() can potentially throw here. So we need to
                 // ensure cleaning up internal resources, inside the finally block.
-                if (Closable && disposing && (stream != null))
-                    stream.Close();
+                if (Closable && disposing)
+                    stream?.Close();
             }
             finally
             {
@@ -706,7 +707,7 @@ namespace TailBlazer.Domain.FileHandling
         public long AbsolutePosition()
         {
             // The number of bytes that the already-read characters need when encoded.
-            int numReadBytes = this.CurrentEncoding.GetByteCount(charBuffer, 0, charPos);
+            int numReadBytes = CurrentEncoding.GetByteCount(charBuffer, 0, charPos);
 
             return BaseStream.Position - byteLen + numReadBytes;
         }

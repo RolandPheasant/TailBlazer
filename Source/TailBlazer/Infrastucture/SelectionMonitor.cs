@@ -3,15 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Concurrency;
 using System.Windows.Controls;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.Infrastructure;
-using TailBlazer.Views;
 using TailBlazer.Views.Tail;
 
 namespace TailBlazer.Infrastucture
@@ -43,7 +42,7 @@ namespace TailBlazer.Infrastucture
         
         private bool _isSelecting;
         private ListBox _selector;
-        private LineProxy _lastSelected = null;
+        private LineProxy _lastSelected;
 
         public SelectionMonitor(ILogger logger, ISchedulerProvider schedulerProvider)
         {
@@ -73,8 +72,6 @@ namespace TailBlazer.Infrastucture
         void IAttachedListBox.Receive(ListBox selector)
         {
             _selector = selector;
-         //  return;
-
 
             var dataSource = ((ReadOnlyObservableCollection<LineProxy>) selector.ItemsSource)
                 .ToObservableChangeSet()

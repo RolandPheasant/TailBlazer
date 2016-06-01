@@ -1,9 +1,3 @@
-
-using System.Collections;
-using System.Collections.Generic;
-using System.Windows.Media;
-using DynamicData.Kernel;
-
 namespace TailBlazer.Domain.Formatting
 {
 

@@ -1,9 +1,9 @@
 using System;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using System.Xml.Linq;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
-using System.Reactive.Concurrency;
-using System.Reactive.Linq;
 using TailBlazer.Infrastucture.AppState;
 
 namespace TailBlazer.Views.Layout
