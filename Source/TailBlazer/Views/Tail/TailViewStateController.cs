@@ -54,7 +54,6 @@ namespace TailBlazer.Views.Tail
                     });
             }
             
-
             //write latest to file when something triggers a staye change
             var selectedChanged = tailView.SearchCollection
                     .WhenValueChanged(sc=>sc.Selected,false)

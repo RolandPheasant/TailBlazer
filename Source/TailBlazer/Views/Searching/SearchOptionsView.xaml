@@ -27,12 +27,15 @@
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Dragable.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <searching:IsGlobalToIconConverter x:Key="IsGlobalToIconConverter"/>
+
             <DataTemplate DataType="{x:Type searching:SearchOptionsProxy}">
 
                 <Grid Margin="4 4 4 4" x:Name="Row">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="22"/>
                         <ColumnDefinition Width="75"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
@@ -123,8 +126,21 @@
                                       IsChecked="{Binding IgnoreCase}" 
                                       Content="Ignore Case"/>
 
-                    <Button Margin="8 0 6 0"
+                    <Button Margin="4 0 0 0"
                                         Grid.Column="6" 
+                                        Padding="4 0 6 0"
+                                        ToolTip="{Binding ChangeScopeToolTip}"
+                                        VerticalAlignment="Center"
+                                        Command="{Binding ChangeScopeCommand}"
+                                        Style="{StaticResource MaterialDesignFlatButton}">
+                       
+                        <wpf:PackIcon  Width="18" Height="18"
+                                       Kind="{Binding IsGlobal, Converter={StaticResource IsGlobalToIconConverter}}"/>
+
+                    </Button>
+
+                    <Button Margin="8 0 6 0"
+                                        Grid.Column="7" 
                                         ToolTip="{Binding RemoveTooltip}"
                                         VerticalAlignment="Center"
                                         Command="{Binding RemoveCommand}"
@@ -149,7 +165,7 @@
     </Control.Resources>
 
     <wpf:DialogHost Identifier="{Binding Id}">
-        <Grid Width="435" Height="325">
+        <Grid Width="485" Height="325">
             <Grid.RowDefinitions>
                 <RowDefinition  Height="Auto"/>
                 <RowDefinition  Height="Auto"/>

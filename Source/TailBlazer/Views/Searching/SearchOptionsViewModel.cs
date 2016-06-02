@@ -26,27 +26,50 @@ namespace TailBlazer.Views.Searching
             SearchHints searchHints)
         {
             SearchHints = searchHints;
-            
-            Local = searchProxyCollectionFactory.Create(metadataCollection, Id);
-            Global = searchProxyCollectionFactory.Create(globalSearchOptions.MetadataCollection, Id);
+
+            var global = globalSearchOptions.MetadataCollection;
+            var local = metadataCollection;
+
+            Action<SearchMetadata> changeScopeAction = meta =>
+            {
+                if (meta.IsGlobal)
+                {
+                    //make global
+                    global.Remove(meta.SearchText);
+                    var newValue = new SearchMetadata(meta, local.NextIndex(),false);
+                    local.AddorUpdate(newValue);
+                }
+                else
+                {
+                    //make local
+                    local.Remove(meta.SearchText);
+                    var newValue = new SearchMetadata(meta, global.NextIndex(), true);
+                    global.AddorUpdate(newValue);
+                }
+            };
+
+            Local = searchProxyCollectionFactory.Create(local, Id, changeScopeAction);
+            Global = searchProxyCollectionFactory.Create(global, Id, changeScopeAction);
 
             //command to add the current search to the tail collection
             var searchInvoker = SearchHints.SearchRequested
                 .ObserveOn(schedulerProvider.Background)
                 .Subscribe(request =>
                 {
+                    var isGlobal = SelectedIndex == 1;
                     var meta = searchMetadataFactory.Create(request.Text,
                         request.UseRegEx,
                         metadataCollection.NextIndex(),
-                        false);
+                        false,
+                        isGlobal);
 
                     if (SelectedIndex == 0)
                     {
-                        metadataCollection.AddorUpdate(meta);
+                        local.AddorUpdate(meta);
                     }
                     else
                     {
-                        globalSearchOptions.MetadataCollection.AddorUpdate(meta);
+                        global.AddorUpdate(meta);
                     }
                    
                 });

@@ -20,6 +20,7 @@ namespace TailBlazer.Domain.FileHandling.Search
         public Func<string, bool> Predicate { get; }
         public Hue HighlightHue { get; }
         public string IconKind { get; }
+        public bool IsGlobal { get;  }
 
         public SearchMetadata([NotNull] SearchMetadata searchMetadata, int newPosition)
         {
@@ -35,6 +36,24 @@ namespace TailBlazer.Domain.FileHandling.Search
             Predicate = searchMetadata.Predicate;
             HighlightHue = searchMetadata.HighlightHue;
             IconKind = searchMetadata.IconKind;
+            IsGlobal = searchMetadata.IsGlobal;
+        }
+
+        public SearchMetadata([NotNull] SearchMetadata searchMetadata, int newPosition, bool isGlobal)
+        {
+            if (searchMetadata == null) throw new ArgumentNullException(nameof(searchMetadata));
+
+            Position = newPosition;
+            SearchText = searchMetadata.SearchText;
+            Filter = searchMetadata.Filter;
+            Highlight = searchMetadata.Highlight;
+            UseRegex = searchMetadata.UseRegex;
+            IgnoreCase = searchMetadata.IgnoreCase;
+            RegEx = searchMetadata.RegEx;
+            Predicate = searchMetadata.Predicate;
+            HighlightHue = searchMetadata.HighlightHue;
+            IconKind = searchMetadata.IconKind;
+            IsGlobal = isGlobal;
         }
 
         public SearchMetadata(int position, [NotNull] string searchText, bool filter, 
@@ -42,7 +61,8 @@ namespace TailBlazer.Domain.FileHandling.Search
             bool useRegex, 
             bool ignoreCase,
             Hue highlightHue,
-            string iconKind)
+            string iconKind,
+            bool isGlobal)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
 
@@ -54,6 +74,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             IgnoreCase = ignoreCase;
             HighlightHue = highlightHue;
             IconKind = iconKind;
+            IsGlobal = isGlobal;
             RegEx = this.BuildRegEx();
             Predicate = this.BuildPredicate();
         }

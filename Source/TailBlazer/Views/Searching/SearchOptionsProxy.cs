@@ -29,10 +29,14 @@ namespace TailBlazer.Views.Searching
         private PackIconKind _iconKind;
         private int _position;
 
+        public bool IsGlobal { get; }
         public string Text => _searchMetadata.SearchText;
         public string RemoveTooltip => $"Get rid of {Text}?";
+        public string ChangeScopeToolTip => IsGlobal ? "Change to local scope" : "Change to global scope";
         public ICommand RemoveCommand { get; }
         public ICommand HighlightCommand { get; }
+        public Command ChangeScopeCommand { get; }
+
         public IEnumerable<Hue> Hues { get; }
         public ICommand ShowIconSelectorCommand { get; }
         private IconSelector IconSelector { get; }
@@ -40,7 +44,8 @@ namespace TailBlazer.Views.Searching
         public IProperty<Brush> Background { get; }
         public IProperty<Brush> Foreground { get; }
 
-        public SearchOptionsProxy([NotNull] SearchMetadata searchMetadata, 
+        public SearchOptionsProxy([NotNull] SearchMetadata searchMetadata,
+            [NotNull] Action<SearchMetadata> changeScopeAction,
             [NotNull] IColourProvider colourProvider, 
             [NotNull] IThemeProvider themeProvider,
             [NotNull] IconSelector iconSelector,
@@ -49,6 +54,7 @@ namespace TailBlazer.Views.Searching
             Guid parentId)
         {
             if (searchMetadata == null) throw new ArgumentNullException(nameof(searchMetadata));
+            if (changeScopeAction == null) throw new ArgumentNullException(nameof(changeScopeAction));
             if (colourProvider == null) throw new ArgumentNullException(nameof(colourProvider));
             if (themeProvider == null) throw new ArgumentNullException(nameof(themeProvider));
             if (iconSelector == null) throw new ArgumentNullException(nameof(iconSelector));
@@ -67,9 +73,11 @@ namespace TailBlazer.Views.Searching
             Position = searchMetadata.Position;
             Hues = colourProvider.Hues;
             HighlightHue = searchMetadata.HighlightHue;
+            IsGlobal = searchMetadata.IsGlobal;
 
             ShowIconSelectorCommand = new Command(async () => await ShowIconSelector());
             RemoveCommand = new Command(() => removeAction(searchMetadata));
+            ChangeScopeCommand = new Command(()=>changeScopeAction(searchMetadata));
             HighlightCommand = new Command<Hue>(newHue =>
             {
                 HighlightHue = newHue;
@@ -88,6 +96,7 @@ namespace TailBlazer.Views.Searching
 
             _cleanUp = new CompositeDisposable(IconSelector,Foreground,Background, defaultHue.Connect());
         }
+
 
         private async Task ShowIconSelector()
         {
@@ -157,7 +166,8 @@ namespace TailBlazer.Views.Searching
                 proxy.UseRegex,
                 proxy.IgnoreCase,
                 proxy.HighlightHue, 
-                proxy.IconKind.ToString());
+                proxy.IconKind.ToString(),
+                proxy.IsGlobal);
         }
 
         #region Equality

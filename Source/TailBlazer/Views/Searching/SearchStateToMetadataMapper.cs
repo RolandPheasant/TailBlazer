@@ -13,7 +13,7 @@ namespace TailBlazer.Views.Searching
             _colourProvider = colourProvider;
         }
 
-        public SearchMetadata Map(SearchState state)
+        public SearchMetadata Map(SearchState state, bool isGlobal = false)
         {
             var hue = _colourProvider
                 .Lookup(new HueKey(state.Swatch, state.Hue))
@@ -21,7 +21,24 @@ namespace TailBlazer.Views.Searching
                         
             return new SearchMetadata(state.Position, state.Text, state.Filter,state.Highlight, state.UseRegEx,state.IgnoreCase,
                 hue,
-                state.Icon);
+                state.Icon,
+                isGlobal);
+        }
+
+        public SearchState Map(SearchMetadata search)
+        {
+            return new SearchState
+                (
+                search.SearchText,
+                search.Position,
+                search.UseRegex,
+                search.Highlight,
+                search.Filter,
+                false,
+                search.IgnoreCase,
+                search.HighlightHue.Swatch,
+                search.IconKind,
+                search.HighlightHue.Name);
         }
     }
 }

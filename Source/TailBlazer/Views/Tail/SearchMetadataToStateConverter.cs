@@ -1,6 +1,5 @@
-using System;
+
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using DynamicData.Kernel;
@@ -34,31 +33,40 @@ namespace TailBlazer.Views.Tail
         public SearchState[] Convert(State state)
         {
             var doc = XDocument.Parse(state.Value);
-            var root = doc.ElementOrThrow(Structure.Root);
-            var searchStates = Convert(root);
+            var root = doc.Element(Structure.Root);
+
+            if (root!=null)
+                return Convert(root);
+
+            var searchStates = ConvertSearchList(doc.Element(Structure.SearchList)); ;
             return searchStates;
         }
 
         public SearchState[] Convert(XElement root)
         {
-            return root.Element(Structure.SearchList)
-                .Elements(Structure.SearchItem)
-                .Select((element, index) =>
-                {
-                    var text = element.ElementOrThrow(Structure.Text);
-                    var position = element.Attribute(Structure.Filter).Value.ParseInt().ValueOr(() => index);
-                    var filter = element.Attribute(Structure.Filter).Value.ParseBool().ValueOr(() => true);
-                    var useRegEx = element.Attribute(Structure.UseRegEx).Value.ParseBool().ValueOr(() => false);
-                    var highlight = element.Attribute(Structure.Highlight).Value.ParseBool().ValueOr(() => true);
-                    var alert = element.Attribute(Structure.Alert).Value.ParseBool().ValueOr(() => false);
-                    var ignoreCase = element.Attribute(Structure.IgnoreCase).Value.ParseBool().ValueOr(() => true);
+            return ConvertSearchList(root.Element(Structure.SearchList));
+        }
 
-                    var swatch = element.Attribute(Structure.Swatch).Value;
-                    var hue = element.Attribute(Structure.Hue).Value;
-                    var icon = element.Attribute(Structure.Icon).Value;
+        private SearchState[] ConvertSearchList(XElement root)
+        {
+            return root
+             .Elements(Structure.SearchItem)
+             .Select((element, index) =>
+             {
+                 var text = element.ElementOrThrow(Structure.Text);
+                 var position = element.Attribute(Structure.Filter).Value.ParseInt().ValueOr(() => index);
+                 var filter = element.Attribute(Structure.Filter).Value.ParseBool().ValueOr(() => true);
+                 var useRegEx = element.Attribute(Structure.UseRegEx).Value.ParseBool().ValueOr(() => false);
+                 var highlight = element.Attribute(Structure.Highlight).Value.ParseBool().ValueOr(() => true);
+                 var alert = element.Attribute(Structure.Alert).Value.ParseBool().ValueOr(() => false);
+                 var ignoreCase = element.Attribute(Structure.IgnoreCase).Value.ParseBool().ValueOr(() => true);
 
-                    return new SearchState(text, position, useRegEx, highlight, filter, alert, ignoreCase, swatch, icon, hue);
-                }).ToArray();
+                 var swatch = element.Attribute(Structure.Swatch).Value;
+                 var hue = element.Attribute(Structure.Hue).Value;
+                 var icon = element.Attribute(Structure.Icon).Value;
+
+                 return new SearchState(text, position, useRegEx, highlight, filter, alert, ignoreCase, swatch, icon, hue);
+             }).ToArray();
         }
 
         public State Convert(SearchState[] state)

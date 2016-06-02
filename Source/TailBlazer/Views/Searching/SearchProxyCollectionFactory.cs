@@ -37,11 +37,11 @@ namespace TailBlazer.Views.Searching
             TextAssociationCollection = textAssociationCollection;
             ThemeProvider = themeProvider;
         }
-        public ISearchProxyCollection Create([NotNull] ISearchMetadataCollection metadataCollection, Guid id)
+        public ISearchProxyCollection Create([NotNull] ISearchMetadataCollection metadataCollection, Guid id, Action<SearchMetadata> changeScopeAction)
         {
             if (metadataCollection == null) throw new ArgumentNullException(nameof(metadataCollection));
 
-            return new SearchProxyCollection(metadataCollection, id, SchedulerProvider, ColourProvider, IconsProvider, TextAssociationCollection, ThemeProvider);
+            return new SearchProxyCollection(metadataCollection, id,changeScopeAction, SchedulerProvider, ColourProvider, IconsProvider, TextAssociationCollection, ThemeProvider);
         }
     }
 }

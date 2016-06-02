@@ -5,6 +5,6 @@ namespace TailBlazer.Views.Searching
 {
     public interface ISearchProxyCollectionFactory
     {
-        ISearchProxyCollection Create(ISearchMetadataCollection metadataCollection, Guid id);
+        ISearchProxyCollection Create(ISearchMetadataCollection metadataCollection, Guid id, Action<SearchMetadata> changeScopeAction);
     }
 }

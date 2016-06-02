@@ -24,6 +24,7 @@ namespace TailBlazer.Views.Searching
 
         public SearchProxyCollection(ISearchMetadataCollection metadataCollection,
             Guid id,
+            Action<SearchMetadata> changeScopeAction,
             ISchedulerProvider schedulerProvider,
             IColourProvider colourProvider,
             IIconProvider iconsProvider,
@@ -35,6 +36,7 @@ namespace TailBlazer.Views.Searching
                 .Transform(meta =>
                 {
                     return new SearchOptionsProxy(meta,
+                        changeScopeAction,
                         colourProvider,
                         themeProvider,
                         new IconSelector(iconsProvider, schedulerProvider),
