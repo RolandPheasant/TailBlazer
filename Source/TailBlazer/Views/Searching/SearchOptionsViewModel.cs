@@ -12,6 +12,7 @@ namespace TailBlazer.Views.Searching
         public Guid Id { get; } = Guid.NewGuid();
 
         private readonly IDisposable _cleanUp;
+        private int _selectedIndex;
         public SearchHints SearchHints { get; }
         public ISearchProxyCollection Local { get; }
         public ISearchProxyCollection Global { get; }
@@ -38,7 +39,16 @@ namespace TailBlazer.Views.Searching
                         request.UseRegEx,
                         metadataCollection.NextIndex(),
                         false);
-                    metadataCollection.AddorUpdate(meta);
+
+                    if (SelectedIndex == 0)
+                    {
+                        metadataCollection.AddorUpdate(meta);
+                    }
+                    else
+                    {
+                        globalSearchOptions.MetadataCollection.AddorUpdate(meta);
+                    }
+                   
                 });
 
             _cleanUp = new CompositeDisposable(searchInvoker,
@@ -47,7 +57,13 @@ namespace TailBlazer.Views.Searching
                 Global,
                 Local);
         }
-        
+
+        public int SelectedIndex
+        {
+            get { return _selectedIndex; }
+            set { SetAndRaise(ref _selectedIndex, value); }
+        }
+
         public void Dispose()
         {
             _cleanUp.Dispose();

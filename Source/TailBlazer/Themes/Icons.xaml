@@ -3,6 +3,9 @@
                     xmlns:controls="clr-namespace:TailBlazer.Controls">
 
 
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
+    </ResourceDictionary.MergedDictionaries>
 
 
     <Style TargetType="{x:Type controls:SaveLayoutIcon}">
