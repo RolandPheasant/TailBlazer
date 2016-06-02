@@ -11,7 +11,7 @@ namespace TailBlazer.Domain.Formatting
     {
         private readonly IObservable<IEnumerable<SearchMetadata>> _strings;
 
-        public LineMatches(ISearchMetadataCollection searchMetadataCollection)
+        public LineMatches(ICombinedSearchMetadataCollection searchMetadataCollection)
         {
             _strings = searchMetadataCollection.Metadata
                 .Connect()

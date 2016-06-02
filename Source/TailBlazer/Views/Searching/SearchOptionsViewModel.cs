@@ -27,7 +27,7 @@ namespace TailBlazer.Views.Searching
         {
             SearchHints = searchHints;
 
-            var global = globalSearchOptions.MetadataCollection;
+            var global = globalSearchOptions.Metadata;
             var local = metadataCollection;
 
             Action<SearchMetadata> changeScopeAction = meta =>

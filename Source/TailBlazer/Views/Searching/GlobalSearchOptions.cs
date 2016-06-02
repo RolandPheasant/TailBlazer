@@ -12,20 +12,20 @@ namespace TailBlazer.Views.Searching
     {
         private readonly IDisposable _cleanUp;
 
-        public ISearchMetadataCollection MetadataCollection { get; }
+        public ISearchMetadataCollection Metadata { get; }
 
-        public GlobalSearchOptions(ISearchMetadataCollection metadataCollection,
+        public GlobalSearchOptions(ISearchMetadataCollection metadata,
             ISearchStateToMetadataMapper converter,
             ISetting<SearchState[]> searchStateSettings)
         {
-            MetadataCollection = metadataCollection;
+            Metadata = metadata;
 
             var loader = searchStateSettings.Value
                 .Take(1)
                 .Select(items => items.Select(state => converter.Map(state,true)))
-                .Subscribe(metadataCollection.Add);
+                .Subscribe(metadata.Add);
 
-            var writer = metadataCollection.Metadata.Connect()
+            var writer = metadata.Metadata.Connect()
                 .ToCollection()
                 .Select(metaData => metaData.ToArray())
                 .Throttle(TimeSpan.FromMilliseconds(250))

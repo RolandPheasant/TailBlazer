@@ -93,8 +93,10 @@
     <Compile Include="FileHandling\IProgressInfo.cs" />
     <Compile Include="FileHandling\LineKey.cs" />
     <Compile Include="FileHandling\Search\GlobalSearchInfoCollection.cs" />
+    <Compile Include="FileHandling\Search\ICombinedSearchMetadataCollection.cs" />
     <Compile Include="FileHandling\Search\IDefaultColourSelector.cs" />
     <Compile Include="FileHandling\Search\IDefaultIconSelector.cs" />
+    <Compile Include="FileHandling\Search\IGlobalSearchOptions.cs" />
     <Compile Include="FileHandling\Search\ISearchInfoCollection.cs" />
     <Compile Include="FileHandling\LineIndexType.cs" />
     <Compile Include="FileHandling\FileNotification.cs" />

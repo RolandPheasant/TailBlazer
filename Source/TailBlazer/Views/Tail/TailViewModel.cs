@@ -82,7 +82,8 @@ namespace TailBlazer.Views.Tail
             [NotNull] ITailViewStateRestorer restorer,
             [NotNull] SearchHints searchHints,
             [NotNull] ITailViewStateControllerFactory tailViewStateControllerFactory,
-            [NotNull] IThemeProvider themeProvider)
+            [NotNull] IThemeProvider themeProvider,
+            [NotNull] IGlobalSearchOptions globalSearchOptions)
         {
          
             if (logger == null) throw new ArgumentNullException(nameof(logger));
@@ -164,8 +165,13 @@ namespace TailBlazer.Views.Tail
                             .ObserveOn(schedulerProvider.MainThread)
                             .ForBinding();
 
+            //TODO: PUSH THIS OUT TO THE FACTORY + INJECT INTO SEARCH INFO COLLECTION
+            //[Add original and global to combined]
+
             //load lines into observable collection
-            var lineProxyFactory = new LineProxyFactory(new TextFormatter(searchMetadataCollection), new LineMatches(searchMetadataCollection), horizonalScrollArgs.DistinctUntilChanged(), themeProvider);
+            var combined = new CombinedSearchMetadataCollection(searchMetadataCollection, globalSearchOptions);
+
+            var lineProxyFactory = new LineProxyFactory(new TextFormatter(combined), new LineMatches(combined), horizonalScrollArgs.DistinctUntilChanged(), themeProvider);
 
             var loader = lineScroller.Lines.Connect()
                 .LogChanges(logger, "Received")

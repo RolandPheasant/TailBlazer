@@ -74,7 +74,7 @@ namespace TailBlazer.Views.Tail
             var searchMetadataCollection = _objectProvider.Get<ISearchMetadataCollection>();
             var searchHints = _objectProvider.Get<SearchHints>();
             var searchOptionsViewModel = new SearchOptionsViewModel(searchMetadataCollection, _globalSearchOptions, _searchProxyCollectionFactory, _searchMetadataFactory, _schedulerProvider, searchHints);
-            
+
             var searchInfo = _objectProvider.Get<ISearchInfoCollection>
                 (
                     new[]

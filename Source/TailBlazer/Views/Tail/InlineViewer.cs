@@ -10,6 +10,7 @@ using DynamicData.Binding;
 using DynamicData.PLinq;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
+using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
@@ -37,13 +38,15 @@ namespace TailBlazer.Views.Tail
             [NotNull] ISchedulerProvider schedulerProvider, 
             [NotNull] ISelectionMonitor selectionMonitor,
             [NotNull] ILogger logger, 
-            [NotNull] IThemeProvider themeProvider)
+            [NotNull] IThemeProvider themeProvider,
+            [NotNull] IGlobalSearchOptions globalSearchOptions)
         {
             if (args == null) throw new ArgumentNullException(nameof(args));
             if (clipboardHandler == null) throw new ArgumentNullException(nameof(clipboardHandler));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (selectionMonitor == null) throw new ArgumentNullException(nameof(selectionMonitor));
             if (themeProvider == null) throw new ArgumentNullException(nameof(themeProvider));
+            if (globalSearchOptions == null) throw new ArgumentNullException(nameof(globalSearchOptions));
             SelectionMonitor = selectionMonitor;
             CopyToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
 
@@ -82,7 +85,9 @@ namespace TailBlazer.Views.Tail
                             .ObserveOn(schedulerProvider.MainThread)
                             .ForBinding();
 
-            var proxyFactory = new LineProxyFactory(new TextFormatter(args.SearchMetadataCollection), new LineMatches(args.SearchMetadataCollection), horizonalScrollArgs.DistinctUntilChanged(), themeProvider);
+            var combined = new CombinedSearchMetadataCollection(args.SearchMetadataCollection, globalSearchOptions);
+
+            var proxyFactory = new LineProxyFactory(new TextFormatter(combined), new LineMatches(combined), horizonalScrollArgs.DistinctUntilChanged(), themeProvider);
 
             //load lines into observable collection
             var loader = lineScroller.Lines.Connect()

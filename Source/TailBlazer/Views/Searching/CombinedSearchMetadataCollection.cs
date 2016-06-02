@@ -9,11 +9,11 @@ using TailBlazer.Domain.FileHandling.Search;
 
 namespace TailBlazer.Views.Searching
 {
-    public class CombinedSearchMetadataCollection: IDisposable
+    public class CombinedSearchMetadataCollection: ICombinedSearchMetadataCollection
     {
         private readonly IDisposable _cleanUp;
 
-        IObservableCache<SearchMetadata, string> Metadata { get; }
+        public IObservableCache<SearchMetadata, string> Metadata { get; }
 
         public CombinedSearchMetadataCollection([NotNull] ISearchMetadataCollection metadataCollection,
             [NotNull] IGlobalSearchOptions globalSearchOptions)
@@ -67,7 +67,6 @@ namespace TailBlazer.Views.Searching
             Metadata = cache.Connect()
                 .IgnoreUpdateWhen((current,previous)=> current.Equals(previous))
                 .AsObservableCache();
-
 
             _cleanUp =new CompositeDisposable(Metadata, cache, combiner);
 
