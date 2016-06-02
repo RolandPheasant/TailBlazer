@@ -3,12 +3,9 @@ using System.IO;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Search;
-using TailBlazer.Domain.FileHandling.TextAssociations;
-using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Infrastucture;
-using TailBlazer.Views.Formatting;
 using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
@@ -17,38 +14,31 @@ namespace TailBlazer.Views.Tail
     {
         private readonly IObjectProvider _objectProvider;
         private readonly ISchedulerProvider _schedulerProvider;
-        private readonly IColourProvider _colourProvider;
         private readonly ISearchMetadataFactory _searchMetadataFactory;
-        private readonly IIconProvider _iconProvider;
         private readonly ITailViewStateControllerFactory _tailViewStateControllerFactory;
-        private readonly ITextAssociationCollection _textAssociationCollection;
-        private readonly IThemeProvider _themeProvider;
+        private readonly IGlobalSearchOptions _globalSearchOptions;
+        private readonly ISearchProxyCollectionFactory _searchProxyCollectionFactory;
 
         public TailViewModelFactory([NotNull] IObjectProvider objectProvider,
             [NotNull] ISchedulerProvider schedulerProvider, 
-            [NotNull] IColourProvider colourProvider,
             [NotNull] ISearchMetadataFactory searchMetadataFactory, 
-            [NotNull] IIconProvider iconProvider,
             [NotNull] ITailViewStateControllerFactory tailViewStateControllerFactory,
-            [NotNull] ITextAssociationCollection textAssociationCollection,
-            [NotNull]  IThemeProvider themeProvider) 
+            [NotNull] IGlobalSearchOptions globalSearchOptions,
+            [NotNull] ISearchProxyCollectionFactory searchProxyCollectionFactory) 
         {
             if (objectProvider == null) throw new ArgumentNullException(nameof(objectProvider));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
-            if (colourProvider == null) throw new ArgumentNullException(nameof(colourProvider));
             if (searchMetadataFactory == null) throw new ArgumentNullException(nameof(searchMetadataFactory));
-            if (iconProvider == null) throw new ArgumentNullException(nameof(iconProvider));
-            if (tailViewStateControllerFactory == null)
-                throw new ArgumentNullException(nameof(tailViewStateControllerFactory));
+            if (tailViewStateControllerFactory == null) throw new ArgumentNullException(nameof(tailViewStateControllerFactory));
+            if (globalSearchOptions == null) throw new ArgumentNullException(nameof(globalSearchOptions));
+            if (searchProxyCollectionFactory == null) throw new ArgumentNullException(nameof(searchProxyCollectionFactory));
 
             _objectProvider = objectProvider;
             _schedulerProvider = schedulerProvider;
-            _colourProvider = colourProvider;
             _searchMetadataFactory = searchMetadataFactory;
-            _iconProvider = iconProvider;
             _tailViewStateControllerFactory = tailViewStateControllerFactory;
-            _textAssociationCollection = textAssociationCollection;
-            _themeProvider = themeProvider;
+            _globalSearchOptions = globalSearchOptions;
+            _searchProxyCollectionFactory = searchProxyCollectionFactory;
         }
         
         public HeaderedView Create(ViewState state)
@@ -83,7 +73,7 @@ namespace TailBlazer.Views.Tail
             
             var searchMetadataCollection = _objectProvider.Get<ISearchMetadataCollection>();
             var searchHints = _objectProvider.Get<SearchHints>();
-            var searchOptionsViewModel = new SearchOptionsViewModel(searchMetadataCollection, _searchMetadataFactory, _schedulerProvider, _colourProvider, _iconProvider, _textAssociationCollection, searchHints, _themeProvider);
+            var searchOptionsViewModel = new SearchOptionsViewModel(searchMetadataCollection, _globalSearchOptions, _searchProxyCollectionFactory, _searchMetadataFactory, _schedulerProvider, searchHints);
             
             var searchInfo = _objectProvider.Get<ISearchInfoCollection>
                 (

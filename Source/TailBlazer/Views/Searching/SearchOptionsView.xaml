@@ -131,6 +131,19 @@
                 </Grid>
 
             </DataTemplate>
+
+            <DataTemplate DataType="{x:Type searching:SearchProxyCollection}">
+                <dragablz:DragablzItemsControl ItemContainerStyle="{StaticResource DragableItem}"
+                                                HorizontalContentAlignment="Stretch"
+                                                PositionMonitor="{Binding PositionMonitor}"
+                                                ItemsSource="{Binding Data}">
+
+                    <dragablz:DragablzItemsControl.ItemsOrganiser>
+                        <dragablz:VerticalOrganiser />
+                    </dragablz:DragablzItemsControl.ItemsOrganiser>
+                </dragablz:DragablzItemsControl>
+            </DataTemplate>
+            
         </ResourceDictionary>
     </Control.Resources>
 
@@ -190,7 +203,11 @@
                 </TextBox>
             </Grid>
 
-            <dragablz:DragablzItemsControl  Grid.Row="2" 
+            <ContentControl Grid.Row="2"  
+                            Margin="6 0 6 0"
+                            Content="{Binding Local}"/>
+
+            <!--<dragablz:DragablzItemsControl  Grid.Row="2" 
                                              Margin="6 0 6 0"
                                                 ItemContainerStyle="{StaticResource DragableItem}"
                                                 HorizontalContentAlignment="Stretch"
@@ -200,7 +217,7 @@
                 <dragablz:DragablzItemsControl.ItemsOrganiser>
                     <dragablz:VerticalOrganiser />
                 </dragablz:DragablzItemsControl.ItemsOrganiser>
-            </dragablz:DragablzItemsControl>
+            </dragablz:DragablzItemsControl>-->
 
             <Button  Grid.Row="3" IsDefault="True"
                  Margin="0 6 6 6"
