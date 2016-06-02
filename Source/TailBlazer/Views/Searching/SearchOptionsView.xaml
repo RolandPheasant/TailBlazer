@@ -239,10 +239,10 @@
                         VerticalAlignment="Bottom"
                         SelectedIndex="{Binding SelectedIndex}"
                         Style="{StaticResource FilterListBoxStyle}">
-                        <ListBoxItem>
+                        <ListBoxItem ToolTip="Amend local search and highlight options">
                             <TextBlock Text="{Binding Local.Data.Count , StringFormat='Local ({0})'}"/>
                         </ListBoxItem>
-                        <ListBoxItem>
+                        <ListBoxItem ToolTip="Amend global search and highlight options">
                             <TextBlock Text="{Binding Global.Data.Count , StringFormat='Global ({0})'}"/>
                         </ListBoxItem>
 
