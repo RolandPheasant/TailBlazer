@@ -94,7 +94,8 @@ namespace TailBlazer.Domain.FileHandling.Search
                 && UseRegex == other.UseRegex
                 && HighlightHue == other.HighlightHue
                 && IconKind == other.IconKind
-                && IgnoreCase == other.IgnoreCase;
+                && IgnoreCase == other.IgnoreCase
+                && IsGlobal == other.IsGlobal;
         }
 
         public override bool Equals(object obj)
@@ -117,6 +118,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                 hashCode = (hashCode*397) ^ UseRegex.GetHashCode();
                 hashCode = (hashCode*397) ^ IgnoreCase.GetHashCode();
                 hashCode = (hashCode * 397) ^ IconKind.GetHashCode();
+                hashCode = (hashCode * 397) ^ IsGlobal.GetHashCode();
                 return hashCode;
             }
         }
