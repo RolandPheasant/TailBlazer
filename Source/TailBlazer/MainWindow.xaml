@@ -66,6 +66,10 @@
         </ResourceDictionary>
     </Window.Resources>
 
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding OpenFileCommand}" Modifiers="Ctrl" Key="O"/>
+    </Window.InputBindings>
+
     <controls:MetroWindow.RightWindowCommands>
         <controls:WindowCommands>
             <StackPanel Orientation="Horizontal">
