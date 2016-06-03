@@ -1,25 +1,13 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.Linq;
 using StructureMap;
-using StructureMap.Configuration.DSL;
 using StructureMap.Graph;
 using StructureMap.Graph.Scanning;
-using StructureMap.TypeRules;
 
 namespace TailBlazer.Infrastucture
 {
-    public class AppConventions : IRegistrationConvention
+    public class ViewModelFactoryConventions : IRegistrationConvention
     {
-        public void Process(Type type, Registry registry)
-        {
-
-
-
-
-        }
-
         public void ScanTypes(TypeSet types, Registry registry)
         {
 
@@ -27,11 +15,22 @@ namespace TailBlazer.Infrastucture
             types.FindTypes(TypeClassification.Concretes | TypeClassification.Closed).ForEach(type =>
             {
 
-                // Only work on concrete types
-             //   if (!type.IsConcrete() || type.IsGenericType) return;
+                if (type.Name.EndsWith("Job"))
+                    registry.For(type).Singleton();
+            });
 
-                // Add against all the interfaces implemented
-                // by this concrete class
+        }
+    }
+
+    public class AppConventions : IRegistrationConvention
+    {
+        public void ScanTypes(TypeSet types, Registry registry)
+        {
+
+            // Only work on concrete types
+            types.FindTypes(TypeClassification.Concretes | TypeClassification.Closed).ForEach(type =>
+            {
+
                 type.GetInterfaces()
                     .Where(@interface => @interface.Name == $"I{type.Name}")
                     .ForEach(@interface => registry.For(@interface).Use(type).Singleton());

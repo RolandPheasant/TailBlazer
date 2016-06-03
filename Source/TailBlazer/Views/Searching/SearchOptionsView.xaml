@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="TailBlazer.Settings.SearchOptionsView"
+﻿<UserControl x:Class="TailBlazer.Views.Searching.SearchOptionsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,7 +6,6 @@
              xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
              xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
-             xmlns:controls="clr-namespace:TailBlazer.Controls"
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              mc:Ignorable="d" 
 
@@ -27,8 +26,6 @@
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Dragable.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"/>
-
             <DataTemplate DataType="{x:Type searching:SearchOptionsProxy}">
 
                 <Grid Margin="4 4 4 4" x:Name="Row">
@@ -48,7 +45,6 @@
                                         ToolTip="Change icon"
                                         Padding="0"
                                         Width="24" Height="24"
-                                       
                                         BorderThickness="0"
                                         HorizontalAlignment="Left"
                                         SnapsToDevicePixels="True"
@@ -89,7 +85,7 @@
                                                         BorderThickness="0"
                                                         SnapsToDevicePixels="True"
                                                         UseLayoutRounding="True"
-                                                        wpf:ShadowAssist.ShadowDepth="Depth2"
+                                                        ToolTip="{Binding}"
                                                         Command="{Binding ElementName=Row,Path=DataContext.HighlightCommand}"
                                                         CommandParameter="{Binding}"
                                                         Margin="2">
@@ -98,11 +94,8 @@
                                             </Button.Background>
                                         </Button>
                                     </Viewbox>
-                                    
-
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
-
 
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -110,7 +103,6 @@
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                         </ItemsControl>
-
                     </wpf:PopupBox>
 
                     <CheckBox Margin="4 0 0 0" Grid.Column="3" 
@@ -130,7 +122,6 @@
                                       IsChecked="{Binding IgnoreCase}" 
                                       Content="Ignore Case"/>
 
-
                     <Button Margin="8 0 6 0"
                                         Grid.Column="6" 
                                         ToolTip="{Binding RemoveTooltip}"
@@ -145,14 +136,14 @@
 
     <wpf:DialogHost Identifier="{Binding Id}">
         <Grid Width="435" Height="325">
-        <Grid.RowDefinitions>
-            <RowDefinition  Height="Auto"/>
-            <RowDefinition  Height="Auto"/>
-            <RowDefinition Height="*"/>
-             <RowDefinition  Height="Auto"/>
+            <Grid.RowDefinitions>
+                <RowDefinition  Height="Auto"/>
+                <RowDefinition  Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition  Height="Auto"/>
             </Grid.RowDefinitions>
-        
-        <TextBlock 
+
+            <TextBlock 
                 Margin="6 8 6 0"
                 FontSize="16"
                 FontWeight="DemiBold"
@@ -187,7 +178,7 @@
                 <TextBox Grid.Column="1" 
                         Margin="0 4 0 0"
                         Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                        wpf:TextFieldAssist.Hint="{Binding SearchHints.Message.Value}" 
+                        wpf:HintAssist.Hint="{Binding SearchHints.Message.Value}" 
                         VerticalAlignment="Center"
                         wpf:ValidationAssist.UsePopup="False"
                         Style="{StaticResource FloatingHintAndErrorTextBox}"
@@ -212,13 +203,13 @@
             </dragablz:DragablzItemsControl>
 
             <Button  Grid.Row="3" IsDefault="True"
-                Margin="0 0 6 0"
-                HorizontalAlignment="Right"
+                 Margin="0 6 6 6"
+                HorizontalAlignment="Left"
                 Style="{DynamicResource MaterialDesignFlatButton}"
-                Content="Finished"     
+                Content="Close"     
                 Command="{x:Static wpf:DialogHost.CloseDialogCommand}"/>
-     
-            
+
+
         </Grid>
 
     </wpf:DialogHost>

@@ -2,9 +2,7 @@
 using System.Windows;
 
 using System.Xml.Linq;
-using DynamicData.Kernel;
 using TailBlazer.Domain.Settings;
-using TailBlazer.Views.Options;
 
 namespace TailBlazer.Views.Layout
 {
@@ -20,10 +18,10 @@ namespace TailBlazer.Views.Layout
             public const string Height = "Height";
         }
 
-        public ShellSettings Convert(XElement state)
+        public ShellSettings Convert(XElement root)
         {
-            var doc = XDocument.Parse(state.Value);
-            var root = doc.ElementOrThrow(Structure.Root);
+           // var doc = XDocument.Parse(state.Value);
+        //    var root = state.Element(Structure.Root);
             var winState = root.ElementOrThrow(Structure.WindowsState).ParseEnum<WindowState>().Value;
             var top = root.ElementOrThrow(Structure.Top).ParseDouble().Value;
             var left = root.ElementOrThrow(Structure.Left).ParseDouble().Value;

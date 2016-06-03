@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using DynamicData;
-using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling.Search
 {

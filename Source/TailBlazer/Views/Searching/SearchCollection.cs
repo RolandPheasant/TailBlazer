@@ -18,7 +18,7 @@ namespace TailBlazer.Views.Searching
         private readonly IDisposable _cleanUp;
         private SearchViewModel _selected;
         private int _count;
-        private IObservableCache<SearchViewModel, string> _viewModels;
+        private readonly IObservableCache<SearchViewModel, string> _viewModels;
 
         public ReadOnlyObservableCollection<SearchViewModel> Items => _items;
         public IObservable<string> SelectedText { get; }
@@ -76,8 +76,7 @@ namespace TailBlazer.Views.Searching
             _viewModels.Lookup(item)
                 .IfHasValue(selected => Selected = selected);
         }
-
-
+        
         public SearchViewModel Selected
         {
             get { return _selected; }

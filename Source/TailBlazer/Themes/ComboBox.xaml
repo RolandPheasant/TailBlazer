@@ -107,8 +107,8 @@
                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
                 <TextBlock x:Name="Hint"
                            IsHitTestVisible="False"
-                           Opacity="{Binding Path=(wpf:TextFieldAssist.HintOpacity), RelativeSource={RelativeSource TemplatedParent}}"
-                           Text="{TemplateBinding wpf:TextFieldAssist.Hint}"
+                           Opacity="{Binding Path=(wpf:HintAssist.HintOpacity), RelativeSource={RelativeSource TemplatedParent}}"
+                           Text="{TemplateBinding wpf:HintAssist.Hint}"
                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                            
                            Validation.ErrorTemplate="{StaticResource BorderOnlyValidationErrorTemplate}" 
@@ -250,8 +250,8 @@
            BasedOn="{StaticResource MaterialDesignComboBox}"
            TargetType="{x:Type ComboBox}">
         <Setter Property="Template" Value="{StaticResource MaterialDesignFloatingHintComboBoxTemplate}" />
-        <Setter Property="wpf:TextFieldAssist.Text" Value="{Binding RelativeSource={RelativeSource Self}, Path=Text}" />
-        <Setter Property="wpf:TextFieldAssist.Managed" Value="{Binding RelativeSource={RelativeSource Self}}" />
+        <Setter Property="wpf:HintAssist.Text" Value="{Binding RelativeSource={RelativeSource Self}, Path=Text}" />
+        <Setter Property="wpf:HintAssist.Managed" Value="{Binding RelativeSource={RelativeSource Self}}" />
 
     </Style>
     

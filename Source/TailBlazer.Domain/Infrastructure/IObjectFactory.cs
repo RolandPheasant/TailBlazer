@@ -8,8 +8,7 @@ namespace TailBlazer.Domain.Infrastructure
     {
         T Get<T>();
         T Get<T>(ExplictArg arg);
-        T Get<T>(IEnumerable<ExplictArg> args)
-            ;
+        T Get<T>(IEnumerable<ExplictArg> args);
     }
 
     public interface IObjectRegister

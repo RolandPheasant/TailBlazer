@@ -75,7 +75,7 @@ namespace TailBlazer.Domain.Settings
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((Setting<T>)obj);
         }
 
@@ -83,7 +83,6 @@ namespace TailBlazer.Domain.Settings
         {
             return _key?.GetHashCode() ?? 0;
         }
-        
 
         public static bool operator ==(Setting<T> left, Setting<T> right)
         {

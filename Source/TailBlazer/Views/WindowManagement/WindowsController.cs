@@ -8,9 +8,9 @@ namespace TailBlazer.Views.WindowManagement
     public class WindowsController : IWindowsController, IDisposable
     {
         private readonly ILogger _logger;
-        private readonly ISourceCache<ViewContainer, Guid> _views = new SourceCache<ViewContainer, Guid>(vc=>vc.Id);
+        private readonly ISourceCache<HeaderedView, Guid> _views = new SourceCache<HeaderedView, Guid>(vc=>vc.Id);
 
-        public IObservableCache<ViewContainer, Guid> Views { get; }
+        public IObservableCache<HeaderedView, Guid> Views { get; }
 
         public WindowsController(ILogger logger)
         {
@@ -18,12 +18,12 @@ namespace TailBlazer.Views.WindowManagement
             Views = _views.AsObservableCache();
         }
 
-        public void Register(ViewContainer item)
+        public void Register(HeaderedView item)
         {
             _views.AddOrUpdate(item);
         }
 
-        public void Remove(ViewContainer item)
+        public void Remove(HeaderedView item)
         {
             _views.Remove(item);
         }

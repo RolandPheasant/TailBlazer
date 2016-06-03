@@ -17,7 +17,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public long Size => End - Start;
 
-        public DateTime TimeStamp { get; } = DateTime.Now;
+        public DateTime TimeStamp { get; } = DateTime.UtcNow;
 
         public Index(long start, long end, long[] indicies, int compression, int lineCount, IndexType type)
         {

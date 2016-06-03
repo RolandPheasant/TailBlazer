@@ -1,8 +1,4 @@
-﻿
-
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 
 namespace TailBlazer.Domain
 {
@@ -10,23 +6,22 @@ namespace TailBlazer.Domain
     {
         private readonly string _original;
         private static readonly StringComparer Comparer = StringComparer.OrdinalIgnoreCase;
-
-
+        
         public CaseInsensitiveString(string source)
         {
             _original = source;
         }
-
-
+        
         public static implicit operator string(CaseInsensitiveString source)
         {
             return source._original;
         }
 
-        public static explicit operator CaseInsensitiveString(string source)
+        public static implicit operator CaseInsensitiveString(string source)
         {
             return new CaseInsensitiveString(source);
         }
+
         #region Equality
 
         public bool Equals(CaseInsensitiveString other)

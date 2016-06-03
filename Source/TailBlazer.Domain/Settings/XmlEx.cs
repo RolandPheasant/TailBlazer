@@ -2,6 +2,7 @@ using System;
 using System.Reactive.Disposables;
 using System.Xml;
 using System.Xml.Linq;
+using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.Settings
 {
@@ -28,6 +29,16 @@ namespace TailBlazer.Domain.Settings
 
 
             return element;
+        }
+
+        public static Optional<string> OptionalElement(this XElement source, string elementName)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (elementName == null) throw new ArgumentNullException(nameof(elementName));
+
+            var element = source.Element(elementName);
+
+            return element?.Value ?? Optional<string>.None;
         }
 
         public static string ElementOrThrow(this XElement source, string elementName)

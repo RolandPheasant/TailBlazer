@@ -2,17 +2,13 @@ using System;
 using System.IO;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using TailBlazer.Domain.Annotations;
+using TailBlazer.Domain.Ratings;
+using TailBlazer.Domain.Settings;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public enum FileStatus
-    {
-        Loading,
-        Error,
-        Loaded
-    }
-
     public class FileWatcher : IFileWatcher
     {
         public IObservable<FileStatus> Status { get; }
@@ -29,20 +25,29 @@ namespace TailBlazer.Domain.FileHandling
 
         public string Extension => FileInfo.Extension;
 
-        public FileWatcher([NotNull] FileInfo fileInfo, IScheduler scheduler=null)
+        private readonly ISubject<long> _scanFrom = new BehaviorSubject<long>(0);
+
+        public FileWatcher([NotNull] FileInfo fileInfo, IRatingService ratingsMetrics, IScheduler scheduler=null)
         {
             FileInfo = fileInfo;
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
 
-            var shared = fileInfo.WatchFile(scheduler: scheduler ?? Scheduler.Default);
-                        //.Replay(1)
-                        //.RefCount();
+            scheduler = scheduler ?? Scheduler.Default;
+
+            var refreshRate = ratingsMetrics.Metrics.Take(1)
+                .Select(metrics=> TimeSpan.FromMilliseconds(metrics.RefreshRate))
+                .Wait();
+
+            var shared = _scanFrom.Select(start => start == 0
+                ? fileInfo.WatchFile(scheduler: scheduler, refreshPeriod: refreshRate)
+                : fileInfo.WatchFile(scheduler: scheduler, refreshPeriod: refreshRate).ScanFromEnd())
+                .Switch();
 
             Latest = shared
-                        .TakeWhile(notification => notification.Exists)
-                        .Repeat();
+                .TakeWhile(notification => notification.Exists).Repeat()
+                .Replay(1).RefCount();
 
-            Status = shared.Select(notificiation =>
+            Status = fileInfo.WatchFile(scheduler: scheduler).Select(notificiation =>
             {
                 if (!notificiation.Exists || notificiation.Error != null)
                     return FileStatus.Error;
@@ -51,6 +56,21 @@ namespace TailBlazer.Domain.FileHandling
             })
             .StartWith(FileStatus.Loading)
             .DistinctUntilChanged();
+        }
+
+        public void ScanFrom(long scanFrom)
+        {
+            _scanFrom.OnNext(scanFrom);
+        }
+
+        public void Clear()
+        {
+            _scanFrom.OnNext(FileInfo.Length);
+        }
+        
+        public void Reset()
+        {
+            _scanFrom.OnNext(0);
         }
     }
 }

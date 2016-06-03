@@ -7,7 +7,7 @@ namespace TailBlazer.Domain.Formatting
     public class Hue : IEquatable<Hue>
     {
         public string Swatch { get; }
-        public string Name { get; set; }
+        public string Name { get;  }
         public Color Foreground { get;  }
         public Color Background { get;  }
 
@@ -15,7 +15,16 @@ namespace TailBlazer.Domain.Formatting
 
         public Brush ForegroundBrush { get; }
         public Brush BackgroundBrush { get; }
-        
+
+        public static readonly Hue NotSpecified = new Hue();
+
+        private Hue()
+        {
+            Swatch = "<None>";
+            Name = "<None>";
+            Key = new HueKey(Swatch, Name);
+        }
+
         public Hue([NotNull] string swatch, [NotNull] string name, Color foreground, Color background)
         {
             if (swatch == null) throw new ArgumentNullException(nameof(swatch));
@@ -26,17 +35,12 @@ namespace TailBlazer.Domain.Formatting
             Name = name;
             Foreground = foreground;
             Background = background;
-
             ForegroundBrush = new SolidColorBrush(foreground);
             ForegroundBrush.Freeze();
-
-
             BackgroundBrush = new SolidColorBrush(background);
             BackgroundBrush.Freeze();
-
         }
-
-
+        
         #region Equality
 
         public bool Equals(Hue other)

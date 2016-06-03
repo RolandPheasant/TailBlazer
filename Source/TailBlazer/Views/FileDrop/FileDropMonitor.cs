@@ -17,10 +17,19 @@ namespace TailBlazer.Views.FileDrop
     {
         private readonly SerialDisposable _cleanUp = new SerialDisposable();
         private readonly ISubject<FileInfo> _fileDropped = new Subject<FileInfo>();
+        private bool isLoaded;
 
         public void Receive(DependencyObject value)
         {
-            var control = (UIElement) value;
+            if (isLoaded || null == value)
+                return;
+
+            isLoaded = true;
+
+            var control = value as UIElement;
+            if (null == control)
+                return;
+
             control.AllowDrop = true;
 
             var window = Window.GetWindow(value);
@@ -44,6 +53,7 @@ namespace TailBlazer.Views.FileDrop
                 {
                     if (adorner == null) return;
                     adorner.Detatch();
+
                     adorner = null;
                 });
 
@@ -52,7 +62,7 @@ namespace TailBlazer.Views.FileDrop
                     .Select(ev => ev.EventArgs)
                     .Where(_=>adorner!=null)
                     .Subscribe(e => adorner.MousePosition = e.GetPosition(window));
-            
+
             var dropped = Observable.FromEventPattern<DragEventHandler, DragEventArgs>
                 (h => control.Drop += h, h => control.Drop -= h)
                 .Select(ev => ev.EventArgs)
@@ -66,7 +76,6 @@ namespace TailBlazer.Views.FileDrop
                     return files.Select(f => new FileInfo(f));
                 })
                 .SubscribeSafe(_fileDropped);
-
 
             _cleanUp.Disposable = Disposable.Create(() =>
             {

@@ -12,17 +12,24 @@ namespace TailBlazer.Views.Tail
         public TailView()
         {
             InitializeComponent();
-            Loaded += (sender, e) =>
+            IsVisibleChanged += (sender, e) =>
             {
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
+                FocusSearchTextBox();
+            };            
+        }
 
-                    this.SearchTextBox.Focus();
-                    MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
-                }));
+        private void FocusSearchTextBox()
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                SearchTextBox.Focus();
+                MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
+            }));
+        }
 
-
-            };
+        private void ApplicationCommandFind_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            FocusSearchTextBox();
         }
     }
 }

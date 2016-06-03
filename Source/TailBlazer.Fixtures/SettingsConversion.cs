@@ -1,9 +1,9 @@
+using System.Globalization;
 using System.IO;
+using System.Threading;
 using FluentAssertions;
-using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Recent;
-using TailBlazer.Settings;
-using TailBlazer.Views.Options;
+using TailBlazer.Domain.Formatting;
 using Xunit;
 
 namespace TailBlazer.Fixtures
@@ -17,7 +17,7 @@ namespace TailBlazer.Fixtures
             var files = new[]
             {
                 new RecentFile(new FileInfo(@"C:\\File1.txt")),
-                new RecentFile(new FileInfo(@"C:\\File2.txt")),
+                new RecentFile(new FileInfo(@"C:\\File2.txt"))
             };
 
             var converter = new RecentFilesToStateConverter();
@@ -27,10 +27,22 @@ namespace TailBlazer.Fixtures
         }
 
         [Fact]
-        public void GeneralOptions()
+        public void GeneralOptionsWithCultureDeDe()
         {
+            SerializeAndDeserializeWithCulture("de-DE");
+        }
 
-            var original = new GeneralOptions(Theme.Dark, false,0.5,125);
+        [Fact]
+        public void GeneralOptionsWithCultureEnUs()
+        {
+            SerializeAndDeserializeWithCulture("en-Us");
+        }
+
+        private void SerializeAndDeserializeWithCulture(string cultureName)
+        {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo(cultureName);
+
+            var original = new GeneralOptions(Theme.Dark, false,0.5, 125,5);
             var converter = new GeneralOptionsConverter();
             var state = converter.Convert(original);
             var restored = converter.Convert(state);

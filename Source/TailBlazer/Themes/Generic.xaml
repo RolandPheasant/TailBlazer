@@ -10,15 +10,14 @@
     </ResourceDictionary.MergedDictionaries>
 
     <Style TargetType="{x:Type controls:HighlightTextControl}">
+        <Setter Property="BorderThickness" Value="2"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:HighlightTextControl}">
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
-                        <TextBlock  TextWrapping="NoWrap" 
-                                    TextTrimming="CharacterEllipsis"  
-                                    x:Name="PART_TEXT"/>
+                        <TextBlock x:Name="PART_TEXT" TextWrapping="NoWrap"/>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>

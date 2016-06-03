@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
+﻿using System.ComponentModel;
 using MahApps.Metro.Controls;
-using TailBlazer.Views;
 using TailBlazer.Views.WindowManagement;
 
 namespace TailBlazer
 {
-
-    public delegate void WindowClosing();
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -21,11 +14,12 @@ namespace TailBlazer
         public MainWindow()
         {
             InitializeComponent();
+          //  EventManager.RegisterClassHandler(typeof(Window), Mouse.MouseWheelEvent, new MouseEventHandler(MouseMouveEventHandler), true);
 
             Closing += MainWindow_Closing;
         }
 
-        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
 
             var windowsModel = DataContext as WindowViewModel;

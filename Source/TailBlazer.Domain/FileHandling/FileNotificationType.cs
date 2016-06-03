@@ -9,6 +9,6 @@ namespace TailBlazer.Domain.FileHandling
         CreatedOrOpened,
         Changed,
         Missing,
-        Error,
+        Error
     }
 }

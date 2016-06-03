@@ -1,6 +1,8 @@
-﻿using DynamicData.Kernel;
+﻿using System;
+using System.Globalization;
+using DynamicData.Kernel;
 
-namespace System
+namespace TailBlazer.Domain.Infrastructure
 {
     public static class ParseEx
     {
@@ -13,28 +15,28 @@ namespace System
             return Optional.None<bool>();
         }
 
-        public static Optional<decimal> ParseDecimal(this string source)
+        public static Optional<decimal> ParseDecimal(this string source, IFormatProvider formatProvider = null)
         {
             decimal result;
-            if (decimal.TryParse(source, out result))
+            if (decimal.TryParse(source, NumberStyles.Number, formatProvider ?? NumberFormatInfo.InvariantInfo, out result))
                 return result;
 
             return Optional.None<decimal>();
         }
 
-        public static Optional<double> ParseDouble(this string source)
+        public static Optional<double> ParseDouble(this string source, IFormatProvider formatProvider = null)
         {
             double result;
-            if (double.TryParse(source, out result))
+            if (double.TryParse(source, NumberStyles.Float | NumberStyles.AllowThousands, formatProvider ?? NumberFormatInfo.InvariantInfo, out result))
                 return result;
 
             return Optional.None<double>();
         }
 
-        public static Optional<int> ParseInt(this string source)
+        public static Optional<int> ParseInt(this string source, IFormatProvider formatProvider = null)
         {
             int result;
-            if (int.TryParse(source, out result))
+            if (int.TryParse(source, NumberStyles.Integer, formatProvider ?? NumberFormatInfo.InvariantInfo, out result))
                 return result;
 
             return Optional.None<int>();
@@ -50,5 +52,6 @@ namespace System
 
             return Optional.None<T>();
         }
+
     }
 }

@@ -17,11 +17,7 @@ namespace TailBlazer.Views.Tail
         private readonly TailViewModel _tailView;
         private readonly IDisposable _cleanUp;
 
-        public TailViewStateController([NotNull] TailViewModel tailView,
-            IStateBucketService stateBucketService,
-            ISchedulerProvider schedulerProvider, 
-            ITailViewStateRestorer tailViewStateRestorer,
-            ILogger logger)
+        public TailViewStateController([NotNull] TailViewModel tailView, IStateBucketService stateBucketService, ISchedulerProvider schedulerProvider, ITailViewStateRestorer tailViewStateRestorer, ILogger logger, bool loadDefaults)
         {
             if (tailView == null) throw new ArgumentNullException(nameof(tailView));
 
@@ -35,25 +31,29 @@ namespace TailBlazer.Views.Tail
             logger.Info("Loading state for {0}", tailView.Name);
 
             //Load state
-            stateBucketService
-                .Lookup(type, tailView.Name)
-                .IfHasValue(tailviewstate =>
-                {
-                    schedulerProvider.Background.Schedule(() =>
+
+            if (loadDefaults)
+            {
+                stateBucketService
+                    .Lookup(type, tailView.Name)
+                    .IfHasValue(tailviewstate =>
                     {
-                        try
+                        schedulerProvider.Background.Schedule(() =>
                         {
-                            loadingSettings = true;
-                            tailViewStateRestorer.Restore(tailView, tailviewstate);
+                            try
+                            {
+                                loadingSettings = true;
+                                tailViewStateRestorer.Restore(tailView, tailviewstate);
                             }
-                        finally 
-                        {
-                            loadingSettings = false;
-                        }
+                            finally
+                            {
+                                loadingSettings = false;
+                            }
 
+                        });
                     });
-                });
-
+            }
+            
 
             //write latest to file when something triggers a staye change
             var selectedChanged = tailView.SearchCollection

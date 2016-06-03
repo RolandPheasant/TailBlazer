@@ -27,7 +27,20 @@ namespace TailBlazer.Views.Formatting
 
             return match != null ? match.IconName : useRegex ? RegEx : Search;
         }
-        
+
+        public string GetIconOrDefault(string text, bool useRegex, string iconKind)
+        {
+            var existing = DefaultMatches
+                .FirstOrDefault(icon => icon.IconName.Equals(iconKind, StringComparison.OrdinalIgnoreCase));
+
+
+            if (existing != null)
+                return existing.IconName;
+
+            return GetIconFor(text, useRegex);
+
+        }
+
         private IEnumerable<DefaultIcons> LoadIcons()
         {
             yield return new DefaultIcons("DEBUG", PackIconKind.Bug.ToString());
@@ -37,18 +50,18 @@ namespace TailBlazer.Views.Formatting
             yield return new DefaultIcons("ERROR", PackIconKind.SquareInc.ToString());
             yield return new DefaultIcons("FATAL", PackIconKind.ExitToApp.ToString());
 
-            yield return new DefaultIcons("BANK", PackIconKind.Bank.ToString(), false);
-            yield return new DefaultIcons("PERSON", PackIconKind.Account.ToString(), false);
-            yield return new DefaultIcons("PEOPLE", PackIconKind.AccountMultiple.ToString(), false);
-            yield return new DefaultIcons("USD", PackIconKind.CurrencyUsd.ToString(), false);
-            yield return new DefaultIcons("GBP", PackIconKind.CurrencyGbp.ToString(), false);
-            yield return new DefaultIcons("EUR", PackIconKind.CurrencyEur.ToString(), false);
+            yield return new DefaultIcons("BANK", PackIconKind.Bank.ToString());
+            yield return new DefaultIcons("PERSON", PackIconKind.Account.ToString());
+            yield return new DefaultIcons("PEOPLE", PackIconKind.AccountMultiple.ToString());
+            yield return new DefaultIcons("USD", PackIconKind.CurrencyUsd.ToString());
+            yield return new DefaultIcons("GBP", PackIconKind.CurrencyGbp.ToString());
+            yield return new DefaultIcons("EUR", PackIconKind.CurrencyEur.ToString());
 
-            yield return new DefaultIcons("FUCK", PackIconKind.EmoticonDevil.ToString(), false);
-            yield return new DefaultIcons("SHIT", PackIconKind.EmoticonPoop.ToString(), false);
-            yield return new DefaultIcons("POOP", PackIconKind.EmoticonPoop.ToString(), false);
-            yield return new DefaultIcons("PISS", PackIconKind.EmoticonDevil.ToString(), false);
-            yield return new DefaultIcons("WANK", PackIconKind.EmoticonDevil.ToString(), false);
+            yield return new DefaultIcons("FUCK", PackIconKind.EmoticonDevil.ToString());
+            yield return new DefaultIcons("SHIT", PackIconKind.EmoticonPoop.ToString());
+            yield return new DefaultIcons("POOP", PackIconKind.EmoticonPoop.ToString());
+            yield return new DefaultIcons("PISS", PackIconKind.EmoticonDevil.ToString());
+            yield return new DefaultIcons("WANK", PackIconKind.EmoticonDevil.ToString());
         }
 
         private class DefaultIcons

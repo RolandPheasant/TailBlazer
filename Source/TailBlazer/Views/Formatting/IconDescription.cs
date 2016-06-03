@@ -1,8 +1,8 @@
 using System;
-using Humanizer;
+using System.Text.RegularExpressions;
 using MaterialDesignThemes.Wpf;
 
-namespace TailBlazer.Views.Searching
+namespace TailBlazer.Views.Formatting
 {
     public class IconDescription : IEquatable<IconDescription>
     {
@@ -11,14 +11,13 @@ namespace TailBlazer.Views.Searching
 
         public string Description { get; }
 
+
         public IconDescription(PackIconKind type, string name)
         {
             Type = type;
             Name = name;
-            Description = name.Humanize();
+            Description = Regex.Replace(name, "(\\B[A-Z])", " $1");
         }
-
-      
 
         #region Equality
 
@@ -41,7 +40,7 @@ namespace TailBlazer.Views.Searching
         {
             unchecked
             {
-                return ((Name != null ? Name.GetHashCode() : 0)*397) ^ (int) Type;
+                return ((Name?.GetHashCode() ?? 0)*397) ^ (int) Type;
             }
         }
 
