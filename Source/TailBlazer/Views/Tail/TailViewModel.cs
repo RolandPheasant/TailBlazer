@@ -24,7 +24,13 @@ using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {
-    public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentView
+    public interface ISelectedLineChangedProvider
+    {
+        IObservable<LineProxy> SelectedLineChanged { get; }
+    }
+
+
+    public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentView, ISelectedLineChangedProvider
     {
         private readonly IDisposable _cleanUp;
         private readonly SingleAssignmentDisposable _stateMonitor= new SingleAssignmentDisposable();
@@ -42,6 +48,8 @@ namespace TailBlazer.Views.Tail
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         public Guid Id { get; } = Guid.NewGuid();
         public ISelectionMonitor SelectionMonitor { get; }
+        public GeneralOptionBindings GeneralOptionBindings { get;  }
+        public IObservable<LineProxy> SelectedLineChanged { get; }
         private SearchOptionsViewModel SearchOptions { get;  }
         public SearchHints SearchHints { get;  }
         public SearchCollection SearchCollection { get; }
@@ -54,8 +62,7 @@ namespace TailBlazer.Views.Tail
         public IProperty<FileStatus> FileStatus { get; }
         public IProperty<bool> InlineViewerVisible { get; }
         public IProperty<bool> CanViewInline { get; }
-        public IProperty<bool> HighlightTail { get; }
-        public IProperty<bool> UsingDarkTheme { get; }
+
         public IProperty<int> MaximumChars { get; }
 
         public ICommand CopyToClipboardCommand { get; }
@@ -74,8 +81,8 @@ namespace TailBlazer.Views.Tail
             [NotNull] ISelectionMonitor selectionMonitor, 
             [NotNull] IClipboardHandler clipboardHandler, 
             [NotNull] ISearchInfoCollection searchInfoCollection, 
-            [NotNull] IInlineViewerFactory inlineViewerFactory, 
-            [NotNull] ISetting<GeneralOptions> generalOptions,
+            [NotNull] IInlineViewerFactory inlineViewerFactory,
+            [NotNull] GeneralOptionBindings generalOptionBindings,
             [NotNull] ISearchMetadataCollection searchMetadataCollection,
             [NotNull] IStateBucketService stateBucketService,
             [NotNull] SearchOptionsViewModel searchOptionsViewModel,
@@ -83,7 +90,9 @@ namespace TailBlazer.Views.Tail
             [NotNull] SearchHints searchHints,
             [NotNull] ITailViewStateControllerFactory tailViewStateControllerFactory,
             [NotNull] IThemeProvider themeProvider,
-            [NotNull] IGlobalSearchOptions globalSearchOptions)
+            [NotNull] SearchCollection searchCollection, 
+            [NotNull] ITextFormatter textFormatter,
+            [NotNull] ILineMatches lineMatches)
         {
          
             if (logger == null) throw new ArgumentNullException(nameof(logger));
@@ -93,15 +102,18 @@ namespace TailBlazer.Views.Tail
             if (clipboardHandler == null) throw new ArgumentNullException(nameof(clipboardHandler));
             if (searchInfoCollection == null) throw new ArgumentNullException(nameof(searchInfoCollection));
             if (inlineViewerFactory == null) throw new ArgumentNullException(nameof(inlineViewerFactory));
-            if (generalOptions == null) throw new ArgumentNullException(nameof(generalOptions));
             if (searchMetadataCollection == null) throw new ArgumentNullException(nameof(searchMetadataCollection));
             if (stateBucketService == null) throw new ArgumentNullException(nameof(stateBucketService));
             if (searchOptionsViewModel == null) throw new ArgumentNullException(nameof(searchOptionsViewModel));
             if (searchHints == null) throw new ArgumentNullException(nameof(searchHints));
             if (themeProvider == null) throw new ArgumentNullException(nameof(themeProvider));
+            if (searchCollection == null) throw new ArgumentNullException(nameof(searchCollection));
+            if (textFormatter == null) throw new ArgumentNullException(nameof(textFormatter));
+            if (lineMatches == null) throw new ArgumentNullException(nameof(lineMatches));
 
             Name = fileWatcher.FullName;
             SelectionMonitor = selectionMonitor;
+            GeneralOptionBindings = generalOptionBindings;
             SearchOptions = searchOptionsViewModel;
             SearchHints = searchHints;
 
@@ -113,24 +125,14 @@ namespace TailBlazer.Views.Tail
             ClearCommand = new Command(fileWatcher.Clear);
             KeyAutoTail = new Command(() => { AutoTail = true; });
 
-            SearchCollection = new SearchCollection(searchInfoCollection, schedulerProvider);
+            SearchCollection = searchCollection;//new SearchCollection(searchInfoCollection, schedulerProvider);
             SearchMetadataCollection = searchMetadataCollection;
-            
+            SelectedLineChanged = this.WhenValueChanged(vm => vm.SelectedItem);
+
             var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
             HorizonalScrollChanged = args => horizonalScrollArgs.OnNext(args);
             
             _tailViewStateControllerFactory = tailViewStateControllerFactory;
-            
-            //Move these 2 highlight fields to a service as all views require them
-            UsingDarkTheme = generalOptions.Value
-                    .ObserveOn(schedulerProvider.MainThread)
-                    .Select(options => options.Theme== Theme.Dark)
-                    .ForBinding();
-
-            HighlightTail = generalOptions.Value
-                .ObserveOn(schedulerProvider.MainThread)
-                .Select(options => options.HighlightTail)
-                .ForBinding();
 
             //this deals with state when loading the system at start up and at shut-down
             _persister = new TailViewPersister(this, restorer);
@@ -165,13 +167,7 @@ namespace TailBlazer.Views.Tail
                             .ObserveOn(schedulerProvider.MainThread)
                             .ForBinding();
 
-            //TODO: PUSH THIS OUT TO THE FACTORY + INJECT INTO SEARCH INFO COLLECTION
-            //[Add original and global to combined]
-
-            //load lines into observable collection
-            var combined = new CombinedSearchMetadataCollection(searchMetadataCollection, globalSearchOptions);
-
-            var lineProxyFactory = new LineProxyFactory(new TextFormatter(combined), new LineMatches(combined), horizonalScrollArgs.DistinctUntilChanged(), themeProvider);
+            var lineProxyFactory = new LineProxyFactory(textFormatter, lineMatches, horizonalScrollArgs.DistinctUntilChanged(), themeProvider);
 
             var loader = lineScroller.Lines.Connect()
                 .LogChanges(logger, "Received")
@@ -218,7 +214,7 @@ namespace TailBlazer.Views.Tail
             //return an empty line provider unless user is viewing inline - this saves needless trips to the file
             var inline = searchInfoCollection.All.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : new EmptyLineProvider());
 
-            InlineViewer = inlineViewerFactory.Create(inline, this.WhenValueChanged(vm => vm.SelectedItem), searchMetadataCollection);
+            InlineViewer = inlineViewerFactory. Create(inline, this.WhenValueChanged(vm => vm.SelectedItem), searchMetadataCollection);
 
             _cleanUp = new CompositeDisposable(lineScroller,
                 loader,
@@ -232,8 +228,6 @@ namespace TailBlazer.Views.Tail
                 InlineViewerVisible,
                 SearchCollection,
                 searchInfoCollection,
-                HighlightTail,
-                UsingDarkTheme,
                 searchHints,
                 searchMetadataCollection,
                 SelectionMonitor,
@@ -241,6 +235,7 @@ namespace TailBlazer.Views.Tail
                 searchInvoker,
                 MaximumChars,
                 _stateMonitor,
+
                 horizonalScrollArgs.SetAsComplete(),
                 _userScrollRequested.SetAsComplete());
         }

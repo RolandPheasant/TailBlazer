@@ -36,7 +36,11 @@ namespace TailBlazer.Infrastucture
             For<ISelectionMonitor>().Use<SelectionMonitor>();
             For<ISearchInfoCollection>().Use<SearchInfoCollection>();
             For<ISearchMetadataCollection>().Use<SearchMetadataCollection>().Transient();
-            For<ITextFormatter>().Use<TextFormatter>();
+            For<ICombinedSearchMetadataCollection>().Use<CombinedSearchMetadataCollection>().Transient();
+             
+
+            For<ITextFormatter>().Use<TextFormatter>().Transient();
+            For<ILineMatches>().Use<LineMatches>().Transient();
             For<ISettingsStore>().Use<FileSettingsStore>().Singleton();
             For<IFileWatcher>().Use<FileWatcher>();
 
@@ -56,9 +60,9 @@ namespace TailBlazer.Infrastucture
             Forward<ApplicationStateBroker, IApplicationStateNotifier>();
             Forward<ApplicationStateBroker, IApplicationStatePublisher>();
 
-
+            
             For<TailViewModelFactory>().Singleton();
-
+            Forward<TailViewModel, ISelectedLineChangedProvider>();
 
             Scan(scanner =>
             {
@@ -68,8 +72,12 @@ namespace TailBlazer.Infrastucture
                 scanner.ExcludeType<SelectionMonitor>();
                 scanner.ExcludeType<SearchInfoCollection>();
                 scanner.ExcludeType<SearchMetadataCollection>();
-                scanner.ExcludeType<ITextFormatter>();
+                scanner.ExcludeType<CombinedSearchMetadataCollection>();
+                scanner.ExcludeType<TextFormatter>();
+                scanner.ExcludeType<LineMatches>();
                 scanner.ExcludeType<ViewFactoryService>();
+
+                
 
                 scanner.ExcludeType<FileWatcher>();
                 scanner.LookForRegistries();

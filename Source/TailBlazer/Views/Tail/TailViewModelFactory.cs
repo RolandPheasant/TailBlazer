@@ -3,11 +3,9 @@ using System.IO;
 using System.Reactive.Concurrency;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
-using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Infrastucture;
-using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {
@@ -15,31 +13,14 @@ namespace TailBlazer.Views.Tail
     {
         private readonly IObjectProvider _objectProvider;
         private readonly ISchedulerProvider _schedulerProvider;
-        private readonly ISearchMetadataFactory _searchMetadataFactory;
-        private readonly ITailViewStateControllerFactory _tailViewStateControllerFactory;
-        private readonly IGlobalSearchOptions _globalSearchOptions;
-        private readonly ISearchProxyCollectionFactory _searchProxyCollectionFactory;
 
-        public TailViewModelFactory([NotNull] IObjectProvider objectProvider,
-            [NotNull] ISchedulerProvider schedulerProvider, 
-            [NotNull] ISearchMetadataFactory searchMetadataFactory, 
-            [NotNull] ITailViewStateControllerFactory tailViewStateControllerFactory,
-            [NotNull] IGlobalSearchOptions globalSearchOptions,
-            [NotNull] ISearchProxyCollectionFactory searchProxyCollectionFactory) 
+        public TailViewModelFactory([NotNull] IObjectProvider objectProvider, [NotNull] ISchedulerProvider schedulerProvider) 
         {
             if (objectProvider == null) throw new ArgumentNullException(nameof(objectProvider));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
-            if (searchMetadataFactory == null) throw new ArgumentNullException(nameof(searchMetadataFactory));
-            if (tailViewStateControllerFactory == null) throw new ArgumentNullException(nameof(tailViewStateControllerFactory));
-            if (globalSearchOptions == null) throw new ArgumentNullException(nameof(globalSearchOptions));
-            if (searchProxyCollectionFactory == null) throw new ArgumentNullException(nameof(searchProxyCollectionFactory));
 
             _objectProvider = objectProvider;
             _schedulerProvider = schedulerProvider;
-            _searchMetadataFactory = searchMetadataFactory;
-            _tailViewStateControllerFactory = tailViewStateControllerFactory;
-            _globalSearchOptions = globalSearchOptions;
-            _searchProxyCollectionFactory = searchProxyCollectionFactory;
         }
         
         public HeaderedView Create(ViewState state)
@@ -70,31 +51,9 @@ namespace TailBlazer.Views.Tail
             {
                 new Argument<FileInfo>(fileInfo),
                 new Argument<IScheduler>(_schedulerProvider.Background)
-            }); 
-
-            var searchMetadataCollection = _objectProvider.Get<ISearchMetadataCollection>();
-            var searchHints = _objectProvider.Get<SearchHints>();
-            var searchOptionsViewModel = new SearchOptionsViewModel(searchMetadataCollection, _globalSearchOptions, _searchProxyCollectionFactory, _searchMetadataFactory, _schedulerProvider, searchHints);
-
-            var searchInfo = _objectProvider.Get<ISearchInfoCollection>
-                (
-                    new[]
-                    {
-                        new NamedArgument("fileWatcher", fileWatcher),
-                        new NamedArgument("searchMetadataCollection", searchMetadataCollection)
-                    }
-                );
-            
-            //I hate explicity specify named args - so fragile but hey ho.
-            var viewModel = _objectProvider.Get<TailViewModel>(new[]
-            {
-                new NamedArgument("fileWatcher", fileWatcher),
-                new NamedArgument("searchInfoCollection", searchInfo),
-                new NamedArgument("searchMetadataCollection", searchMetadataCollection),
-                new NamedArgument("searchOptionsViewModel", searchOptionsViewModel),
             });
 
-            return viewModel;
+            return _objectProvider.Get<TailViewModel>(new Argument<IFileWatcher>(fileWatcher));
         }
         
         public string Key => TailViewModelConstants.ViewKey;

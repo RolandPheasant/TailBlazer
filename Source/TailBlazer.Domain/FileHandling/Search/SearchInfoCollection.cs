@@ -8,7 +8,7 @@ namespace TailBlazer.Domain.FileHandling.Search
 {
     public sealed class SearchInfoCollection : ISearchInfoCollection
     {
-        private readonly ISearchMetadataCollection _metadataCollection;
+        private readonly ISearchMetadataCollection _localMetadataCollection;
         private readonly ISearchMetadataFactory _searchMetadataFactory;
         private readonly IFileWatcher _fileWatcher;
         private readonly IDisposable _cleanUp;
@@ -17,11 +17,11 @@ namespace TailBlazer.Domain.FileHandling.Search
         
         public IObservable<ILineProvider> All { get; }
         
-        public SearchInfoCollection(ISearchMetadataCollection searchMetadataCollection,
+        public SearchInfoCollection(ICombinedSearchMetadataCollection combinedSearchMetadataCollection,
             ISearchMetadataFactory searchMetadataFactory,
             IFileWatcher fileWatcher)
         {
-            _metadataCollection = searchMetadataCollection;
+            _localMetadataCollection = combinedSearchMetadataCollection.Local;
             _searchMetadataFactory = searchMetadataFactory;
             _fileWatcher = fileWatcher;
 
@@ -33,7 +33,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             systemSearches.AddOrUpdate(new SearchInfo("<All>", All, SearchType.All));
             
             //create a collection of all possible user filters
-            var userSearches = searchMetadataCollection.Metadata
+            var userSearches = combinedSearchMetadataCollection.Combined
                 .Connect(meta => meta.Filter)
                 .IgnoreUpdateWhen((current,previous)=> SearchMetadata.EffectsFilterComparer.Equals(current, previous))
                 .Transform(meta =>
@@ -57,14 +57,14 @@ namespace TailBlazer.Domain.FileHandling.Search
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
 
-            var index = _metadataCollection.NextIndex();
+            var index = _localMetadataCollection.NextIndex();
             var metatdata = _searchMetadataFactory.Create(searchText, useRegex, index,true);
-            _metadataCollection.AddorUpdate(metatdata);
+            _localMetadataCollection.AddorUpdate(metatdata);
         }
 
         public void Remove(string searchText)
         {
-            _metadataCollection.Remove(searchText);
+            _localMetadataCollection.Remove(searchText);
         }
 
         public void Dispose()
