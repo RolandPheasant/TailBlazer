@@ -1,6 +1,5 @@
 using System;
 using TailBlazer.Domain.FileHandling;
-using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Views.Tail
@@ -14,14 +13,12 @@ namespace TailBlazer.Views.Tail
             _objectProvider = objectProvider;
         }
 
-        public InlineViewer Create(IObservable<ILineProvider> lineProvider,
-            IObservable<LineProxy> selectedChanged, 
-            ISearchMetadataCollection searchMetadataCollection)
+        public InlineViewer Create(IObservable<ILineProvider> lineProvider, IObservable<LineProxy> selectedChanged)
         {
             
-            var args = new InlineViewerArgs(lineProvider, selectedChanged, searchMetadataCollection);
+            var args = new InlineViewerArgs(lineProvider, selectedChanged);
 
-            return _objectProvider.Get<InlineViewer>(new NamedArgument("args", args));
+            return _objectProvider.Get<InlineViewer>(new Argument(args));
         }
     }
 }

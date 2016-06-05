@@ -92,7 +92,8 @@ namespace TailBlazer.Views.Tail
             [NotNull] IThemeProvider themeProvider,
             [NotNull] SearchCollection searchCollection, 
             [NotNull] ITextFormatter textFormatter,
-            [NotNull] ILineMatches lineMatches)
+            [NotNull] ILineMatches lineMatches,
+            [NotNull] ICombinedSearchMetadataCollection combinedSearchMetadataCollection)
         {
          
             if (logger == null) throw new ArgumentNullException(nameof(logger));
@@ -110,6 +111,7 @@ namespace TailBlazer.Views.Tail
             if (searchCollection == null) throw new ArgumentNullException(nameof(searchCollection));
             if (textFormatter == null) throw new ArgumentNullException(nameof(textFormatter));
             if (lineMatches == null) throw new ArgumentNullException(nameof(lineMatches));
+            if (combinedSearchMetadataCollection == null) throw new ArgumentNullException(nameof(combinedSearchMetadataCollection));
 
             Name = fileWatcher.FullName;
             SelectionMonitor = selectionMonitor;
@@ -212,9 +214,9 @@ namespace TailBlazer.Views.Tail
             InlineViewerVisible = inlineViewerVisible.ForBinding();
 
             //return an empty line provider unless user is viewing inline - this saves needless trips to the file
-            var inline = searchInfoCollection.All.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : new EmptyLineProvider());
+            var inline = searchInfoCollection.All.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : EmptyLineProvider.Instance);
 
-            InlineViewer = inlineViewerFactory. Create(inline, this.WhenValueChanged(vm => vm.SelectedItem), searchMetadataCollection);
+            InlineViewer = inlineViewerFactory. Create(inline, this.WhenValueChanged(vm => vm.SelectedItem));
 
             _cleanUp = new CompositeDisposable(lineScroller,
                 loader,
@@ -235,7 +237,7 @@ namespace TailBlazer.Views.Tail
                 searchInvoker,
                 MaximumChars,
                 _stateMonitor,
-
+                combinedSearchMetadataCollection,
                 horizonalScrollArgs.SetAsComplete(),
                 _userScrollRequested.SetAsComplete());
         }

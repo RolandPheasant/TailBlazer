@@ -22,7 +22,6 @@ namespace TailBlazer.Views.Searching
             ISearchProxyCollectionFactory searchProxyCollectionFactory,
             ISearchMetadataFactory searchMetadataFactory,
             ISchedulerProvider schedulerProvider,
-            
             SearchHints searchHints)
         {
             SearchHints = searchHints;
@@ -71,7 +70,6 @@ namespace TailBlazer.Views.Searching
                     {
                         global.AddorUpdate(meta);
                     }
-                   
                 });
 
             _cleanUp = new CompositeDisposable(searchInvoker,

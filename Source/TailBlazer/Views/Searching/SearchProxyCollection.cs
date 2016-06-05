@@ -66,12 +66,9 @@ namespace TailBlazer.Views.Searching
                     return new CompositeDisposable(anyPropertyHasChanged, textAssociationChanged);
                 })
                 .AsObservableCache();
-
-
-            var monitor = MonitorPositionalChanges()
-                .Subscribe(metadataCollection.Add);
-
-
+            
+            var monitor = MonitorPositionalChanges().Subscribe(metadataCollection.Add);
+            
             //load data onto grid
             var collection = new ObservableCollectionExtended<SearchOptionsProxy>();
 

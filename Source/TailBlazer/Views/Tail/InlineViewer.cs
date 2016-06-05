@@ -59,9 +59,7 @@ namespace TailBlazer.Views.Tail
             var scrollSelected = selectedChanged
                     .CombineLatest(lineProvider, pageSize, (proxy, lp, pge) => proxy == null ? new ScrollRequest(pge,0) : new ScrollRequest(pge, proxy.Start))
                     .DistinctUntilChanged();
-
-
-
+            
             var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
             HorizonalScrollChanged = hargs =>
             {
