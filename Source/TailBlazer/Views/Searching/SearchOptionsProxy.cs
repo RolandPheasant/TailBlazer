@@ -1,19 +1,18 @@
 using System;
 using System.Collections.Generic;
-using System.Reactive.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
 using DynamicData.Binding;
 using DynamicData.Kernel;
 using MaterialDesignThemes.Wpf;
-using TailBlazer.Controls;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
-using Hue = TailBlazer.Domain.Formatting.Hue;
 
 namespace TailBlazer.Views.Searching
 {
@@ -35,18 +34,15 @@ namespace TailBlazer.Views.Searching
         public ICommand RemoveCommand { get; }
         public ICommand HighlightCommand { get; }
         public IEnumerable<Hue> Hues { get; }
-
         public ICommand ShowIconSelectorCommand { get; }
-
         private IconSelector IconSelector { get; }
-
         public Guid ParentId { get; }
-
         public IProperty<Brush> Background { get; }
         public IProperty<Brush> Foreground { get; }
 
         public SearchOptionsProxy([NotNull] SearchMetadata searchMetadata, 
             [NotNull] IColourProvider colourProvider, 
+            [NotNull] IThemeProvider themeProvider,
             [NotNull] IconSelector iconSelector,
             [NotNull] Action<SearchMetadata> removeAction, 
             [NotNull] IDefaultIconSelector defaultIconSelector,
@@ -54,22 +50,15 @@ namespace TailBlazer.Views.Searching
         {
             if (searchMetadata == null) throw new ArgumentNullException(nameof(searchMetadata));
             if (colourProvider == null) throw new ArgumentNullException(nameof(colourProvider));
+            if (themeProvider == null) throw new ArgumentNullException(nameof(themeProvider));
             if (iconSelector == null) throw new ArgumentNullException(nameof(iconSelector));
             if (removeAction == null) throw new ArgumentNullException(nameof(removeAction));
             if (defaultIconSelector == null) throw new ArgumentNullException(nameof(defaultIconSelector));
 
-
             _searchMetadata = searchMetadata;
             _defaultIconSelector = defaultIconSelector;
-            IconSelector = iconSelector;
 
-            ShowIconSelectorCommand = new Command(ShowIconSelector);
-            RemoveCommand = new Command(() => removeAction(searchMetadata));
-            HighlightCommand = new Command<Hue>(newHue =>
-            {
-                HighlightHue = newHue;
-            });
-            
+            IconSelector = iconSelector;
             ParentId = parentId;
             Highlight = _searchMetadata.Highlight;
             Filter = _searchMetadata.Filter;
@@ -79,23 +68,31 @@ namespace TailBlazer.Views.Searching
             Hues = colourProvider.Hues;
             HighlightHue = searchMetadata.HighlightHue;
 
+            ShowIconSelectorCommand = new Command(async () => await ShowIconSelector());
+            RemoveCommand = new Command(() => removeAction(searchMetadata));
+            HighlightCommand = new Command<Hue>(newHue =>
+            {
+                HighlightHue = newHue;
+            });
+            
             IconKind = _searchMetadata.IconKind.ParseEnum<PackIconKind>()
                             .ValueOr(() => PackIconKind.ArrowRightBold);
 
-            Foreground = this.WhenValueChanged(vm => vm.HighlightHue)
-                .Select(h => h.ForegroundBrush)
-                .ForBinding();
+            //combine system with user choice.
+            var defaultHue = this.WhenValueChanged(vm => vm.HighlightHue)
+                    .CombineLatest(themeProvider.Accent, (user, system) => user == Hue.NotSpecified ? system : user)
+                    .Publish();
 
-            Background = this.WhenValueChanged(vm => vm.HighlightHue)
-               .Select(h => h.BackgroundBrush)
-               .ForBinding();
+            Foreground = defaultHue.Select(h => h.ForegroundBrush).ForBinding();
+            Background = defaultHue.Select(h => h.BackgroundBrush).ForBinding();
 
-            _cleanUp = new CompositeDisposable(IconSelector,  Foreground, Background);
+            _cleanUp = new CompositeDisposable(IconSelector,Foreground,Background, defaultHue.Connect());
         }
-        
-        private async void ShowIconSelector()
+
+        private async Task ShowIconSelector()
         {
             var dialogResult = await DialogHost.Show(IconSelector, ParentId);
+
             var result = (IconSelectorResult)dialogResult;
             if (result == IconSelectorResult.UseDefault)
             {
@@ -107,8 +104,8 @@ namespace TailBlazer.Views.Searching
             {
                 IconKind = IconSelector.Selected.Type;
             }
-         }
-        
+        }
+
         public PackIconKind IconKind
         {
             get { return _iconKind; }
@@ -121,7 +118,7 @@ namespace TailBlazer.Views.Searching
             set { SetAndRaise(ref _highlight, value); }
         }
 
-        private Hue HighlightHue
+        public Hue HighlightHue
         {
             get { return _highlightHue; }
             set { SetAndRaise(ref _highlightHue, value); }
@@ -182,7 +179,7 @@ namespace TailBlazer.Views.Searching
 
         public override int GetHashCode()
         {
-            return (_searchMetadata != null ? _searchMetadata.GetHashCode() : 0);
+            return _searchMetadata?.GetHashCode() ?? 0;
         }
 
         public static bool operator ==(SearchOptionsProxy left, SearchOptionsProxy right)
@@ -199,7 +196,7 @@ namespace TailBlazer.Views.Searching
 
         public override string ToString()
         {
-            return $"SearchMetadata: {_searchMetadata}";
+            return $"SearchOptionsProxy: {_searchMetadata}";
         }
 
         public void Dispose()

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using DynamicData;
@@ -32,6 +33,14 @@ namespace TailBlazer.Domain.FileHandling.Search
             return _searches.Items.Select(m => m.Position).Max() + 1;
         }
 
+        public void Add([NotNull] IEnumerable<SearchMetadata> metadata)
+        {
+            if (metadata == null) throw new ArgumentNullException(nameof(metadata));
+            _searches.AddOrUpdate(metadata);
+            _logger.Info("{0} SearchMetadata has been loaded", metadata.Count());
+
+        }
+
         public void AddorUpdate([NotNull] SearchMetadata metadata)
         {
             if (metadata == null) throw new ArgumentNullException(nameof(metadata));
@@ -45,9 +54,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             _searches.Remove(searchText);
             _logger.Info("Search metadata has been removed: {0}", searchText);
         }
-
-
-
+        
         public void Dispose()
         {
             _cleanUp.Dispose();

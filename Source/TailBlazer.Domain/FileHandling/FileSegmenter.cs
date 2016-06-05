@@ -2,10 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
-using TailBlazer.Domain.FileHandling.Search;
-using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -35,19 +32,16 @@ namespace TailBlazer.Domain.FileHandling
             if (notifications == null) throw new ArgumentNullException(nameof(notifications));
             _initialTail = initialTail;
             _segmentSize = segmentSize;
-
-
-
-
+            
             //TODO: Re-segment as file grows + account for rollover
             Segments = notifications
-                //.notifications()
                 .Scan((FileSegmentCollection) null, (previous, current) =>
                 {
-                    if (previous == null || previous.FileLength == 0)
-                    {
-                        _info =(FileInfo) current;
+                    _info = (FileInfo)current;
+                    var nameHasChanged = previous != null && (previous.Info.Name != current.Name);
 
+                    if (previous == null || previous.FileLength == 0 || nameHasChanged)
+                    {
                         var segments = LoadSegments().ToArray();
                         return new FileSegmentCollection(_info, segments, current.Size);
                     }
@@ -61,10 +55,10 @@ namespace TailBlazer.Domain.FileHandling
                     }
 
                     return new FileSegmentCollection(newLength, previous);
-                }).Replay(1).RefCount();
+                });
         }
 
-        public IEnumerable<FileSegment> LoadSegments()
+        private IEnumerable<FileSegment> LoadSegments()
         {
             using (var stream = File.Open(_info.FullName, FileMode.Open, FileAccess.Read,FileShare.Delete | FileShare.ReadWrite))
             {

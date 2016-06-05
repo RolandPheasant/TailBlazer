@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using DynamicData;
 using DynamicData.Kernel;
-using MaterialDesignThemes.Wpf;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
 
@@ -11,16 +10,12 @@ namespace TailBlazer.Views.Formatting
 {
     public sealed class DefaultColourSelector : IDefaultColourSelector
     {
-        private readonly Dictionary<HueKey, Hue> _hues;
-        private readonly Hue _defaultHighlight;
+        private readonly IColourProvider _colourProvider;
         private readonly DefaultHue[] _defaults;
 
         public DefaultColourSelector(IColourProvider colourProvider)
         {
-            _hues = colourProvider.Hues.ToDictionary(h => h.Key);
-            _defaultHighlight = colourProvider.Hues
-                                    .Last(s => s.Swatch.Equals("amber", StringComparison.OrdinalIgnoreCase));
-
+            _colourProvider = colourProvider;
             _defaults = Load().ToArray();
         }
         
@@ -31,7 +26,12 @@ namespace TailBlazer.Views.Formatting
                     ? hue.Text.Equals(text)
                     : hue.Text.Equals(text, StringComparison.OrdinalIgnoreCase));
 
-            return match != null ? match.Hue :  _defaultHighlight;
+            return match != null ? match.Hue : _colourProvider.DefaultAccent;
+        }
+
+        public Hue Lookup(HueKey key)
+        {
+            return _colourProvider.Lookup(key).ValueOr(() => _colourProvider.DefaultAccent);
         }
 
         private IEnumerable<DefaultHue> Load()
@@ -47,7 +47,7 @@ namespace TailBlazer.Views.Formatting
 
         private Hue Lookup(string swatch, string name)
         {
-            return _hues.Lookup(new HueKey(swatch, name))
+            return _colourProvider.Lookup(new HueKey(swatch, name))
                 .ValueOrThrow(() => new MissingKeyException(swatch + "."+ name + " is invalid"));
         }
 
@@ -57,14 +57,12 @@ namespace TailBlazer.Views.Formatting
             public Hue Hue { get; }
             public bool MatchTextOnCase { get; }
 
-
             public DefaultHue(string text, Hue hue, bool matchTextOnCase = false)
             {
                 Text = text;
                 Hue = hue;
                 MatchTextOnCase = matchTextOnCase;
             }
-
         }
     }
 }

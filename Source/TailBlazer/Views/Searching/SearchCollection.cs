@@ -5,6 +5,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Binding;
+using DynamicData.Kernel;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
@@ -17,6 +18,7 @@ namespace TailBlazer.Views.Searching
         private readonly IDisposable _cleanUp;
         private SearchViewModel _selected;
         private int _count;
+        private readonly IObservableCache<SearchViewModel, string> _viewModels;
 
         public ReadOnlyObservableCollection<SearchViewModel> Items => _items;
         public IObservable<string> SelectedText { get; }
@@ -24,7 +26,7 @@ namespace TailBlazer.Views.Searching
 
         public SearchCollection(ISearchInfoCollection searchInfoCollection, ISchedulerProvider schedulerProvider)
         {
-            var viewModels = searchInfoCollection.Searches.Connect()
+            _viewModels = searchInfoCollection.Searches.Connect()
                 .Transform(tail => new SearchViewModel(tail, vm =>
                 {
                     searchInfoCollection.Remove(vm.Text);
@@ -32,7 +34,7 @@ namespace TailBlazer.Views.Searching
                 .DisposeMany()
                 .AsObservableCache();
             
-            var shared = viewModels.Connect();//.Publish();
+            var shared = _viewModels.Connect();//.Publish();
 
             var binderLoader = shared
                 .Sort(SortExpressionComparer<SearchViewModel>
@@ -49,7 +51,7 @@ namespace TailBlazer.Views.Searching
 
 
             var removed = shared.WhereReasonsAre(ChangeReason.Remove)
-                .Subscribe(_ => Selected = viewModels.Items.First());
+                .Subscribe(_ => Selected = _viewModels.Items.First());
 
             var counter = shared.ToCollection()
                 .Subscribe(count => Count = count.Count);
@@ -66,10 +68,15 @@ namespace TailBlazer.Views.Searching
                 .Replay(1).RefCount();
 
 
-            _cleanUp = new CompositeDisposable(viewModels, binderLoader, counter, removed, autoSelector);
+            _cleanUp = new CompositeDisposable(_viewModels, binderLoader, counter, removed, autoSelector);
+        }
+
+        public void Select(string item)
+        {
+            _viewModels.Lookup(item)
+                .IfHasValue(selected => Selected = selected);
         }
         
-
         public SearchViewModel Selected
         {
             get { return _selected; }

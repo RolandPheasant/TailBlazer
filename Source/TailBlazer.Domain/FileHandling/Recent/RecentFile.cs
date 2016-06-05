@@ -11,7 +11,7 @@ namespace TailBlazer.Domain.FileHandling.Recent
         public RecentFile(FileInfo fileInfo)
         {
             Name = fileInfo.FullName;
-            Timestamp = DateTime.Now;
+            Timestamp = DateTime.UtcNow;
         }
 
         public RecentFile(DateTime timestamp, string name)
@@ -41,7 +41,7 @@ namespace TailBlazer.Domain.FileHandling.Recent
         {
             unchecked
             {
-                return (Timestamp.GetHashCode()*397) ^ (Name != null ? Name.GetHashCode() : 0);
+                return (Timestamp.GetHashCode()*397) ^ (Name?.GetHashCode() ?? 0);
             }
         }
 

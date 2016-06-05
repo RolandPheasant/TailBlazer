@@ -44,20 +44,16 @@
     <ApplicationIcon>tailblazer.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dragablz, Version=0.0.3.153, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dragablz.0.0.3.153\lib\net45\Dragablz.dll</HintPath>
+    <Reference Include="Dragablz, Version=0.0.3.163, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dragablz.0.0.3.163\lib\net45\Dragablz.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DynamicData, Version=4.4.0.1110, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DynamicData.4.4.0.1110-beta\lib\net45\DynamicData.dll</HintPath>
+    <Reference Include="DynamicData, Version=4.7.4.1160, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DynamicData.4.7.4.1160-beta\lib\net45\DynamicData.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DynamicData.Plinq, Version=4.4.0.1110, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DynamicData.Plinq.4.4.0.1110-beta\lib\net45\DynamicData.Plinq.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Humanizer, Version=2.0.1.0, Culture=neutral, PublicKeyToken=979442b78dfc278e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Humanizer.Core.2.0.1\lib\portable-win+net45+wp8+wpa81\Humanizer.dll</HintPath>
+    <Reference Include="DynamicData.Plinq, Version=4.7.4.1160, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DynamicData.Plinq.4.7.4.1160-beta\lib\net45\DynamicData.Plinq.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
@@ -72,8 +68,8 @@
       <HintPath>..\packages\MaterialDesignColors.1.1.2\lib\net45\MaterialDesignColors.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MaterialDesignThemes.Wpf, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignThemes.1.5.0-ci496\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=2.0.0.600, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.2.0.0-ci600\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -131,6 +127,9 @@
     </ApplicationDefinition>
     <Compile Include="Controls\ExitIcon.cs" />
     <Compile Include="Controls\FilterIcon.cs" />
+    <Compile Include="Controls\ListboxItemHighlightAssist.cs" />
+    <Compile Include="Infrastucture\Virtualisation\LineScrollDelegate.cs" />
+    <Compile Include="Infrastucture\Virtualisation\LinesScrollPanel.cs" />
     <Compile Include="Controls\RegexIcon.cs" />
     <Compile Include="Controls\RegexMatchedIcon.cs" />
     <Compile Include="Controls\SaveLayoutIcon.cs" />
@@ -138,29 +137,40 @@
     <Compile Include="Controls\SearchResultIndicator.cs" />
     <Compile Include="Controls\TextMatchedIcon.cs" />
     <Compile Include="DialogNames.cs" />
+    <Compile Include="Infrastucture\AppState\ApplicationState.cs" />
+    <Compile Include="Infrastucture\AppState\ApplicationStateBroker.cs" />
+    <Compile Include="Infrastucture\AppState\IApplicationStatePublisher.cs" />
     <Compile Include="Infrastucture\CheckedToLengthConverter.cs" />
     <Compile Include="Infrastucture\ClipboardHandler.cs" />
     <Compile Include="Infrastucture\FileHeader.cs" />
     <Compile Include="Controls\HighlightTextControl.cs" />
     <Compile Include="Infrastucture\IClipboardHandler.cs" />
     <Compile Include="Infrastucture\IAttachedListBox.cs" />
+    <Compile Include="Infrastucture\IViewFactoryProvider.cs" />
     <Compile Include="Infrastucture\ListBoxHelper.cs" />
     <Compile Include="Infrastucture\LogFactory.cs" />
     <Compile Include="Infrastucture\FileNamer.cs" />
     <Compile Include="Infrastucture\MouseWheelGesture.cs" />
     <Compile Include="Infrastucture\SelectionMonitor.cs" />
     <Compile Include="Infrastucture\StartupController.cs" />
+    <Compile Include="Infrastucture\Virtualisation\TextScrollEx.cs" />
+    <Compile Include="Infrastucture\Virtualisation\TextScrollInfo.cs" />
     <Compile Include="Infrastucture\UhandledExceptionHandler.cs" />
-    <Compile Include="Infrastucture\VirtualizingWrapPanel.cs" />
+    <Compile Include="Infrastucture\IViewFactoryRegister.cs" />
+    <Compile Include="Infrastucture\ViewFactoryService.cs" />
+    <Compile Include="Infrastucture\Virtualisation\VirtualizingWrapPanel.cs" />
+    <Compile Include="Infrastucture\WindowAssist.cs" />
     <Compile Include="Views\Formatting\DefaultColourSelector.cs" />
     <Compile Include="Views\Formatting\IconDescription.cs" />
     <Compile Include="Views\Formatting\IIconProvider.cs" />
     <Compile Include="Views\Formatting\DefaultIconSelector.cs" />
-    <Compile Include="Views\Layout\LayoutAnalyser.cs" />
-    <Compile Include="Views\Layout\LayoutContent.cs" />
+    <Compile Include="Views\Formatting\SystemSetterJob.cs" />
+    <Compile Include="Views\IViewFactory.cs" />
+    <Compile Include="Views\Layout\ILayoutConverter.cs" />
+    <Compile Include="Views\Layout\ILayoutService.cs" />
+    <Compile Include="Views\Layout\LayoutService.cs" />
+    <Compile Include="Views\Layout\LayoutConverter.cs" />
     <Compile Include="Views\Layout\ShellSettings.cs" />
-    <Compile Include="Views\Layout\StateNode.cs" />
-    <Compile Include="Views\Options\GeneralOptionsConverter.cs" />
     <Compile Include="Views\Options\GeneralOptionsView.xaml.cs">
       <DependentUpon>GeneralOptionsView.xaml</DependentUpon>
     </Compile>
@@ -181,15 +191,22 @@
       <DependentUpon>SearchOptionsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Searching\SearchOptionsViewModel.cs" />
-    <Compile Include="Views\Searching\SearchOptions.cs" />
-    <Compile Include="Views\Searching\SearchOptionsConverter.cs" />
-    <Compile Include="Views\Options\Theme.cs" />
     <Compile Include="Views\FileDrop\FileDropContainer.cs" />
     <Compile Include="Views\FileDrop\FileDropMonitor.cs" />
     <Compile Include="Views\Tail\ILinesVisualisation.cs" />
+    <Compile Include="Views\Searching\ISearchStateToMetadataMapper.cs" />
+    <Compile Include="Views\Tail\ITailViewStateControllerFactory.cs" />
+    <Compile Include="Views\Tail\ITailViewStateRestorer.cs" />
     <Compile Include="Views\Tail\LineMatchProxy.cs" />
+    <Compile Include="Views\Searching\SearchState.cs" />
+    <Compile Include="Views\Searching\SearchStateToMetadataMapper.cs" />
+    <Compile Include="Views\Tail\TailViewModelConstants.cs" />
     <Compile Include="Views\Tail\TailViewPersister.cs" />
     <Compile Include="Views\Tail\TailViewState.cs" />
+    <Compile Include="Views\Tail\TailViewStateController.cs" />
+    <Compile Include="Views\Tail\TailViewStateControllerFactory.cs" />
+    <Compile Include="Views\Tail\TailViewStateRestorer.cs" />
+    <Compile Include="Views\Tail\TailViewToStateConverter.cs" />
     <Compile Include="Views\WindowManagement\FileHeaderNamingJob.cs" />
     <Compile Include="Controls\FileIcon.cs" />
     <Compile Include="Infrastucture\SchedulerProvider.cs" />
@@ -205,7 +222,9 @@
     <Compile Include="Views\Tail\InlineViewer.cs" />
     <Compile Include="Views\Tail\InlineViewerArgs.cs" />
     <Compile Include="Views\Tail\InlineViewerFactory.cs" />
-    <Compile Include="Infrastucture\IScrollReceiver.cs" />
+    <Compile Include="Infrastucture\Virtualisation\IScrollReceiver.cs" />
+    <Compile Include="Infrastucture\AppState\IApplicationStateNotifier.cs" />
+    <Compile Include="Views\WindowManagement\IViewOpener.cs" />
     <Compile Include="Views\WindowManagement\IWindowsController.cs" />
     <Compile Include="Views\Tail\LineProxy.cs" />
     <Compile Include="Views\Tail\LineProxyFactory.cs" />
@@ -216,18 +235,17 @@
     </Compile>
     <Compile Include="Views\Recent\RecentFilesViewModel.cs" />
     <Compile Include="Controls\RemoveIcon.cs" />
-    <Compile Include="Controls\ScrollChangedArgs.cs" />
-    <Compile Include="Controls\ScrollDirection.cs" />
-    <Compile Include="Controls\ScrollBoundsArgs.cs" />
+    <Compile Include="Infrastucture\Virtualisation\ScrollChangedArgs.cs" />
+    <Compile Include="Infrastucture\Virtualisation\ScrollDirection.cs" />
+    <Compile Include="Infrastucture\Virtualisation\ScrollBoundsArgs.cs" />
     <Compile Include="Views\Searching\SearchHints.cs" />
     <Compile Include="Views\Searching\SearchRequest.cs" />
     <Compile Include="Views\Searching\SearchHintEx.cs" />
     <Compile Include="Views\Searching\SearchViewModel.cs" />
     <Compile Include="Controls\SettingsIcon.cs" />
-    <Compile Include="Views\Options\GeneralOptions.cs" />
     <Compile Include="Controls\TailBlazerIcon.cs" />
     <Compile Include="Views\Searching\SearchCollection.cs" />
-    <Compile Include="Controls\VirtualScrollPanel.cs" />
+    <Compile Include="Infrastucture\Virtualisation\VirtualScrollPanel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -237,7 +255,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Infrastucture\AppConventions.cs" />
-    <Compile Include="Infrastucture\AppRegistry.cs" />
+    <Compile Include="AppRegistry.cs" />
     <Compile Include="Infrastucture\BooleanToVisibilityConverter.cs" />
     <Compile Include="BootStrap.cs" />
     <Compile Include="Infrastucture\Command.cs" />
@@ -246,7 +264,7 @@
     <Compile Include="Views\WindowManagement\IWindowFactory.cs" />
     <Compile Include="Infrastucture\Log4NetLogger.cs" />
     <Compile Include="Infrastucture\ObjectProvider.cs" />
-    <Compile Include="Infrastucture\ViewContainer.cs" />
+    <Compile Include="Infrastucture\HeaderedView.cs" />
     <Compile Include="Views\WindowManagement\WindowFactory.cs" />
     <Compile Include="Views\WindowManagement\WindowsController.cs" />
     <Compile Include="Views\WindowManagement\WindowViewModel.cs" />
@@ -254,10 +272,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Themes\ComboBox.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Themes\Dragable.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -340,7 +354,9 @@
     <None Include="Log4Net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -365,12 +381,12 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Fody.1.28.3\build\Fody.targets" Condition="Exists('..\packages\Fody.1.28.3\build\Fody.targets')" />
+  <Import Project="..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets" Condition="Exists('..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Fody.1.28.3\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.28.3\build\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

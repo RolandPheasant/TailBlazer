@@ -8,33 +8,32 @@ namespace TailBlazer.Domain.FileHandling
     {
         public static IObservable<ILineProvider> Index(this IObservable<FileSegmentCollection> source)
         {
-            var indexFactory = source
-                .Publish(shared =>
-                {
-                    var diff = shared.Select(fsc => fsc.SizeDiff);
+            if (source == null) throw new ArgumentNullException(nameof(source));
 
-                    var idx = Observable.Create<IndexCollection>(observer =>
-                    {
-                        var indexer = new Indexer(shared);
-                        var notifier = indexer.Result.SubscribeSafe(observer);
-                        return new CompositeDisposable(indexer, notifier);
-                    });
+            var published = source.Replay(1).RefCount();
+            var nameChanged = published.Select(fsc => fsc.Info.Name).DistinctUntilChanged().Skip(1);
+            var diff = published.Select(fsc => fsc.SizeDiff);
 
-                    return idx.CombineLatest(diff, (index, sizeDiff) => new { index, sizeDiff });
-                });
+            var idx = Observable.Create<IndexCollection>(observer =>
+            {
+                var indexer = new Indexer(published);
+                var notifier = indexer.Result.SubscribeSafe(observer);
+                return new CompositeDisposable(indexer, notifier);
+            });
 
-            //this is the beast which allows the indexer to be recreated when a log file rolls
-            return indexFactory
+            var searchFactory = idx.CombineLatest(diff, (search, sizeDiff) => new { search, sizeDiff });
+
+            //this is the magic which allows the search to be recreated when a log file rolls
+            return searchFactory
+                .TakeUntil(nameChanged)
                 .TakeWhile(x => x.sizeDiff >= 0).Repeat()
-                .Select(x => x.index);
+                .Select(x => x.search);
 
         }
+
         public static IObservable<ILineProvider> Index(this IObservable<FileNotification> source)
         {
             return source.WithSegments().Index();
         }
-
-
-
     }
 }

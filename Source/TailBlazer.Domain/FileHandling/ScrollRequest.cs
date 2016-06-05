@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -40,6 +39,14 @@ namespace TailBlazer.Domain.FileHandling
             FirstIndex = firstIndex;
             SpecifiedByPosition = specifiedByPosition;
             Mode = ScrollReason.User;
+        }
+
+        public ScrollRequest(ScrollReason mode, int pageSize, long position)
+        {
+            PageSize = pageSize;
+            Mode = mode;
+            Position = position;
+            SpecifiedByPosition = true;
         }
 
         public ScrollRequest(ScrollReason mode, int pageSize, int firstIndex)

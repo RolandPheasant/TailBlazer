@@ -51,11 +51,11 @@ namespace TailBlazer.Domain.FileHandling
         public static IObservable<FileNotification> WatchFile(this FileInfo file, IObservable<Unit> pulse)
         {
             return pulse.StartWith(Unit.Default)
-
                 .Scan((FileNotification) null, (state, _) => state == null
                     ? new FileNotification(file)
                     : new FileNotification(state));
         }
+
 
 
         /// <summary>
@@ -68,7 +68,6 @@ namespace TailBlazer.Domain.FileHandling
             {
                 using (var reader = new StreamReaderExtended(stream, true))
                 {
-                    var something = reader.Peek();
                     return reader.CurrentEncoding;
                 }
             }

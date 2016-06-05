@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using TailBlazer.Domain.FileHandling.Search;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -12,7 +11,6 @@ namespace TailBlazer.Domain.FileHandling
         public int Count { get; }
         public int Diff { get; }
         public bool IsEmpty => Count != 0;
-        private LinesChangedReason ChangedReason { get; }
         private Index[] Indicies { get; }
         private FileInfo Info { get; }
         private Encoding Encoding { get; }
@@ -32,17 +30,11 @@ namespace TailBlazer.Domain.FileHandling
             //need to check whether
             if (previous == null)
             {
-                ChangedReason = LinesChangedReason.Loaded;
                 TailInfo = new TailInfo(latest.Max(idx => idx.End));
             }
             else
             {
-                var mostRecent = latest.OrderByDescending(l => l.TimeStamp).First();
-                ChangedReason = mostRecent.Type == IndexType.Tail
-                                ? LinesChangedReason.Tailed
-                                : LinesChangedReason.Paged;
-
-             TailInfo = new TailInfo(previous.Indicies.Max(idx => idx.End));
+                TailInfo = new TailInfo(previous.Indicies.Max(idx => idx.End));
             }
         }
 
@@ -99,8 +91,8 @@ namespace TailBlazer.Domain.FileHandling
                         var endPosition = reader.AbsolutePosition();
                         var info = new LineInfo(i + 1, i, startPosition, endPosition);
 
-                        var ontail = startPosition >= TailInfo.TailStartsAt && DateTime.Now.Subtract(TailInfo.LastTail).TotalSeconds < 1
-                            ? DateTime.Now
+                        var ontail = startPosition >= TailInfo.TailStartsAt && DateTime.UtcNow.Subtract(TailInfo.LastTail).TotalSeconds < 1
+                            ? DateTime.UtcNow
                             : (DateTime?)null;
 
                         yield return new Line(info, line, ontail);
@@ -136,8 +128,8 @@ namespace TailBlazer.Domain.FileHandling
                         var endPosition = reader.AbsolutePosition();
 
                         var info = new LineInfo(first + taken + 1, first + taken, startPosition, endPosition);
-                        var ontail = endPosition >= TailInfo.TailStartsAt && DateTime.Now.Subtract(TailInfo.LastTail).TotalSeconds < 1
-                            ? DateTime.Now
+                        var ontail = endPosition >= TailInfo.TailStartsAt && DateTime.UtcNow.Subtract(TailInfo.LastTail).TotalSeconds < 1
+                            ? DateTime.UtcNow
                             : (DateTime?)null;
 
                         yield return new Line(info, line, ontail);

@@ -10,7 +10,6 @@ namespace TailBlazer.Domain.FileHandling
         public string Text { get;  }
         public DateTime? Timestamp { get;  }
         public LineInfo LineInfo { get;  }
-
         private long Start { get; }
         public LineKey Key { get; }
 
@@ -19,21 +18,17 @@ namespace TailBlazer.Domain.FileHandling
         {
             Number = number;
             Start = number;
-            Text = text;
+            Text = text ?? string.Empty;
             Timestamp = timestamp;
             Key = new LineKey(text, number);
         }
 
    
-
-
         public Line(LineInfo lineInfo, string text, DateTime? timestamp)
         {
-
             LineInfo = lineInfo;
-            Text = text;
+            Text = text ?? string.Empty;
             Timestamp = timestamp;
-
             Number = LineInfo.Line;
             Start = LineInfo.Start;
             Index = LineInfo.Index;

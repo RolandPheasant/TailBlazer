@@ -9,5 +9,9 @@ namespace TailBlazer.Domain.FileHandling
         string FullName { get; }
         string Name { get; }
         string Folder { get; }
+
+        void ScanFrom(long scanFrom);
+        void Clear();
+        void Reset();
     }
 }

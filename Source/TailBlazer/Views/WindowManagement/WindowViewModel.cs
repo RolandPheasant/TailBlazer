@@ -17,37 +17,38 @@ using DynamicData.Binding;
 using Microsoft.Win32;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Infrastucture;
+using TailBlazer.Infrastucture.AppState;
 using TailBlazer.Views.FileDrop;
-using TailBlazer.Views.Layout;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Recent;
 using TailBlazer.Views.Tail;
 
 namespace TailBlazer.Views.WindowManagement
 {
-    public class WindowViewModel: AbstractNotifyPropertyChanged, IDisposable
+    public class WindowViewModel: AbstractNotifyPropertyChanged, IDisposable, IViewOpener
     {
         private readonly ILogger _logger;
         private readonly IWindowsController _windowsController;
         private readonly ISchedulerProvider _schedulerProvider;
         private readonly IObjectProvider _objectProvider;
         private readonly IDisposable _cleanUp;
-        private ViewContainer _selected;
+        private HeaderedView _selected;
         private bool _isEmpty;
         private bool _menuIsOpen;
-        public ObservableCollection<ViewContainer> Views { get; } = new ObservableCollection<ViewContainer>();
+
+        public ObservableCollection<HeaderedView> Views { get; } = new ObservableCollection<HeaderedView>();
         public RecentFilesViewModel RecentFiles { get; }
         public GeneralOptionsViewModel GeneralOptions { get; }
         public IInterTabClient InterTabClient { get; }
         public ICommand OpenFileCommand { get; }
         public Command ShowInGitHubCommand { get; }
         public string Version { get; }
-        public ICommand SaveLayoutCommand { get; }
         public ICommand ExitCommmand { get; }
         public ICommand ZoomInCommand { get; }
         public ICommand ZoomOutCommand { get; }
-        
         public FileDropMonitor DropMonitor { get; } = new FileDropMonitor();
+        public ItemActionCallback ClosingTabItemHandler => ClosingTabItemHandlerImpl;
+        public ApplicationExitingDelegate WindowExiting { get; }
 
         public WindowViewModel(IObjectProvider objectProvider, 
             IWindowFactory windowFactory, 
@@ -55,7 +56,8 @@ namespace TailBlazer.Views.WindowManagement
             IWindowsController windowsController,
             RecentFilesViewModel recentFilesViewModel,
             GeneralOptionsViewModel generalOptionsViewModel,
-            ISchedulerProvider schedulerProvider)
+            ISchedulerProvider schedulerProvider,
+            IApplicationStatePublisher applicationStatePublisher)
         {
             _logger = logger;
             _windowsController = windowsController;
@@ -65,30 +67,41 @@ namespace TailBlazer.Views.WindowManagement
             _objectProvider = objectProvider;
             InterTabClient = new InterTabClient(windowFactory);
             OpenFileCommand =  new Command(OpenFile);
-            ShowInGitHubCommand = new Command(()=>   Process.Start("https://github.com/RolandPheasant"));
 
+            ShowInGitHubCommand = new Command(()=>   Process.Start("https://github.com/RolandPheasant"));
             ZoomOutCommand= new Command(()=> { GeneralOptions.Scale = GeneralOptions.Scale + 5; });
             ZoomInCommand = new Command(() => { GeneralOptions.Scale = GeneralOptions.Scale - 5; });
-            SaveLayoutCommand = new Command(WalkTheLayout);
-            ExitCommmand = new Command(() => Application.Current.Shutdown());
+            ExitCommmand = new Command(() =>
+            {
+                applicationStatePublisher.Publish(ApplicationState.ShuttingDown);
+                Application.Current.Shutdown();
+            });
+            WindowExiting = () =>
+            {
+                applicationStatePublisher.Publish(ApplicationState.ShuttingDown);
+            };
 
             Version = $"v{Assembly.GetEntryAssembly().GetName().Version.ToString(3)}";
 
             var fileDropped = DropMonitor.Dropped.Subscribe(OpenFile);
+
             var isEmptyChecker = Views.ToObservableChangeSet()
                                     .ToCollection()
                                     .Select(items=>items.Count)
                                     .StartWith(0)
                                     .Select(count=>count==0)
+                                    .LogErrors(logger)
                                     .Subscribe(isEmpty=> IsEmpty = isEmpty);
 
             var openRecent = recentFilesViewModel.OpenFileRequest
+                                .LogErrors(logger)
                                 .Subscribe(file =>
                                 {
                                     MenuIsOpen = false;
                                     OpenFile(file);
                                 });
-            
+
+
             _cleanUp = new CompositeDisposable(recentFilesViewModel,
                 isEmptyChecker,
                 fileDropped,
@@ -100,13 +113,6 @@ namespace TailBlazer.Views.WindowManagement
                             .OfType<IDisposable>()
                             .ForEach(d=>d.Dispose());
                 }));
-        }
-
-        private void WalkTheLayout()
-        {
-            var analyser = new LayoutAnalyser();
-            var root = analyser.QueryLayouts();
-            Console.WriteLine(root);
         }
 
         private void OpenFile()
@@ -139,19 +145,16 @@ namespace TailBlazer.Views.WindowManagement
 
                     //1. resolve TailViewModel
                     var factory = _objectProvider.Get<TailViewModelFactory>();
-                    var viewModel = factory.Create(file);
+                    var newItem = factory.Create(file);
 
                     //2. Display it
-                    var newItem = new ViewContainer(new FileHeader(file), viewModel);
-                    
                     _windowsController.Register(newItem);
 
                     _logger.Info($"Objects for '{file.FullName}' has been created.");
                     //do the work on the ui thread
                     _schedulerProvider.MainThread.Schedule(() =>
                     {
-                        
-                        Views.Add(newItem);
+                       Views.Add(newItem);
                         _logger.Info($"Opened '{file.FullName}'");
                         Selected = newItem;
                     });
@@ -164,7 +167,35 @@ namespace TailBlazer.Views.WindowManagement
             });
         }
 
-        public ItemActionCallback ClosingTabItemHandler => ClosingTabItemHandlerImpl;
+        //TODO: Abstract this
+        public void OpenView(HeaderedView headeredView)
+        {
+            _schedulerProvider.Background.Schedule(() =>
+            {
+                try
+                {
+                   _logger.Info($"Attempting to open a restored view {headeredView.Header}");
+                    //var HeaderedView = new HeaderedView(view);
+
+                    //TODO: Factory should create the HeaderedView
+
+                    _windowsController.Register(headeredView);
+
+                    //do the work on the ui thread
+                    _schedulerProvider.MainThread.Schedule(() =>
+                    {
+                        Views.Add(headeredView);
+                        Selected = headeredView;
+                    });
+                }
+                catch (Exception ex)
+                {
+                    //TODO: Create a failed to load view
+                    _logger.Error(ex, $"There was a problem opening '{headeredView.Header}'");
+                }
+            });
+        }
+
 
         public void OnWindowClosing()
         {
@@ -179,7 +210,7 @@ namespace TailBlazer.Views.WindowManagement
         private void ClosingTabItemHandlerImpl(ItemActionCallbackArgs<TabablzControl> args)
         {
             _logger.Info("Tab is closing. {0} view to close", Views.Count);
-            var container = (ViewContainer)args.DragablzItem.DataContext;
+            var container = (HeaderedView)args.DragablzItem.DataContext;
             _windowsController.Remove(container);
             if (container.Equals(Selected))
             {
@@ -189,7 +220,7 @@ namespace TailBlazer.Views.WindowManagement
             disposable?.Dispose();
         }
 
-        public ViewContainer Selected
+        public HeaderedView Selected
         {
             get { return _selected; }
             set { SetAndRaise(ref _selected, value); }
@@ -207,12 +238,9 @@ namespace TailBlazer.Views.WindowManagement
             set { SetAndRaise(ref _menuIsOpen, value); }
         }
 
-
         public void Dispose()
         {
             _cleanUp.Dispose();
         }
-
-
     }
 }

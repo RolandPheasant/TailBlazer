@@ -1,4 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace TailBlazer.Views.Tail
 {
@@ -10,6 +12,24 @@ namespace TailBlazer.Views.Tail
         public TailView()
         {
             InitializeComponent();
+            IsVisibleChanged += (sender, e) =>
+            {
+                FocusSearchTextBox();
+            };            
+        }
+
+        private void FocusSearchTextBox()
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                SearchTextBox.Focus();
+                MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
+            }));
+        }
+
+        private void ApplicationCommandFind_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            FocusSearchTextBox();
         }
     }
 }

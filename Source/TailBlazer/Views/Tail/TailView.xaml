@@ -12,10 +12,13 @@
              xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
              xmlns:fileHandling="clr-namespace:TailBlazer.Domain.FileHandling;assembly=TailBlazer.Domain"
              xmlns:converters="clr-namespace:Dragablz.Converters;assembly=Dragablz"
+             xmlns:virtualisation="clr-namespace:TailBlazer.Infrastucture.Virtualisation"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
                 Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
              x:Name="Control"
              mc:Ignorable="d" 
+              FocusManager.FocusedElement="{Binding ElementName= SearchTextBox}"
              d:DataContext="{d:DesignInstance tail:TailViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="400" d:DesignWidth="400">
 
@@ -32,7 +35,7 @@
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Buttons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ToggleButtons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/TextBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ComboBox.xaml" />
+                <!--<ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/ComboBox.xaml" />-->
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Lines.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
@@ -94,6 +97,12 @@
         </ResourceDictionary>
     </Control.Resources>
 
+    <UserControl.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Find"
+                        Executed="ApplicationCommandFind_Executed"
+                        />
+    </UserControl.CommandBindings>
+    
     <wpf:DialogHost Identifier="{Binding Id}"
                                  TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
                 Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
@@ -124,6 +133,8 @@
 
             </StackPanel>
 
+
+
             <Grid  
                 Visibility="{Binding FileStatus.Value, Converter={StaticResource EqualityToVisibilityConverter},ConverterParameter={x:Static fileHandling:FileStatus.Loaded}}"
                 Margin="-4 0 -4 0">
@@ -135,7 +146,8 @@
                     <RowDefinition Height="20"/>
                 </Grid.RowDefinitions>
 
-                <Grid Margin="0 4 0 4">
+                <Grid 
+                    Margin="0 4 0 2" KeyboardNavigation.TabNavigation="Cycle">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto" />
@@ -147,9 +159,12 @@
 
 
                     <ToggleButton
+                                    
                                    VerticalAlignment="Bottom" 
                                    Margin="2 0 0 0"
                                    Padding="2"
+                                   TabIndex="5"
+                                   IsTabStop="False"
                                    Width="32" 
                                    Height="32" 
                                    IsChecked="{Binding SearchHints.UseRegex}">
@@ -166,9 +181,11 @@
                     </ToggleButton>
 
                     <TextBox Grid.Column="1" 
+                            TabIndex="0"
+                             x:Name="SearchTextBox"
                             Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                            wpf:TextFieldAssist.Hint="{Binding SearchHints.Message.Value}" 
-                            VerticalAlignment="Center"
+                            wpf:HintAssist.Hint="{Binding SearchHints.Message.Value}" 
+                            VerticalAlignment="Bottom"
                             wpf:ValidationAssist.UsePopup="False"
                             Style="{StaticResource FloatingHintAndErrorTextBox}"
                             Validation.ErrorTemplate="{StaticResource BorderOnlyValidationErrorTemplate}" 
@@ -190,7 +207,9 @@
                             Text="Switch Results"/>
 
 
-                    <ListBox Grid.Column="3" Margin="4 2 0 2" 
+                    <ListBox
+                        TabIndex="1"
+                        Grid.Column="3" Margin="4 2 0 2" 
                         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
                         Background="{DynamicResource MaterialDesignPaper}"
                         VerticalAlignment="Stretch"
@@ -264,7 +283,7 @@
                     <!--</Border>-->
 
                     <Button Grid.Column="4" 
-
+                            TabIndex="2"
                         Style="{StaticResource MaterialDesignFlatButton}"
                         Command="{Binding OpenSearchOptionsCommand}"
                         HorizontalAlignment="Left"
@@ -282,13 +301,20 @@
 
                         <CheckBox HorizontalAlignment="Left"
                             VerticalAlignment="Center"
-                            IsChecked="{Binding AutoTail}"
+                            TabIndex="3"
+                            IsChecked="{Binding AutoTail, Mode=TwoWay}"
                             Margin="4 0 4 0"
-                            Content="Follow Tail"/>
+                            Content="Follow Tail">
+                            <CheckBox.InputBindings>
+                                <KeyBinding Key="Space"
+                                Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.KeyAutoTail}"/>
+                            </CheckBox.InputBindings>
+                        </CheckBox>
 
                         <CheckBox Visibility="{Binding CanViewInline.Value, Converter={StaticResource BooleanToVisibilityConverter}}"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"
+                            TabIndex="4"
                             IsChecked="{Binding ShowInline}"
                             Content="Show inline"
                             Margin="4 0 4 0"/>
@@ -297,20 +323,29 @@
                     </StackPanel>
                 </Grid>
 
-                <ListBox
+                <Border Grid.Row="0" Grid.Column="0" 
+                            Visibility="Collapsed"
+                            BorderThickness="0 0 0 1" BorderBrush="{DynamicResource PrimaryHueMidBrush}"/>
+
+
+                <ListBox Margin="0 4 0 2"
                     Grid.Row="1" 
                     VerticalAlignment="Stretch"
-                        ItemsSource="{Binding Lines}" 
-                        SelectedItem="{Binding SelectedItem}"
-                        Style="{StaticResource LinesListBoxStyle}"
-                        infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}">
+                    MinHeight="50"     
+                    ItemsSource="{Binding Lines}" 
+                    SelectedItem="{Binding SelectedItem}"
+                    Style="{StaticResource LinesListBoxStyle}"
+                    infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}">
 
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <controls:VirtualScrollPanel ItemHeight="22"
+                            <virtualisation:LinesScrollPanel ItemHeight="22"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
-                                                TotalItems="{Binding LatestCount.Value}"/>
+                                                TotalItems="{Binding LatestCount.Value}"
+                                                HorizontalScrollChanged="{Binding HorizonalScrollChanged}"       
+                                                CharacterWidth ="6.59666666666667"
+                                                TotalCharacters="{Binding MaximumChars.Value, UpdateSourceTrigger=PropertyChanged}"/>
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
 
@@ -320,16 +355,30 @@
 
                     <ListBox.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="_Copy" Command="{Binding CopyToClipboardCommand}">
-                                <MenuItem.Icon>
-                                    <Viewbox Width="16" Height="16">
-                                        <Canvas Width="24" Height="24">
-                                            <Path Data="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" 
+                            <ContextMenu.Items>
+                                <MenuItem Header="_Copy" Command="{Binding CopyToClipboardCommand}">
+                                    <MenuItem.Icon>
+                                        <Viewbox Width="16" Height="16">
+                                            <Canvas Width="24" Height="24">
+                                                <Path Data="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" 
                                               Fill="{DynamicResource MaterialDesignBody}" />
-                                        </Canvas>
-                                    </Viewbox>
-                                </MenuItem.Icon>
-                            </MenuItem>
+                                            </Canvas>
+                                        </Viewbox>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                
+                                <MenuItem Header="Clear" Command="{Binding ClearCommand}">
+                                        <MenuItem.Icon>
+                                        <wpf:PackIcon Kind="Eraser" Width="16" Height="16"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="Un-Clear" Command="{Binding UnClearCommand}">
+                                    <MenuItem.Icon>
+                                        <wpf:PackIcon Kind="Undo" Width="16" Height="16"/>
+                                    </MenuItem.Icon>
+                                </MenuItem> 
+                            </ContextMenu.Items>
+
                         </ContextMenu>
                     </ListBox.ContextMenu>
                 </ListBox>
@@ -342,10 +391,10 @@
                           BorderThickness="1" HorizontalAlignment="Stretch"/>
 
 
-                <ContentPresenter Grid.Row="3"
+                <ContentPresenter Grid.Row="3"   
                     ContentTemplate="{StaticResource LinesDataTemplate}"
                     Content="{Binding InlineViewer,Mode=OneWay}" />
-              
+
                 <Grid    Grid.Row="4" Margin = "0 0 0 -4"   Background="{StaticResource PrimaryHueMidBrush}">
 
                     <Grid.Resources>
@@ -380,7 +429,8 @@
                             
                             
                             <Grid Margin="6 0 6 0"
-                                  
+                                    TextOptions.TextFormattingMode="Ideal" 
+                                    TextOptions.TextRenderingMode="Auto" 
                                   HorizontalAlignment="Left">
                                 <Grid.Resources>
                                     <Style TargetType="{x:Type TextBlock}">
@@ -407,6 +457,7 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
 
                                 <Button Command="{Binding OpenFileCommand}">
@@ -415,7 +466,7 @@
                                                 VerticalAlignment="Center"
                                                 Kind="FileOutline" 
                                                 Width="14" Height="14"/>
-                                        <TextBlock  Text="Open file"/>
+                                        <TextBlock Text="Open file"/>
                                     </StackPanel>
                                 </Button>
 
@@ -425,13 +476,38 @@
                                             VerticalAlignment="Center"
                                             Kind="Folder" 
                                             Width="14" Height="14"/>
-                                        <TextBlock  Text="Open folder"/>
+                                        <TextBlock Text="Open folder"/>
                                     </StackPanel>
                                 </Button>
+
+                                <Button Grid.Row="2" Command="{Binding CopyPathToClipboardCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <wpf:PackIcon 
+                                                VerticalAlignment="Center"
+                                                Kind="ClipboardOutline" 
+                                                Width="14" Height="14"/>
+                                        <TextBlock Text="Copy path to clipboard"/>
+                                    </StackPanel>
+                                </Button>
+
                             </Grid>
 
 
                         </wpf:PopupBox>
+
+
+                        <Border 
+                            Margin="4 2 2 0"
+                            Opacity="0.56"
+                            BorderThickness="1 0 0 0" BorderBrush="White"/>
+                        
+                        <TextBlock  
+                            Margin="4 0 0 0"
+                            Text="{Binding  CountText.Value, StringFormat='\{0}.'}"
+                            VerticalAlignment="Center"/>
+
+
+                        <TextBlock Margin="6 0 0 0" Text="{Binding FileSizeText.Value}" />
 
                     </StackPanel>
 
@@ -440,13 +516,31 @@
                     Grid.Column="2"
                             HorizontalAlignment="Right"
                             Orientation="Horizontal">
-                        <TextBlock  
-                        Margin="4 0 0 0"
-                        Text="{Binding  CountText.Value, StringFormat='\{0}.'}"
-                        VerticalAlignment="Center"/>
+
+                        <Button Width="22" Height="22"
+                                Margin="4 0 0 0" 
+                                Padding="0"
+                                Foreground="White"
+                                Opacity="0.76"
+                                ToolTip="Un-clear to monitor entire file"
+                                Style="{StaticResource MaterialDesignFlatButton}" 
+                                Command="{Binding UnClearCommand}">
+                            <wpf:PackIcon Kind="Undo" Width="16" Height="16"/>
+                        </Button>
+                        
+                        <Button  Width="22" Height="22"
+                                 Margin="4 0 0 0" 
+                                 Padding="0"
+                                 Opacity="0.76"
+                                 ToolTip="Clear to monitor tail only"
+                                 Foreground="White"
+                                Style="{StaticResource MaterialDesignFlatButton}" 
+                                Command="{Binding ClearCommand}">
+                            <wpf:PackIcon Kind="Eraser" Width="16" Height="16"/>
+                        </Button>
 
 
-                        <TextBlock Margin="6 0 0 0" Text="{Binding FileSizeText.Value}" />
+
                     </StackPanel>
                 </Grid>
             </Grid>

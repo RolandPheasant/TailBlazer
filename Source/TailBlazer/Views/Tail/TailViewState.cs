@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {

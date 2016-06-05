@@ -3,7 +3,6 @@ using System.Collections;
 using System.Linq;
 using System.Xml.Linq;
 using TailBlazer.Domain.Settings;
-using TailBlazer.Settings;
 
 namespace TailBlazer.Views.Recent
 {
@@ -31,7 +30,7 @@ namespace TailBlazer.Views.Recent
                             {
                                 var name = element.Attribute(Structure.Name).Value;
                                 var dateTime = element.Attribute(Structure.Date).Value;
-                                return new RecentSearch(DateTime.Parse(dateTime),name);
+                                return new RecentSearch(DateTime.Parse(dateTime).ToUniversalTime(),name);
                             }).ToArray();
             return files;
         }

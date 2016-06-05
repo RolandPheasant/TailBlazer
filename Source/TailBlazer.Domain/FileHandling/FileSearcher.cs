@@ -8,14 +8,12 @@ using System.Reactive.Linq;
 using System.Text;
 using DynamicData;
 using TailBlazer.Domain.Annotations;
-using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
     /// <summary>
     /// Responsive and flexible file searching.
-    /// 
     /// See https://github.com/RolandPheasant/TailBlazer/issues/42
     /// </summary>
     public class FileSearcher: IDisposable
@@ -46,11 +44,12 @@ namespace TailBlazer.Domain.FileHandling
             var shared = fileSegments.Replay(1).RefCount();
 
             var infoSubscriber = shared.Select(segments => segments.Info)
-                .Take(1)
                 .Subscribe(info =>
                 {
-                    Info = info;
-                    Encoding = encoding ?? info.GetEncoding();
+                   Info = info;
+
+                    if (Encoding == null || info.Name != Info.Name)
+                        Encoding = encoding ?? info.GetEncoding();
                 });
             //Create a cache of segments which are to be searched
             var segmentCache = shared.Select(s => s.Segments)
@@ -138,7 +137,8 @@ namespace TailBlazer.Domain.FileHandling
                 tailSubscriber,
                 headSubscriber,
                 tailSearch.Connect(),
-                infoSubscriber);
+                infoSubscriber,
+                searchData);
         }
 
         private FileSegmentSearchResult Search(long start, long end)

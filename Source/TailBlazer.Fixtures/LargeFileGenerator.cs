@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace TailBlazer.Fixtures
 {
@@ -24,29 +20,28 @@ namespace TailBlazer.Fixtures
             } 
         }
 
-      //  [Fact]
+     //  [Fact]
         public void GenerateWideLinesInFile()
         {
-            string fileName = @"U:\Large Files\WideFile.txt";
-
-            //var file = File.Create(@"U:\WideFile.txt");
+           // string fileName = @"U:\Large Files\WideFile.txt";
+            string fileName = @"c:\work\LargeFiles\WideFile.txt";
+           //s var file = File.Create();
 
             var template = "0123456789abcdefghijklmnopqrstuvwxyz";
             var sb = new StringBuilder();
 
-            for (int i = 0; i < 250; i++)
-            {
-                sb.Append(i);
-                sb.Append("_");
-                sb.Append(template);
-             
-            }
 
+            long x;
             for (int i = 0; i < 1000; i++)
             {
+                for (int j = 0; i < 200; i++)
+                {
+                    sb.Append(j);
+                    sb.Append("_");
+                    sb.Append(template);
+                }
 
-
-                File.AppendAllLines(fileName,new string[] {sb.ToString()});
+                File.AppendAllLines(fileName,new[] {sb.Append(i).ToString()});
             }
         }
 

@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:controls="clr-namespace:TailBlazer.Controls"
              xmlns:recent="clr-namespace:TailBlazer.Views.Recent"
+              TextOptions.TextFormattingMode="Ideal" 
+              TextOptions.TextRenderingMode="Auto" 
              mc:Ignorable="d" 
                d:DataContext="{d:DesignInstance recent:RecentFilesViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="300" d:DesignWidth="300">
@@ -14,29 +16,32 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.textbox.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.button.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Buttons.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
         </ResourceDictionary>
-        
     </UserControl.Resources>
-    
-    <Grid>
 
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*" MaxHeight="250"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <TextBlock  Text="Recent Files" FontSize="16" FontWeight="SemiBold"/>
 
-        <ItemsControl Grid.Row="1" Margin="8 12 0 0"
-                         ItemsSource="{Binding  Files}">
-            
-            <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type recent:RecentFileProxy}">
-                    <Grid>
+        <ScrollViewer Grid.Row="1" Margin="8 12 4 0" 
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Auto">
 
-                        <Button 
+            <ItemsControl ItemsSource="{Binding  Files}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type recent:RecentFileProxy}">
+                        <Grid Margin="0 0 4 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Button 
                             HorizontalAlignment="Left"
                             Style="{StaticResource MaterialDesignFlatButton}"
                             Margin="2 0 2 2" Height="22" Padding="0"
@@ -44,41 +49,29 @@
                             Command="{Binding OpenCommand}"
                             ToolTip="{Binding OpenToolTip}">
 
-                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Horizontal">
 
-                                <controls:OpenFileIcon Width="14" Height="14"/>
-
-                                <TextBlock Foreground="{DynamicResource MaterialDesignBody}" 
+                                    <controls:OpenFileIcon Width="14" Height="14"/>
+                                    <TextBlock Foreground="{DynamicResource MaterialDesignBody}" 
                                            FontWeight="Light"
                                            Margin="5 2 4 2" 
                                             VerticalAlignment="Center"
                                            
                                    Text="{Binding Name}"/>
-                            </StackPanel>
+                                </StackPanel>
+                            </Button>
 
-
-
-                        </Button>
-
-                        <!--<Button Grid.Column="1" 
-                                Style="{StaticResource MaterialDesignFlatButton}"
-                                Margin="0 2 2 2" Width="22" Height="22" Padding="0"
+                            <Button Grid.Column="1" 
+                                Margin="0 2 0 2" 
+                                Style="{StaticResource CloseButtonStyle}"
                                 VerticalAlignment="Center"
                                 Command="{Binding RemoveCommand}"
-                                ToolTip="{Binding RemoveToolTip}">
-                            <local:RemoveIcon Width="10" Height="10"/>
-                        </Button>-->
-                        
-                        <!--<TextBlock Grid.Column="2" Margin="0 2 4 2" 
-                                   VerticalAlignment="Center"
-                                   Text="{Binding Name}"/>-->
-
-
-
-                    </Grid>
-
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+                                ToolTip="{Binding RemoveToolTip}" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
     </Grid>
 </UserControl>
+

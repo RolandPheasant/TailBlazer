@@ -4,11 +4,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using DynamicData.Kernel;
 using TailBlazer.Domain.Formatting;
 
 namespace TailBlazer.Controls
 {
-
     public class HighlightTextControl : Control
     {
         static HighlightTextControl()
@@ -16,27 +16,34 @@ namespace TailBlazer.Controls
             DefaultStyleKeyProperty.OverrideMetadata(typeof(HighlightTextControl), new FrameworkPropertyMetadata(typeof(HighlightTextControl)));
         }
 
+        public static readonly DependencyProperty HighlightForegroundBrushProperty = DependencyProperty.Register(
+            "HighlightForegroundBrush", 
+            typeof (Brush), 
+            typeof (HighlightTextControl), 
+            new PropertyMetadata(default(Brush), UpdateControlCallBack));
 
-        public static readonly DependencyProperty HighlightBackgroundProperty = DependencyProperty.Register(
-            "HighlightBackground", typeof (Brush), typeof (HighlightTextControl), new PropertyMetadata(default(Brush), UpdateControlCallBack));
+        public static readonly DependencyProperty HighlightBackgroundBrushProperty = DependencyProperty.Register(
+            "HighlightBackgroundBrush", 
+            typeof (Brush), 
+            typeof (HighlightTextControl), 
+            new PropertyMetadata(default(Brush), UpdateControlCallBack));
 
-        public Brush HighlightBackground
+        public Brush HighlightBackgroundBrush
         {
-            get { return (Brush) GetValue(HighlightBackgroundProperty); }
-            set { SetValue(HighlightBackgroundProperty, value); }
+            get { return (Brush) GetValue(HighlightBackgroundBrushProperty); }
+            set { SetValue(HighlightBackgroundBrushProperty, value); }
         }
 
-        public static readonly DependencyProperty HighlightForegroundProperty = DependencyProperty.Register(
-            "HighlightForeground", typeof (Brush), typeof (HighlightTextControl), new PropertyMetadata(default(Brush), UpdateControlCallBack));
-
-        public Brush HighlightForeground
+        public Brush HighlightForegroundBrush
         {
-            get { return (Brush) GetValue(HighlightForegroundProperty); }
-            set { SetValue(HighlightForegroundProperty, value); }
+            get { return (Brush) GetValue(HighlightForegroundBrushProperty); }
+            set { SetValue(HighlightForegroundBrushProperty, value); }
         }
-
-        public static readonly DependencyProperty FormattedTextProperty = DependencyProperty.Register(
-            "FormattedText", typeof (IEnumerable<DisplayText>), typeof (HighlightTextControl), new PropertyMetadata(default(IEnumerable<DisplayText>), UpdateControlCallBack));
+        
+        public static readonly DependencyProperty FormattedTextProperty = DependencyProperty.Register(nameof(FormattedText), 
+            typeof (IEnumerable<DisplayText>), 
+            typeof (HighlightTextControl), 
+            new PropertyMetadata(default(IEnumerable<DisplayText>), UpdateControlCallBack));
 
         public IEnumerable<DisplayText> FormattedText
         {
@@ -44,8 +51,10 @@ namespace TailBlazer.Controls
             set { SetValue(FormattedTextProperty, value); }
         }
 
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
-            "Text", typeof (string), typeof (HighlightTextControl), new PropertyMetadata(default(string)));
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register(nameof(Text), 
+            typeof (string), 
+            typeof (HighlightTextControl), 
+            new PropertyMetadata(default(string), UpdateControlCallBack));
 
         public string Text
         {
@@ -53,8 +62,7 @@ namespace TailBlazer.Controls
             set { SetValue(TextProperty, value); }
         }
 
-        public static readonly DependencyProperty HighlightEnabledProperty = DependencyProperty.Register(
-            "HighlightEnabled", typeof (bool), typeof (HighlightTextControl), new PropertyMetadata(true, UpdateControlCallBack));
+        public static readonly DependencyProperty HighlightEnabledProperty = DependencyProperty.Register(nameof(HighlightEnabled), typeof (bool), typeof (HighlightTextControl), new PropertyMetadata(true, UpdateControlCallBack));
 
         public bool HighlightEnabled
         {
@@ -73,11 +81,17 @@ namespace TailBlazer.Controls
         {
             base.OnApplyTemplate();
             _textBlock = (TextBlock)Template.FindName("PART_TEXT", this);
+
+            //const string sample = "The quick brown fox jumps over the lazy dog";
+            //var stringSize = this.MeasureString(sample);
+            //var widthPerChar = stringSize.Width / sample.Length;
+
+            ////6.5966
+            //Console.WriteLine(widthPerChar);
         }
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-
             _textBlock.Inlines.Clear();
             if (FormattedText == null || !FormattedText.Any())
             {
@@ -88,20 +102,50 @@ namespace TailBlazer.Controls
                 return;
             }
 
-            _textBlock.Inlines.AddRange(FormattedText.Select(ft =>
+            var formattedText = FormattedText.AsArray();
+            if (formattedText.Length == 1)
             {
-                var run = new Run(ft.Text);
+                var line = formattedText[0];
+                _textBlock.Text = line.Text;
 
-                if (ft.Highlight && HighlightEnabled)
+                //if (line.Highlight && HighlightEnabled)
+                //{
+                //    if (line.Hue == Hue.NotSpecified)
+                //    {
+                //        _textBlock.Background = this.HighlightBackgroundBrush;
+                //        _textBlock.Foreground = this.HighlightForegroundBrush;
+                //    }
+                //    else
+                //    {
+                //        _textBlock.Background = line.Hue.BackgroundBrush;
+                //        _textBlock.Foreground = line.Hue.ForegroundBrush;
+                //    }
+                //}
+            }
+            else
+            {
+                _textBlock.Inlines.AddRange(formattedText.Select(ft =>
                 {
-                    run.Background = ft.Hue.BackgroundBrush;
-                    run.Foreground = ft.Hue.ForegroundBrush;
+                    var run = new Run(ft.Text);
 
-                    run.FontWeight = FontWeights.Bold;
-                }
-                return run;
-            }));
+                    if (ft.Highlight && HighlightEnabled)
+                    {
 
+                        if (ft.Hue == Hue.NotSpecified)
+                        {
+                            run.Background = HighlightBackgroundBrush;
+                            run.Foreground = HighlightForegroundBrush;
+                        }
+                        else
+                        {
+                            run.Background = ft.Hue.BackgroundBrush;
+                            run.Foreground = ft.Hue.ForegroundBrush;
+                        }
+
+                    }
+                    return run;
+                }));
+            }
             base.OnRender(drawingContext);
         }
     }

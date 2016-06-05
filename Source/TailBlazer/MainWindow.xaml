@@ -20,26 +20,31 @@
         TextElement.FontSize="12"
         TextOptions.TextFormattingMode="Ideal" 
         TextOptions.TextRenderingMode="Auto"       
-        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"   
+        FontFamily="{StaticResource MaterialDesignFont}"  
         NonActiveWindowTitleBrush="{DynamicResource WindowTitleColorBrush}"
         WindowTitleBrush="{DynamicResource WindowTitleColorBrush}"
         GlowBrush="{DynamicResource AccentColorBrush3}"
+        infrastucture:WindowAssist.ApplicationClosing="{Binding WindowExiting}"
         WindowStartupLocation="CenterScreen"  
         WindowTransitionsEnabled="False"
         x:Name="Window"
+        SaveWindowPosition="False"
 
         d:DataContext="{d:DesignInstance windowManagement:WindowViewModel, IsDesignTimeCreatable=False}"
         Title="Tail Blazer" 
         Height="650"
-        Width="850">
+        Width="950">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/controls.buttons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToggleButton.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Font.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/MaterialDesign.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            
+            <infrastucture:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter" />
 
             <DataTemplate DataType="{x:Type infrastucture:FileHeader}">
                 <TextBlock Margin="6 2 2 2" 
@@ -50,7 +55,7 @@
 
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type infrastucture:ViewContainer}">
+            <DataTemplate DataType="{x:Type infrastucture:HeaderedView}">
                 <ContentControl Content="{Binding Content}">
                     <ContentControl.LayoutTransform>
                         <ScaleTransform ScaleX="{Binding DataContext.GeneralOptions.ScaleRatio.Value, ElementName=Window}" 
@@ -60,6 +65,10 @@
             </DataTemplate>
         </ResourceDictionary>
     </Window.Resources>
+
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding OpenFileCommand}" Modifiers="Ctrl" Key="O"/>
+    </Window.InputBindings>
 
     <controls:MetroWindow.RightWindowCommands>
         <controls:WindowCommands>
@@ -74,20 +83,11 @@
                     <StackPanel  Orientation="Vertical" Margin="2">
 
                         <Button Margin="6 0 0 0"
-                                Command ="{Binding SaveLayoutCommand}"
-                                ToolTip="Save Layout">
-                            <StackPanel Orientation="Horizontal">
-                                <controls1:SaveLayoutIcon Width="18" Height="18"/>
-                                <TextBlock Margin="8 0 8 0" VerticalAlignment="Center" Text="Save layout"/>
-                            </StackPanel>
-                        </Button>
-
-                        <Button Margin="6 0 0 0"
                                 Command ="{Binding ExitCommmand}"
                                 ToolTip="Exit Tail Blazer">
                             <StackPanel Orientation="Horizontal">
                                 <controls1:ExitIcon Width="18" Height="18"/>
-                                <TextBlock Margin="8 0 0 0" VerticalAlignment="Center" Text="Exit"/>
+                                <TextBlock Margin="8 0 0 0" VerticalAlignment="Center" Text="Exit and save layout"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -149,15 +149,13 @@
                 <MouseBinding Gesture="{x:Static infrastucture:MouseWheelGesture.ControlUp}"  
                                 Command="{Binding ZoomOutCommand}" />
             </Grid.InputBindings>
-            
-
-             <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
+            <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
             <materialDesign:DrawerHost.LeftDrawerContent>
 
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
                     <options:GeneralOptionsView
@@ -168,16 +166,18 @@
                             Grid.Row="1"
                             Margin="6 12 6 0"
                             DataContext="{Binding RecentFiles}"/>
-
                 </Grid>
 
             </materialDesign:DrawerHost.LeftDrawerContent>
 
             <Grid>
-                <dockablz:Layout   x:Name="Layout" >
+
+                  <dockablz:Layout   x:Name="Layout">
                     <dragablz:TabablzControl 
-                        x:Name="InitialTabablzControl"
+                            IsTabStop="True"
+                            x:Name="InitialTabablzControl"
                             HeaderMemberPath="Header" 
+                          
                             TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
                             Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
                             ShowDefaultCloseButton="True"       
@@ -192,19 +192,17 @@
                     </dragablz:TabablzControl>
                 </dockablz:Layout>
 
-                <StackPanel
-                    Visibility="{Binding IsEmpty,Converter={StaticResource BooleanToVisibilityConverter}}"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
-                    Orientation="Vertical"
-                    IsHitTestVisible="False">
-
-                    <TextBlock  FontSize="26" HorizontalAlignment="Center" Margin="0 0 0 4" Text="Drag files here"/>
-                    <controls1:FileIcon x:Name="FileIcon" BorderThickness="0" Width="50" Height="50" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-                    <TextBlock FontSize="26" Margin="0 4 0 0" Text="to open" HorizontalAlignment="Center"/>
-
-                </StackPanel>
-            </Grid>
+                        <StackPanel
+                        Visibility="{Binding IsEmpty,Converter={StaticResource BooleanToVisibilityConverter}}"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Orientation="Vertical"
+                        IsHitTestVisible="False">
+                            <TextBlock  FontSize="26" HorizontalAlignment="Center" Margin="0 0 0 4" Text="Drag files here"/>
+                            <controls1:FileIcon  BorderThickness="0" Width="50" Height="50" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            <TextBlock FontSize="26" Margin="0 4 0 0" Text="to open" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
         </materialDesign:DrawerHost>
 
         </Grid>

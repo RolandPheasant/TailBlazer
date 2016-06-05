@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using DynamicData.Kernel;
 using TailBlazer.Domain.Annotations;
@@ -79,11 +78,5 @@ namespace System.Collections
                 yield return $"{delimiter}{item}";
 
         }
-
-        //public static T[] AsArray<T>(this IEnumerable<T> source)
-        //{
-        //    return source as T[] ?? source.ToArray();
-        //}
-
     }
 }
