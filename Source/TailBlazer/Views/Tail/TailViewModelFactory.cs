@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reactive.Concurrency;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Search;
@@ -65,12 +66,12 @@ namespace TailBlazer.Views.Tail
         {
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
 
-            var fileWatcher = _objectProvider.Get<IFileWatcher>(new[]
+            var fileWatcher = _objectProvider.Get<IFileWatcher>(new IArgument[]
             {
-                new ExplictArg("fileInfo", fileInfo),
-                new ExplictArg("scheduler",_schedulerProvider.Background)
-            });
-            
+                new Argument<FileInfo>(fileInfo),
+                new Argument<IScheduler>(_schedulerProvider.Background)
+            }); 
+
             var searchMetadataCollection = _objectProvider.Get<ISearchMetadataCollection>();
             var searchHints = _objectProvider.Get<SearchHints>();
             var searchOptionsViewModel = new SearchOptionsViewModel(searchMetadataCollection, _globalSearchOptions, _searchProxyCollectionFactory, _searchMetadataFactory, _schedulerProvider, searchHints);
@@ -79,19 +80,18 @@ namespace TailBlazer.Views.Tail
                 (
                     new[]
                     {
-                        new ExplictArg("fileWatcher", fileWatcher),
-                        new ExplictArg("searchMetadataCollection", searchMetadataCollection)
+                        new NamedArgument("fileWatcher", fileWatcher),
+                        new NamedArgument("searchMetadataCollection", searchMetadataCollection)
                     }
                 );
             
             //I hate explicity specify named args - so fragile but hey ho.
             var viewModel = _objectProvider.Get<TailViewModel>(new[]
             {
-                new ExplictArg("fileWatcher", fileWatcher),
-                new ExplictArg("searchInfoCollection", searchInfo),
-                new ExplictArg("searchMetadataCollection", searchMetadataCollection),
-                new ExplictArg("searchOptionsViewModel", searchOptionsViewModel),
-                new ExplictArg("tailViewStateControllerFactory", _tailViewStateControllerFactory)
+                new NamedArgument("fileWatcher", fileWatcher),
+                new NamedArgument("searchInfoCollection", searchInfo),
+                new NamedArgument("searchMetadataCollection", searchMetadataCollection),
+                new NamedArgument("searchOptionsViewModel", searchOptionsViewModel),
             });
 
             return viewModel;

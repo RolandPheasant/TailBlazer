@@ -22,7 +22,7 @@ namespace TailBlazer.Views.Tail
 
             var args = new InlineViewerArgs(lineProvider, selectedChanged, searchMetadataCollection);
 
-            return _objectProvider.Get<InlineViewer>(new ExplictArg("args", args));
+            return _objectProvider.Get<InlineViewer>(new NamedArgument("args", args));
         }
     }
 }
