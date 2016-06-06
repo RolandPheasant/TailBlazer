@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
-using MaterialDesignThemes.Wpf;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Search;
@@ -46,7 +43,6 @@ namespace TailBlazer.Views.Tail
         public Guid Id { get; } = Guid.NewGuid();
         public ISelectionMonitor SelectionMonitor { get; }
         public GeneralOptionBindings GeneralOptionBindings { get;  }
-        public IObservable<LineProxy> SelectedLineChanged { get; }
         public SearchHints SearchHints { get;  }
         public SearchCollection SearchCollection { get; }
         internal ISearchMetadataCollection SearchMetadataCollection { get; }
@@ -65,7 +61,6 @@ namespace TailBlazer.Views.Tail
         public ICommand OpenFileCommand { get; }
         public ICommand OpenFolderCommand { get; }
         public ICommand CopyPathToClipboardCommand { get; }
-        //public ICommand OpenSearchOptionsCommand => new Command(async () => await OpenSearchOptions());
         public ICommand OpenSearchOptionsCommand { get; }
         public ICommand ClearCommand { get; }
         public ICommand UnClearCommand { get; }
@@ -128,7 +123,6 @@ namespace TailBlazer.Views.Tail
 
             SearchCollection = searchCollection;
             SearchMetadataCollection = combinedSearchMetadataCollection.Local;
-            SelectedLineChanged = this.WhenValueChanged(vm => vm.SelectedItem);
 
             var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
             HorizonalScrollChanged = args => horizonalScrollArgs.OnNext(args);
