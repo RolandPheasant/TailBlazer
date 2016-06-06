@@ -62,7 +62,6 @@ namespace TailBlazer.Infrastucture
 
             
             For<TailViewModelFactory>().Singleton();
-            Forward<TailViewModel, ISelectedLineChangedProvider>();
 
             Scan(scanner =>
             {

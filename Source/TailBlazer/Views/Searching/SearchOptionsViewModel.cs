@@ -17,8 +17,7 @@ namespace TailBlazer.Views.Searching
         public ISearchProxyCollection Local { get; }
         public ISearchProxyCollection Global { get; }
 
-        public SearchOptionsViewModel(ISearchMetadataCollection metadataCollection,
-            IGlobalSearchOptions globalSearchOptions,
+        public SearchOptionsViewModel(ICombinedSearchMetadataCollection combinedSearchMetadataCollection,
             ISearchProxyCollectionFactory searchProxyCollectionFactory,
             ISearchMetadataFactory searchMetadataFactory,
             ISchedulerProvider schedulerProvider,
@@ -26,8 +25,8 @@ namespace TailBlazer.Views.Searching
         {
             SearchHints = searchHints;
 
-            var global = globalSearchOptions.Metadata;
-            var local = metadataCollection;
+            var global = combinedSearchMetadataCollection.Global;
+            var local = combinedSearchMetadataCollection.Local;
 
             Action<SearchMetadata> changeScopeAction = meta =>
             {
@@ -56,19 +55,21 @@ namespace TailBlazer.Views.Searching
                 .Subscribe(request =>
                 {
                     var isGlobal = SelectedIndex == 1;
+                    var nextIndex = isGlobal ? global.NextIndex() : local.NextIndex();
+
                     var meta = searchMetadataFactory.Create(request.Text,
                         request.UseRegEx,
-                        metadataCollection.NextIndex(),
+                        nextIndex,
                         false,
                         isGlobal);
 
-                    if (SelectedIndex == 0)
+                    if (isGlobal)
                     {
-                        local.AddorUpdate(meta);
+                        global.AddorUpdate(meta);
                     }
                     else
                     {
-                        global.AddorUpdate(meta);
+                        local.AddorUpdate(meta);
                     }
                 });
 

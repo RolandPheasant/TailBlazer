@@ -160,6 +160,8 @@
     <Compile Include="Infrastucture\ViewFactoryService.cs" />
     <Compile Include="Infrastucture\Virtualisation\VirtualizingWrapPanel.cs" />
     <Compile Include="Infrastucture\WindowAssist.cs" />
+    <Compile Include="Views\DialogServices\IDialogCoordinator.cs" />
+    <Compile Include="Views\DialogServices\IDialogViewModel.cs" />
     <Compile Include="Views\Formatting\DefaultColourSelector.cs" />
     <Compile Include="Views\Formatting\IconDescription.cs" />
     <Compile Include="Views\Formatting\IIconProvider.cs" />
@@ -199,6 +201,7 @@
     <Compile Include="Views\FileDrop\FileDropMonitor.cs" />
     <Compile Include="Views\Searching\SearchProxyCollection.cs" />
     <Compile Include="Views\Searching\SearchProxyCollectionFactory.cs" />
+    <Compile Include="Views\DialogServices\DialogCoordinator.cs" />
     <Compile Include="Views\Tail\GeneralOptionBindings.cs" />
     <Compile Include="Views\Tail\ILinesVisualisation.cs" />
     <Compile Include="Views\Searching\ISearchStateToMetadataMapper.cs" />
@@ -207,7 +210,7 @@
     <Compile Include="Views\Tail\LineMatchProxy.cs" />
     <Compile Include="Views\Searching\SearchState.cs" />
     <Compile Include="Views\Searching\SearchStateToMetadataMapper.cs" />
-    <Compile Include="Views\Tail\SearchMetadataToStateConverter.cs" />
+    <Compile Include="Views\Searching\SearchMetadataToStateConverter.cs" />
     <Compile Include="Views\Tail\TailViewModelConstants.cs" />
     <Compile Include="Views\Tail\TailViewPersister.cs" />
     <Compile Include="Views\Tail\TailViewState.cs" />

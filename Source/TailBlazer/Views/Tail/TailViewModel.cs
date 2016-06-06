@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -9,7 +10,6 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
-using DynamicData.PLinq;
 using MaterialDesignThemes.Wpf;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
@@ -20,17 +20,12 @@ using TailBlazer.Domain.Settings;
 using TailBlazer.Domain.StateHandling;
 using TailBlazer.Infrastucture;
 using TailBlazer.Infrastucture.Virtualisation;
+using TailBlazer.Views.DialogServices;
 using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {
-    public interface ISelectedLineChangedProvider
-    {
-        IObservable<LineProxy> SelectedLineChanged { get; }
-    }
-
-
-    public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentView, ISelectedLineChangedProvider
+    public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentView, IDialogViewModel
     {
         private readonly IDisposable _cleanUp;
         private readonly SingleAssignmentDisposable _stateMonitor= new SingleAssignmentDisposable();
@@ -44,13 +39,14 @@ namespace TailBlazer.Views.Tail
         private int _pageSize;
         private LineProxy _selectedLine;
         private bool _showInline;
+        private bool _isDialogOpen;
+        private object _dialogContent;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         public Guid Id { get; } = Guid.NewGuid();
         public ISelectionMonitor SelectionMonitor { get; }
         public GeneralOptionBindings GeneralOptionBindings { get;  }
         public IObservable<LineProxy> SelectedLineChanged { get; }
-        private SearchOptionsViewModel SearchOptions { get;  }
         public SearchHints SearchHints { get;  }
         public SearchCollection SearchCollection { get; }
         internal ISearchMetadataCollection SearchMetadataCollection { get; }
@@ -69,7 +65,8 @@ namespace TailBlazer.Views.Tail
         public ICommand OpenFileCommand { get; }
         public ICommand OpenFolderCommand { get; }
         public ICommand CopyPathToClipboardCommand { get; }
-        public ICommand OpenSearchOptionsCommand => new Command(async () => await OpenSearchOptions());
+        //public ICommand OpenSearchOptionsCommand => new Command(async () => await OpenSearchOptions());
+        public ICommand OpenSearchOptionsCommand { get; }
         public ICommand ClearCommand { get; }
         public ICommand UnClearCommand { get; }
         public ICommand KeyAutoTail { get; }
@@ -83,9 +80,8 @@ namespace TailBlazer.Views.Tail
             [NotNull] ISearchInfoCollection searchInfoCollection, 
             [NotNull] IInlineViewerFactory inlineViewerFactory,
             [NotNull] GeneralOptionBindings generalOptionBindings,
-            [NotNull] ISearchMetadataCollection searchMetadataCollection,
+            [NotNull] ICombinedSearchMetadataCollection combinedSearchMetadataCollection,
             [NotNull] IStateBucketService stateBucketService,
-            [NotNull] SearchOptionsViewModel searchOptionsViewModel,
             [NotNull] ITailViewStateRestorer restorer,
             [NotNull] SearchHints searchHints,
             [NotNull] ITailViewStateControllerFactory tailViewStateControllerFactory,
@@ -93,7 +89,8 @@ namespace TailBlazer.Views.Tail
             [NotNull] SearchCollection searchCollection, 
             [NotNull] ITextFormatter textFormatter,
             [NotNull] ILineMatches lineMatches,
-            [NotNull] ICombinedSearchMetadataCollection combinedSearchMetadataCollection)
+            IObjectProvider objectProvider,
+            IDialogCoordinator dialogCoordinator)
         {
          
             if (logger == null) throw new ArgumentNullException(nameof(logger));
@@ -103,9 +100,7 @@ namespace TailBlazer.Views.Tail
             if (clipboardHandler == null) throw new ArgumentNullException(nameof(clipboardHandler));
             if (searchInfoCollection == null) throw new ArgumentNullException(nameof(searchInfoCollection));
             if (inlineViewerFactory == null) throw new ArgumentNullException(nameof(inlineViewerFactory));
-            if (searchMetadataCollection == null) throw new ArgumentNullException(nameof(searchMetadataCollection));
             if (stateBucketService == null) throw new ArgumentNullException(nameof(stateBucketService));
-            if (searchOptionsViewModel == null) throw new ArgumentNullException(nameof(searchOptionsViewModel));
             if (searchHints == null) throw new ArgumentNullException(nameof(searchHints));
             if (themeProvider == null) throw new ArgumentNullException(nameof(themeProvider));
             if (searchCollection == null) throw new ArgumentNullException(nameof(searchCollection));
@@ -116,7 +111,6 @@ namespace TailBlazer.Views.Tail
             Name = fileWatcher.FullName;
             SelectionMonitor = selectionMonitor;
             GeneralOptionBindings = generalOptionBindings;
-            SearchOptions = searchOptionsViewModel;
             SearchHints = searchHints;
 
             CopyToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
@@ -126,9 +120,14 @@ namespace TailBlazer.Views.Tail
             UnClearCommand = new Command(fileWatcher.Reset);
             ClearCommand = new Command(fileWatcher.Clear);
             KeyAutoTail = new Command(() => { AutoTail = true; });
+            OpenSearchOptionsCommand = new Command(() =>
+            {
+                var content = objectProvider.Get<SearchOptionsViewModel>(new Argument<ICombinedSearchMetadataCollection>(combinedSearchMetadataCollection) );
+                dialogCoordinator.Show(this, content, x => content.Dispose());
+            });
 
-            SearchCollection = searchCollection;//new SearchCollection(searchInfoCollection, schedulerProvider);
-            SearchMetadataCollection = searchMetadataCollection;
+            SearchCollection = searchCollection;
+            SearchMetadataCollection = combinedSearchMetadataCollection.Local;
             SelectedLineChanged = this.WhenValueChanged(vm => vm.SelectedItem);
 
             var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
@@ -138,21 +137,21 @@ namespace TailBlazer.Views.Tail
 
             //this deals with state when loading the system at start up and at shut-down
             _persister = new TailViewPersister(this, restorer);
-            
-            //An observable which acts as a scroll command
-            var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
-            var scroller = _userScrollRequested.CombineLatest(autoChanged, (user, auto) =>
-                        {
-                            var mode = AutoTail ? ScrollReason.Tail : ScrollReason.User;
-                            return  new ScrollRequest(mode, user.PageSize, user.FirstIndex);
-                        })
-                        .Do(x=>logger.Info("Scrolling to {0}/{1}", x.FirstIndex,x.PageSize))
-                        .DistinctUntilChanged();
 
             FileStatus = fileWatcher.Status.ForBinding();
 
             //command to add the current search to the tail collection
             var searchInvoker = SearchHints.SearchRequested.Subscribe(request => searchInfoCollection.Add(request.Text, request.UseRegEx));
+
+            //An observable which acts as a scroll command
+            var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
+            var scroller = _userScrollRequested.CombineLatest(autoChanged, (user, auto) =>
+            {
+                var mode = AutoTail ? ScrollReason.Tail : ScrollReason.User;
+                return new ScrollRequest(mode, user.PageSize, user.FirstIndex);
+            })
+            .Do(x => logger.Info("Scrolling to {0}/{1}", x.FirstIndex, x.PageSize))
+            .DistinctUntilChanged();
 
             //User feedback to show file size
             FileSizeText = fileWatcher.Latest.Select(fn=>fn.Size)
@@ -231,9 +230,9 @@ namespace TailBlazer.Views.Tail
                 SearchCollection,
                 searchInfoCollection,
                 searchHints,
-                searchMetadataCollection,
+                combinedSearchMetadataCollection,
                 SelectionMonitor,
-                SearchOptions,
+                Disposable.Create(dialogCoordinator.Close),
                 searchInvoker,
                 MaximumChars,
                 _stateMonitor,
@@ -243,10 +242,17 @@ namespace TailBlazer.Views.Tail
         }
      
         public TextScrollDelegate HorizonalScrollChanged { get; }
-        
-        private async Task OpenSearchOptions()
+
+        public bool IsDialogOpen
         {
-           await DialogHost.Show(SearchOptions, Id);
+            get { return _isDialogOpen; }
+            set { SetAndRaise(ref _isDialogOpen, value); }
+        }
+
+        public object DialogContent
+        {
+            get { return _dialogContent; }
+            set { SetAndRaise(ref _dialogContent, value); }
         }
 
         public LineProxy SelectedItem

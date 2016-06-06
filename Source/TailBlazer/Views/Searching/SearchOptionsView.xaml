@@ -186,8 +186,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <ToggleButton
-                                   VerticalAlignment="Bottom" 
+                <ToggleButton VerticalAlignment="Bottom" 
                                    Margin="2 0 0 0"
                                    Padding="2"
                                    Width="32" 
