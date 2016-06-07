@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
+using DynamicData.PLinq;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Search;
@@ -170,7 +171,7 @@ namespace TailBlazer.Views.Tail
 
             var loader = lineScroller.Lines.Connect()
                 .LogChanges(logger, "Received")
-                .Transform(lineProxyFactory.Create)
+                .Transform(lineProxyFactory.Create, new ParallelisationOptions(ParallelType.Ordered,5))
                 .LogChanges(logger, "Sorting")
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
                 .ObserveOn(schedulerProvider.MainThread)
