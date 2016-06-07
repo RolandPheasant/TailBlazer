@@ -10,7 +10,6 @@ namespace TailBlazer.Domain.FileHandling.Search
 {
     public class CombinedSearchMetadataCollection : ICombinedSearchMetadataCollection
     {
-
         private readonly IDisposable _cleanUp;
 
         public IObservableCache<SearchMetadata, string> Combined { get; }

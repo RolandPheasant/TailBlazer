@@ -21,7 +21,6 @@ namespace TailBlazer.Views.Searching
         private readonly IObservableCache<SearchViewModel, string> _viewModels;
 
         public ReadOnlyObservableCollection<SearchViewModel> Items => _items;
-        public IObservable<string> SelectedText { get; }
         public IObservable<ILineProvider> Latest { get; }
 
         public SearchCollection(ISearchInfoCollection searchInfoCollection, ISchedulerProvider schedulerProvider)
@@ -60,11 +59,6 @@ namespace TailBlazer.Views.Searching
                 .Where(x => x == null)
                 .Subscribe(x => Selected =_viewModels.Items.First());
 
-
-           SelectedText = this.WhenValueChanged(sc => sc.Selected)
-                                .Where(x => x != null)
-                                .Select(svm => svm.Text)
-                                .Replay(1).RefCount();
 
            Latest = this.WhenValueChanged(sc => sc.Selected)
                 .Where(x=>x!=null)

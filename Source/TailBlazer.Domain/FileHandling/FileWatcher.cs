@@ -5,10 +5,10 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.Ratings;
-using TailBlazer.Domain.Settings;
 
 namespace TailBlazer.Domain.FileHandling
 {
+ 
     public class FileWatcher : IFileWatcher
     {
         public IObservable<FileStatus> Status { get; }

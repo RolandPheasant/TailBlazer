@@ -68,6 +68,7 @@
 
     <Window.InputBindings>
         <KeyBinding Command="{Binding OpenFileCommand}" Modifiers="Ctrl" Key="O"/>
+        <KeyBinding Command="{Binding CollectMemoryCommand}" Key="F8"/>
     </Window.InputBindings>
 
     <controls:MetroWindow.RightWindowCommands>

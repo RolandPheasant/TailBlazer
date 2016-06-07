@@ -32,7 +32,8 @@ namespace TailBlazer.Views.Tail
         public IProperty<int> MaximumChars { get; }
         public ISelectionMonitor SelectionMonitor { get; }
 
-        public InlineViewer([NotNull] InlineViewerArgs args,
+        public InlineViewer([NotNull] IObservable<ILineProvider> lineProvider,
+            [NotNull] IObservable<LineProxy> selectedChanged,
             [NotNull] IClipboardHandler clipboardHandler,
             [NotNull] ISchedulerProvider schedulerProvider, 
             [NotNull] ISelectionMonitor selectionMonitor,
@@ -41,7 +42,8 @@ namespace TailBlazer.Views.Tail
             [NotNull] ITextFormatter textFormatter,
             [NotNull] ILineMatches lineMatches)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
+            if (lineProvider == null) throw new ArgumentNullException(nameof(lineProvider));
+            if (selectedChanged == null) throw new ArgumentNullException(nameof(selectedChanged));
             if (clipboardHandler == null) throw new ArgumentNullException(nameof(clipboardHandler));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (selectionMonitor == null) throw new ArgumentNullException(nameof(selectionMonitor));
@@ -50,9 +52,6 @@ namespace TailBlazer.Views.Tail
             CopyToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
 
             _isSettingScrollPosition = false;
-
-            var lineProvider = args.LineProvider;
-            var selectedChanged = args.SelectedChanged;
             var pageSize = this.WhenValueChanged(vm=>vm.PageSize);
 
             //if use selection is null, tail the file

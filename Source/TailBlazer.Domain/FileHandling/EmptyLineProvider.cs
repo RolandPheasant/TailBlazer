@@ -2,7 +2,7 @@
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class EmptyLineProvider: ILineProvider
+    public sealed class EmptyLineProvider: ILineProvider
     {
         public static readonly ILineProvider Instance = new EmptyLineProvider();
 

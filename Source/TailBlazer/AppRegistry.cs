@@ -40,7 +40,7 @@ namespace TailBlazer.Infrastucture
              
 
             For<ITextFormatter>().Use<TextFormatter>().Transient();
-            For<ILineMatches>().Use<LineMatches>().Transient();
+            For<ILineMatches>().Use<LineMatches>();
             For<ISettingsStore>().Use<FileSettingsStore>().Singleton();
             For<IFileWatcher>().Use<FileWatcher>();
 

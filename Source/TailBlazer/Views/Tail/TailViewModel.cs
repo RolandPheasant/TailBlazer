@@ -213,7 +213,7 @@ namespace TailBlazer.Views.Tail
             //return an empty line provider unless user is viewing inline - this saves needless trips to the file
             var inline = searchInfoCollection.All.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : EmptyLineProvider.Instance);
 
-            InlineViewer = inlineViewerFactory. Create(inline, this.WhenValueChanged(vm => vm.SelectedItem));
+            InlineViewer = inlineViewerFactory. Create(combinedSearchMetadataCollection, inline, this.WhenValueChanged(vm => vm.SelectedItem));
 
             _cleanUp = new CompositeDisposable(lineScroller,
                 loader,

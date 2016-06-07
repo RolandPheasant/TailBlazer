@@ -2,7 +2,7 @@ using System;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class FileSegment : IEquatable<FileSegment>
+    public sealed class FileSegment : IEquatable<FileSegment>
     {
         public int Index { get; }
         public long Start { get;  }
