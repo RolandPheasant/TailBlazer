@@ -56,6 +56,11 @@ namespace TailBlazer.Views.Searching
             var counter = shared.ToCollection()
                 .Subscribe(count => Count = count.Count);
 
+            var nullDodger = this.WhenValueChanged(sc => sc.Selected)
+                .Where(x => x == null)
+                .Subscribe(x => Selected =_viewModels.Items.First());
+
+
            SelectedText = this.WhenValueChanged(sc => sc.Selected)
                                 .Where(x => x != null)
                                 .Select(svm => svm.Text)
@@ -66,9 +71,8 @@ namespace TailBlazer.Views.Searching
                 .Select(svm => svm.Latest)
                 .Switch()
                 .Replay(1).RefCount();
-
-
-            _cleanUp = new CompositeDisposable(_viewModels, binderLoader, counter, removed, autoSelector);
+            
+            _cleanUp = new CompositeDisposable(_viewModels, binderLoader, counter, removed, autoSelector, nullDodger);
         }
 
         public void Select(string item)
