@@ -39,42 +39,46 @@ namespace TailBlazer.Domain.FileHandling.Search
                 .Connect().ToCollection()
                 .Select(items => items.ToArray())
                 .StartWith(Enumerable.Empty<SearchMetadata>());
-            
-            var combiner = localItems.CombineLatest(globalItems, (local, global) =>
-            {
-                int i = 0;
-                var dictionary = new Dictionary<string, SearchMetadata>();
 
-                foreach (var meta in local)
+            var combiner = localItems.CombineLatest(globalItems, (local, global) => new {local, global})
+                .Throttle(TimeSpan.FromMilliseconds(250))
+                .Select(x => Combine(x.local, x.global))
+                .Subscribe(uppdatedItems =>
                 {
-                    dictionary[meta.SearchText] = new SearchMetadata(meta, i);
-                    i++;
-                }
-
-                foreach (var meta in global)
-                {
-                    if (dictionary.ContainsKey(meta.SearchText)) continue;
-                    dictionary[meta.SearchText] = new SearchMetadata(meta, i);
-                    i++;
-                }
-
-                return dictionary.Values;
-            }).Subscribe(uppdatedItems =>
-            {
-                cache.Edit(innerCache =>
-                {
-                    var toRemove = innerCache.Items.Except(uppdatedItems).ToArray();
-                    innerCache.Remove(toRemove);
-                    innerCache.AddOrUpdate(uppdatedItems);
+                    cache.Edit(innerCache =>
+                    {
+                        var toRemove = innerCache.Items.Except(uppdatedItems).ToArray();
+                        innerCache.Remove(toRemove);
+                        innerCache.AddOrUpdate(uppdatedItems);
+                    });
                 });
-            });
 
             Combined = cache.Connect()
                 .IgnoreUpdateWhen((current, previous) => current.Equals(previous))
                 .AsObservableCache();
 
             _cleanUp = new CompositeDisposable(Combined, cache, combiner);
+        }
 
+        private SearchMetadata[] Combine(IEnumerable<SearchMetadata> local, IEnumerable<SearchMetadata> global)
+        {
+            int i = 0;
+            var dictionary = new Dictionary<string, SearchMetadata>();
+
+            foreach (var meta in local.OrderBy(meta=>meta.Position))
+            {
+                dictionary[meta.SearchText] = new SearchMetadata(meta, i);
+                i++;
+            }
+
+            foreach (var meta in global.OrderBy(meta => meta.Position))
+            {
+                if (dictionary.ContainsKey(meta.SearchText)) continue;
+                dictionary[meta.SearchText] = new SearchMetadata(meta, i);
+                i++;
+            }
+
+            return dictionary.Values.ToArray();
         }
 
         public void Dispose()

@@ -24,7 +24,7 @@ namespace TailBlazer.Views.Searching
         private bool _highlight;
         private bool _filter;
         private bool _useRegex;
-        private bool _ignoreCase;
+        private bool _caseSensitive;
         private Hue _highlightHue;
         private PackIconKind _iconKind;
         private int _position;
@@ -69,7 +69,7 @@ namespace TailBlazer.Views.Searching
             Highlight = _searchMetadata.Highlight;
             Filter = _searchMetadata.Filter;
             UseRegex = searchMetadata.UseRegex;
-            IgnoreCase = searchMetadata.IgnoreCase;
+            CaseSensitive = !searchMetadata.IgnoreCase;
             Position = searchMetadata.Position;
             Hues = colourProvider.Hues;
             HighlightHue = searchMetadata.HighlightHue;
@@ -77,7 +77,7 @@ namespace TailBlazer.Views.Searching
 
             ShowIconSelectorCommand = new Command(async () => await ShowIconSelector());
             RemoveCommand = new Command(() => removeAction(searchMetadata));
-            ChangeScopeCommand = new Command(()=>changeScopeAction(searchMetadata));
+            ChangeScopeCommand = new Command(()=>changeScopeAction((SearchMetadata)this));
             HighlightCommand = new Command<Hue>(newHue =>
             {
                 HighlightHue = newHue;
@@ -145,10 +145,10 @@ namespace TailBlazer.Views.Searching
             private set { SetAndRaise(ref _useRegex, value); }
         }
 
-        public bool IgnoreCase
+        public bool CaseSensitive
         {
-            get { return _ignoreCase; }
-            set { SetAndRaise(ref _ignoreCase, value); }
+            get { return _caseSensitive; }
+            set { SetAndRaise(ref _caseSensitive, value); }
         }
 
         public int Position
@@ -164,7 +164,7 @@ namespace TailBlazer.Views.Searching
                 Filter,
                 proxy.Highlight,
                 proxy.UseRegex,
-                proxy.IgnoreCase,
+                !proxy.CaseSensitive,
                 proxy.HighlightHue, 
                 proxy.IconKind.ToString(),
                 proxy.IsGlobal);

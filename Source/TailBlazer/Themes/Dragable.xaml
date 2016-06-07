@@ -6,6 +6,7 @@
 
         <Style.Setters>
             <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate>
@@ -16,15 +17,16 @@
                                         SnapsToDevicePixels="True">
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
-                                <Thumb  x:Name="PART_Thumb" Grid.Column="1" Width="12" Height="12">
+                                <Thumb  x:Name="PART_Thumb" Grid.Column="0" Width="14" Height="14">
                                     <Thumb.Template>
                                         <ControlTemplate TargetType="Thumb">
-                                            <Border Background="Transparent"  x:Name="PART_DragableElement">
+                                            <Border Background="Transparent"  
+                                                    ToolTip="Drag to change position"
+                                                    x:Name="PART_DragableElement">
                                                 <Path 
                                                 
                                                 Data="M10,13V11H18V13H10M10,19V17H14V19H10M10,7V5H22V7H10M6,17H8.5L5,20.5L1.5,17H4V7H1.5L5,3.5L8.5,7H6V17Z" 
@@ -43,7 +45,7 @@
                                     </Thumb.Template>
                                     
                                 </Thumb>
-                                <ContentPresenter Grid.Column="2" 
+                                <ContentPresenter Grid.Column="1" 
                                                   Content="{TemplateBinding ContentControl.Content}"
                                                   ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}" 
                                                   ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}" 

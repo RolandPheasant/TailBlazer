@@ -81,8 +81,6 @@ namespace TailBlazer.Domain.FileHandling.Search
 
         #region Equality
 
-
-
         public bool Equals(SearchMetadata other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -91,10 +89,10 @@ namespace TailBlazer.Domain.FileHandling.Search
                 && string.Equals(SearchText, other.SearchText) 
                 && Filter == other.Filter 
                 && Highlight == other.Highlight 
-                && UseRegex == other.UseRegex
-                && HighlightHue == other.HighlightHue
-                && IconKind == other.IconKind
-                && IgnoreCase == other.IgnoreCase
+                && UseRegex == other.UseRegex 
+                && IgnoreCase == other.IgnoreCase 
+                && Equals(HighlightHue, other.HighlightHue) 
+                && string.Equals(IconKind, other.IconKind) 
                 && IsGlobal == other.IsGlobal;
         }
 
@@ -111,14 +109,14 @@ namespace TailBlazer.Domain.FileHandling.Search
             unchecked
             {
                 var hashCode = Position;
-                hashCode = (hashCode*397) ^ (SearchText?.GetHashCode() ?? 0);
+                hashCode = (hashCode*397) ^ (SearchText != null ? SearchText.GetHashCode() : 0);
                 hashCode = (hashCode*397) ^ Filter.GetHashCode();
                 hashCode = (hashCode*397) ^ Highlight.GetHashCode();
-                hashCode = (hashCode * 397) ^ HighlightHue.GetHashCode();
                 hashCode = (hashCode*397) ^ UseRegex.GetHashCode();
                 hashCode = (hashCode*397) ^ IgnoreCase.GetHashCode();
-                hashCode = (hashCode * 397) ^ IconKind.GetHashCode();
-                hashCode = (hashCode * 397) ^ IsGlobal.GetHashCode();
+                hashCode = (hashCode*397) ^ (HighlightHue != null ? HighlightHue.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (IconKind != null ? IconKind.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ IsGlobal.GetHashCode();
                 return hashCode;
             }
         }

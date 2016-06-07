@@ -54,9 +54,10 @@ namespace TailBlazer.Views.Tail
                     });
             }
             
-            //write latest to file when something triggers a staye change
+            //write latest to file when something triggers a change
             var selectedChanged = tailView.SearchCollection
                     .WhenValueChanged(sc=>sc.Selected,false)
+                    .Where(vm => vm !=null)
                     .Select(vm=>vm.Text);
 
             var metaChanged = _tailView.SearchMetadataCollection.Metadata.Connect()

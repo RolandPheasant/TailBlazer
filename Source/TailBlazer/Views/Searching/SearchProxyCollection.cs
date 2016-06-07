@@ -55,11 +55,11 @@ namespace TailBlazer.Views.Searching
                     //the same choice can be used again
                     var iconChanged = so.WhenValueChanged(proxy => proxy.IconKind, false).ToUnit();
                     var colourChanged = so.WhenValueChanged(proxy => proxy.HighlightHue, false).ToUnit();
-                    var ignoreCaseChanged = so.WhenValueChanged(proxy => proxy.IgnoreCase, false).ToUnit();
+                    var ignoreCaseChanged = so.WhenValueChanged(proxy => proxy.CaseSensitive, false).ToUnit();
 
                     var textAssociationChanged = iconChanged.Merge(colourChanged).Merge(ignoreCaseChanged)
                         .Throttle(TimeSpan.FromMilliseconds(250))
-                        .Select(_ => new TextAssociation(so.Text, so.IgnoreCase, so.UseRegex, so.HighlightHue.Swatch,
+                        .Select(_ => new TextAssociation(so.Text, so.CaseSensitive, so.UseRegex, so.HighlightHue.Swatch,
                             so.IconKind.ToString(), so.HighlightHue.Name, DateTime.UtcNow))
                         .Subscribe(textAssociationCollection.MarkAsChanged);
 
