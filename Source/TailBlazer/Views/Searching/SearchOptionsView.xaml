@@ -8,7 +8,7 @@
              xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
-
+            Width="485" Height="325"
              d:DataContext="{d:DesignInstance searching:SearchOptionsViewModel}"
              d:DesignHeight="300">
 
@@ -32,49 +32,72 @@
             <DataTemplate DataType="{x:Type searching:SearchOptionsProxy}">
 
                 <Grid Margin="4 4 4 4" x:Name="Row">
+                    <Grid.Resources>
+                        <Style x:Key="SearchButton" TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatButton}">
+
+                            <Setter Property="Padding" Value="0 0 2 0"/>
+                            <Setter Property="Width" Value="24"/>
+                            <Setter Property="Height" Value="24"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="HorizontalAlignment" Value="Left"/>
+                            <Setter Property="wpf:ShadowAssist.ShadowDepth" Value="Depth2"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="SnapsToDevicePixels" Value="True"/>
+                            <Setter Property="UseLayoutRounding" Value="True"/>
+                        </Style>
+                    </Grid.Resources>
+                    
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="22"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="75"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Button Style="{StaticResource MaterialDesignFlatButton}"
+                    <Button Grid.Column="0" 
+                            ToolTip="{Binding ChangeScopeToolTip}"
+                            Command="{Binding ChangeScopeCommand}"
+                            Style="{StaticResource SearchButton}">
+
+                        <wpf:PackIcon  Padding="2" 
+                                       Kind="{Binding IsGlobal, Converter={StaticResource IsGlobalToIconConverter}}"/>
+
+                    </Button>
+
+                    <Button Grid.Column="1" 
+                            Margin="2 0 0 0"  
+                            Style="{StaticResource SearchButton}"
                                         Command="{Binding ShowIconSelectorCommand}"
-                                        ToolTip="Change icon"
-                                        Padding="0"
-                                        Width="24" Height="24"
-                                        BorderThickness="0"
-                                        HorizontalAlignment="Left"
-                                        SnapsToDevicePixels="True"
-                                        UseLayoutRounding="True"
-                                        wpf:ShadowAssist.ShadowDepth="Depth2"
-                                        VerticalAlignment="Center">
+                                        ToolTip="Change icon">
                         <wpf:PackIcon  
-                                        Padding="4" 
+                                        Padding="2" 
                                         Foreground="{Binding Background.Value}"
                                         Kind="{Binding IconKind,FallbackValue={x:Static wpf:PackIconKind.ArrowRightBold}}"/>
                     </Button>
 
-                    <TextBlock Padding="2" Margin="6 0 0 0" x:Name="Label" Grid.Column="1" 
-                                       Foreground="{Binding Foreground.Value}"
-                                       Background="{Binding Background.Value}"
-                                       Text="{Binding Text}"
-                                        VerticalAlignment="Center"/>
 
-                    <wpf:PopupBox
+
+                    <TextBlock Padding="2" Margin="2 0 0 0" 
+                               x:Name="Label" 
+                               Grid.Column="2" 
+                                Foreground="{Binding Foreground.Value}"
+                                Background="{Binding Background.Value}"
+                                Text="{Binding Text}"
+                                VerticalAlignment="Center"/>
+
+                    <wpf:PopupBox  Grid.Column="3"
                                     ToolTip="Change colour"
-                                    Grid.Column="2"
+                                    Margin="2 0 0 0"
                                     FontFamily="{StaticResource MaterialDesignFont}"
                                     PopupMode="Click">
                         <wpf:PopupBox.ToggleContent>
                             <wpf:PackIcon Kind="FormatPaint" 
-                                            Margin="4 0 4 0" Width="14" Height="14"
+                                            Width="14" Height="14"
                                             Foreground="{Binding Background.Value}" />
                         </wpf:PopupBox.ToggleContent>
 
@@ -109,39 +132,29 @@
                         </ItemsControl>
                     </wpf:PopupBox>
 
-                    <CheckBox Margin="4 0 0 0" Grid.Column="3" 
-                                      VerticalAlignment="Center"
-                                      IsChecked="{Binding Filter}" 
-                                      ToolTip="Filter lines this value"
-                                      Content="Filter"/>
-
                     <CheckBox Margin="4 0 0 0" Grid.Column="4" 
                                       VerticalAlignment="Center"
                                       IsChecked="{Binding Highlight}" 
                                       ToolTip="Highlight text within the line"
                                       Content="Highlight"/>
 
+
                     <CheckBox Margin="4 0 0 0" Grid.Column="5" 
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding Filter}" 
+                                      ToolTip="Filter lines this value"
+                                      Content="Filter"/>
+
+
+                    <CheckBox Margin="4 0 0 0" Grid.Column="6" 
                                       VerticalAlignment="Center"
                                       IsChecked="{Binding IgnoreCase}" 
                                       Content="Ignore Case"/>
 
-                    <Button Margin="4 0 0 0"
-                                        Grid.Column="6" 
-                                        Padding="4 0 6 0"
-                                        ToolTip="{Binding ChangeScopeToolTip}"
-                                        VerticalAlignment="Center"
-                                        Command="{Binding ChangeScopeCommand}"
-                                        Style="{StaticResource MaterialDesignFlatButton}">
-                       
-                        <wpf:PackIcon  Width="18" Height="18"
-                                       Kind="{Binding IsGlobal, Converter={StaticResource IsGlobalToIconConverter}}"/>
-
-                    </Button>
-
-                    <Button Margin="8 0 6 0"
+                    <Button Margin="4 0 4 0"
                                         Grid.Column="7" 
                                         ToolTip="{Binding RemoveTooltip}"
+                                        HorizontalAlignment="Right"
                                         VerticalAlignment="Center"
                                         Command="{Binding RemoveCommand}"
                                         Style="{StaticResource CloseButtonStyle}"/>
@@ -165,7 +178,7 @@
     </Control.Resources>
 
     <wpf:DialogHost Identifier="{Binding Id}">
-        <Grid Width="485" Height="325">
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition  Height="Auto"/>
                 <RowDefinition  Height="Auto"/>
@@ -271,7 +284,7 @@
                                               Foreground="{DynamicResource MaterialDesignDarkForeground}"
                                               ClipToBounds="True">
                     <materialDesign:TransitionerSlide.OpeningEffects>
-                        <materialDesign:TransitionEffect Kind="SlideInFromLeft" Duration="0:0:0.8" />
+                        <materialDesign:TransitionEffect Kind="SlideInFromRight" Duration="0:0:0.8" />
                         <materialDesign:TransitionEffect Kind="SlideInFromBottom" Duration="0:0:0.8" OffsetTime="0:0:0.15" />
                     </materialDesign:TransitionerSlide.OpeningEffects>
                     <ContentControl  Content="{Binding Global}"/>

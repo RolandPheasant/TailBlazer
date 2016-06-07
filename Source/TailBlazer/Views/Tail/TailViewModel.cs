@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
@@ -115,10 +116,13 @@ namespace TailBlazer.Views.Tail
             UnClearCommand = new Command(fileWatcher.Reset);
             ClearCommand = new Command(fileWatcher.Clear);
             KeyAutoTail = new Command(() => { AutoTail = true; });
-            OpenSearchOptionsCommand = new Command(() =>
+            OpenSearchOptionsCommand = new Command(async () =>
             {
-                var content = objectProvider.Get<SearchOptionsViewModel>(new Argument<ICombinedSearchMetadataCollection>(combinedSearchMetadataCollection) );
-                dialogCoordinator.Show(this, content, x => content.Dispose());
+                await Task.Run(() =>
+                {
+                    var content = objectProvider.Get<SearchOptionsViewModel>(new Argument<ICombinedSearchMetadataCollection>(combinedSearchMetadataCollection));
+                    dialogCoordinator.Show(this, content, x => content.Dispose());
+                });
             });
 
             SearchCollection = searchCollection;

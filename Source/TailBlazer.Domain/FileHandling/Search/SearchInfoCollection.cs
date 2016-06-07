@@ -9,6 +9,7 @@ namespace TailBlazer.Domain.FileHandling.Search
     public sealed class SearchInfoCollection : ISearchInfoCollection
     {
         private readonly ISearchMetadataCollection _localMetadataCollection;
+        private readonly ICombinedSearchMetadataCollection _combinedSearchMetadataCollection;
         private readonly ISearchMetadataFactory _searchMetadataFactory;
         private readonly IFileWatcher _fileWatcher;
         private readonly IDisposable _cleanUp;
@@ -22,6 +23,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             IFileWatcher fileWatcher)
         {
             _localMetadataCollection = combinedSearchMetadataCollection.Local;
+            _combinedSearchMetadataCollection = combinedSearchMetadataCollection;
             _searchMetadataFactory = searchMetadataFactory;
             _fileWatcher = fileWatcher;
 
@@ -30,7 +32,7 @@ namespace TailBlazer.Domain.FileHandling.Search
 
             //create a collection with 1 item, which is used to show entire file
             var systemSearches = new SourceCache<SearchInfo, string>(t => t.SearchText);
-            systemSearches.AddOrUpdate(new SearchInfo("<All>", All, SearchType.All));
+            systemSearches.AddOrUpdate(new SearchInfo("<All>", false, All, SearchType.All));
             
             //create a collection of all possible user filters
             var userSearches = combinedSearchMetadataCollection.Combined
@@ -42,7 +44,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                         .Search(meta.BuildPredicate())
                         .Replay(1).RefCount();
 
-                    return new SearchInfo(meta.SearchText, latest, SearchType.User);
+                    return new SearchInfo(meta.SearchText, meta.IsGlobal, latest, SearchType.User);
                 });
 
             //combine te results into a single collection
@@ -64,7 +66,19 @@ namespace TailBlazer.Domain.FileHandling.Search
 
         public void Remove(string searchText)
         {
-            _localMetadataCollection.Remove(searchText);
+            var item = Searches.Lookup(searchText);
+            if (!item.HasValue) return;
+
+
+            if (!item.Value.IsGlobal)
+            {
+                _localMetadataCollection.Remove(searchText);
+            }
+            else
+            {
+                _combinedSearchMetadataCollection.Global.Remove(searchText);
+            }
+
         }
 
         public void Dispose()

@@ -12,8 +12,7 @@ namespace TailBlazer.Views.DialogServices
 
         public void Show(IDialogViewModel view, object content, Action<object> onClosed = null)
         {
-            Task.Factory.StartNew(() =>
-            {
+
                 _disposer.Disposable = Disposable.Empty;
                 view.DialogContent = content;
                 view.IsDialogOpen = true;
@@ -28,7 +27,7 @@ namespace TailBlazer.Views.DialogServices
                     view.IsDialogOpen = false;
                     onClosed?.Invoke(view.DialogContent);
                 });
-            });
+            
         }
 
         public void Close()
