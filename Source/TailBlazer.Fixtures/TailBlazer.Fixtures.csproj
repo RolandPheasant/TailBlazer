@@ -111,6 +111,7 @@
     <Compile Include="DefaultColourSelectorFixture.cs" />
     <Compile Include="DefaultIconSelectorFixture.cs" />
     <Compile Include="DisplayTextFixture.cs" />
+    <Compile Include="ExlusionFilterFixture.cs" />
     <Compile Include="FileDropFixture.cs" />
     <Compile Include="IconDescriptionFixture.cs" />
     <Compile Include="IconProviderFixture.cs" />

@@ -66,6 +66,8 @@
   <ItemGroup>
     <Compile Include="CaseInsensitiveString.cs" />
     <Compile Include="FileHandling\EmptyLineProvider.cs" />
+    <Compile Include="FileHandling\ExludedLinesProvider.cs" />
+    <Compile Include="FileHandling\ExludeLinesEx.cs" />
     <Compile Include="FileHandling\FileInfoEx.cs" />
     <Compile Include="FileHandling\FileRewriter.cs" />
     <Compile Include="FileHandling\FileSearcher.cs" />

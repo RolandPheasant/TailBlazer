@@ -40,7 +40,6 @@ namespace TailBlazer.Domain.FileHandling.Search
                 .StartWith(Enumerable.Empty<SearchMetadata>());
 
             var combiner = localItems.CombineLatest(globalItems, (local, global) => new {local, global})
-                //.Throttle(TimeSpan.FromMilliseconds(250))
                 .Select(x => Combine(x.local, x.global))
                 .Subscribe(uppdatedItems =>
                 {

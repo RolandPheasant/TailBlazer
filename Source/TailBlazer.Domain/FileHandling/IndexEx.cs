@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
@@ -6,6 +8,15 @@ namespace TailBlazer.Domain.FileHandling
 {
     public static class IndexEx
     {
+        public static IObservable<ILineProvider> Index(this FileInfo source,  IScheduler scheduler = null)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+
+            return source.WatchFile(scheduler: scheduler)
+                .WithSegments()
+                .Index();
+        }
+
         public static IObservable<ILineProvider> Index(this IObservable<FileSegmentCollection> source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));

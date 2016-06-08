@@ -15,7 +15,6 @@ namespace TailBlazer.Domain.FileHandling
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
             return source.WatchFile(scheduler: scheduler)
-
                 .WithSegments()
                 .Search(predicate, scheduler);
         }
