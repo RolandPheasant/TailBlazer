@@ -10,22 +10,19 @@ namespace TailBlazer.Views.Searching
             if (string.IsNullOrEmpty(source.Text))
                 return new SearchHintMessage(true, $"Type to search using {(source.UseRegEx ? "regex" : "plain text")}");
 
-            if (string.IsNullOrEmpty(source.Text))
-                return SearchHintMessage.Valid;
-
             if (source.UseRegEx && !source.Text.IsLongerThanOrEqualTo(2))
                 return new SearchHintMessage(false, "Regex must be at least 2 characters");
 
-            if (!source.UseRegEx && !source.Text.IsLongerThanOrEqualTo(3))
+            var textLength = source.IsExclusion ? 4 : 3;
+            if (!source.UseRegEx && !source.Text.IsLongerThanOrEqualTo(textLength))
                 return new SearchHintMessage(false, "Text must be at least 3 characters");
 
-            if ((!source.UseRegEx && source.Text.Contains(@"\")) ||
-                (source.Text.Trim().Length == 0))
+            if ((!source.UseRegEx && source.Text.Contains(@"\")) || (source.TextWithoutExclusion.Trim().Length == 0))
                 return new SearchHintMessage(false, "Text contains illegal characters");
 
             try
             {
-                var test = new Regex(source.Text);
+                var test = new Regex(source.TextWithoutExclusion);
             }
             catch (Exception)
             {

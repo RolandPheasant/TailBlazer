@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
@@ -27,8 +28,32 @@ namespace TailBlazer.Domain.FileHandling.Search
             _searchMetadataFactory = searchMetadataFactory;
             _fileWatcher = fileWatcher;
 
-            //Add a complete file display
-            All = _fileWatcher.Latest.Index().Replay(1).RefCount();
+            //Add a complete file display [if items are exclued, we should exclude otherwise include all]
+            var exclusionPredicate = combinedSearchMetadataCollection.Combined.Connect()
+                    .IgnoreUpdateWhen((current, previous) => SearchMetadata.EffectsHighlightComparer.Equals(current, previous))
+                    .Filter(meta=> meta.IsExclusion)
+                    .ToCollection()
+                    .Select(searchMetadataItems =>
+                    {
+                        Func<string, bool> predicate = null;
+                        var predicates = searchMetadataItems.Select(meta => meta.BuildPredicate()).ToArray();
+                        predicate = str =>
+                        {
+                            return !predicates.Any(item => item(str));
+                        };
+                        return predicate;
+                    }).StartWith((Func<string, bool>)null);
+
+            All = exclusionPredicate.Select(predicate =>
+            {
+                if (predicate==null)
+                    return _fileWatcher.Latest.Index();
+
+                return _fileWatcher.Latest.Search(predicate);
+
+            }).Switch().Replay(1).RefCount();
+
+         //   All = _fileWatcher.Latest.Index().Replay(1).RefCount();
 
             //create a collection with 1 item, which is used to show entire file
             var systemSearches = new SourceCache<SearchInfo, string>(t => t.SearchText);

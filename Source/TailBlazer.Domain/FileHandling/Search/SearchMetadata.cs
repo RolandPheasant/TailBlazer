@@ -115,14 +115,15 @@ namespace TailBlazer.Domain.FileHandling.Search
             unchecked
             {
                 var hashCode = Position;
-                hashCode = (hashCode*397) ^ (SearchText != null ? SearchText.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (SearchText?.GetHashCode() ?? 0);
                 hashCode = (hashCode*397) ^ Filter.GetHashCode();
                 hashCode = (hashCode*397) ^ Highlight.GetHashCode();
                 hashCode = (hashCode*397) ^ UseRegex.GetHashCode();
                 hashCode = (hashCode*397) ^ IgnoreCase.GetHashCode();
-                hashCode = (hashCode*397) ^ (HighlightHue != null ? HighlightHue.GetHashCode() : 0);
-                hashCode = (hashCode*397) ^ (IconKind != null ? IconKind.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (HighlightHue?.GetHashCode() ?? 0);
+                hashCode = (hashCode*397) ^ (IconKind?.GetHashCode() ?? 0);
                 hashCode = (hashCode*397) ^ IsGlobal.GetHashCode();
+                hashCode = (hashCode * 397) ^ IsExclusion.GetHashCode();
                 return hashCode;
             }
         }
@@ -185,8 +186,11 @@ namespace TailBlazer.Domain.FileHandling.Search
                 if (x.GetType() != y.GetType()) return false;
 
                 var stringComparison = x.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-                return string.Equals(x.SearchText, y.SearchText, stringComparison) 
-                    && x.Filter == y.Filter && x.UseRegex == y.UseRegex && x.IgnoreCase == y.IgnoreCase;
+                return string.Equals(x.SearchText, y.SearchText, stringComparison)
+                       && x.Filter == y.Filter
+                       && x.UseRegex == y.UseRegex
+                       && x.IgnoreCase == y.IgnoreCase
+                       && x.IsExclusion == y.IsExclusion;
             }
 
             public int GetHashCode(SearchMetadata obj)
@@ -199,6 +203,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                     hashCode = (hashCode*397) ^ obj.UseRegex.GetHashCode();
                     hashCode = (hashCode*397) ^ obj.IgnoreCase.GetHashCode();
                     hashCode = (hashCode * 397) ^ obj.IgnoreCase.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.IsExclusion.GetHashCode();
                     return hashCode;
                 }
             }

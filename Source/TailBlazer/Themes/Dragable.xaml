@@ -48,6 +48,7 @@
                                 <ContentPresenter Grid.Column="1" 
                                                   Content="{TemplateBinding ContentControl.Content}"
                                                   ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}" 
+                                                  ContentTemplateSelector="{TemplateBinding ContentControl.ContentTemplateSelector}"
                                                   ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}" 
                                                   HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}" 
                                                   VerticalAlignment="{TemplateBinding Control.VerticalContentAlignment}" 
