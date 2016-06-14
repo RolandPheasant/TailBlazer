@@ -36,11 +36,6 @@ namespace TailBlazer.Views.Searching
 
         public SearchHints(IRecentSearchCollection recentSearchCollection, ISchedulerProvider schedulerProvider)
         {
-            //build a predicate when SearchText changes
-            var filter = this.WhenValueChanged(t => t.SearchText)
-                .Throttle(TimeSpan.FromMilliseconds(250))
-                .Select(BuildFilter);
-
             //User feedback to guide them whilst typing
             var searchText = this.WhenValueChanged(vm => vm.SearchText);
             var useRegEx = this.WhenValueChanged(vm => vm.UseRegex);
@@ -50,8 +45,6 @@ namespace TailBlazer.Views.Searching
             var combined = searchText.CombineLatest(useRegEx, (text, regex) => new SearchRequest(text, regex))
                 .Select(searchRequest => searchRequest.BuildMessage())
                 .Publish();
-
-           // SearchHintMessage = combined.ForBinding();
 
             IsValid = combined.Select(shm => shm.IsValid).ForBinding();
             Message = combined.Select(shm => shm.Message).ForBinding();
@@ -69,7 +62,6 @@ namespace TailBlazer.Views.Searching
                 searchRequested.OnNext(new SearchRequest(SearchText, UseRegex));
                 SearchText = string.Empty;
                 UseRegex = false;
-
             }, () => IsValid.Value && SearchText.Length>0);
 
 

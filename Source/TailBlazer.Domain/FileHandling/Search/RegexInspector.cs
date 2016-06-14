@@ -10,7 +10,7 @@ namespace TailBlazer.Domain.FileHandling.Search
 
         public RegexInspector()
         {
-            _isPlainText = new Regex("^[a-zA-Z0-9 ]*$");
+            _isPlainText = new Regex("^[-][a-zA-Z0-9 ]*$");
         }
 
         public bool DoesThisLookLikeRegEx(string text)

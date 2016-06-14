@@ -1,7 +1,5 @@
 namespace TailBlazer.Views.Searching
 {
-
-
     public sealed  class SearchState
     {
         public string Text { get; }
@@ -15,12 +13,12 @@ namespace TailBlazer.Views.Searching
         public string Swatch { get; }
 
         public string Hue { get; }
+        public bool IsExclusion { get;  }
 
         public string Icon { get; }
 
         public SearchState(string text,int position, bool useRegEx, bool highlight, bool filter, bool alert, 
-            bool ignoreCase, string swatch, string icon, 
-            string hue)
+            bool ignoreCase, string swatch, string icon, string hue, bool isExclusion)
         {
             Text = text;
             Position = position;
@@ -32,6 +30,7 @@ namespace TailBlazer.Views.Searching
             Swatch = swatch;
             Icon = icon;
             Hue = hue;
+            IsExclusion = isExclusion;
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using TailBlazer.Domain.FileHandling.TextAssociations;
 using TailBlazer.Domain.Formatting;
 
@@ -26,6 +27,8 @@ namespace TailBlazer.Domain.FileHandling.Search
 
             //maybe key on useRegex as well as text
             var association = _textAssociationCollection.Lookup(searchText);
+            var isExclusion = !useRegex && searchText.Substring(0, 1) == "-";
+            searchText = isExclusion ? searchText.Substring(1, searchText.Length-1) : searchText;
 
             string icon;
             Hue hue;
@@ -40,8 +43,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                 icon = _defaultIconSelector.GetIconFor(searchText, useRegex);
                 hue = _defaultColourSelector.Select(searchText);
             }
-
-
+            
             return new SearchMetadata(index, searchText,
                 filter, 
                 true, 
@@ -49,7 +51,8 @@ namespace TailBlazer.Domain.FileHandling.Search
                 true,
                 hue , 
                 icon,
-                isGlobal);
+                isGlobal,
+                isExclusion);
         }
 
     }

@@ -45,8 +45,6 @@ namespace TailBlazer.Domain.Formatting
             {
                 yield return matchedString;
             }
-
-
         }
 
         private  IEnumerable<MatchedString> Yield(string input, string tomatch)
@@ -80,9 +78,7 @@ namespace TailBlazer.Domain.Formatting
             }
 
         }
-
         
-
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();

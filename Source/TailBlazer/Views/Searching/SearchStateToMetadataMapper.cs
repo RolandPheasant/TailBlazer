@@ -22,7 +22,8 @@ namespace TailBlazer.Views.Searching
             return new SearchMetadata(state.Position, state.Text, state.Filter,state.Highlight, state.UseRegEx,state.IgnoreCase,
                 hue,
                 state.Icon,
-                isGlobal);
+                isGlobal,
+                state.IsExclusion);
         }
 
         public SearchState Map(SearchMetadata search)
@@ -38,7 +39,8 @@ namespace TailBlazer.Views.Searching
                 search.IgnoreCase,
                 search.HighlightHue.Swatch,
                 search.IconKind,
-                search.HighlightHue.Name);
+                search.HighlightHue.Name,
+                search.IsExclusion);
         }
     }
 }

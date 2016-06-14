@@ -25,9 +25,11 @@ namespace TailBlazer.Views.Searching
         private bool _filter;
         private bool _useRegex;
         private bool _caseSensitive;
+        private bool _isExclusion;
         private Hue _highlightHue;
         private PackIconKind _iconKind;
         private int _position;
+      
 
         public bool IsGlobal { get; }
         public string Text => _searchMetadata.SearchText;
@@ -74,6 +76,7 @@ namespace TailBlazer.Views.Searching
             Hues = colourProvider.Hues;
             HighlightHue = searchMetadata.HighlightHue;
             IsGlobal = searchMetadata.IsGlobal;
+            IsExclusion = searchMetadata.IsExclusion;
 
             ShowIconSelectorCommand = new Command(async () => await ShowIconSelector());
             RemoveCommand = new Command(() => removeAction(searchMetadata));
@@ -151,6 +154,12 @@ namespace TailBlazer.Views.Searching
             set { SetAndRaise(ref _caseSensitive, value); }
         }
 
+        public bool IsExclusion
+        {
+            get { return _isExclusion; }
+            private set { SetAndRaise(ref _isExclusion, value); }
+        }
+
         public int Position
         {
             get { return _position; }
@@ -167,7 +176,8 @@ namespace TailBlazer.Views.Searching
                 !proxy.CaseSensitive,
                 proxy.HighlightHue, 
                 proxy.IconKind.ToString(),
-                proxy.IsGlobal);
+                proxy.IsGlobal,
+                proxy.IsExclusion);
         }
 
         #region Equality

@@ -21,6 +21,7 @@ namespace TailBlazer.Domain.FileHandling.Search
         public Hue HighlightHue { get; }
         public string IconKind { get; }
         public bool IsGlobal { get;  }
+        public bool IsExclusion { get;  }
 
         public SearchMetadata([NotNull] SearchMetadata searchMetadata, int newPosition)
         {
@@ -37,6 +38,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             HighlightHue = searchMetadata.HighlightHue;
             IconKind = searchMetadata.IconKind;
             IsGlobal = searchMetadata.IsGlobal;
+            IsExclusion = searchMetadata.IsExclusion;
         }
 
         public SearchMetadata([NotNull] SearchMetadata searchMetadata, int newPosition, bool isGlobal)
@@ -44,6 +46,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             if (searchMetadata == null) throw new ArgumentNullException(nameof(searchMetadata));
 
             Position = newPosition;
+            IsGlobal = isGlobal;
             SearchText = searchMetadata.SearchText;
             Filter = searchMetadata.Filter;
             Highlight = searchMetadata.Highlight;
@@ -53,7 +56,8 @@ namespace TailBlazer.Domain.FileHandling.Search
             Predicate = searchMetadata.Predicate;
             HighlightHue = searchMetadata.HighlightHue;
             IconKind = searchMetadata.IconKind;
-            IsGlobal = isGlobal;
+            IsExclusion = searchMetadata.IsExclusion;
+
         }
 
         public SearchMetadata(int position, [NotNull] string searchText, bool filter, 
@@ -62,7 +66,8 @@ namespace TailBlazer.Domain.FileHandling.Search
             bool ignoreCase,
             Hue highlightHue,
             string iconKind,
-            bool isGlobal)
+            bool isGlobal,
+            bool isExclusion)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
 
@@ -75,6 +80,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             HighlightHue = highlightHue;
             IconKind = iconKind;
             IsGlobal = isGlobal;
+            IsExclusion = isExclusion;
             RegEx = this.BuildRegEx();
             Predicate = this.BuildPredicate();
         }

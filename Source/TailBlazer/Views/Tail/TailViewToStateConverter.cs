@@ -35,7 +35,8 @@ namespace TailBlazer.Views.Tail
                         search.IgnoreCase,
                         search.HighlightHue.Swatch,
                         search.IconKind,
-                        search.HighlightHue.Name
+                        search.HighlightHue.Name,
+                        search.IsExclusion
                     )).ToArray();
 
             var tailViewState = new TailViewState(fileName, selectedSearch, searchItems);
