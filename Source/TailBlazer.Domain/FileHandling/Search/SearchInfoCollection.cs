@@ -30,12 +30,16 @@ namespace TailBlazer.Domain.FileHandling.Search
 
             //Add a complete file display [if items are exclued, we should exclude otherwise include all]
             var exclusionPredicate = combinedSearchMetadataCollection.Combined.Connect()
-                    .IgnoreUpdateWhen((current, previous) => SearchMetadata.EffectsFilterComparer.Equals(current, previous))
+                    .IncludeUpdateWhen((current, previous) => !SearchMetadata.EffectsFilterComparer.Equals(current, previous))
                     .Filter(meta=> meta.IsExclusion)
                     .ToCollection()
                     .Select(searchMetadataItems =>
                     {
                         Func<string, bool> predicate = null;
+
+                        if (searchMetadataItems.Count == 0)
+                            return predicate;
+                        
                         var predicates = searchMetadataItems.Select(meta => meta.BuildPredicate()).ToArray();
                         predicate = str =>
                         {
