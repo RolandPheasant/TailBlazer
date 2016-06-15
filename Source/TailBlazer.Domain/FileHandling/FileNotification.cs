@@ -3,7 +3,7 @@ using System.IO;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class FileNotification : IEquatable<FileNotification>
+    public sealed class FileNotification : IEquatable<FileNotification>
     {
         private FileInfo Info { get; }
         public bool Exists { get; }

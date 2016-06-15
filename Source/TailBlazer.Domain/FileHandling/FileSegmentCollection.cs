@@ -4,10 +4,8 @@ using System.Linq;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class FileSegmentCollection : IEquatable<FileSegmentCollection>
+    public sealed class FileSegmentCollection : IEquatable<FileSegmentCollection>
     {
-        private long sizeDiff;
-
         public FileInfo Info { get;  }
         public FileSegment[] Segments { get;  }
         public long TailStartsAt { get;  }

@@ -55,59 +55,30 @@ namespace TailBlazer.Domain.Formatting
             if (string.IsNullOrEmpty(input))
                 yield break;
 
-
-            //TODO: Check whether there are perf-issues with RegEx
-            var split = Regex.Split(input, tomatch, RegexOptions.IgnoreCase);
-
+            string pattern = "(" + Regex.Escape(tomatch) + ")";
+            var split = Regex.Split(input, pattern, RegexOptions.IgnoreCase);
             var length = split.Length;
 
             if (length == 0) yield break;
-            
+
             if (length == 1)
             {
                 yield return new MatchedString(input);
                 yield break;
             }
 
-          //  int start =0;
-            int currentLength = 0;
-
-            for (int i = 0; i < split.Length; i++)
+            foreach (var item in split)
             {
-                var current = split[i] ?? string.Empty;
-
-                if (string.IsNullOrEmpty(current))
+                if (item.Equals(tomatch, StringComparison.OrdinalIgnoreCase))
                 {
-                    //Get original string back as the user may have searched in a different case
-                    var originalString = input.Substring(currentLength, tomatch.Length);
-
-                    //TODO: MAKE THIS WORK
-                    yield return new MatchedString(originalString, _tomatch);
-
-                    currentLength = current.Length + currentLength + tomatch.Length;
-                    if (currentLength + tomatch.Length > input.Length)
-                        yield break;
-                }
-                else if (i > 0 && !string.IsNullOrEmpty(split[i - 1]))
-                {
-                    if (currentLength + tomatch.Length > input.Length)
-                        yield break;
-
-                    //Get original string back as the user may have searched in a different case
-                    var originalString = input.Substring(currentLength, tomatch.Length);
-
-                    yield return new MatchedString(originalString, _tomatch);
-                    yield return new MatchedString(current);
-
-                    currentLength = current.Length + currentLength + tomatch.Length;
+                    yield return new MatchedString(item, _tomatch);
                 }
                 else
                 {
-                    yield return new MatchedString(current);
-                    currentLength = current.Length + currentLength;
+                    yield return new MatchedString(item);
                 }
-             
             }
+
         }
 
         

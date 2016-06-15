@@ -20,7 +20,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             _textAssociationCollection = textAssociationCollection;
         }
 
-        public SearchMetadata Create(string searchText, bool useRegex, int index, bool filter)
+        public SearchMetadata Create(string searchText, bool useRegex, int index, bool filter, bool isGlobal = false)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
 
@@ -48,7 +48,8 @@ namespace TailBlazer.Domain.FileHandling.Search
                 useRegex, 
                 true,
                 hue , 
-                icon);
+                icon,
+                isGlobal);
         }
 
     }

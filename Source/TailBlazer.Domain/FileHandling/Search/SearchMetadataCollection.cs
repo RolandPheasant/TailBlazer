@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using DynamicData;
+using DynamicData.Kernel;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.Infrastructure;
 
@@ -36,8 +37,9 @@ namespace TailBlazer.Domain.FileHandling.Search
         public void Add([NotNull] IEnumerable<SearchMetadata> metadata)
         {
             if (metadata == null) throw new ArgumentNullException(nameof(metadata));
-            _searches.AddOrUpdate(metadata);
-            _logger.Info("{0} SearchMetadata has been loaded", metadata.Count());
+            var searchMetadatas = metadata.AsArray();
+            _searches.AddOrUpdate(searchMetadatas);
+            _logger.Info("{0} SearchMetadata has been loaded", searchMetadatas.Count());
 
         }
 

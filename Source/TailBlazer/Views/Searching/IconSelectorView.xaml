@@ -22,8 +22,8 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Control.Resources>
-    
-    <Grid Margin="4" Width="435" Height="325">
+
+    <Grid Margin="4"  Width="485" Height="325">
             <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>

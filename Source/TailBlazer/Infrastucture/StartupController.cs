@@ -36,6 +36,7 @@ namespace TailBlazer.Infrastucture
             settingsRegister.Register(new StateBucketConverter(), "BucketOfState");
             settingsRegister.Register(new RecentSearchToStateConverter(), "RecentSearch");
             settingsRegister.Register(new TextAssociationToStateConverter(), "TextAssociation");
+            settingsRegister.Register(new SearchMetadataToStateConverter(), "GlobalSearch");
 
             //TODO: Need type scanner then this code is not required
             var viewFactoryRegister = objectProvider.Get<IViewFactoryRegister>();

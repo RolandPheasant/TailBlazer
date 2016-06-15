@@ -6,15 +6,16 @@ namespace TailBlazer.Domain.FileHandling.Search
     public sealed class SearchInfo : IEquatable<SearchInfo>
     {
         public string SearchText { get;  }
+        public bool IsGlobal { get;  }
         public IObservable<ILineProvider> Latest { get;  }
         public SearchType SearchType { get;  }
         
-
-        public SearchInfo([NotNull] string searchText, [NotNull] IObservable<ILineProvider> latest, SearchType searchType)
+        public SearchInfo([NotNull] string searchText, bool isGlobal, [NotNull] IObservable<ILineProvider> latest, SearchType searchType)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
             if (latest == null) throw new ArgumentNullException(nameof(latest));
             SearchText = searchText;
+            IsGlobal = isGlobal;
             Latest = latest;
             SearchType = searchType;
         }

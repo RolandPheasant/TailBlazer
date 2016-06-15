@@ -18,7 +18,9 @@ namespace TailBlazer.Views.Searching
 
         public string Icon { get; }
 
-        public SearchState(string text,int position, bool useRegEx, bool highlight, bool filter, bool alert, bool ignoreCase, string swatch, string icon, string hue)
+        public SearchState(string text,int position, bool useRegEx, bool highlight, bool filter, bool alert, 
+            bool ignoreCase, string swatch, string icon, 
+            string hue)
         {
             Text = text;
             Position = position;

@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using TailBlazer.Domain.FileHandling.Search;
 
 namespace TailBlazer.Domain.FileHandling.TextAssociations
 {

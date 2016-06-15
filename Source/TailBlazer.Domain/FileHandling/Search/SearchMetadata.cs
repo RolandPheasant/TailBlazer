@@ -7,7 +7,6 @@ using TailBlazer.Domain.Formatting;
 
 namespace TailBlazer.Domain.FileHandling.Search
 {
-    //public static class K
 
     public class SearchMetadata : IEquatable<SearchMetadata>
     {
@@ -21,6 +20,7 @@ namespace TailBlazer.Domain.FileHandling.Search
         public Func<string, bool> Predicate { get; }
         public Hue HighlightHue { get; }
         public string IconKind { get; }
+        public bool IsGlobal { get;  }
 
         public SearchMetadata([NotNull] SearchMetadata searchMetadata, int newPosition)
         {
@@ -36,6 +36,24 @@ namespace TailBlazer.Domain.FileHandling.Search
             Predicate = searchMetadata.Predicate;
             HighlightHue = searchMetadata.HighlightHue;
             IconKind = searchMetadata.IconKind;
+            IsGlobal = searchMetadata.IsGlobal;
+        }
+
+        public SearchMetadata([NotNull] SearchMetadata searchMetadata, int newPosition, bool isGlobal)
+        {
+            if (searchMetadata == null) throw new ArgumentNullException(nameof(searchMetadata));
+
+            Position = newPosition;
+            SearchText = searchMetadata.SearchText;
+            Filter = searchMetadata.Filter;
+            Highlight = searchMetadata.Highlight;
+            UseRegex = searchMetadata.UseRegex;
+            IgnoreCase = searchMetadata.IgnoreCase;
+            RegEx = searchMetadata.RegEx;
+            Predicate = searchMetadata.Predicate;
+            HighlightHue = searchMetadata.HighlightHue;
+            IconKind = searchMetadata.IconKind;
+            IsGlobal = isGlobal;
         }
 
         public SearchMetadata(int position, [NotNull] string searchText, bool filter, 
@@ -43,7 +61,8 @@ namespace TailBlazer.Domain.FileHandling.Search
             bool useRegex, 
             bool ignoreCase,
             Hue highlightHue,
-            string iconKind)
+            string iconKind,
+            bool isGlobal)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
 
@@ -55,13 +74,12 @@ namespace TailBlazer.Domain.FileHandling.Search
             IgnoreCase = ignoreCase;
             HighlightHue = highlightHue;
             IconKind = iconKind;
+            IsGlobal = isGlobal;
             RegEx = this.BuildRegEx();
             Predicate = this.BuildPredicate();
         }
 
         #region Equality
-
-
 
         public bool Equals(SearchMetadata other)
         {
@@ -71,10 +89,11 @@ namespace TailBlazer.Domain.FileHandling.Search
                 && string.Equals(SearchText, other.SearchText) 
                 && Filter == other.Filter 
                 && Highlight == other.Highlight 
-                && UseRegex == other.UseRegex
-                && HighlightHue == other.HighlightHue
-                && IconKind == other.IconKind
-                && IgnoreCase == other.IgnoreCase;
+                && UseRegex == other.UseRegex 
+                && IgnoreCase == other.IgnoreCase 
+                && Equals(HighlightHue, other.HighlightHue) 
+                && string.Equals(IconKind, other.IconKind) 
+                && IsGlobal == other.IsGlobal;
         }
 
         public override bool Equals(object obj)
@@ -90,13 +109,14 @@ namespace TailBlazer.Domain.FileHandling.Search
             unchecked
             {
                 var hashCode = Position;
-                hashCode = (hashCode*397) ^ (SearchText?.GetHashCode() ?? 0);
+                hashCode = (hashCode*397) ^ (SearchText != null ? SearchText.GetHashCode() : 0);
                 hashCode = (hashCode*397) ^ Filter.GetHashCode();
                 hashCode = (hashCode*397) ^ Highlight.GetHashCode();
-                hashCode = (hashCode * 397) ^ HighlightHue.GetHashCode();
                 hashCode = (hashCode*397) ^ UseRegex.GetHashCode();
                 hashCode = (hashCode*397) ^ IgnoreCase.GetHashCode();
-                hashCode = (hashCode * 397) ^ IconKind.GetHashCode();
+                hashCode = (hashCode*397) ^ (HighlightHue != null ? HighlightHue.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (IconKind != null ? IconKind.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ IsGlobal.GetHashCode();
                 return hashCode;
             }
         }

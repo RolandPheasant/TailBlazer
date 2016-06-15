@@ -46,6 +46,8 @@ namespace TailBlazer.Views.WindowManagement
         public ICommand ExitCommmand { get; }
         public ICommand ZoomInCommand { get; }
         public ICommand ZoomOutCommand { get; }
+        public Command CollectMemoryCommand { get; }
+
         public FileDropMonitor DropMonitor { get; } = new FileDropMonitor();
         public ItemActionCallback ClosingTabItemHandler => ClosingTabItemHandlerImpl;
         public ApplicationExitingDelegate WindowExiting { get; }
@@ -71,6 +73,13 @@ namespace TailBlazer.Views.WindowManagement
             ShowInGitHubCommand = new Command(()=>   Process.Start("https://github.com/RolandPheasant"));
             ZoomOutCommand= new Command(()=> { GeneralOptions.Scale = GeneralOptions.Scale + 5; });
             ZoomInCommand = new Command(() => { GeneralOptions.Scale = GeneralOptions.Scale - 5; });
+            CollectMemoryCommand = new Command(() =>
+            {
+                //Diagnostics [useful for memory testing]
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+            });
             ExitCommmand = new Command(() =>
             {
                 applicationStatePublisher.Publish(ApplicationState.ShuttingDown);
@@ -114,6 +123,8 @@ namespace TailBlazer.Views.WindowManagement
                             .ForEach(d=>d.Dispose());
                 }));
         }
+
+
 
         private void OpenFile()
         {

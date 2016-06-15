@@ -25,7 +25,7 @@ namespace TailBlazer.Views.Tail
         public void Restore(TailViewModel view,TailViewState tailviewstate)
         {
             _logger.Info("Applying {0} saved search settings  for {1} ", tailviewstate.SearchItems.Count(), view.Name);
-            var searches = tailviewstate.SearchItems.Select(_searchStateToMetadataMapper.Map);
+            var searches = tailviewstate.SearchItems.Select(state=>_searchStateToMetadataMapper.Map(state,false));
             view.SearchMetadataCollection.Add(searches);
             view.SearchCollection.Select(tailviewstate.SelectedSearch);
             _logger.Info("DONE: Applied {0} search settings for {1} ", tailviewstate.SearchItems.Count(), view.Name);

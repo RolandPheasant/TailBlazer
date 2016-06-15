@@ -8,7 +8,8 @@ namespace TailBlazer.Domain.FileHandling.Search
 {
     public sealed class SearchInfoCollection : ISearchInfoCollection
     {
-        private readonly ISearchMetadataCollection _metadataCollection;
+        private readonly ISearchMetadataCollection _localMetadataCollection;
+        private readonly ICombinedSearchMetadataCollection _combinedSearchMetadataCollection;
         private readonly ISearchMetadataFactory _searchMetadataFactory;
         private readonly IFileWatcher _fileWatcher;
         private readonly IDisposable _cleanUp;
@@ -17,11 +18,12 @@ namespace TailBlazer.Domain.FileHandling.Search
         
         public IObservable<ILineProvider> All { get; }
         
-        public SearchInfoCollection(ISearchMetadataCollection searchMetadataCollection,
+        public SearchInfoCollection(ICombinedSearchMetadataCollection combinedSearchMetadataCollection,
             ISearchMetadataFactory searchMetadataFactory,
             IFileWatcher fileWatcher)
         {
-            _metadataCollection = searchMetadataCollection;
+            _localMetadataCollection = combinedSearchMetadataCollection.Local;
+            _combinedSearchMetadataCollection = combinedSearchMetadataCollection;
             _searchMetadataFactory = searchMetadataFactory;
             _fileWatcher = fileWatcher;
 
@@ -30,10 +32,10 @@ namespace TailBlazer.Domain.FileHandling.Search
 
             //create a collection with 1 item, which is used to show entire file
             var systemSearches = new SourceCache<SearchInfo, string>(t => t.SearchText);
-            systemSearches.AddOrUpdate(new SearchInfo("<All>", All, SearchType.All));
+            systemSearches.AddOrUpdate(new SearchInfo("<All>", false, All, SearchType.All));
             
             //create a collection of all possible user filters
-            var userSearches = searchMetadataCollection.Metadata
+            var userSearches = combinedSearchMetadataCollection.Combined
                 .Connect(meta => meta.Filter)
                 .IgnoreUpdateWhen((current,previous)=> SearchMetadata.EffectsFilterComparer.Equals(current, previous))
                 .Transform(meta =>
@@ -42,7 +44,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                         .Search(meta.BuildPredicate())
                         .Replay(1).RefCount();
 
-                    return new SearchInfo(meta.SearchText, latest, SearchType.User);
+                    return new SearchInfo(meta.SearchText, meta.IsGlobal, latest, SearchType.User);
                 });
 
             //combine te results into a single collection
@@ -57,14 +59,26 @@ namespace TailBlazer.Domain.FileHandling.Search
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
 
-            var index = _metadataCollection.NextIndex();
+            var index = _localMetadataCollection.NextIndex();
             var metatdata = _searchMetadataFactory.Create(searchText, useRegex, index,true);
-            _metadataCollection.AddorUpdate(metatdata);
+            _localMetadataCollection.AddorUpdate(metatdata);
         }
 
         public void Remove(string searchText)
         {
-            _metadataCollection.Remove(searchText);
+            var item = Searches.Lookup(searchText);
+            if (!item.HasValue) return;
+
+
+            if (!item.Value.IsGlobal)
+            {
+                _localMetadataCollection.Remove(searchText);
+            }
+            else
+            {
+                _combinedSearchMetadataCollection.Global.Remove(searchText);
+            }
+
         }
 
         public void Dispose()

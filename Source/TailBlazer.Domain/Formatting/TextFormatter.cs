@@ -11,9 +11,9 @@ namespace TailBlazer.Domain.Formatting
     {
         private readonly IObservable<IEnumerable<SearchMetadata>> _strings;
 
-        public TextFormatter(ISearchMetadataCollection searchMetadataCollection)
+        public TextFormatter(ICombinedSearchMetadataCollection searchMetadataCollection)
         {
-            _strings = searchMetadataCollection.Metadata
+            _strings = searchMetadataCollection.Combined
                 .Connect(meta => meta.Highlight)
                 .IgnoreUpdateWhen((current, previous) => SearchMetadata.EffectsHighlightComparer.Equals(current, previous))
                 .QueryWhenChanged(query => query.Items.OrderBy(m => m.Position))

@@ -14,15 +14,17 @@ namespace TailBlazer.Views.Tail
             _objectProvider = objectProvider;
         }
 
-        public InlineViewer Create(IObservable<ILineProvider> lineProvider,
-            IObservable<LineProxy> selectedChanged, 
-            ISearchMetadataCollection searchMetadataCollection)
+        public InlineViewer Create(ICombinedSearchMetadataCollection combinedSearchMetadataCollection,  
+            IObservable<ILineProvider> lineProvider, 
+            IObservable<LineProxy> selectedChanged)
         {
-
-
-            var args = new InlineViewerArgs(lineProvider, selectedChanged, searchMetadataCollection);
-
-            return _objectProvider.Get<InlineViewer>(new ExplictArg("args", args));
+            var args = new IArgument[]
+            {
+                new Argument<IObservable<ILineProvider>>(lineProvider),
+                new Argument<IObservable<LineProxy>>(selectedChanged),
+                new Argument<ICombinedSearchMetadataCollection>(combinedSearchMetadataCollection)
+            };
+            return _objectProvider.Get<InlineViewer>(args);
         }
     }
 }

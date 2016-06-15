@@ -68,17 +68,17 @@
       <HintPath>..\packages\MaterialDesignColors.1.1.2\lib\net45\MaterialDesignColors.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MaterialDesignThemes.Wpf, Version=2.0.0.600, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignThemes.2.0.0-ci600\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=2.0.0.609, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.2.0.0-ci609\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="StructureMap, Version=4.0.1.318, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\structuremap.4.0.1.318\lib\net40\StructureMap.dll</HintPath>
+    <Reference Include="StructureMap, Version=4.2.0.402, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\structuremap.4.2.0.402\lib\net40\StructureMap.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="StructureMap.Net4, Version=4.0.1.318, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\structuremap.4.0.1.318\lib\net40\StructureMap.Net4.dll</HintPath>
+    <Reference Include="StructureMap.Net4, Version=4.2.0.402, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\structuremap.4.2.0.402\lib\net40\StructureMap.Net4.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -160,6 +160,8 @@
     <Compile Include="Infrastucture\ViewFactoryService.cs" />
     <Compile Include="Infrastucture\Virtualisation\VirtualizingWrapPanel.cs" />
     <Compile Include="Infrastucture\WindowAssist.cs" />
+    <Compile Include="Views\DialogServices\IDialogCoordinator.cs" />
+    <Compile Include="Views\DialogServices\IDialogViewModel.cs" />
     <Compile Include="Views\Formatting\DefaultColourSelector.cs" />
     <Compile Include="Views\Formatting\IconDescription.cs" />
     <Compile Include="Views\Formatting\IIconProvider.cs" />
@@ -177,6 +179,7 @@
     <Compile Include="Views\Options\GeneralOptionsViewModel.cs" />
     <Compile Include="Views\Formatting\ColourProvider.cs" />
     <Compile Include="Views\Formatting\IconProvider.cs" />
+    <Compile Include="Views\Searching\GlobalSearchOptions.cs" />
     <Compile Include="Views\Searching\IconSelector.cs" />
     <Compile Include="Views\Searching\IconSelectorView.xaml.cs">
       <DependentUpon>IconSelectorView.xaml</DependentUpon>
@@ -185,6 +188,9 @@
     <Compile Include="Views\Recent\RecentSearch.cs" />
     <Compile Include="Views\Recent\RecentSearchCollection.cs" />
     <Compile Include="Views\Recent\RecentFilesToStateConverter.cs" />
+    <Compile Include="Views\Searching\ISearchProxyCollection.cs" />
+    <Compile Include="Views\Searching\ISearchProxyCollectionFactory.cs" />
+    <Compile Include="Views\Searching\IsGlobalToIconConverter.cs" />
     <Compile Include="Views\Searching\SearchHintMessage.cs" />
     <Compile Include="Views\Searching\SearchOptionsProxy.cs" />
     <Compile Include="Views\Searching\SearchOptionsView.xaml.cs">
@@ -193,6 +199,10 @@
     <Compile Include="Views\Searching\SearchOptionsViewModel.cs" />
     <Compile Include="Views\FileDrop\FileDropContainer.cs" />
     <Compile Include="Views\FileDrop\FileDropMonitor.cs" />
+    <Compile Include="Views\Searching\SearchProxyCollection.cs" />
+    <Compile Include="Views\Searching\SearchProxyCollectionFactory.cs" />
+    <Compile Include="Views\DialogServices\DialogCoordinator.cs" />
+    <Compile Include="Views\Tail\GeneralOptionBindings.cs" />
     <Compile Include="Views\Tail\ILinesVisualisation.cs" />
     <Compile Include="Views\Searching\ISearchStateToMetadataMapper.cs" />
     <Compile Include="Views\Tail\ITailViewStateControllerFactory.cs" />
@@ -200,6 +210,7 @@
     <Compile Include="Views\Tail\LineMatchProxy.cs" />
     <Compile Include="Views\Searching\SearchState.cs" />
     <Compile Include="Views\Searching\SearchStateToMetadataMapper.cs" />
+    <Compile Include="Views\Searching\SearchMetadataToStateConverter.cs" />
     <Compile Include="Views\Tail\TailViewModelConstants.cs" />
     <Compile Include="Views\Tail\TailViewPersister.cs" />
     <Compile Include="Views\Tail\TailViewState.cs" />
@@ -220,7 +231,6 @@
     <Compile Include="Views\Tail\IInlineViewerFactory.cs" />
     <Compile Include="Views\Tail\ILineProxyFactory.cs" />
     <Compile Include="Views\Tail\InlineViewer.cs" />
-    <Compile Include="Views\Tail\InlineViewerArgs.cs" />
     <Compile Include="Views\Tail\InlineViewerFactory.cs" />
     <Compile Include="Infrastucture\Virtualisation\IScrollReceiver.cs" />
     <Compile Include="Infrastucture\AppState\IApplicationStateNotifier.cs" />
@@ -277,6 +287,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Lines.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\ListBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
