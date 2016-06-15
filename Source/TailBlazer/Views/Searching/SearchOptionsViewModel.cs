@@ -7,6 +7,7 @@ using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Views.Searching
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class SearchOptionsViewModel : AbstractNotifyPropertyChanged, IDisposable
     {
         public Guid Id { get; } = Guid.NewGuid();

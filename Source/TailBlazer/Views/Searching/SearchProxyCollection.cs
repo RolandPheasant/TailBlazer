@@ -18,8 +18,11 @@ namespace TailBlazer.Views.Searching
     public class SearchProxyCollection : ISearchProxyCollection
     {
         private readonly IDisposable _cleanUp;
+        public IProperty<int> Count { get; }
 
-        public ReadOnlyObservableCollection<SearchOptionsProxy> Data { get; }
+        public ReadOnlyObservableCollection<SearchOptionsProxy> Included { get; }
+        public ReadOnlyObservableCollection<SearchOptionsProxy> Excluded { get; }
+
         public VerticalPositionMonitor PositionMonitor { get; } = new VerticalPositionMonitor();
 
         public SearchProxyCollection(ISearchMetadataCollection metadataCollection,
@@ -66,23 +69,38 @@ namespace TailBlazer.Views.Searching
                     return new CompositeDisposable(anyPropertyHasChanged, textAssociationChanged);
                 })
                 .AsObservableCache();
-            
+
+            Count = proxyItems.CountChanged.StartWith(0).ForBinding();
+
             var monitor = MonitorPositionalChanges().Subscribe(metadataCollection.Add);
             
             //load data onto grid
             var collection = new ObservableCollectionExtended<SearchOptionsProxy>();
 
-            var userOptions = proxyItems.Connect()
+            var includedLoader = proxyItems
+                .Connect(proxy => !proxy.IsExclusion)
                 .Sort(SortExpressionComparer<SearchOptionsProxy>.Ascending(proxy => proxy.Position))
                 .ObserveOn(schedulerProvider.MainThread)
                 //force reset for each new or removed item dues to a bug in the underlying dragablz control which inserts in an incorrect position
                 .Bind(collection, new ObservableCollectionAdaptor<SearchOptionsProxy, string>(0))
                 .DisposeMany()
                 .Subscribe();
+            
+            ReadOnlyObservableCollection<SearchOptionsProxy> excluded;
+            var excludedLoader = proxyItems
+                .Connect(proxy => proxy.IsExclusion)
+                .Sort(SortExpressionComparer<SearchOptionsProxy>.Ascending(proxy => proxy.Text))
+                .ObserveOn(schedulerProvider.MainThread)
+                //force reset for each new or removed item dues to a bug in the underlying dragablz control which inserts in an incorrect position
+                .Bind(out excluded)
+                .DisposeMany()
+                .Subscribe();
 
-            Data = new ReadOnlyObservableCollection<SearchOptionsProxy>(collection);
 
-            _cleanUp = new CompositeDisposable(proxyItems, userOptions, monitor);
+            Excluded = excluded;
+            Included = new ReadOnlyObservableCollection<SearchOptionsProxy>(collection);
+
+            _cleanUp = new CompositeDisposable(proxyItems, includedLoader, excludedLoader, monitor);
         }
 
         private IObservable<IEnumerable<SearchMetadata>> MonitorPositionalChanges()

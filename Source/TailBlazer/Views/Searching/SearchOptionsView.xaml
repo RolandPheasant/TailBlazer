@@ -7,8 +7,10 @@
              xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
              xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
-            Width="485" Height="325"
+            Width="485" Height="400"
              d:DataContext="{d:DesignInstance searching:SearchOptionsViewModel}"
              d:DesignHeight="300">
 
@@ -28,6 +30,9 @@
             </ResourceDictionary.MergedDictionaries>
 
             <searching:IsGlobalToIconConverter x:Key="IsGlobalToIconConverter"/>
+            <system:Int32 x:Key="Zero">0</system:Int32>
+            <infrastucture:EqualsToVisibilityConverter x:Key="EqualsToVisibilityConverter"/>
+            <infrastucture:NotEqualsToVisibilityConverter x:Key="NotEqualsToVisibilityConverter"/>
 
             <Style x:Key="SearchButton" TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatButton}">
 
@@ -42,7 +47,7 @@
                 <Setter Property="UseLayoutRounding" Value="True"/>
             </Style>
 
-            <DataTemplate x:Key="DefaultTemplate" DataType="{x:Type searching:SearchOptionsProxy}">
+            <DataTemplate x:Key="IncludedTemplate" DataType="{x:Type searching:SearchOptionsProxy}">
 
                 <Grid Margin="4 4 4 4" x:Name="Row">
                     <Grid.ColumnDefinitions>
@@ -53,7 +58,6 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
-                        <!--<ColumnDefinition Width="Auto"/>-->
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
@@ -171,10 +175,6 @@
                         <ColumnDefinition Width="75"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <!--<ColumnDefinition Width="Auto"/>-->
-                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
                     <Button Grid.Column="0" 
@@ -205,14 +205,14 @@
                                ToolTip="{Binding Text, StringFormat='\{}{0} will be excluded in search results'}"
                                VerticalAlignment="Center"/>
 
-                    <CheckBox Margin="4 0 0 0" Grid.Column="6" 
+                    <CheckBox Margin="4 0 0 0" Grid.Column="3" 
                                       VerticalAlignment="Center"
                                       IsChecked="{Binding CaseSensitive}" 
                                       ToolTip="Is this search value case sensitive"
                                       Content="Case Sensitive"/>
 
                     <Button Margin="10 0 4 0"
-                                        Grid.Column="7" 
+                                        Grid.Column="4" 
                                         ToolTip="{Binding RemoveTooltip}"
                                         HorizontalAlignment="Right"
                                         VerticalAlignment="Center"
@@ -222,30 +222,55 @@
 
             </DataTemplate>
 
-
             <searching:SearchOptionsProxyDataTemplateSelector x:Key="SearchOptionsProxyDataTemplateSelector"
-                                                              DefaultDataTemplate="{StaticResource DefaultTemplate}"
+                                                              DefaultDataTemplate="{StaticResource IncludedTemplate}"
                                                               ExcludeDataTemplate="{StaticResource ExcludedTemplate}"/>
             
             <DataTemplate DataType="{x:Type searching:SearchProxyCollection}">
-                <dragablz:DragablzItemsControl ItemContainerStyle="{StaticResource DragableItem}"
-                                             
-                                               HorizontalContentAlignment="Stretch"
-                                                PositionMonitor="{Binding PositionMonitor}"
-                                                ItemTemplateSelector="{StaticResource SearchOptionsProxyDataTemplateSelector}"
-                                                ItemsSource="{Binding Data}">
+                
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto" MaxHeight="125"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Margin="0 4 0 0"
+                               Visibility="{Binding Excluded.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}"
+                               Text="Items will be EXCLUDED from all filters:"/>
+
+                    <ItemsControl Grid.Row="1" Margin="14 6 0 4"
+                            Visibility="{Binding Excluded.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}"
+                            ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                            ItemTemplate="{StaticResource ExcludedTemplate}"
+                            ItemsSource="{Binding Excluded}">
+                    </ItemsControl>
+
+                    <TextBlock Grid.Row="2" Margin="0 4 0 0" 
+                               Visibility="{Binding Included.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}"
+                               Text="Items will be used for filters and highlights:"/>
+                   
+                    <dragablz:DragablzItemsControl  Grid.Row="3" Margin="0 6 0 0"
+                            Visibility="{Binding Included.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}"
+                            ItemContainerStyle="{StaticResource DragableItem}"                   
+                            HorizontalContentAlignment="Stretch"
+                            PositionMonitor="{Binding PositionMonitor}"
+                            ItemTemplate="{StaticResource IncludedTemplate}"
+                            ItemsSource="{Binding Included}">
 
                     <dragablz:DragablzItemsControl.ItemsOrganiser>
                         <dragablz:VerticalOrganiser />
                     </dragablz:DragablzItemsControl.ItemsOrganiser>
                 </dragablz:DragablzItemsControl>
+                </Grid>
             </DataTemplate>
             
         </ResourceDictionary>
     </Control.Resources>
 
     <wpf:DialogHost
-        
         Identifier="{Binding Id}">
         <Grid>
             <Grid.RowDefinitions>
@@ -322,10 +347,10 @@
                         SelectedIndex="{Binding SelectedIndex}"
                         Style="{StaticResource FilterListBoxStyle}">
                         <ListBoxItem ToolTip="Amend local search and highlight options">
-                            <TextBlock Text="{Binding Local.Data.Count , StringFormat='Local ({0})'}"/>
+                            <TextBlock Text="{Binding Local.Count.Value , StringFormat='Local ({0})'}"/>
                         </ListBoxItem>
                         <ListBoxItem ToolTip="Amend global search and highlight options">
-                            <TextBlock Text="{Binding Global.Data.Count , StringFormat='Global ({0})'}"/>
+                            <TextBlock Text="{Binding Global.Count.Value , StringFormat='Global ({0})'}"/>
                         </ListBoxItem>
 
                         <ListBox.ItemsPanel>
@@ -338,8 +363,7 @@
             </Grid>
 
             <materialDesign:Transitioner Grid.Row="2" 
-                                      
-                                          Margin="6 0 6 0"
+                                         Margin="6 0 6 0"
                                          SelectedIndex="{Binding SelectedIndex, ElementName=Selector}">
 
 

@@ -8,6 +8,7 @@ using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling.Search
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class CombinedSearchMetadataCollection : ICombinedSearchMetadataCollection
     {
         private readonly IDisposable _cleanUp;
@@ -29,31 +30,21 @@ namespace TailBlazer.Domain.FileHandling.Search
             var cache = new SourceCache<SearchMetadata, string>(t => t.SearchText);
 
             ////Prioritise local before global and renumber
-            var localItems = metadataCollection.Metadata
-                .Connect().ToCollection()
-                .Select(items => items.ToArray<SearchMetadata>())
-                .StartWith(Enumerable.Empty<SearchMetadata>());
+            var localItems = metadataCollection.Metadata.Connect().ToCollection().Select(items => items.ToArray()).StartWith(Enumerable.Empty<SearchMetadata>());
 
-            var globalItems = globalSearchOptions.Metadata.Metadata
-                .Connect().ToCollection()
-                .Select(items => items.ToArray())
-                .StartWith(Enumerable.Empty<SearchMetadata>());
+            var globalItems = globalSearchOptions.Metadata.Metadata.Connect().ToCollection().Select(items => items.ToArray()).StartWith(Enumerable.Empty<SearchMetadata>());
 
-            var combiner = localItems.CombineLatest(globalItems, (local, global) => new {local, global})
-                .Select(x => Combine(x.local, x.global))
-                .Subscribe(uppdatedItems =>
+            var combiner = localItems.CombineLatest(globalItems, (local, global) => new {local, global}).Select(x => Combine(x.local, x.global)).Subscribe(uppdatedItems =>
+            {
+                cache.Edit(innerCache =>
                 {
-                    cache.Edit(innerCache =>
-                    {
-                        var toRemove = innerCache.Items.Except(uppdatedItems).ToArray();
-                        innerCache.Remove(toRemove);
-                        innerCache.AddOrUpdate(uppdatedItems);
-                    });
+                    var toRemove = innerCache.Items.Except(uppdatedItems,SearchMetadata.SearchTextComparer).ToArray();
+                    innerCache.Remove(toRemove);
+                    innerCache.AddOrUpdate(uppdatedItems);                  
                 });
+            });
 
-            Combined = cache.Connect()
-                .IgnoreUpdateWhen((current, previous) => current.Equals(previous))
-                .AsObservableCache();
+            Combined = cache.Connect().IgnoreUpdateWhen((current, previous) => current.Equals(previous)).AsObservableCache();
 
             _cleanUp = new CompositeDisposable(Combined, cache, combiner);
         }
@@ -63,7 +54,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             int i = 0;
             var dictionary = new Dictionary<string, SearchMetadata>();
 
-            foreach (var meta in local.OrderBy(meta=>meta.Position))
+            foreach (var meta in local.OrderBy(meta => meta.Position))
             {
                 dictionary[meta.SearchText] = new SearchMetadata(meta, i);
                 i++;

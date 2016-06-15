@@ -212,6 +212,24 @@ namespace TailBlazer.Domain.FileHandling.Search
         public static IEqualityComparer<SearchMetadata> EffectsFilterComparer { get; } = new EffectsFilterEqualityComparer();
 
 
+        private sealed class SearchTextEqualityComparer : IEqualityComparer<SearchMetadata>
+        {
+            public bool Equals(SearchMetadata x, SearchMetadata y)
+            {
+                if (ReferenceEquals(x, y)) return true;
+                if (ReferenceEquals(x, null)) return false;
+                if (ReferenceEquals(y, null)) return false;
+                if (x.GetType() != y.GetType()) return false;
+                return string.Equals(x.SearchText, y.SearchText);
+            }
+
+            public int GetHashCode(SearchMetadata obj)
+            {
+                return obj.SearchText?.GetHashCode() ?? 0;
+            }
+        }
+
+        public static IEqualityComparer<SearchMetadata> SearchTextComparer { get; } = new SearchTextEqualityComparer();
 
         #endregion
 
