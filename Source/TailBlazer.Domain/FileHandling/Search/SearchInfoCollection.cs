@@ -30,7 +30,7 @@ namespace TailBlazer.Domain.FileHandling.Search
 
             //Add a complete file display [if items are exclued, we should exclude otherwise include all]
             var exclusionPredicate = combinedSearchMetadataCollection.Combined.Connect()
-                    .IgnoreUpdateWhen((current, previous) => SearchMetadata.EffectsHighlightComparer.Equals(current, previous))
+                    .IgnoreUpdateWhen((current, previous) => SearchMetadata.EffectsFilterComparer.Equals(current, previous))
                     .Filter(meta=> meta.IsExclusion)
                     .ToCollection()
                     .Select(searchMetadataItems =>
@@ -42,7 +42,8 @@ namespace TailBlazer.Domain.FileHandling.Search
                             return !predicates.Any(item => item(str));
                         };
                         return predicate;
-                    }).StartWith((Func<string, bool>)null);
+                    }).StartWith((Func<string, bool>)null)
+                    .Replay(1).RefCount();
 
             All = exclusionPredicate.Select(predicate =>
             {
@@ -52,8 +53,6 @@ namespace TailBlazer.Domain.FileHandling.Search
                 return _fileWatcher.Latest.Search(predicate);
 
             }).Switch().Replay(1).RefCount();
-
-         //   All = _fileWatcher.Latest.Index().Replay(1).RefCount();
 
             //create a collection with 1 item, which is used to show entire file
             var systemSearches = new SourceCache<SearchInfo, string>(t => t.SearchText);
@@ -65,9 +64,24 @@ namespace TailBlazer.Domain.FileHandling.Search
                 .IgnoreUpdateWhen((current,previous)=> SearchMetadata.EffectsFilterComparer.Equals(current, previous))
                 .Transform(meta =>
                 {
-                    var latest = _fileWatcher.Latest
-                        .Search(meta.BuildPredicate())
-                        .Replay(1).RefCount();
+                    var latest = exclusionPredicate
+                                .Select(exclpredicate =>
+                                {
+                                    Func<string, bool> resultingPredicate;
+                                    if (exclpredicate == null)
+                                    {
+                                        resultingPredicate = meta.BuildPredicate();
+                                    }
+                                    else
+                                    {
+                                        var toMatch = meta.BuildPredicate();
+                                        resultingPredicate =  str=> toMatch(str) && exclpredicate(str);
+                                    }
+                                    return _fileWatcher.Latest.Search(resultingPredicate);
+
+                                })
+                                .Switch()
+                                .Replay(1).RefCount();
 
                     return new SearchInfo(meta.SearchText, meta.IsGlobal, latest, SearchType.User);
                 });

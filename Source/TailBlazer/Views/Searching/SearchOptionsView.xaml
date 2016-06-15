@@ -10,7 +10,7 @@
              xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
-            Width="485" Height="400"
+             Width="485" Height="400"
              d:DataContext="{d:DesignInstance searching:SearchOptionsViewModel}"
              d:DesignHeight="300">
 
@@ -53,7 +53,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="24"/>
-                        <ColumnDefinition Width="75"/>
+                        <ColumnDefinition Width="70"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
@@ -172,7 +172,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="24"/>
-                        <ColumnDefinition Width="75"/>
+                        <ColumnDefinition Width="70"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
@@ -187,7 +187,6 @@
 
                     </Button>
 
-                    <!--StringFormat='\{0}.'-->
                     <wpf:PackIcon 
                             Grid.Column="1" 
                             Margin="2 0 0 0" 
@@ -221,38 +220,36 @@
                 </Grid>
 
             </DataTemplate>
-
-            <searching:SearchOptionsProxyDataTemplateSelector x:Key="SearchOptionsProxyDataTemplateSelector"
-                                                              DefaultDataTemplate="{StaticResource IncludedTemplate}"
-                                                              ExcludeDataTemplate="{StaticResource ExcludedTemplate}"/>
             
             <DataTemplate DataType="{x:Type searching:SearchProxyCollection}">
                 
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto" MaxHeight="125"/>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
                     <TextBlock Margin="0 4 0 0"
                                Visibility="{Binding Excluded.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}"
-                               Text="Items will be EXCLUDED from all filters:"/>
+                               Text="The following will be excluded from all filters:"/>
 
-                    <ItemsControl Grid.Row="1" Margin="14 6 0 4"
-                            Visibility="{Binding Excluded.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}"
-                            ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                            ScrollViewer.VerticalScrollBarVisibility="Auto"
-                            ItemTemplate="{StaticResource ExcludedTemplate}"
-                            ItemsSource="{Binding Excluded}">
-                    </ItemsControl>
-
-                    <TextBlock Grid.Row="2" Margin="0 4 0 0" 
+                    <ScrollViewer Grid.Row="1" Margin="14 6 0 4"
+                                  MaxHeight="100"
+                                  VerticalScrollBarVisibility="Auto"
+                                  Visibility="{Binding Excluded.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}">
+                        <ItemsControl
+                                ItemTemplate="{StaticResource ExcludedTemplate}"
+                                ItemsSource="{Binding Excluded}">
+                        </ItemsControl>
+                    </ScrollViewer>
+                    
+                    <TextBlock Grid.Row="2" Margin="0 4 0 2" 
                                Visibility="{Binding Included.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}"
-                               Text="Items will be used for filters and highlights:"/>
+                               Text="The following will be used for filters and highlighting:"/>
                    
-                    <dragablz:DragablzItemsControl  Grid.Row="3" Margin="0 6 0 0"
+                    <dragablz:DragablzItemsControl  Grid.Row="3" Margin="0 6 0 12"
                             Visibility="{Binding Included.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}"
                             ItemContainerStyle="{StaticResource DragableItem}"                   
                             HorizontalContentAlignment="Stretch"
@@ -363,7 +360,7 @@
             </Grid>
 
             <materialDesign:Transitioner Grid.Row="2" 
-                                         Margin="6 0 6 0"
+                                         Margin="6 0 6 4"
                                          SelectedIndex="{Binding SelectedIndex, ElementName=Selector}">
 
 
@@ -385,7 +382,7 @@
             </materialDesign:Transitioner> 
 
             <Button  Grid.Row="3" IsDefault="True"
-                 Margin="0 6 6 6"
+                 Margin="0 2 6 4"
                 HorizontalAlignment="Left"
                 Style="{DynamicResource MaterialDesignFlatButton}"
                 Content="Close"     
