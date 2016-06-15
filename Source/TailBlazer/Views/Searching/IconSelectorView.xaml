@@ -23,7 +23,7 @@
         </ResourceDictionary>
     </Control.Resources>
 
-    <Grid Margin="4"  Width="485" Height="325">
+    <Grid Margin="4"   Width="485" Height="400">
             <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>

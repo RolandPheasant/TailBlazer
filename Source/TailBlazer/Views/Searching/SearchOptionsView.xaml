@@ -12,7 +12,7 @@
              mc:Ignorable="d" 
              Width="485" Height="400"
              d:DataContext="{d:DesignInstance searching:SearchOptionsViewModel}"
-             d:DesignHeight="300">
+            >
 
     <Control.Resources>
         <ResourceDictionary>
