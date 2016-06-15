@@ -31,17 +31,44 @@ namespace TailBlazer.Views.Formatting
             ThemeConstants.Themes.Select((str,idx)=>new {str,idx})
                 .ForEach(x=> orders[x.str] = x.idx);
 
+            var greys = swatches//.Where(s => !s.IsAccented)
+                .Where(s => s.Name == "bluegrey")
+                .SelectMany(swatch =>
+                {
+                    var hues = swatch.PrimaryHues
+                            .Where(hue=> hue.Name=="Primary200" 
+                            || hue.Name == "Primary300" 
+                            || hue.Name == "Primary400"
+                            || hue.Name == "Primary500")
+                            .Select(hue =>  new Hue(swatch.Name, hue.Name, hue.Foreground, hue.Color));
+
+
+                    var withNumber= hues.Select(h =>
+                    {
+                        var num = GetNumber(h.Name);
+                        return new {hue=h, Num = num};
+                    }).OrderBy(h=>h.Num)
+                    .Take(8)
+                    .Select(x=>x.hue);
+
+                    return withNumber;
+                });
             Hues = accents
                         .OrderBy(x => orders.Lookup(x.Name).ValueOr(() => 100))
                         .SelectMany(swatch =>
                         {
                             return swatch.AccentHues.Select(hue => new Hue(swatch.Name, hue.Name, hue.Foreground, hue.Color));
                         })
+                        .Union(greys)
                         .ToArray();
 
             HueCache = Hues.ToDictionary(h => h.Key);
         }
 
+        private string GetNumber(string swatchName)
+        {
+            return new string(swatchName.Where(Char.IsDigit).ToArray());
+        }
 
         public Optional<Hue> Lookup(HueKey key)
         {

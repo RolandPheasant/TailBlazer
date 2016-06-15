@@ -191,8 +191,8 @@
                     <wpf:PackIcon 
                             Grid.Column="1" 
                             Margin="2 0 0 0" 
-                            Width="14"
-                            Height="14"
+                            Width="12"
+                            Height="12"
                             ToolTip="{Binding Text, StringFormat='\{}{0} will be excluded in search results'}"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Center"
@@ -229,7 +229,8 @@
             
             <DataTemplate DataType="{x:Type searching:SearchProxyCollection}">
                 <dragablz:DragablzItemsControl ItemContainerStyle="{StaticResource DragableItem}"
-                                                HorizontalContentAlignment="Stretch"
+                                             
+                                               HorizontalContentAlignment="Stretch"
                                                 PositionMonitor="{Binding PositionMonitor}"
                                                 ItemTemplateSelector="{StaticResource SearchOptionsProxyDataTemplateSelector}"
                                                 ItemsSource="{Binding Data}">
@@ -243,7 +244,9 @@
         </ResourceDictionary>
     </Control.Resources>
 
-    <wpf:DialogHost Identifier="{Binding Id}">
+    <wpf:DialogHost
+        
+        Identifier="{Binding Id}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition  Height="Auto"/>
@@ -258,7 +261,8 @@
                 FontWeight="DemiBold"
                 Text="Search and highlight options"/>
 
-            <Grid Grid.Row="1">
+            <Grid 
+                Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto" />
@@ -334,11 +338,12 @@
             </Grid>
 
             <materialDesign:Transitioner Grid.Row="2" 
+                                      
                                           Margin="6 0 6 0"
                                          SelectedIndex="{Binding SelectedIndex, ElementName=Selector}">
-                <materialDesign:TransitionerSlide Background="{DynamicResource MaterialDesignDarkBackground}"
-                                              Foreground="{DynamicResource MaterialDesignDarkForeground}"
-                                              ClipToBounds="True">
+
+
+                <materialDesign:TransitionerSlide ClipToBounds="True">
                     <materialDesign:TransitionerSlide.OpeningEffects>
                         <materialDesign:TransitionEffect Kind="SlideInFromLeft" Duration="0:0:0.8" />
                         <materialDesign:TransitionEffect Kind="SlideInFromBottom" Duration="0:0:0.8" OffsetTime="0:0:0.15" />
@@ -346,9 +351,7 @@
                     <ContentControl  Content="{Binding Local}"/>
                 </materialDesign:TransitionerSlide>
 
-                <materialDesign:TransitionerSlide Background="{DynamicResource MaterialDesignDarkBackground}"
-                                              Foreground="{DynamicResource MaterialDesignDarkForeground}"
-                                              ClipToBounds="True">
+                <materialDesign:TransitionerSlide ClipToBounds="True">
                     <materialDesign:TransitionerSlide.OpeningEffects>
                         <materialDesign:TransitionEffect Kind="SlideInFromRight" Duration="0:0:0.8" />
                         <materialDesign:TransitionEffect Kind="SlideInFromBottom" Duration="0:0:0.8" OffsetTime="0:0:0.15" />
