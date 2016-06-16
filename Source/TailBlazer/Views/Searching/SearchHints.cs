@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
@@ -56,12 +57,16 @@ namespace TailBlazer.Views.Searching
             //Handle adding new search
             var searchRequested = new Subject<SearchRequest>();
             SearchRequested = searchRequested.AsObservable();
-            AddSearchCommand = new Command(() =>
+            AddSearchCommand = new Command(async () =>
             {
-                recentSearchCollection.Add(new RecentSearch(SearchText));
-                searchRequested.OnNext(new SearchRequest(SearchText, UseRegex));
-                SearchText = string.Empty;
-                UseRegex = false;
+                await Task.Run(() =>
+                {
+                    recentSearchCollection.Add(new RecentSearch(SearchText));
+                    searchRequested.OnNext(new SearchRequest(SearchText, UseRegex));
+                    SearchText = string.Empty;
+                    UseRegex = false;
+                });
+
             }, () => IsValid.Value && SearchText.Length>0);
 
 

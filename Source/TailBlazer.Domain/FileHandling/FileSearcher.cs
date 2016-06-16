@@ -102,7 +102,7 @@ namespace TailBlazer.Domain.FileHandling
                 var locker = new object();
 
                 return searchData.Connect(fss=>fss.Segment.Type == FileSegmentType.Head )
-                    .Do(head => Debug.WriteLine(head.First().Current))
+                  //  .Do(head => Debug.WriteLine(head.First().Current))
                     .WhereReasonsAre(ChangeReason.Add)  
                     .SelectMany(changes=>changes.Select(c=>c.Current).OrderByDescending(c=>c.Segment.Index).ToArray())
                     .ObserveOn(_scheduler)
