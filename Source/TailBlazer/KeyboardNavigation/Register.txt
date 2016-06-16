@@ -1,0 +1,36 @@
+ For<IKeyboardNavigationHandler>().Use<KeyboardNavigationHandler>();
+
+//Hook it in
+infrastucture:DependencyObjectHook.Receiver="{Binding KeyboardNavigationHandler}"
+
+
+Implement in scrollers
+
+    public interface IPageProvider
+    {
+        int PageSize { get;  }
+        int FirstIndex { get;  }
+    }
+
+Inline
+
+            //populate next scroll request when navigating by keyboard
+            var keyNavigation = KeyboardNavigationHandler.NavigationKeys
+                .ToScrollRequest(this)
+                .SubscribeSafe(_userScrollRequested);
+
+Tail
+            //populate next scroll request when navigating by keyboard
+            var keyNavigation = KeyboardNavigationHandler.NavigationKeys
+                .Do(key =>
+                {
+                    if (key == KeyboardNavigationType.PageUp || key == KeyboardNavigationType.Up)
+                    {
+                        AutoTail = false;
+                    }
+                    else if (key == KeyboardNavigationType.End) //Should end be left / right scrolling
+                    {
+                        AutoTail = true;
+                    }
+                }).ToScrollRequest(this)
+                .SubscribeSafe(_userScrollRequested);
