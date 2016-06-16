@@ -23,8 +23,9 @@ namespace TailBlazer.Domain.FileHandling.Search
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
 
-            var isExclusion = searchText.Substring(0, 1) == "-";
-            searchText = isExclusion ? searchText.Substring(1, searchText.Length - 1) : searchText;
+            var withNegation = searchText.WithNegation();
+            var isExclusion = withNegation.IsNegation;
+            searchText = withNegation.Text;
 
             var association = _textAssociationCollection.Lookup(searchText);
             string icon;
@@ -42,7 +43,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             }
             
             return new SearchMetadata(index, searchText,
-                filter, 
+               isExclusion ? false: filter, 
                 true, 
                 useRegex, 
                 true,

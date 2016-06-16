@@ -1,6 +1,8 @@
 ﻿// ReSharper disable once CheckNamespace
 namespace System
 {
+
+
     public static class StringEx
     {
         public static bool IsLongerThan(this string source, int length)
@@ -8,6 +10,31 @@ namespace System
             return !string.IsNullOrEmpty(source) && source.Length > length;
         }
 
+        public static StringWithNegation WithNegation(this string searchText)
+        {
+            if (string.IsNullOrEmpty(searchText))
+                return StringWithNegation.Empty;
+
+            var isExclusion = searchText.Substring(0, 1) == "-";
+            if (!isExclusion)
+                return new StringWithNegation(false, searchText);
+
+            return new StringWithNegation(true, searchText.Substring(1, searchText.Length - 1));
+        }
+
+        public sealed class StringWithNegation
+        {
+            public readonly static StringWithNegation Empty = new StringWithNegation(false, string.Empty);
+
+            public bool IsNegation { get;  }
+            public string Text { get;  }
+
+            public StringWithNegation(bool isNegation, string text)
+            {
+                IsNegation = isNegation;
+                Text = text;
+            }
+        }
         public static bool IsLongerThanOrEqualTo(this string source, int length)
         {
             return !string.IsNullOrEmpty(source) && source.Length >= length;
