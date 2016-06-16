@@ -11,11 +11,11 @@ So I have decided to rectify this by creating a more modern version.  The missio
 
 >It has to be fast, intuitive, functionally rich and the code has to be 100% reactive.
 
-After a few iterations I have come up with this:  
+After several months of sacrificing my free time, Tail Blazer is finally begining to have a polished feel to it:  
 
-![Tail Blazer](Images/Tailing.gif)
+![Tail Blazer](Images//Release%20v0.9/Search%20and%20highlight.gif)
 
-That's better. A tail program which is pleasing to my eyes!
+And I believe now that it is begining to look good.
 
 ## Current feature list
 
@@ -29,6 +29,7 @@ That's better. A tail program which is pleasing to my eyes!
  - Highlight text in different colours
  - Highlight rows using different images
  - Filter or highlight using regex
+ - Global and local search and Highlighting
  - Apply multiple searches and toogle between search results
  - View search result in original position in file
  - Copy to clipboard
@@ -41,7 +42,6 @@ That's better. A tail program which is pleasing to my eyes!
  - Conditional Alerts
  - Automatic creation of columns
  - Pipe filter to file
- - Ability to pin a file
  - Plug in to external providers (see [#51](https://github.com/RolandPheasant/TailBlazer/issues/51))
  - Search and tail entire folder
 
