@@ -279,7 +279,8 @@
                 <Border Grid.Row="0" Grid.Column="0" 
                             Visibility="Collapsed"
                             BorderThickness="0 0 0 1" BorderBrush="{DynamicResource PrimaryHueMidBrush}"/>
-
+               
+                <!--infrastucture:DependencyObjectHook.Receiver="{Binding KeyboardNavigationHandler}"-->
 
                 <ListBox Margin="0 4 0 2"
                     Grid.Row="1" 
@@ -288,6 +289,7 @@
                     ItemsSource="{Binding Lines}" 
                     SelectedItem="{Binding SelectedItem}"
                     Style="{StaticResource LinesListBoxStyle}"
+                    
                     infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}">
 
                     <ListBox.ItemsPanel>

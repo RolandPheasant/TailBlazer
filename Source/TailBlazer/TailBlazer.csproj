@@ -160,10 +160,10 @@
     <Compile Include="Infrastucture\ViewFactoryService.cs" />
     <Compile Include="Infrastucture\Virtualisation\VirtualizingWrapPanel.cs" />
     <Compile Include="Infrastucture\WindowAssist.cs" />
-    <Compile Include="KeyboardNavigation\IKeyboardNavigationHandler.cs" />
-    <Compile Include="KeyboardNavigation\IPageProvider.cs" />
-    <Compile Include="KeyboardNavigation\KeyboardNavigationHandler.cs" />
-    <Compile Include="KeyboardNavigation\KeyboardNavigationType.cs" />
+    <Compile Include="Infrastucture\KeyboardNavigation\IKeyboardNavigationHandler.cs" />
+    <Compile Include="Infrastucture\KeyboardNavigation\IPageProvider.cs" />
+    <Compile Include="Infrastucture\KeyboardNavigation\KeyboardNavigationHandler.cs" />
+    <Compile Include="Infrastucture\KeyboardNavigation\KeyboardNavigationType.cs" />
     <Compile Include="Views\DialogServices\IDialogCoordinator.cs" />
     <Compile Include="Views\DialogServices\IDialogViewModel.cs" />
     <Compile Include="Views\Formatting\DefaultColourSelector.cs" />
@@ -397,9 +397,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="FodyWeavers.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="KeyboardNavigation\Register.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets" Condition="Exists('..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets')" />

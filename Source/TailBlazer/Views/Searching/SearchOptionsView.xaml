@@ -233,7 +233,7 @@
 
                     <TextBlock Margin="0 4 0 0"
                                Visibility="{Binding Excluded.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}"
-                               Text="The following will be excluded from all filters:"/>
+                               Text="Lines which match any text below will be excluded from results:"/>
 
                     <ScrollViewer Grid.Row="1" Margin="14 6 0 4"
                                   MaxHeight="100"

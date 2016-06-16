@@ -7,7 +7,7 @@ using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Infrastucture.AppState;
-using TailBlazer.KeyboardNavigation;
+using TailBlazer.Infrastucture.KeyboardNavigation;
 using TailBlazer.Views.Options;
 using TailBlazer.Views.Tail;
 using ILogger = TailBlazer.Domain.Infrastructure.ILogger;

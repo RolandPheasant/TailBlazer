@@ -6,9 +6,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using DynamicData.Kernel;
-using TailBlazer.Infrastucture;
 
-namespace TailBlazer.KeyboardNavigation
+namespace TailBlazer.Infrastucture.KeyboardNavigation
 {
     public class KeyboardNavigationHandler: IDependencyObjectReceiver, IKeyboardNavigationHandler
     {
@@ -29,7 +28,9 @@ namespace TailBlazer.KeyboardNavigation
 
         void IDependencyObjectReceiver.Receive(DependencyObject value)
         {
-            var control = (Border) value;
+            var control = (Control) value;
+
+            control.IsKeyboardFocusedChanged += Control_IsKeyboardFocusedChanged;
 
             _keySubscriber.Disposable = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(
                                 h => control.PreviewKeyDown += h, 
@@ -38,6 +39,19 @@ namespace TailBlazer.KeyboardNavigation
                 .Where(e => e.HasValue)
                 .Select(e => e.Value)
                 .SubscribeSafe(_keyStream);
+        }
+
+        private void Control_IsKeyboardFocusedChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+         //   Console.WriteLine(e.NewValue);
+           // var focused = (Boolean) e.NewValue;
+            //if (!focused)
+            //{
+            //    IInputElement focusedControl = Keyboard.FocusedElement;
+            //    Console.WriteLine(focusedControl.GetType());
+
+            //  //  ((Control) focusedControl).Background =new SolidColorBrush(Colors.PaleVioletRed);;
+            //}
         }
 
         private Optional<KeyboardNavigationType> Map(KeyEventArgs keyEventArgs)

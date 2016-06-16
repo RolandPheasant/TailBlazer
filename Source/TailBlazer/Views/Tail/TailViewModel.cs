@@ -18,8 +18,8 @@ using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Domain.StateHandling;
 using TailBlazer.Infrastucture;
+using TailBlazer.Infrastucture.KeyboardNavigation;
 using TailBlazer.Infrastucture.Virtualisation;
-using TailBlazer.KeyboardNavigation;
 using TailBlazer.Views.DialogServices;
 using TailBlazer.Views.Searching;
 
@@ -48,7 +48,6 @@ namespace TailBlazer.Views.Tail
         public GeneralOptionBindings GeneralOptionBindings { get;  }
         public SearchHints SearchHints { get;  }
         public SearchCollection SearchCollection { get; }
-        public IKeyboardNavigationHandler KeyboardNavigationHandler { get;  }
         internal ISearchMetadataCollection SearchMetadataCollection { get; }
         public InlineViewer InlineViewer { get; }
         public IProperty<int> Count { get; }
@@ -89,8 +88,7 @@ namespace TailBlazer.Views.Tail
             [NotNull] ITextFormatter textFormatter,
             [NotNull] ILineMatches lineMatches,
             [NotNull] IObjectProvider objectProvider,
-            [NotNull] IDialogCoordinator dialogCoordinator,
-            [NotNull] IKeyboardNavigationHandler keyboardNavigationHandler)
+            [NotNull] IDialogCoordinator dialogCoordinator)
         {
          
             if (logger == null) throw new ArgumentNullException(nameof(logger));
@@ -108,7 +106,6 @@ namespace TailBlazer.Views.Tail
             if (lineMatches == null) throw new ArgumentNullException(nameof(lineMatches));
             if (objectProvider == null) throw new ArgumentNullException(nameof(objectProvider));
             if (dialogCoordinator == null) throw new ArgumentNullException(nameof(dialogCoordinator));
-            if (keyboardNavigationHandler == null) throw new ArgumentNullException(nameof(keyboardNavigationHandler));
             if (combinedSearchMetadataCollection == null) throw new ArgumentNullException(nameof(combinedSearchMetadataCollection));
 
             Name = fileWatcher.FullName;
@@ -133,7 +130,6 @@ namespace TailBlazer.Views.Tail
             });
 
             SearchCollection = searchCollection;
-            KeyboardNavigationHandler = keyboardNavigationHandler;
             SearchMetadataCollection = combinedSearchMetadataCollection.Local;
 
             var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
@@ -165,21 +161,6 @@ namespace TailBlazer.Views.Tail
                 .DistinctUntilChanged()
                 .ForBinding();
 
-            //keyboard navigation
-            //populate next scroll request when navigating by keyboard
-            var keyNavigation = KeyboardNavigationHandler.NavigationKeys
-                .Do(key =>
-                {
-                    if (key == KeyboardNavigationType.PageUp || key == KeyboardNavigationType.Up)
-                    {
-                        AutoTail = false;
-                    }
-                    else if (key == KeyboardNavigationType.End) //Should end be left / right scrolling
-                    {
-                        AutoTail = true;
-                    }
-                }).ToScrollRequest(this)
-                .SubscribeSafe(_userScrollRequested);
 
             //tailer is the main object used to tail, scroll and filter in a file
             var selectedProvider = SearchCollection.Latest.ObserveOn(schedulerProvider.Background);
@@ -260,9 +241,7 @@ namespace TailBlazer.Views.Tail
                 _stateMonitor,
                 combinedSearchMetadataCollection,
                 horizonalScrollArgs.SetAsComplete(),
-                _userScrollRequested.SetAsComplete(),
-                keyNavigation,
-                KeyboardNavigationHandler);
+                _userScrollRequested.SetAsComplete());
         }
      
         public TextScrollDelegate HorizonalScrollChanged { get; }
