@@ -28,7 +28,6 @@ namespace TailBlazer.Domain.FileHandling.Search
             _searchMetadataFactory = searchMetadataFactory;
             _fileWatcher = fileWatcher;
 
-            //Add a complete file display [if items are exclued, we should exclude otherwise include all]
             var exclusionPredicate = combinedSearchMetadataCollection.Combined.Connect()
                     .IncludeUpdateWhen((current, previous) => !SearchMetadata.EffectsFilterComparer.Equals(current, previous))
                     .Filter(meta=> meta.IsExclusion)
