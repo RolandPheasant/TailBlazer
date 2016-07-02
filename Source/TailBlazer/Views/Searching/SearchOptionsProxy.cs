@@ -38,7 +38,6 @@ namespace TailBlazer.Views.Searching
         public ICommand RemoveCommand { get; }
         public ICommand HighlightCommand { get; }
         public Command ChangeScopeCommand { get; }
-
         public IEnumerable<Hue> Hues { get; }
         public ICommand ShowIconSelectorCommand { get; }
         private IconSelector IconSelector { get; }

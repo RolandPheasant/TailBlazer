@@ -107,20 +107,6 @@ namespace TailBlazer.Controls
             {
                 var line = formattedText[0];
                 _textBlock.Text = line.Text;
-
-                //if (line.Highlight && HighlightEnabled)
-                //{
-                //    if (line.Hue == Hue.NotSpecified)
-                //    {
-                //        _textBlock.Background = this.HighlightBackgroundBrush;
-                //        _textBlock.Foreground = this.HighlightForegroundBrush;
-                //    }
-                //    else
-                //    {
-                //        _textBlock.Background = line.Hue.BackgroundBrush;
-                //        _textBlock.Foreground = line.Hue.ForegroundBrush;
-                //    }
-                //}
             }
             else
             {
