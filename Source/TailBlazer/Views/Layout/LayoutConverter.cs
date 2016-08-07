@@ -224,6 +224,7 @@ namespace TailBlazer.Views.Layout
         {
             return GetChildrenState(element)
                 .AsParallel()
+                .AsOrdered()
                 .Select(state =>
                 {
                     var key = state.Key;
