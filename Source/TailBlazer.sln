@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TailBlazer", "TailBlazer\TailBlazer.csproj", "{EBF74AA2-F4C2-4AE9-A6CF-33F3414893B7}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TailBlazer.Domain", "TailBlazer.Domain\TailBlazer.Domain.csproj", "{332F8BEB-1743-4B41-8953-A66A57F2503D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TailBlazer.Fixtures", "TailBlazer.Fixtures\TailBlazer.Fixtures.csproj", "{B7A99C2B-9833-4B7F-BE91-2329B22517B3}"
@@ -11,8 +13,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		..\README.md = ..\README.md
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TailBlazer", "TailBlazer\TailBlazer.csproj", "{EBF74AA2-F4C2-4AE9-A6CF-33F3414893B7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{7279DB67-E1FA-4923-A236-9EF21758D0A1}"
 	ProjectSection(SolutionItems) = preProject
