@@ -23,97 +23,97 @@
         </ResourceDictionary>
     </Control.Resources>
 
-    <Grid Margin="4"   Width="485" Height="400">
-            <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+    <Grid Margin="4" Width="485" Height="400">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-        <TextBlock 
-                Margin="4 8 6 0"
-                FontSize="16"
-                FontWeight="DemiBold"
-                Text="Select a row indicator"/>
+        <TextBlock
+            Margin="4 8 6 0"
+            FontSize="16"
+            FontWeight="DemiBold"
+            Text="Select a row indicator" />
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0 6 0 6">
             <materialDesign:PackIcon Kind="Magnify" Width="22" Height="22"
-                                         Foreground="{Binding ElementName= SearchBox, Path=BorderBrush}"
-                                         VerticalAlignment="Bottom"/>
-            
-                <TextBox x:Name="SearchBox"
-                    Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                    materialDesign:HintAssist.Hint="Enter text to find icon" 
-                    VerticalAlignment="Center"
-                    materialDesign:ValidationAssist.UsePopup="False"                   
-                    MinWidth="200" />
+                                     Foreground="{Binding ElementName= SearchBox, Path=BorderBrush}"
+                                     VerticalAlignment="Bottom" />
+
+            <TextBox x:Name="SearchBox"
+                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                     materialDesign:HintAssist.Hint="Enter text to find icon"
+                     VerticalAlignment="Center"
+                     materialDesign:ValidationAssist.UsePopup="False"
+                     MinWidth="200" />
 
         </StackPanel>
 
-            <ListBox Grid.Row="2" 
-                     SelectedItem="{Binding Selected}"
-                     ItemsSource="{Binding Icons}">
+        <ListBox Grid.Row="2"
+                 SelectedItem="{Binding Selected}"
+                 ItemsSource="{Binding Icons}">
 
-                <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type formatting:IconDescription}">
-                        <materialDesign:PackIcon
-                            Padding="2"
-                            Kind="{Binding Type,FallbackValue={x:Static materialDesign:PackIconKind.Information}}"   
-                            VerticalAlignment="Center" 
-                            HorizontalAlignment="Center"/>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type formatting:IconDescription}">
+                    <materialDesign:PackIcon
+                        Padding="2"
+                        Kind="{Binding Type,FallbackValue={x:Static materialDesign:PackIconKind.Information}}"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
 
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MaterialDesignListBoxItem}">
-                        <Setter Property="ToolTip">
-                            <Setter.Value>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                    <Setter Property="ToolTip">
+                        <Setter.Value>
                             <TextBlock Text="{Binding Description}" />
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListBox.ItemContainerStyle>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
 
             <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
+                <ItemsPanelTemplate>
                     <virtualisation:VirtualizingWrapPanel ItemHeight="32" ItemWidth="32" />
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-            </ListBox>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
 
         <Grid Grid.Row="3" Margin="0 6 0 6">
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Button  Grid.Column="0" IsDefault="False"
-                HorizontalAlignment="Right"
-                Style="{DynamicResource MaterialDesignFlatButton}"
-                Content="Close"
-                ToolTip="Close and do nothing"     
-                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                CommandParameter="{x:Static local:IconSelectorResult.None}"/>
+            <Button Grid.Column="0" IsDefault="False"
+                    HorizontalAlignment="Right"
+                    Style="{DynamicResource MaterialDesignFlatButton}"
+                    Content="Close"
+                    ToolTip="Close and do nothing"
+                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                    CommandParameter="{x:Static local:IconSelectorResult.None}" />
 
 
-            <Button  Grid.Column="1" IsDefault="False"
-                HorizontalAlignment="Right"
-                Style="{DynamicResource MaterialDesignFlatButton}"
-                ToolTip="Allow Tail Blazer to choose you icon" 
-                Content="Use Default"
-                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                CommandParameter="{x:Static local:IconSelectorResult.UseDefault}"/>
-            
-            <Button  Grid.Column="2" IsDefault="True"
-                HorizontalAlignment="Right"
-                Style="{DynamicResource MaterialDesignFlatButton}"
-                ToolTip="Use the selected icon" 
-                Content="Use Selected"
-                IsEnabled="{Binding HasSelection.Value}"
-                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                CommandParameter="{x:Static local:IconSelectorResult.UseSelected}"/>
+            <Button Grid.Column="1" IsDefault="False"
+                    HorizontalAlignment="Right"
+                    Style="{DynamicResource MaterialDesignFlatButton}"
+                    ToolTip="Allow Tail Blazer to choose you icon"
+                    Content="Use Default"
+                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                    CommandParameter="{x:Static local:IconSelectorResult.UseDefault}" />
+
+            <Button Grid.Column="2" IsDefault="True"
+                    HorizontalAlignment="Right"
+                    Style="{DynamicResource MaterialDesignFlatButton}"
+                    ToolTip="Use the selected icon"
+                    Content="Use Selected"
+                    IsEnabled="{Binding HasSelection.Value}"
+                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                    CommandParameter="{x:Static local:IconSelectorResult.UseSelected}" />
         </Grid>
 
     </Grid>
