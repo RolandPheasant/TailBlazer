@@ -576,12 +576,12 @@ namespace TailBlazer.Infrastucture.Virtualisation
 
         public void PageLeft()
         {
-            SetHorizontalOffset(HorizontalOffset + ItemWidth);
+            SetHorizontalOffset(HorizontalOffset - ItemWidth);
         }
 
         public void PageRight()
         {
-            SetHorizontalOffset(HorizontalOffset - ItemWidth);
+            SetHorizontalOffset(HorizontalOffset + ItemWidth);
         }
 
         public void MouseWheelUp()
