@@ -14,7 +14,6 @@ namespace TailBlazer
         public MainWindow()
         {
             InitializeComponent();
-          //  EventManager.RegisterClassHandler(typeof(Window), Mouse.MouseWheelEvent, new MouseEventHandler(MouseMouveEventHandler), true);
 
             Closing += MainWindow_Closing;
         }

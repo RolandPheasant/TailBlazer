@@ -25,7 +25,7 @@ using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {
-    public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentView, IDialogViewModel, IPageProvider
+    public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentView, IDialogViewModel, IPageProvider, ISelectedAware
     {
         private readonly IDisposable _cleanUp;
         private readonly SingleAssignmentDisposable _stateMonitor= new SingleAssignmentDisposable();
@@ -41,6 +41,7 @@ namespace TailBlazer.Views.Tail
         private bool _showInline;
         private bool _isDialogOpen;
         private object _dialogContent;
+        private bool _isSelected;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         public Guid Id { get; } = Guid.NewGuid();
@@ -69,6 +70,8 @@ namespace TailBlazer.Views.Tail
         public ICommand UnClearCommand { get; }
         public ICommand KeyAutoTail { get; }
         public string Name { get; }
+
+
 
         public TailViewModel([NotNull] ILogger logger,
             [NotNull] ISchedulerProvider schedulerProvider,
@@ -128,6 +131,10 @@ namespace TailBlazer.Views.Tail
                     dialogCoordinator.Show(this, content, x => content.Dispose());
                 });
             });
+
+            var closeOnDeselect = this.WhenValueChanged(vm => vm.IsSelected, false)
+                .Where(selected => !selected)
+                .Subscribe(_ => dialogCoordinator.Close());
 
             SearchCollection = searchCollection;
             SearchMetadataCollection = combinedSearchMetadataCollection.Local;
@@ -235,6 +242,7 @@ namespace TailBlazer.Views.Tail
                 searchHints,
                 combinedSearchMetadataCollection,
                 SelectionMonitor,
+                closeOnDeselect,
                 Disposable.Create(dialogCoordinator.Close),
                 searchInvoker,
                 MaximumChars,
@@ -245,6 +253,12 @@ namespace TailBlazer.Views.Tail
         }
      
         public TextScrollDelegate HorizonalScrollChanged { get; }
+
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set { SetAndRaise(ref _isSelected, value); }
+        }
 
         public bool IsDialogOpen
         {

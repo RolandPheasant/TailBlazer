@@ -110,12 +110,27 @@ namespace TailBlazer.Views.WindowManagement
                                     OpenFile(file);
                                 });
 
+            var selectedChange = this.WhenValueChanged(vm => vm.Selected)
+                .Subscribe(selected =>
+                {
+                    var currentSelection = selected?.Content as ISelectedAware;
+                    
+                    Views.Where(hv=> !hv.Equals(selected))
+                        .Select(hv => hv.Content)
+                        .OfType<ISelectedAware>()
+                        .ForEach(selectedAware => selectedAware.IsSelected = false);
+
+                    if (currentSelection != null)
+                        currentSelection.IsSelected = true;
+                });
+
 
             _cleanUp = new CompositeDisposable(recentFilesViewModel,
                 isEmptyChecker,
                 fileDropped,
                 DropMonitor,
                 openRecent,
+                selectedChange,
                 Disposable.Create(() =>
                 {
                      Views.Select(vc => vc.Content)
