@@ -1,7 +1,6 @@
 using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using DynamicData.Binding;
 
 namespace TailBlazer.Views.DialogServices
@@ -27,7 +26,6 @@ namespace TailBlazer.Views.DialogServices
                     view.IsDialogOpen = false;
                     onClosed?.Invoke(view.DialogContent);
                 });
-            
         }
 
         public void Close()
