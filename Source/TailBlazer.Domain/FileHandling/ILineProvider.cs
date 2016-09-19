@@ -6,6 +6,8 @@ namespace TailBlazer.Domain.FileHandling
     {
         int Count { get; }
 
+        TailInfo TailInfo { get; }
+
         IEnumerable<Line> ReadLines(ScrollRequest scroll);
     }
 }

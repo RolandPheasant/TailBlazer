@@ -74,14 +74,11 @@
   <ItemGroup>
     <Compile Include="CaseInsensitiveString.cs" />
     <Compile Include="FileHandling\EmptyLineProvider.cs" />
-    <Compile Include="FileHandling\ExludedLinesProvider.cs" />
-    <Compile Include="FileHandling\ExludeLinesEx.cs" />
     <Compile Include="FileHandling\FileInfoEx.cs" />
     <Compile Include="FileHandling\FileRewriter.cs" />
     <Compile Include="FileHandling\FileSearcher.cs" />
     <Compile Include="FileHandling\FileSearchEx.cs" />
     <Compile Include="FileHandling\FileSearchResult.cs" />
-    <Compile Include="FileHandling\FileSearchResultEx.cs" />
     <Compile Include="FileHandling\FileSegmentEx.cs" />
     <Compile Include="FileHandling\FileSegmentSearchResult.cs" />
     <Compile Include="FileHandling\FileSegment.cs" />
@@ -94,6 +91,7 @@
     <Compile Include="FileHandling\FileSegmentType.cs" />
     <Compile Include="FileHandling\FileStatus.cs" />
     <Compile Include="FileHandling\FileWatcher.cs" />
+    <Compile Include="FileHandling\IAutoTail.cs" />
     <Compile Include="FileHandling\IFileWatcher.cs" />
     <Compile Include="FileHandling\IHasLimitationOfLines.cs" />
     <Compile Include="FileHandling\ILineProvider.cs" />

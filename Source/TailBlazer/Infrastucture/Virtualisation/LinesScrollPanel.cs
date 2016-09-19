@@ -213,7 +213,7 @@ namespace TailBlazer.Infrastucture.Virtualisation
 
             var visualIndex = 0;
             double widestWidth = 0;
-            var currentX = 0;//layoutInfo.FirstRealizedItemLeft;
+            var currentX = layoutInfo.FirstRealizedItemLeft;
             var currentY = layoutInfo.FirstRealizedLineTop;
      
             ////1. Calc width, Call back available chars + first char

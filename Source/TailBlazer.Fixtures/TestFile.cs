@@ -9,10 +9,23 @@ namespace TailBlazer.Fixtures
         public string Name { get; }
         public FileInfo Info { get; }
 
-        public TestFile()
+        public TestFile(string name = null)
         {
+   
 
-            Name = Path.GetTempFileName();
+            if (name == null)
+            {
+                Name = Path.GetTempFileName();
+
+            }
+            else
+            {
+                var path = Path.GetTempPath();
+                var fullPath = Path.Combine(path, name);
+                if (File.Exists(fullPath)) File.Delete(fullPath);
+                Name = fullPath;
+            }
+
             Info = new FileInfo(Name);
         }
 

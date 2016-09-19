@@ -7,7 +7,8 @@ namespace TailBlazer.Domain.FileHandling
         public static readonly ILineProvider Instance = new EmptyLineProvider();
 
         public int Count { get; } = 0;
-        
+        public TailInfo TailInfo { get; } = TailInfo.None;
+
         public IEnumerable<Line> ReadLines(ScrollRequest scroll)
         {
             yield break;

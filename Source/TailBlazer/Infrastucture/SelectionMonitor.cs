@@ -72,6 +72,7 @@ namespace TailBlazer.Infrastucture
         void IAttachedListBox.Receive(ListBox selector)
         {
             _selector = selector;
+            return;
 
             var dataSource = ((ReadOnlyObservableCollection<LineProxy>) selector.ItemsSource)
                 .ToObservableChangeSet()

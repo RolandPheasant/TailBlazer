@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,13 +18,14 @@ namespace TailBlazer.Domain.FileHandling
         public bool IsSearching { get; }
         public bool HasReachedLimit { get; }
         public int Maximum { get; }
+        public TailInfo TailInfo { get; }
 
         private readonly IDictionary<FileSegmentKey, FileSegmentSearch> _allSearches;
 
         private FileSegmentSearch LastSearch { get; }
         private FileInfo Info { get;  }
         private Encoding Encoding { get;  }
-        private TailInfo TailInfo { get; }
+
         private long Size { get; }
 
         public FileSearchResult(FileSegmentSearch initial,
@@ -108,6 +110,7 @@ namespace TailBlazer.Domain.FileHandling
 
                 using (var reader = new StreamReaderExtended(stream, Encoding, false))
                 {
+
                     if (page.Size == 0) yield break;
 
                     foreach (var i in Enumerable.Range(page.Start, page.Size))
@@ -139,14 +142,32 @@ namespace TailBlazer.Domain.FileHandling
             }
         }
 
-
         private Page GetPage(ScrollRequest scroll)
         {
+            if (scroll.SpecifiedByPosition && scroll.Mode == ScrollReason.TailOnly)
+            {
+                int j = 0;
+                for (var i = Matches.Length - 1; i >= 0; i--)
+                {
+                    j++;
+                    var match = Matches[i];
+                    if (match <= scroll.Position)
+                    {
+
+                        return new Page(i + 1, match == scroll.Position ? j : j-1);
+                    }
+                }
+
+
+            }
+
             int first;
             if (scroll.SpecifiedByPosition)
             {
                 //get line number fro
                 first = IndexOf(scroll.Position);
+
+
             }
             else
             {
@@ -161,6 +182,7 @@ namespace TailBlazer.Domain.FileHandling
             }
             else
             {
+
                 if (scroll.FirstIndex + size >= Count)
                     first = Count - size;
             }
@@ -179,6 +201,8 @@ namespace TailBlazer.Domain.FileHandling
 
             return -1;
         }
+
+
 
         #region Equality
 

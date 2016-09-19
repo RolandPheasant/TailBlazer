@@ -14,7 +14,7 @@ namespace TailBlazer.Domain.FileHandling
         private Index[] Indicies { get; }
         private FileInfo Info { get; }
         private Encoding Encoding { get; }
-        private TailInfo TailInfo { get; }
+        public TailInfo TailInfo { get; }
 
         public IndexCollection(IReadOnlyCollection<Index> latest,
                                     IndexCollection previous,
