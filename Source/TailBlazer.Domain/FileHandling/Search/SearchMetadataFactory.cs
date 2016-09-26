@@ -23,9 +23,13 @@ namespace TailBlazer.Domain.FileHandling.Search
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
 
-            var withNegation = searchText.WithNegation();
-            var isExclusion = withNegation.IsNegation;
-            searchText = withNegation.Text;
+            var isExclusion = false;
+            if (!useRegex)
+            {
+                var withNegation = searchText.WithNegation();
+                isExclusion = withNegation.IsNegation;
+                searchText = withNegation.Text;
+            }
 
             var association = _textAssociationCollection.Lookup(searchText);
             string icon;
@@ -52,6 +56,5 @@ namespace TailBlazer.Domain.FileHandling.Search
                 isGlobal,
                 isExclusion);
         }
-
     }
 }

@@ -24,7 +24,7 @@ namespace TailBlazer.Views.Searching
             {
                 try
                 {
-                    var test = new Regex(source.TextWithoutExclusion);
+                    var test = new Regex(source.Text);
                 }
                 catch (Exception)
                 {
