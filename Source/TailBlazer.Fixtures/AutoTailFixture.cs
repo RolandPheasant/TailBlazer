@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Subjects;
 using DynamicData.Kernel;
 using FluentAssertions;
 using Microsoft.Reactive.Testing;
@@ -15,16 +16,17 @@ namespace TailBlazer.Fixtures
         public void TailsLatestValuesOnly()
         {
             var scheduler = new TestScheduler();
+            var size = new BehaviorSubject<int>(10);
 
             using (var file = new TestFile())
             {
                 file.Append(CreateLines(1, 100));
 
-                var autoTailer = new AutoTail(file.Info.WatchFile(scheduler: scheduler).Index());
+                var autoTailer = new AutoTail(file.Info.WatchFile(scheduler: scheduler).Index(), size);
 
                 Line[] result = null;
                 int counter = 0;
-                using (autoTailer.Tail(10).Subscribe(x=> { result = x.AsArray(); counter++; }))
+                using (autoTailer.Tail().Subscribe(x=> { result = x.AsArray(); counter++; }))
                 {
                     //check that intial values are loaded
                     scheduler.AdvanceBySeconds(1);
@@ -47,16 +49,17 @@ namespace TailBlazer.Fixtures
         public void TailsLatestValuesOnly_ForFilteredValues()
         {
             var scheduler = new TestScheduler();
+            var size = new BehaviorSubject<int>(10);
 
             using (var file = new TestFile("TailsLatestValuesOnly_ForFilteredValues"))
             {
                 file.Append(CreateLines(1, 100));
 
-                var autoTailer = new AutoTail(file.Info.WatchFile(scheduler: scheduler).Search(str => str.Contains("9")));
+                var autoTailer = new AutoTail(file.Info.WatchFile(scheduler: scheduler).Search(str => str.Contains("9")),size);
 
                 Line[] result = null;
                 int counter = 0;
-                using (autoTailer.Tail(10).Subscribe(x => { result = x.AsArray(); counter++; }))
+                using (autoTailer.Tail().Subscribe(x => { result = x.AsArray(); counter++; }))
                 {
                     //check that intial values are loaded
                     scheduler.AdvanceBySeconds(1);

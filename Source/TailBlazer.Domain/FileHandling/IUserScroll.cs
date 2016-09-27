@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public interface IAutoTail
+    public interface IUserScroll
     {
-        IObservable<IEnumerable<Line>> Tail();
+        IObservable<IEnumerable<Line>> Scroll();
     }
 }

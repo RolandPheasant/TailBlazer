@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -144,6 +143,7 @@ namespace TailBlazer.Domain.FileHandling
 
         private Page GetPage(ScrollRequest scroll)
         {
+            //TODO: 
             if (scroll.SpecifiedByPosition && scroll.Mode == ScrollReason.TailOnly)
             {
                 int j = 0;
@@ -157,17 +157,12 @@ namespace TailBlazer.Domain.FileHandling
                         return new Page(i + 1, match == scroll.Position ? j : j-1);
                     }
                 }
-
-
             }
 
             int first;
             if (scroll.SpecifiedByPosition)
             {
-                //get line number fro
                 first = IndexOf(scroll.Position);
-
-
             }
             else
             {
