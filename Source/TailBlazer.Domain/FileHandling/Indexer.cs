@@ -9,6 +9,7 @@ using System.Text;
 using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.Annotations;
+using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {

@@ -41,6 +41,7 @@ namespace TailBlazer.Domain.FileHandling
             var shared = _scanFrom.Select(start => start == 0
                 ? fileInfo.WatchFile(scheduler: scheduler, refreshPeriod: refreshRate)
                 : fileInfo.WatchFile(scheduler: scheduler, refreshPeriod: refreshRate).ScanFromEnd())
+                .DistinctUntilChanged()
                 .Switch();
 
             Latest = shared

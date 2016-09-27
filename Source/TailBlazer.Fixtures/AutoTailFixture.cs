@@ -14,7 +14,7 @@ namespace TailBlazer.Fixtures
     {
         [Fact]
         public void TailsLatestValuesOnly()
-        {
+       {
             var scheduler = new TestScheduler();
             var size = new BehaviorSubject<int>(10);
 
@@ -29,7 +29,7 @@ namespace TailBlazer.Fixtures
                 using (autoTailer.Tail().Subscribe(x=> { result = x.AsArray(); counter++; }))
                 {
                     //check that intial values are loaded
-                    scheduler.AdvanceBySeconds(1);
+                    scheduler.AdvanceBySeconds(250);
                     counter.Should().Be(1);
                     result.Count().Should().Be(10);
                     var expected = CreateLines(91, 10);

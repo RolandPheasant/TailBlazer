@@ -24,33 +24,88 @@ namespace TailBlazer.Domain.FileHandling
         public IObservable<IEnumerable<Line>> Tail()
         {
 
-            return Observable.Create<IEnumerable<Line>>(observer =>
+           return _lineProvider.CombineLatest(_pageSize, (lp, pge) => new { LineProvider = lp, PageSize = pge })
+                    .Scan(LastScanInfo.Empty, (last, latest) =>
+                    {
+                        Line[] result;
+                        if (last == LastScanInfo.Empty && last.PageSize == latest.PageSize && last.TailInfo.TailStartsAt == latest.LineProvider.TailInfo.TailStartsAt)
+                            return last;
+
+                        //if (last != LastScanInfo.Empty && last.PageSize == latest.PageSize && last.TailInfo.TailStartsAt == latest.LineProvider.TailInfo.TailStartsAt)
+                        //    return last;
+
+                        if (latest.PageSize != last.PageSize)
+                        {
+                            result = latest.LineProvider.ReadLines(new ScrollRequest(latest.PageSize)).ToArray();
+                        }
+                        else
+                        {
+                            result = latest.LineProvider.ReadLines(new ScrollRequest(ScrollReason.TailOnly, latest.PageSize, latest.LineProvider.TailInfo.TailStartsAt)).ToArray();
+                        }
+                        return new LastScanInfo(latest.LineProvider.TailInfo, latest.PageSize, result);
+                    })
+                    .DistinctUntilChanged()
+                    .Where(result => result.Result.Length != 0)
+                    .Select(info => info.Result);
+
+        }
+
+        private class LastScanInfo : IEquatable<LastScanInfo>
+        {
+            public TailInfo TailInfo { get;  }
+            public int PageSize { get;  }
+            public Line[] Result { get;  }
+
+            public readonly static LastScanInfo Empty = new LastScanInfo(TailInfo.None,0, new Line[0]);
+
+            public LastScanInfo(TailInfo tailInfo, int pageSize, Line[] result)
             {
-                var lastTail = TailInfo.None;
+                PageSize = pageSize;
+                TailInfo = tailInfo;
+                Result = result;
+            }
 
-                var shared = _lineProvider.Publish();
-                //int pageSize = 0;
+            #region Equality
 
-                var initial = shared.Take(1)
-                    .CombineLatest(_pageSize, (lp, pageSize) =>
-                    {
-                        Interlocked.Exchange(ref lastTail, lp.TailInfo);
-                        return lp.ReadLines(new ScrollRequest(pageSize)).ToArray();
-                    });
+            public bool Equals(LastScanInfo other)
+            {
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+                return Equals(TailInfo, other.TailInfo) 
+                    && PageSize == other.PageSize 
+                    && Result.SequenceEqual(other.Result);
+            }
 
-                var subsequent = shared.Skip(1)
-                    .DistinctUntilChanged(x=>x.TailInfo.TailStartsAt)
-                    .CombineLatest(_pageSize, (lp, pageSize) =>
-                    {
-                        var result = lp.ReadLines(new ScrollRequest(ScrollReason.TailOnly, pageSize, lastTail.TailStartsAt)).ToArray();
-                        Interlocked.Exchange(ref lastTail, lp.TailInfo);
-                        return result;
-                    });
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((LastScanInfo) obj);
+            }
 
-                var notifier = initial.Concat(subsequent).SubscribeSafe(observer);
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    var hashCode = (TailInfo != null ? TailInfo.GetHashCode() : 0);
+                    hashCode = (hashCode*397) ^ PageSize;
+                    hashCode = (hashCode*397) ^ (Result != null ? Result.GetHashCode() : 0);
+                    return hashCode;
+                }
+            }
 
-                return new CompositeDisposable(shared.Connect(), notifier);
-            });
+            public static bool operator ==(LastScanInfo left, LastScanInfo right)
+            {
+                return Equals(left, right);
+            }
+
+            public static bool operator !=(LastScanInfo left, LastScanInfo right)
+            {
+                return !Equals(left, right);
+            }
+
+            #endregion
         }
     }
 }
