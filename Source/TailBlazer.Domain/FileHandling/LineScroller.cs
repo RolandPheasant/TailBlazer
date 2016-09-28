@@ -71,32 +71,36 @@ namespace TailBlazer.Domain.FileHandling
             scrollRequest = scrollRequest.Synchronize(locker);
             latest = latest.Synchronize(locker);
 
-            var aggregator = latest
-                .CombineLatest(scrollRequest, (currentLines, scroll) => new { currentLines, scroll})
-                .Sample(TimeSpan.FromMilliseconds(50))
-                .Select(x =>
-                {
-                    if (x.scroll== ScrollRequest.None ||  x.scroll.PageSize == 0 || x.currentLines.Count == 0)
-                        return new Line[0];
+            var shared = latest.Synchronize(locker).Publish();
+            var isTailing = scrollRequest.Select(request => request.Mode == ScrollReason.Tail).DistinctUntilChanged();
+            var tailer = shared.Tail(scrollRequest.Select(request => request.PageSize).DistinctUntilChanged());
+            var scroller = shared.Scroll(scrollRequest).DistinctUntilChanged();
 
-                    return x.currentLines.ReadLines(x.scroll).ToArray();
-                })
-                .RetryWithBackOff<Line[], Exception>((ex, i) => TimeSpan.FromSeconds(1))
-                .Subscribe(currentPage =>
+            var aggregator = tailer
+                .RetryWithBackOff<AutoTailResponse, Exception>((ex, i) => TimeSpan.FromSeconds(1))
+                .Subscribe(tail =>
                 {
-                    var previous = lines.Items.ToArray();
-                    var added = currentPage.Except(previous, Line.TextStartComparer).ToArray();
-                    var removed = previous.Except(currentPage, Line.TextStartComparer).ToArray();
-
                     lines.Edit(innerCache =>
                     {
-                        if (currentPage.Length == 0) innerCache.Clear();
-                        if (removed.Any()) innerCache.Remove(removed);
-                        if (added.Any()) innerCache.AddOrUpdate(added);
+                        if (tail.Reason == AutoTailReason.LoadTail) innerCache.Clear();
+                        
+                        //add new lines
+                        innerCache.AddOrUpdate(tail.Lines);
+
+                        if (tail.PageSize >= innerCache.Count) return;
+                         
+                        //remove unneeded lines
+                        var toRemove = innerCache.Items
+                                .OrderBy(l => l.LineInfo.Start)
+                                .Take(innerCache.Count - tail.PageSize)
+                                .Select(line => line.Key)
+                                .ToArray();
+
+                        innerCache.Remove(toRemove);
                     });
                 });
 
-            _cleanUp = new CompositeDisposable(Lines, lines, aggregator);
+            _cleanUp = new CompositeDisposable(Lines, lines, aggregator, shared.Connect());
         }
 
         public void Dispose()

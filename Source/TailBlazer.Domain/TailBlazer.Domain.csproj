@@ -103,6 +103,7 @@
     <Compile Include="FileHandling\IProgressInfo.cs" />
     <Compile Include="FileHandling\IUserScroll.cs" />
     <Compile Include="FileHandling\LineKey.cs" />
+    <Compile Include="FileHandling\LineProviderEx.cs" />
     <Compile Include="FileHandling\Search\CombinedSearchMetadataCollection.cs" />
     <Compile Include="FileHandling\Search\GlobalSearchInfoCollection.cs" />
     <Compile Include="FileHandling\Search\ICombinedSearchMetadataCollection.cs" />
