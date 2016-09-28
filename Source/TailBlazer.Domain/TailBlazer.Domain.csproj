@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="CaseInsensitiveString.cs" />
     <Compile Include="FileHandling\AutoTail.cs" />
+    <Compile Include="FileHandling\AutoTailInfo.cs" />
     <Compile Include="FileHandling\EmptyLineProvider.cs" />
     <Compile Include="FileHandling\FileInfoEx.cs" />
     <Compile Include="FileHandling\FileRewriter.cs" />
@@ -144,6 +145,7 @@
     <Compile Include="FileHandling\TextAssociations\TextAssociationCollection.cs" />
     <Compile Include="FileHandling\TextAssociations\TextAssociationToStateConverter.cs" />
     <Compile Include="FileHandling\UserScroll.cs" />
+    <Compile Include="FileHandling\UserScrollResponse.cs" />
     <Compile Include="Formatting\DisplayText.cs" />
     <Compile Include="Formatting\GeneralOptions.cs" />
     <Compile Include="Formatting\GeneralOptionsConverter.cs" />

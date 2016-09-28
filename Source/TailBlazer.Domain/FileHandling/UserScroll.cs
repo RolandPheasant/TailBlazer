@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading;
 using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
@@ -21,35 +18,24 @@ namespace TailBlazer.Domain.FileHandling
             _scrollRequest = scrollRequest;
         }
 
-        public IObservable<IEnumerable<Line>> Scroll()
+        public IObservable<UserScrollResponse> Scroll()
         {
-
-            return Observable.Create<IEnumerable<Line>>(observer =>
-            {
-                var locker = new object();
-                var scrollRequest = _scrollRequest.Synchronize(locker);
-                var lineProvider = EmptyLineProvider.Instance;
-
-                //TODO: Should I force a read on the first scroll request
-                var latest = _lineProvider
-                        .Subscribe(lp =>
-                        {
-                            Interlocked.Exchange(ref lineProvider, lp);
-                        });
-
-                var scroller = scrollRequest
-                   .Select(request =>
+            return _lineProvider.CombineLatest(_scrollRequest, (lp, request) => new { LineProvider = lp, Request = request })
+                    .Scan(UserScrollResponse.Empty, (last, latest) =>
                     {
-                        if (request == ScrollRequest.None || request.PageSize == 0 || lineProvider.Count == 0)
-                            return new Line[0];
+                        var request = latest.Request;
 
-                        return lineProvider.ReadLines(request).ToArray();
-                    });
+                        //only scroll if it comes from a new user request
+                        if (last.PageSize == request.PageSize 
+                                    && last.FirstIndex == request.FirstIndex)
+                            return last;
 
-                var notifier = scroller.SubscribeSafe(observer);
-                return new CompositeDisposable(latest, notifier);
-            });
+                        var result = latest.LineProvider.ReadLines(request).ToArray();
+                        return new UserScrollResponse(latest.LineProvider.TailInfo, request.PageSize, request.FirstIndex, result);
+                    })
+                    .DistinctUntilChanged()
+                    .Where(result => result.Lines.Length != 0)
+                    .Select(info => info);
         }
-
     }
 }

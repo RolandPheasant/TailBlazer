@@ -5,6 +5,6 @@ namespace TailBlazer.Domain.FileHandling
 {
     public interface IUserScroll
     {
-        IObservable<IEnumerable<Line>> Scroll();
+        IObservable<UserScrollResponse> Scroll();
     }
 }

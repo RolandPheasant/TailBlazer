@@ -37,7 +37,9 @@ namespace TailBlazer.Domain.FileHandling
             Segments = notifications
                 .Scan((FileSegmentCollection) null, (previous, current) =>
                 {
-                    _info = (FileInfo)current;
+                   _info = (FileInfo)current;
+
+
                     var nameHasChanged = previous != null && (previous.Info.Name != current.Name);
 
                     if (previous == null || previous.FileLength == 0 || nameHasChanged)
@@ -45,6 +47,13 @@ namespace TailBlazer.Domain.FileHandling
                         var segments = LoadSegments().ToArray();
                         return new FileSegmentCollection(_info, segments, current.Size);
                     }
+
+                    //if file size has not changed, do not reload segment
+                    if (previous.FileLength == _info.Length)
+                    {
+                        return previous;
+                    }
+
                     var newLength = _info.Length;
 
                     if (newLength < previous.FileLength)
@@ -55,7 +64,7 @@ namespace TailBlazer.Domain.FileHandling
                     }
 
                     return new FileSegmentCollection(newLength, previous);
-                });
+                }).DistinctUntilChanged();
         }
 
         private IEnumerable<FileSegment> LoadSegments()

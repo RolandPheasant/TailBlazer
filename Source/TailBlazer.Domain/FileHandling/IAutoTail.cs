@@ -5,6 +5,6 @@ namespace TailBlazer.Domain.FileHandling
 {
     public interface IAutoTail
     {
-        IObservable<IEnumerable<Line>> Tail();
+        IObservable<AutoTailResponse> Tail();
     }
 }

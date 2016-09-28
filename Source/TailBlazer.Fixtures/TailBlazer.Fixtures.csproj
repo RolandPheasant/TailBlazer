@@ -119,6 +119,7 @@
     <Compile Include="FileDropFixture.cs" />
     <Compile Include="IconDescriptionFixture.cs" />
     <Compile Include="IconProviderFixture.cs" />
+    <Compile Include="LinesEx.cs" />
     <Compile Include="StartFromFixture.cs" />
     <Compile Include="FileSearchFixture.cs" />
     <Compile Include="FileSegmentFixture.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="SplitFileByMatchingTextFixture.cs" />
     <Compile Include="StringExFixture.cs" />
     <Compile Include="TestFile.cs" />
+    <Compile Include="UserScrollFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
