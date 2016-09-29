@@ -5,6 +5,8 @@ using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
 {
+
+
     public class AutoTail: IAutoTail
     {
         private readonly IObservable<ILineProvider> _lineProvider;
@@ -24,6 +26,7 @@ namespace TailBlazer.Domain.FileHandling
                     .Scan(AutoTailResponse.Empty, (last, latest) =>
                     {
                         Line[] result;
+
                         if (last == AutoTailResponse.Empty && last.PageSize == latest.PageSize && last.TailInfo.TailStartsAt == latest.LineProvider.TailInfo.TailStartsAt)
                             return last;
 

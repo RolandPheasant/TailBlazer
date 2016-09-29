@@ -1,5 +1,6 @@
 using System;
 using System.Reactive.Linq;
+using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -16,6 +17,12 @@ namespace TailBlazer.Domain.FileHandling
                 return segmenter.Segments.SubscribeSafe(observer);
             })
             .TakeUntil(shared.Where(f => !f.Exists));
+        }
+
+        public static IObservable<FileTailInfo> Tail([NotNull] this IObservable<FileSegmentCollection> source)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            return new FileTailReader(source).Tail();
         }
     }
 }

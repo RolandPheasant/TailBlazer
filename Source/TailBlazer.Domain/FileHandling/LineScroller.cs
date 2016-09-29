@@ -69,9 +69,9 @@ namespace TailBlazer.Domain.FileHandling
             var locker = new object();
 
             scrollRequest = scrollRequest.Synchronize(locker);
-            latest = latest.Synchronize(locker);
 
             var shared = latest.Synchronize(locker).Publish();
+
             var isTailing = scrollRequest.Select(request => request.Mode == ScrollReason.Tail).DistinctUntilChanged();
             var tailer = shared.Tail(scrollRequest.Select(request => request.PageSize).DistinctUntilChanged());
             var scroller = shared.Scroll(scrollRequest).DistinctUntilChanged();
