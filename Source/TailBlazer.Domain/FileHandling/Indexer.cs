@@ -9,7 +9,6 @@ using System.Text;
 using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.Annotations;
-using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -70,13 +69,13 @@ namespace TailBlazer.Domain.FileHandling
                 .Scan((IndexCollection)null, (previous, notification) => new IndexCollection(notification, previous, Info, Encoding))
                 .Replay(1).RefCount();
 
-
+            //TODO: INSERT-AUTO TAILER HERE
             //3. Scan the tail so results can be returned quickly
-            var tailScanner= shared.Select(segments => segments.Tail)
+            var tailIndexScan = shared.Select(segments => segments.Tail)
                 .DistinctUntilChanged()
                 .Scan((Index)null, (previous, current) =>
                {
-                    if (previous == null)
+                   if (previous == null)
                     {
                         var initial = Scan(current.Start, -1, 1);
                         return initial ?? new Index(0, 0,0,0,IndexType.Tail);
@@ -87,8 +86,8 @@ namespace TailBlazer.Domain.FileHandling
                 .Where(tail=>tail!=null)
                 .Replay(1).RefCount();
 
-            //4. estimate =
-            var tailSubscriber = tailScanner.Subscribe(tail =>
+            //4. Replace index when-ever we get new scan results
+            var tailSubscriber = tailIndexScan.Subscribe(tail =>
             {
                 _indicies.Edit(innerList =>
                 {
@@ -99,7 +98,7 @@ namespace TailBlazer.Domain.FileHandling
             });
             
             //Scan the remainer of the file
-            var headSubscriber = tailScanner.FirstAsync()
+            var headSubscriber = tailIndexScan.FirstAsync()
                 .Subscribe(tail =>
                 {
                     if (tail.Start == 0) return;

@@ -44,7 +44,7 @@ namespace TailBlazer.Fixtures
 
         private string[] CreateLines(int start, int take)
         {
-            return Enumerable.Range(start, take).Select(i => $"This is line number {i.ToString("00000000")}").ToArray();
+            return Enumerable.Range(start, take).Select(i => $"This is line number {i:00000000}").ToArray();
         }
     }
 }

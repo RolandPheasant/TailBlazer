@@ -30,8 +30,6 @@ namespace TailBlazer.Fixtures
             var template = "0123456789abcdefghijklmnopqrstuvwxyz";
             var sb = new StringBuilder();
 
-
-            long x;
             for (int i = 0; i < 1000; i++)
             {
                 for (int j = 0; i < 200; i++)

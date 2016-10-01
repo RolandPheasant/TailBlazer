@@ -19,7 +19,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public IObservable<FileTailInfo> Tail()
         {
-            //continually return a changin tail 
+            //continually return a changing tail 
             return Observable.Create<FileTailInfo>(observer =>
             {
                 Encoding encoding = null;
