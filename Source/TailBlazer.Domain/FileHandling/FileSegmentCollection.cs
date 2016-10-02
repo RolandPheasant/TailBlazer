@@ -92,5 +92,10 @@ namespace TailBlazer.Domain.FileHandling
         }
 
         #endregion
+
+        public override string ToString()
+        {
+            return $"{nameof(TailStartsAt)}: {TailStartsAt}, {nameof(Count)}: {Count}, {nameof(Reason)}: {Reason}, {nameof(FileSize)}: {FileSize}, {nameof(SizeDiff)}: {SizeDiff}";
+        }
     }
 }

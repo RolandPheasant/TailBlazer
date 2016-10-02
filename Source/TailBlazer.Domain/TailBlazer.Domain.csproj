@@ -90,6 +90,7 @@
     <Compile Include="FileHandling\FileSegmentCollection.cs" />
     <Compile Include="FileHandling\FileSegmentSearch.cs" />
     <Compile Include="FileHandling\FileSegmentSearchStatus.cs" />
+    <Compile Include="FileHandling\FileSegmentsWithTail.cs" />
     <Compile Include="FileHandling\FileSegmentType.cs" />
     <Compile Include="FileHandling\FileStatus.cs" />
     <Compile Include="FileHandling\FileTailInfo.cs" />

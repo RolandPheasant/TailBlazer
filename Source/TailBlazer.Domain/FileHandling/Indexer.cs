@@ -24,6 +24,10 @@ namespace TailBlazer.Domain.FileHandling
 
         An alternative solution to what I got now is to do a triple index (as per point 3).
         In doing so it would make the rx easier and get rid of the need for the observable list
+
+
+        Addendum: The concept of this class has nw changed.  Now the only reason it needs to notify 
+        if that the number of match lines have changed. The indicies are only used when a user scrolls
   */
     public class Indexer : IDisposable
     {

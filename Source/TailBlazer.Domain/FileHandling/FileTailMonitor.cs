@@ -8,23 +8,29 @@ using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class FileTailReader
+    public sealed class FileTailReader
     {
         private readonly IObservable<FileSegmentCollection> _fileSegmentCollection;
         
-        public FileTailReader([NotNull] IObservable<FileSegmentCollection> fileSegmentCollection)
+        public FileTailReader([NotNull] IObservable<FileSegmentCollection> fileSegmentCollection, int intialTailSize = 10000)
         {
             _fileSegmentCollection = fileSegmentCollection;
         }
-
+        
         public IObservable<FileTailInfo> Tail()
         {
+            //1. Load tail of an initial size when stream starts
+            //2. Load subsequent tail as changes are made
+
             //continually return a changing tail 
             return Observable.Create<FileTailInfo>(observer =>
             {
+                var lastTail = FileTailInfo.Empty;
                 Encoding encoding = null;
+                var locker = new object();
 
                 return _fileSegmentCollection
+                    .Synchronize(locker)
                     .Select(fsc =>
                     {
                         if (fsc.Count == 0)
@@ -32,21 +38,21 @@ namespace TailBlazer.Domain.FileHandling
 
                         if (encoding == null)
                             encoding = fsc.Info.GetEncoding();
-
-                        var lines = ReadLines(fsc, encoding);
-                        return new FileTailInfo(lines.ToArray());
+                        
+                        //calculate last tail => either inital size or scan from end
+                        var lines = ReadTail(fsc.Info.FullName, lastTail.End, encoding).ToArray();
+                        var tail = new FileTailInfo(lines);
+                        lastTail = tail;
+                        return tail;
                     })
                     .Where(info => info.Count != 0)
                     .SubscribeSafe(observer);
             });
         }
         
-        private IEnumerable<Line> ReadLines(FileSegmentCollection segments, Encoding encoding)
+        
+        private IEnumerable<Line> ReadTail(string fileName, long position, Encoding encoding)
         {
-            var tail = segments.Tail;
-            var fileName = segments.Info.FullName;
-            var position = segments.Reason == FileSegmentChangedReason.Loaded ? 0 : tail.Start;
-
             int i = 0;
             using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
