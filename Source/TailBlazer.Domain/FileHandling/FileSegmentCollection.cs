@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -13,13 +14,11 @@ namespace TailBlazer.Domain.FileHandling
         public FileSegmentChangedReason Reason { get; }
         public FileSegment Tail => Segments[Count - 1];
         public long FileLength => Tail.End;
-
         public long FileSize { get; }
-
-
         public long SizeDiff { get; }
+        public Encoding Encoding { get;  }
 
-        public FileSegmentCollection(FileInfo fileInfo, FileSegment[] segments, long sizeDiff)
+        public FileSegmentCollection(FileInfo fileInfo, FileSegment[] segments, long sizeDiff, Encoding encoding)
         {
             if (segments.Length == 0)
                 throw new ArgumentException("Argument is empty collection", nameof(segments));
@@ -30,6 +29,7 @@ namespace TailBlazer.Domain.FileHandling
             Count = Segments.Length;
             FileSize = TailStartsAt;
             SizeDiff = sizeDiff;
+            Encoding = encoding;
             Reason = FileSegmentChangedReason.Loaded;
         }
 
@@ -47,6 +47,7 @@ namespace TailBlazer.Domain.FileHandling
             var segments = previous.Segments;
             segments[segments.Length-1] = new FileSegment(last, newLength);
             Segments = segments;
+            Encoding = previous.Encoding ?? Info.GetEncoding();
             Count = Segments.Length;
             FileSize = newLength;
 

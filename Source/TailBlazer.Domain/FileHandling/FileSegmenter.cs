@@ -38,14 +38,15 @@ namespace TailBlazer.Domain.FileHandling
                 .Scan((FileSegmentCollection) null, (previous, current) =>
                 {
                    _info = (FileInfo)current;
-
+                   
 
                     var nameHasChanged = previous != null && (previous.Info.Name != current.Name);
 
                     if (previous == null || previous.FileLength == 0 || nameHasChanged)
                     {
+                        var encoding = _info.GetEncoding();
                         var segments = LoadSegments().ToArray();
-                        return new FileSegmentCollection(_info, segments, current.Size);
+                        return new FileSegmentCollection(_info, segments, current.Size, encoding);
                     }
 
                     //if file size has not changed, do not reload segment
@@ -56,11 +57,13 @@ namespace TailBlazer.Domain.FileHandling
 
                     var newLength = _info.Length;
 
+                    //if file is smaller, treat it as a new file
                     if (newLength < previous.FileLength)
                     {
+                        var encoding = _info.GetEncoding();
                         var sizeDiff = newLength - previous.FileLength;
                         var segments = LoadSegments().ToArray();
-                        return new FileSegmentCollection(_info, segments, sizeDiff);
+                        return new FileSegmentCollection(_info, segments, sizeDiff, encoding);
                     }
 
                     return new FileSegmentCollection(newLength, previous);

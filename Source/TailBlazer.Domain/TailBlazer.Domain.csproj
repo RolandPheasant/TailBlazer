@@ -76,6 +76,7 @@
     <Compile Include="FileHandling\AutoTail.cs" />
     <Compile Include="FileHandling\AutoTailInfo.cs" />
     <Compile Include="FileHandling\EmptyLineProvider.cs" />
+    <Compile Include="FileHandling\FileIndexer.cs" />
     <Compile Include="FileHandling\FileInfoEx.cs" />
     <Compile Include="FileHandling\FileRewriter.cs" />
     <Compile Include="FileHandling\FileSearcher.cs" />

@@ -11,8 +11,8 @@ namespace TailBlazer.Domain.FileHandling
     public sealed class FileTailReader
     {
         private readonly IObservable<FileSegmentCollection> _fileSegmentCollection;
-        
-        public FileTailReader([NotNull] IObservable<FileSegmentCollection> fileSegmentCollection, int intialTailSize = 10000)
+
+        public FileTailReader([NotNull] IObservable<FileSegmentCollection> fileSegmentCollection)
         {
             _fileSegmentCollection = fileSegmentCollection;
         }
@@ -38,9 +38,13 @@ namespace TailBlazer.Domain.FileHandling
 
                         if (encoding == null)
                             encoding = fsc.Info.GetEncoding();
+
+                        var tailFromPosition = fsc.Reason == FileSegmentChangedReason.Loaded 
+                                ? fsc.Tail.Start
+                                : lastTail.End;
                         
                         //calculate last tail => either inital size or scan from end
-                        var lines = ReadTail(fsc.Info.FullName, lastTail.End, encoding).ToArray();
+                        var lines = ReadTail(fsc.Info.FullName, tailFromPosition, encoding).ToArray();
                         var tail = new FileTailInfo(lines);
                         lastTail = tail;
                         return tail;
@@ -65,16 +69,13 @@ namespace TailBlazer.Domain.FileHandling
                     {
                         var line = reader.ReadLine();
                         if (line == null) yield break;
-
-                        i++;
-
+                        
                         var endPosition = reader.AbsolutePosition();
-
                         var info = new LineInfo(i + 1, i, startPosition, endPosition);
                         yield return new Line(info, line, DateTime.UtcNow);
 
                         startPosition = endPosition;
-
+                        i++;
                     } while (!reader.EndOfStream);
                 }
             }

@@ -18,7 +18,7 @@ namespace TailBlazer.Fixtures
             {
                 file.Append(CreateLines(1, 100));
 
-                var autoTailer = new FileTailReader(file.Info.WatchFile(scheduler: scheduler).WithSegments());
+                var autoTailer = new FileTailReader(file.Info.WatchFile(scheduler: scheduler).WithSegments(7500));
 
                 FileTailInfo result = null;
                 int counter = 0;

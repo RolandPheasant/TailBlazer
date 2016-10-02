@@ -22,7 +22,7 @@ namespace TailBlazer.Fixtures
             {
                 file.Append(Enumerable.Range(1, 100).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
 
-                using (var indexer = new Indexer(file.Info.WatchFile(pulse).WithSegments(), scheduler: scheduler))
+                using (var indexer = new FileIndexer(file.Info.WatchFile(pulse).WithSegments().WithTail(), scheduler: scheduler))
                 {
                     IndexCollection result = null;
                     using (indexer.Result.Subscribe(indicies => result = indicies))
@@ -59,7 +59,7 @@ namespace TailBlazer.Fixtures
             {
                 file.Append(Enumerable.Range(1, 10000).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
 
-                using (var indexer = new Indexer(file.Info.WatchFile(pulse).WithSegments(), tailSize: 1000,scheduler: scheduler))
+                using (var indexer = new FileIndexer(file.Info.WatchFile(pulse).WithSegments().WithTail(), scheduler: scheduler))
                 {
 
                     IndexCollection result = null;
@@ -96,8 +96,7 @@ namespace TailBlazer.Fixtures
             using (var file = new TestFile())
             {
 
-                using (var indexer = new Indexer(file.Info.WatchFile(pulse).WithSegments(), tailSize: 1000,
-                        scheduler: scheduler))
+                using (var indexer = new FileIndexer(file.Info.WatchFile(pulse).WithSegments(1000).WithTail(),scheduler: scheduler))
                 {
                     var lines = Enumerable.Range(1, 10000)
                         .Select(i => $"This is line number {i.ToString("00000000")}")
@@ -128,7 +127,7 @@ namespace TailBlazer.Fixtures
             using (var file = new TestFile())
             {
 
-                using (var indexer = new Indexer(file.Info.WatchFile(pulse).WithSegments(), tailSize: 1000,
+                using (var indexer = new FileIndexer(file.Info.WatchFile(pulse).WithSegments(1000).WithTail(),
                         scheduler: scheduler))
                 {
                     file.Append(Enumerable.Range(1, 10000)
