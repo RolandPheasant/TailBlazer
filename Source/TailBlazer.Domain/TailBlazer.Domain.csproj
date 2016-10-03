@@ -81,6 +81,7 @@
     <Compile Include="FileHandling\FileRewriter.cs" />
     <Compile Include="FileHandling\FileSearcher.cs" />
     <Compile Include="FileHandling\FileSearchEx.cs" />
+    <Compile Include="FileHandling\FileSearchIndexer.cs" />
     <Compile Include="FileHandling\FileSearchResult.cs" />
     <Compile Include="FileHandling\FileSegmentEx.cs" />
     <Compile Include="FileHandling\FileSegmentSearchResult.cs" />

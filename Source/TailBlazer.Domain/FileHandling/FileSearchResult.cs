@@ -7,9 +7,9 @@ using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class FileSearchResult: ILineProvider, IEquatable<FileSearchResult>, IHasLimitationOfLines, IProgressInfo
+    public class FileSearchCollection: ILineProvider, IEquatable<FileSearchCollection>, IHasLimitationOfLines, IProgressInfo
     {
-        public static readonly FileSearchResult None = new FileSearchResult();
+        public static readonly FileSearchCollection None = new FileSearchCollection();
         public long[] Matches { get; }
         public int Count => Matches.Length;
         public int SegmentsCompleted { get; }
@@ -27,7 +27,7 @@ namespace TailBlazer.Domain.FileHandling
 
         private long Size { get; }
 
-        public FileSearchResult(FileSegmentSearch initial,
+        public FileSearchCollection(FileSegmentSearch initial,
             FileInfo info,
             Encoding encoding,
             int limit)
@@ -50,7 +50,7 @@ namespace TailBlazer.Domain.FileHandling
             HasReachedLimit = false;
         }
 
-        public FileSearchResult(FileSearchResult previous, 
+        public FileSearchCollection(FileSearchCollection previous, 
             FileSegmentSearch current,
             FileInfo info,
             Encoding encoding,
@@ -90,7 +90,7 @@ namespace TailBlazer.Domain.FileHandling
             HasReachedLimit = Matches.Length >= limit;
         }
 
-        private FileSearchResult()
+        private FileSearchCollection()
         {
             Matches = new long[0];
             HasReachedLimit = false;
@@ -201,7 +201,7 @@ namespace TailBlazer.Domain.FileHandling
 
         #region Equality
 
-        public bool Equals(FileSearchResult other)
+        public bool Equals(FileSearchCollection other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -213,7 +213,7 @@ namespace TailBlazer.Domain.FileHandling
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((FileSearchResult) obj);
+            return Equals((FileSearchCollection) obj);
         }
 
         public override int GetHashCode()
@@ -228,12 +228,12 @@ namespace TailBlazer.Domain.FileHandling
             }
         }
 
-        public static bool operator ==(FileSearchResult left, FileSearchResult right)
+        public static bool operator ==(FileSearchCollection left, FileSearchCollection right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(FileSearchResult left, FileSearchResult right)
+        public static bool operator !=(FileSearchCollection left, FileSearchCollection right)
         {
             return !Equals(left, right);
         }

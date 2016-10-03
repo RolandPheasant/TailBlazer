@@ -9,7 +9,7 @@ namespace TailBlazer.Domain.FileHandling
 {
     public static class FileSearchEx
     {
-        public static IObservable<FileSearchResult> Search(this FileInfo source, Func<string, bool> predicate, IScheduler scheduler = null)
+        public static IObservable<FileSearchCollection> Search(this FileInfo source, Func<string, bool> predicate, IScheduler scheduler = null)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
@@ -19,7 +19,7 @@ namespace TailBlazer.Domain.FileHandling
                 .Search(predicate, scheduler);
         }
 
-        public static IObservable<FileSearchResult> Search(this IObservable<FileNotification> source, Func<string, bool> predicate, IScheduler scheduler = null)
+        public static IObservable<FileSearchCollection> Search(this IObservable<FileNotification> source, Func<string, bool> predicate, IScheduler scheduler = null)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
@@ -27,7 +27,7 @@ namespace TailBlazer.Domain.FileHandling
             return source.WithSegments().Search(predicate, scheduler);
         }
 
-        public static IObservable<FileSearchResult> Search(this IObservable<FileSegmentCollection> source, Func<string, bool> predicate, IScheduler scheduler = null)
+        public static IObservable<FileSearchCollection> Search(this IObservable<FileSegmentCollection> source, Func<string, bool> predicate, IScheduler scheduler = null)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
@@ -36,7 +36,7 @@ namespace TailBlazer.Domain.FileHandling
             var nameChanged = published.Select(fsc => fsc.Info.Name).DistinctUntilChanged().Skip(1);
             var diff = published.Select(fsc => fsc.SizeDiff);
 
-            var searcher = Observable.Create<FileSearchResult>(observer =>
+            var searcher = Observable.Create<FileSearchCollection>(observer =>
             {
                 var fileSearch = new FileSearcher(published, predicate, scheduler: scheduler);
                 var publisher = fileSearch.SearchResult.SubscribeSafe(observer);
@@ -50,6 +50,13 @@ namespace TailBlazer.Domain.FileHandling
                 .TakeUntil(nameChanged)
                 .TakeWhile(x => x.sizeDiff >= 0).Repeat()
                 .Select(x => x.search);
+        }
+
+        public static IObservable<FileSearchCollection> Search(this IObservable<FileSegmentsWithTail> source, Func<string, bool> predicate, IScheduler scheduler = null)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+            return new FileSearchIndexer(source, predicate).SearchResult;
         }
 
 

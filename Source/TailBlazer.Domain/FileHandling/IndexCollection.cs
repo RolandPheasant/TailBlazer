@@ -150,13 +150,13 @@ namespace TailBlazer.Domain.FileHandling
 
             if (scroll.Mode == ScrollReason.Tail)
             {
-                first = size > Count ? 0 : Count - size;
+                first = size > Count ? 0 : Count - size + 1;
             }
             else
             {
 
                     if (scroll.FirstIndex + size >= Count)
-                        first = Count - size;
+                        first = Count - size + 1;
 
             }
 

@@ -7,16 +7,16 @@ namespace TailBlazer.Fixtures
     public class TestFile: IDisposable
     {
         public string Name { get; }
-        public FileInfo Info { get; }
+        public FileInfo Info => new FileInfo(Name);
 
         public TestFile(string name = null)
         {
-   
-
             if (name == null)
             {
-                Name = Path.GetTempFileName();
-
+                var filename = string.Format(@"{0}.txt", Guid.NewGuid());
+                var path = Path.GetTempPath();
+                var fullPath = Path.Combine(path, filename);
+                Name = fullPath;
             }
             else
             {
@@ -25,8 +25,6 @@ namespace TailBlazer.Fixtures
                 if (File.Exists(fullPath)) File.Delete(fullPath);
                 Name = fullPath;
             }
-
-            Info = new FileInfo(Name);
         }
 
         public void Append(IEnumerable<string> lines)

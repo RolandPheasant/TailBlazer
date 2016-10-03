@@ -12,10 +12,12 @@ using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class FileIndexer : IDisposable
+    public class FileIndexer
     {
-        private readonly IDisposable _cleanUp;
-        private readonly ISourceList<Index> _indicies = new SourceList<Index>();
+        private readonly IObservable<FileSegmentsWithTail> _fileSegments;
+        private readonly int _compression;
+        private readonly int _sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing;
+        private readonly IScheduler _scheduler;
 
         public IObservable<IndexCollection> Result { get; }
 
@@ -25,95 +27,110 @@ namespace TailBlazer.Domain.FileHandling
             IScheduler scheduler = null)
         {
             if (fileSegments == null) throw new ArgumentNullException(nameof(fileSegments));
+            _fileSegments = fileSegments;
+            _compression = compression;
+            _sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing = sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing;
+            _scheduler = scheduler ?? Scheduler.Default;
+            Result = BuildObservable();
 
-            scheduler = scheduler ?? Scheduler.Default;
+        }
 
-            var shared = fileSegments.Publish();
+        private IObservable<IndexCollection> BuildObservable()
+        {
+            return Observable.Create<IndexCollection>(observer =>
+            {
+                var shared = _fileSegments.Publish();
 
-            //0.5 ensure we have the latest file info and encoding
-            Encoding encoding = null;
-            FileInfo fileInfo = null;
+                //0.5 ensure we have the latest file info and encoding
+                Encoding encoding = null;
+                FileInfo fileInfo = null;
 
-            //TODO: This is shit. We need a better way of passing around the Encoding / File meta data
-            var infoSubscriber = shared
-                .Where(fs => fs.Segments.Encoding != null)
-                .Take(1)
-                .Subscribe(fswt=>
+                //TODO: This is shit. We need a better way of passing around the Encoding / File meta data
+                var infoSubscriber = shared
+                    .Where(fs => fs.Segments.Encoding != null)
+                    .Take(1)
+                    .Subscribe(fswt =>
                     {
                         encoding = fswt.Segments.Encoding;
                         fileInfo = fswt.Segments.Info;
                     });
 
-            //1. create  a resulting index object from the collection of index fragments
-            Result = _indicies
-                .Connect()
-                .Sort(SortExpressionComparer<Index>.Ascending(si => si.Start))
-                .ToCollection()
-                .Scan((IndexCollection)null, (previous, notification) => new IndexCollection(notification, previous, fileInfo, encoding))
-                .Replay(1).RefCount();
+                //1. create  a resulting index object from the collection of index fragments
+                var indexList = new SourceList<Index>();
+
+                var subscriber = indexList
+                    .Connect()
+                    .Sort(SortExpressionComparer<Index>.Ascending(si => si.Start))
+                    .ToCollection()
+                    .Scan((IndexCollection) null,(previous, notification) => new IndexCollection(notification, previous, fileInfo, encoding))
+                    .SubscribeSafe(observer);
 
 
-            //2. continual indexing of the tail + replace tail index whenether there are new scan results
-            var tailScanner = shared
-                .Scan((Index) null, (previous, current) =>
-                {
-                    //index the tail
-                    var tail = current.TailInfo;
-                    var indicies = tail.Lines.Select(l => l.LineInfo.Start).ToArray();
-                    var index = new Index(tail.Start, tail.End, indicies, 1, tail.Count, IndexType.Tail);
-                    return previous == null ? index : new Index(index, previous);
-                }).Subscribe(tail =>
-                {
-                    //write tail  
-                    _indicies.Edit(innerList =>
+                //2. continual indexing of the tail + replace tail index whenether there are new scan results
+                var tailScanner = shared
+                    .Select(segments => segments.TailInfo)
+                    .DistinctUntilChanged()
+                    .Scan((Index) null, (previous, tail) =>
                     {
-                        var existing = innerList.FirstOrDefault(si => si.Type == IndexType.Tail);
-                        if (existing != null) innerList.Remove(existing);
-                        innerList.Add(tail);
-                    });
-                });
-
-           
-            //3. Index the remainer of the file, only after the head has been indexed
-            var headSubscriber = shared
-                .FirstAsync()
-                .Subscribe(segments =>
-                {
-                    var tail = segments.TailInfo;
-                    var segment = segments.Segments;
-
-                    if (tail.Start == 0) return;
-
-                    //Add an estimated number of lines
-                    var estimateLines = EstimateNumberOfLines(segments);
-                    var estimate = new Index(0, tail.Start, compression, estimateLines, IndexType.Page);
-                    _indicies.Add(estimate);
-
-                    //keep it as an estimate for files over 250 meg [for now]
-                    if (tail.Start > sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing) return;
-
-                    //todo: index first and last segment for large sized file
-                    //Index the remainder of the file
-                    scheduler.Schedule(() =>
+                        //index the tail
+                        var indicies = tail.Lines.Select(l => l.LineInfo.Start).ToArray();
+                        var index = new Index(tail.Start, tail.End, indicies, 1, tail.Count, IndexType.Tail);
+                        return previous == null ? index : new Index(index, previous);
+                    }).Subscribe(tail =>
                     {
-                        var actual = Scan(segment.Info.FullName, segment.Encoding, 0, tail.Start, compression);
-                        _indicies.Edit(innerList =>
+                        //write tail  
+                        indexList.Edit(innerList =>
                         {
-                            innerList.Remove(estimate);
-                            innerList.Add(actual);
+                            var existing = innerList.FirstOrDefault(si => si.Type == IndexType.Tail);
+                            if (existing != null) innerList.Remove(existing);
+                            innerList.Add(tail);
                         });
                     });
-                });
-            
-            _cleanUp = new CompositeDisposable(shared.Connect(), tailScanner, _indicies,  headSubscriber, infoSubscriber);
+
+
+                //3. Index the remainer of the file, only after the head has been indexed
+                var headSubscriber = shared
+                    .FirstAsync()
+                    .ObserveOn(_scheduler)
+                    .Subscribe(segments =>
+                    {
+                        var tail = segments.TailInfo;
+                        var segment = segments.Segments;
+
+                        if (tail.Start == 0) return;
+                        
+                        //add an estimate for the file size
+                        var estimateLines = EstimateNumberOfLines(segments);
+                        var estimate = new Index(0, tail.Start, _compression, estimateLines, IndexType.Page);
+                        indexList.Add(estimate);
+
+                        if (tail.Start < _sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing)
+                        {
+                            //keep it as an estimate for files over 250 meg [for now]
+                            //Perhaps we could correctly use segments an index entire file
+                            //todo: index first and last segment for large sized file
+                            //Produce indicies 
+                            var actual = Scan(segment.Info.FullName, segment.Encoding, 0, tail.Start, _compression);
+                            indexList.Edit(innerList =>
+                            {
+                                innerList.Remove(estimate);
+                                innerList.Add(actual);
+                            });
+                        }
+                    });
+                return new CompositeDisposable(shared.Connect(), subscriber, tailScanner, indexList, headSubscriber, infoSubscriber);
+            });
         }
-        
+
+
         private int EstimateNumberOfLines(FileSegmentsWithTail fileSegmentsWithTail)
         {
             var tail = fileSegmentsWithTail.TailInfo;
             var segment = fileSegmentsWithTail.Segments;
 
             //TODO: Need to account for line delimiter
+            //var delimiter = fileSegmentsWithTail.Segments.Info.FindDelimiter();
+            //var delimiterLength = Math.Max(2, delimiter);
             //Calculate estimate line count
             var averageLineLength = tail.Size / tail.Count;
             var estimatedLines = (segment.TailStartsAt) / averageLineLength;
@@ -183,11 +200,6 @@ namespace TailBlazer.Domain.FileHandling
                     i = 0;
                 }
             }
-        }
-
-        public void Dispose()
-        {
-            _cleanUp.Dispose();
         }
     }
 }

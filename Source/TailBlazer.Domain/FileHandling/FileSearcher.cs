@@ -16,6 +16,7 @@ namespace TailBlazer.Domain.FileHandling
     /// Responsive and flexible file searching.
     /// See https://github.com/RolandPheasant/TailBlazer/issues/42
     /// </summary>
+    [Obsolete]
     public class FileSearcher: IDisposable
     {
         private readonly IScheduler _scheduler;
@@ -26,7 +27,7 @@ namespace TailBlazer.Domain.FileHandling
         private Encoding Encoding { get;  set; }
         private FileInfo Info { get;  set; }
 
-        public IObservable<FileSearchResult> SearchResult { get;  }
+        public IObservable<FileSearchCollection> SearchResult { get;  }
 
         public FileSearcher([NotNull] IObservable<FileSegmentCollection> fileSegments, 
             [NotNull] Func<string, bool> predicate,
@@ -63,10 +64,10 @@ namespace TailBlazer.Domain.FileHandling
             SearchResult = searchData.Connect()
                 .Flatten()
                 .Select(change=>change.Current)
-                .Scan((FileSearchResult)null, (previous, current) => previous==null 
-                                ? new FileSearchResult(current, Info, Encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered) 
-                                : new FileSearchResult(previous, current, Info, Encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
-                .StartWith(FileSearchResult.None)
+                .Scan((FileSearchCollection)null, (previous, current) => previous==null 
+                                ? new FileSearchCollection(current, Info, Encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered) 
+                                : new FileSearchCollection(previous, current, Info, Encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
+                .StartWith(FileSearchCollection.None)
                 .Replay(1).RefCount();
 
             //initialise a pending state for all segments
