@@ -46,5 +46,10 @@ namespace TailBlazer.Domain.FileHandling
         {
             return source.WithSegments().Index();
         }
+
+        public static IObservable<ILineProvider> Index(this IObservable<FileSegmentsWithTail> source)
+        {
+            return new FileIndexer(source).Result;
+        }
     }
 }

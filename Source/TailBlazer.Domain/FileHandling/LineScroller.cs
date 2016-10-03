@@ -56,6 +56,48 @@ namespace TailBlazer.Domain.FileHandling
             _cleanUp = new CompositeDisposable(Lines, lines, aggregator);
         }
 
+        //public LineScroller([NotNull] IObservable<ILineProvider> latest, [NotNull] IObservable<ScrollRequest> scrollRequest)
+        //{
+        //    if (latest == null) throw new ArgumentNullException(nameof(latest));
+        //    if (scrollRequest == null) throw new ArgumentNullException(nameof(scrollRequest));
+
+
+        //    var lines = new SourceCache<Line, LineKey>(l => l.Key);
+        //    Lines = lines.Connect().IgnoreUpdateWhen((current, previous) => current.Key == previous.Key).AsObservableCache();
+
+        //    var locker = new object();
+
+        //    scrollRequest = scrollRequest.Synchronize(locker);
+        //    latest = latest.Synchronize(locker);
+
+        //    var aggregator = latest
+        //        .CombineLatest(scrollRequest, (currentLines, scroll) => new { currentLines, scroll })
+        //        .Sample(TimeSpan.FromMilliseconds(50))
+        //        .Select(x =>
+        //        {
+        //            if (x.scroll == ScrollRequest.None || x.scroll.PageSize == 0 || x.currentLines.Count == 0)
+        //                return new Line[0];
+
+        //            return x.currentLines.ReadLines(x.scroll).ToArray();
+        //        })
+        //        .RetryWithBackOff<Line[], Exception>((ex, i) => TimeSpan.FromSeconds(1))
+        //        .Subscribe(currentPage =>
+        //        {
+        //            var previous = lines.Items.ToArray();
+        //            var added = currentPage.Except(previous, Line.TextStartComparer).ToArray();
+        //            var removed = previous.Except(currentPage, Line.TextStartComparer).ToArray();
+
+        //            lines.Edit(innerCache =>
+        //            {
+        //                if (currentPage.Length == 0) innerCache.Clear();
+        //                if (removed.Any()) innerCache.Remove(removed);
+        //                if (added.Any()) innerCache.AddOrUpdate(added);
+        //            });
+        //        });
+
+        //    _cleanUp = new CompositeDisposable(Lines, lines, aggregator);
+        //}
+
 
         public LineScroller([NotNull] IObservable<ILineProvider> latest, [NotNull] IObservable<ScrollRequest> scrollRequest)
         {
@@ -64,7 +106,7 @@ namespace TailBlazer.Domain.FileHandling
 
 
             var lines = new SourceCache<Line, LineKey>(l => l.Key);
-            Lines = lines.Connect().IgnoreUpdateWhen((current,previous)=> current.Key==previous.Key).AsObservableCache();
+            Lines = lines.Connect().IgnoreUpdateWhen((current, previous) => current.Key == previous.Key).AsObservableCache();
 
             var locker = new object();
 
@@ -83,12 +125,12 @@ namespace TailBlazer.Domain.FileHandling
                     lines.Edit(innerCache =>
                     {
                         if (tail.Reason == AutoTailReason.LoadTail) innerCache.Clear();
-                        
+
                         //add new lines
                         innerCache.AddOrUpdate(tail.Lines);
 
                         if (tail.PageSize >= innerCache.Count) return;
-                         
+
                         //remove unneeded lines
                         var toRemove = innerCache.Items
                                 .OrderBy(l => l.LineInfo.Start)

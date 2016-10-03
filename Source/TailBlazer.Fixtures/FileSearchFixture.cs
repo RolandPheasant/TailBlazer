@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -57,7 +58,7 @@ namespace TailBlazer.Fixtures
             }
         }
 
-        //[Fact]
+        [Fact]
         //Cannot recreate the file as something is hanging on to it.
         public void CreateFileLater()
         {
@@ -69,7 +70,7 @@ namespace TailBlazer.Fixtures
 
                 FileSearchCollection fileSearchCollection = null;
 
-                using (file.Info.WatchFile(pulse).WithSegments().WithTail()
+                using (new FileInfo(file.Name).WatchFile(pulse).WithSegments().WithTail()
                     .Search(str => str.Contains("9"))
                     .Subscribe(x => fileSearchCollection = x))
                 {

@@ -28,6 +28,8 @@ namespace TailBlazer.Domain.FileHandling.Search
             _searchMetadataFactory = searchMetadataFactory;
             _fileWatcher = fileWatcher;
 
+            var sharedTail = _fileWatcher.Latest.WithSegments().WithTail().Replay(1).RefCount();
+
             var exclusionPredicate = combinedSearchMetadataCollection.Combined.Connect()
                     .IncludeUpdateWhen((current, previous) => !SearchMetadata.EffectsFilterComparer.Equals(current, previous))
                     .Filter(meta=> meta.IsExclusion)
@@ -51,9 +53,9 @@ namespace TailBlazer.Domain.FileHandling.Search
             All = exclusionPredicate.Select(predicate =>
             {
                 if (predicate==null)
-                    return _fileWatcher.Latest.Index();
+                    return sharedTail.Index();
 
-                return _fileWatcher.Latest.Search(predicate);
+                return sharedTail.Search(predicate);
 
             }).Switch().Replay(1).RefCount();
 
@@ -80,7 +82,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                                         var toMatch = meta.BuildPredicate();
                                         resultingPredicate =  str=> toMatch(str) && exclpredicate(str);
                                     }
-                                    return _fileWatcher.Latest.Search(resultingPredicate);
+                                    return sharedTail.Search(resultingPredicate);
 
                                 })
                                 .Switch()

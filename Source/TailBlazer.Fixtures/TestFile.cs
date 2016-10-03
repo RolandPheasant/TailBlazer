@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace TailBlazer.Fixtures
 {
@@ -29,7 +30,23 @@ namespace TailBlazer.Fixtures
 
         public void Append(IEnumerable<string> lines)
         {
-            File.AppendAllLines(Name,lines);
+
+            File.AppendAllLines(Name, lines);
+            //using (var fs = new FileStream(Name, FileMode.OpenOrCreate, FileAccess.Read, FileShare.Read))
+            //{
+
+            //    using (var writer = TextWriter)
+            //    {
+                    
+            //    }
+
+            //    byte[] newline = Encoding.ASCII.GetBytes(Environment.NewLine)
+            //    fs.Write(b, 0, b.Length);
+            //    byte[] newline = Encoding.ASCII.GetBytes(Environment.NewLine);
+            //    fs.Write(newline, 0, newline.Length);
+
+            //}
+           
         }
 
         public void Append(string line)
