@@ -10,8 +10,6 @@ namespace TailBlazer.Domain.FileHandling
         public FileSegmentSearchStatus Status { get; }
         public long[] Lines => _matches.Data;
 
-        public FileSegmentType Type { get; }
-
         private readonly ImmutableArray<long> _matches;
 
 

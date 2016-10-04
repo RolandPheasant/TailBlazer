@@ -26,7 +26,7 @@ namespace TailBlazer.Domain.FileHandling
         public IObservable<FileSegmentCollection> Segments { get; }
 
         public FileSegmenter(IObservable<FileNotification> notifications, 
-                                int initialTail= 100000, 
+                                int initialTail= 500000, 
                                 int segmentSize=25000000)
         {
             if (notifications == null) throw new ArgumentNullException(nameof(notifications));

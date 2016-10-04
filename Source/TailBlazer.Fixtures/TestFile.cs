@@ -14,10 +14,7 @@ namespace TailBlazer.Fixtures
         {
             if (name == null)
             {
-                var filename = string.Format(@"{0}.txt", Guid.NewGuid());
-                var path = Path.GetTempPath();
-                var fullPath = Path.Combine(path, filename);
-                Name = fullPath;
+                Name = Name = Path.GetTempFileName(); ;
             }
             else
             {

@@ -11,7 +11,7 @@ namespace TailBlazer.Domain.FileHandling
 
     public class AutoTailResponse : IEquatable<AutoTailResponse>
     {
-        public TailInfo TailInfo { get; }
+        public FileTailInfo TailInfo { get; }
         public int PageSize { get; }
         public Line[] Lines { get; }
         public AutoTailReason Reason { get;  }
@@ -19,17 +19,17 @@ namespace TailBlazer.Domain.FileHandling
 
         public static readonly AutoTailResponse Empty = new AutoTailResponse();
 
-        public AutoTailResponse(TailInfo tailInfo, int pageSize, Line[] lines, AutoTailReason reason)
+        public AutoTailResponse(FileTailInfo tailInfo, int pageSize,  AutoTailReason reason)
         {
             PageSize = pageSize;
             TailInfo = tailInfo;
-            Lines = lines;
+            Lines = tailInfo.Lines;
             Reason = reason;
         }
 
         public AutoTailResponse()
         {
-            TailInfo = TailInfo.None;
+            TailInfo = FileTailInfo.Empty;
             PageSize = 0;
             Lines = new Line[0];
         }
@@ -78,7 +78,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public override string ToString()
         {
-            return $"Tail starts at: {TailInfo.TailStartsAt}, PageSize: {PageSize}, Reason: {Reason}, Count: {Count}";
+            return $"Tail starts at: {TailInfo.Start}, PageSize: {PageSize}, Reason: {Reason}, Count: {Count}";
         }
     }
 }

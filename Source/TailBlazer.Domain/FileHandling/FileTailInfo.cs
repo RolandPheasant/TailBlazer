@@ -1,7 +1,22 @@
 using System;
+using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
 {
+    public static class FileTailInfoEx
+    {
+        public static FileTailInfo Trim([NotNull] this FileTailInfo source, int size)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+
+            if (size >= source.Count)
+                return source;
+            var trimmed = new Line[size];
+            Array.Copy(source.Lines, source.Count-size, trimmed, 0, size);
+            return new FileTailInfo(trimmed);
+        }
+    }
+
     /// <summary>
     /// Container which provides the latest tail changes
     /// </summary>
@@ -25,13 +40,14 @@ namespace TailBlazer.Domain.FileHandling
             End = lines.Length == 0 ? 0 : lines[lines.Length - 1].LineInfo.End;
         }
 
+
         #region Equality
 
         public bool Equals(FileTailInfo other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Start == other.Start && End == other.End && DateTime.Equals(other.DateTime);
+            return Start == other.Start && End == other.End ;
         }
 
         public override bool Equals(object obj)
@@ -48,7 +64,6 @@ namespace TailBlazer.Domain.FileHandling
             {
                 var hashCode = Start.GetHashCode();
                 hashCode = (hashCode*397) ^ End.GetHashCode();
-                hashCode = (hashCode*397) ^ DateTime.GetHashCode();
                 return hashCode;
             }
         }
@@ -67,7 +82,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public override string ToString()
         {
-            return $"{nameof(Count)}: {Count}, {nameof(Start)}: {Start}, {nameof(End)}: {End}, {nameof(Size)}: {Size}";
+            return $"({Count} lines),  {Start}->{End}, {nameof(Size)}: {Size}";
         }
     }
 }

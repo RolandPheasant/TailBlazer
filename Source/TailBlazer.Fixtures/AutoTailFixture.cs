@@ -20,7 +20,7 @@ namespace TailBlazer.Fixtures
             {
                 file.Append(CreateLines(1, 100));
 
-                var autoTailer = new AutoTail(file.Info.WatchFile(scheduler: scheduler).Index(), size);
+                var autoTailer = new AutoTail(file.Info.WatchFile(scheduler: scheduler).WithSegments().WithTail().Index(), size);
 
                 AutoTailResponse result = null;
                 int counter = 0;
@@ -53,7 +53,7 @@ namespace TailBlazer.Fixtures
             {
                 file.Append(CreateLines(1, 100));
 
-                var autoTailer = new AutoTail(file.Info.WatchFile(scheduler: scheduler).Search(str => str.Contains("9")),size);
+                var autoTailer = new AutoTail(file.Info.WatchFile(scheduler: scheduler).WithSegments().WithTail().Search(str => str.Contains("9")),size);
 
                 AutoTailResponse result = null;
                 int counter = 0;
@@ -63,15 +63,15 @@ namespace TailBlazer.Fixtures
                     scheduler.AdvanceBySeconds(1);
                      counter.Should().Be(1);
                     result.Count.Should().Be(10);
-                    var expected = CreateLines(90, 10);
-                    result.Lines.Join().ShouldBeEquivalentTo(expected.Join());
+                    var expected = CreateLines(91, 10);
+                    result.Lines.Select(x=>x.Text).ShouldBeEquivalentTo(expected);
 
                     file.Append(CreateLines(101, 10));
                     scheduler.AdvanceBySeconds(1);
                     counter.Should().Be(2);
-                    result.Count.Should().Be(1);
-                    expected = CreateLines(109, 1);
-                    result.Lines.Join().ShouldBeEquivalentTo(expected.Join());
+                    result.Count.Should().Be(10);
+                    expected = CreateLines(101, 10);
+                    result.Lines.Select(x => x.Text).ShouldBeEquivalentTo(expected);
                 }
             }
         }

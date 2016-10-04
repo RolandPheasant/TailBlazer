@@ -68,15 +68,20 @@ namespace TailBlazer.Domain.FileHandling
                     .IgnoreUpdateWhen((current, previous) => current == previous)
                     .AsObservableCache();
 
+                var tailWatcher = shared
+                    .Select(segments => segments.TailInfo)
+                    .DistinctUntilChanged();
+
                 //manually maintained search results and status
                 var searchData = new SourceCache<FileSegmentSearch, FileSegmentKey>(s => s.Key);
 
                 var publisher = searchData.Connect()
                     .Flatten()
                     .Select(change => change.Current)
+                    .CombineLatest(tailWatcher, (segment, tail) => new { Segment = segment, Tail = tail })
                     .Scan((FileSearchCollection)null, (previous, current) => previous == null
-                        ? new FileSearchCollection(current, fileInfo, encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered)
-                        : new FileSearchCollection(previous, current, fileInfo, encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
+                        ? new FileSearchCollection(current.Segment, current.Tail, fileInfo, encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered)
+                        : new FileSearchCollection(previous, current.Segment, current.Tail, fileInfo, encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
                     .StartWith(FileSearchCollection.None)
                     .SubscribeSafe(observer);   
 
@@ -87,18 +92,25 @@ namespace TailBlazer.Domain.FileHandling
                     .PopulateInto(searchData);
 
                 //continual indexing of the tail + replace tail index whenether there are new scan results
-                var tailScanner = shared
-                    .Select(segments => segments.TailInfo)
-                    .DistinctUntilChanged()
+                var tailScanner = tailWatcher
                     .Scan((FileSegmentSearch)null, (previous, tail) =>
                     {
                         var tailSegment = searchData.Lookup(FileSegmentKey.Tail)
                             .ValueOrThrow(()=>new MissingKeyException("Tail is missing"));
 
-                    //filter the tail and grab any matching indicies
-                    var indicies = tail.Lines.Where(line => _predicate(line.Text)).Select(l => l.LineInfo.Start).ToArray();
-                        var result = new FileSegmentSearchResult(tail.Start, tail.End, indicies);
-                        return previous == null ? new FileSegmentSearch(tailSegment, result) : new FileSegmentSearch(previous, result);
+                        
+                        if (previous == null)
+                        {
+                            var result = Search(fileInfo.FullName, encoding, tailSegment.Segment.Start, tailSegment.Segment.End);
+                            return new FileSegmentSearch(tailSegment, result);
+                        }
+                        else
+                        {
+                            var lines = tail.Lines.Where(line => _predicate(line.Text)).ToArray();
+                            var indicies = lines.Select(l => l.LineInfo.Start).ToArray();
+                            var result = new FileSegmentSearchResult(tail.Start, tail.End, indicies);
+                            return new FileSegmentSearch(tailSegment, result);
+                        }
                     })
                     .DistinctUntilChanged()
                     .Subscribe(tail => searchData.AddOrUpdate(tail));
@@ -117,14 +129,14 @@ namespace TailBlazer.Domain.FileHandling
                         .Do(head => searchData.AddOrUpdate(new FileSegmentSearch(head.Segment, FileSegmentSearchStatus.Searching)))
                         .Select(fileSegmentSearch =>
                         {
-                        /*
-                            This hack imposes a limitation on the number of items returned as memory can be 
-                            absolutely hammered [I have seen 20MB memory when searching a 1 GB file - obviously not an option]
-                           TODO: A proper solution. 
-                                   1. How about index to file?
-                                   2. Allow auto pipe of large files
-                                   3. Allow user to have some control here
-                       */
+                                /*
+                                    This hack imposes a limitation on the number of items returned as memory can be 
+                                    absolutely hammered [I have seen 20MB memory when searching a 1 GB file - obviously not an option]
+                                   TODO: A proper solution. 
+                                           1. How about index to file?
+                                           2. Allow auto pipe of large files
+                                           3. Allow user to have some control here
+                               */
 
                             var sum = searchData.Items.Sum(fss => fss.Lines.Length);
 
@@ -150,6 +162,20 @@ namespace TailBlazer.Domain.FileHandling
             });
         }
 
+
+        //private class FileSegmentSearchWithTail
+        //{
+        //    public FileSegmentSearch FileSegmentSearch { get; }
+        //    public FileTailInfo FileTail { get; }
+
+        //    public FileSegmentSearchWithTail(FileSegmentSearch fileSegmentSearch, FileTailInfo fileTail)
+        //    {
+        //        FileSegmentSearch = fileSegmentSearch;
+        //        FileTail = fileTail;
+        //    }
+
+        //}
+
         private FileSegmentSearchResult Search(string fileName, Encoding encoding, long start, long end)
         {
             long lastPosition = 0;
@@ -170,7 +196,7 @@ namespace TailBlazer.Domain.FileHandling
 
                     lines = reader.SearchLines(_predicate, i => i, (line, position) =>
                     {
-                        lastPosition = position;//this is end of line po
+                        lastPosition = position;//this is end of line
                         return end != -1 && lastPosition > end;
 
                     }).ToArray();

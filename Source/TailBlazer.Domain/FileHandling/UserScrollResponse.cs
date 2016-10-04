@@ -5,7 +5,7 @@ namespace TailBlazer.Domain.FileHandling
 {
     public class UserScrollResponse : IEquatable<UserScrollResponse>
     {
-        public TailInfo TailInfo { get; }
+        public FileTailInfo TailInfo { get; }
         public int PageSize { get; }
         public int FirstIndex { get; set; }
         public Line[] Lines { get; }
@@ -14,7 +14,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public static readonly UserScrollResponse Empty = new UserScrollResponse();
 
-        public UserScrollResponse(TailInfo tailInfo, int pageSize, int firstIndex, Line[] lines)
+        public UserScrollResponse(FileTailInfo tailInfo, int pageSize, int firstIndex, Line[] lines)
         {
             PageSize = pageSize;
             FirstIndex = firstIndex;
@@ -24,7 +24,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public UserScrollResponse()
         {
-            TailInfo = TailInfo.None;
+            TailInfo = FileTailInfo.Empty;
             PageSize = 0;
             FirstIndex = 0;
             Lines = new Line[0];
@@ -76,7 +76,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public override string ToString()
         {
-            return $"Tail starts at: {TailInfo.TailStartsAt}, PageSize: {PageSize}, FirstIndex: {FirstIndex}, Count: {Count}";
+            return $"Tail starts at: {TailInfo.Start}, PageSize: {PageSize}, FirstIndex: {FirstIndex}, Count: {Count}";
         }
     }
 }

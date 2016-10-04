@@ -79,10 +79,9 @@
     <Compile Include="FileHandling\FileIndexer.cs" />
     <Compile Include="FileHandling\FileInfoEx.cs" />
     <Compile Include="FileHandling\FileRewriter.cs" />
-    <Compile Include="FileHandling\FileSearcher.cs" />
     <Compile Include="FileHandling\FileSearchEx.cs" />
     <Compile Include="FileHandling\FileSearchIndexer.cs" />
-    <Compile Include="FileHandling\FileSearchResult.cs" />
+    <Compile Include="FileHandling\FileSearchCollection.cs" />
     <Compile Include="FileHandling\FileSegmentEx.cs" />
     <Compile Include="FileHandling\FileSegmentSearchResult.cs" />
     <Compile Include="FileHandling\FileSegment.cs" />
@@ -132,7 +131,6 @@
     <Compile Include="FileHandling\ScrollRequest.cs" />
     <Compile Include="FileHandling\Index.cs" />
     <Compile Include="FileHandling\IndexCollection.cs" />
-    <Compile Include="FileHandling\Indexer.cs" />
     <Compile Include="FileHandling\Search\ISearchMetadataCollection.cs" />
     <Compile Include="FileHandling\Search\ISearchMetadataFactory.cs" />
     <Compile Include="FileHandling\Search\RegexInspector.cs" />

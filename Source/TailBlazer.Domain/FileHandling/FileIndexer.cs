@@ -54,22 +54,27 @@ namespace TailBlazer.Domain.FileHandling
                         encoding = fswt.Segments.Encoding;
                         fileInfo = fswt.Segments.Info;
                     });
+                
+
+                var tailWatcher = shared
+                    .Select(segments => segments.TailInfo)
+                    .DistinctUntilChanged();
 
                 //1. create  a resulting index object from the collection of index fragments
                 var indexList = new SourceList<Index>();
 
-                var subscriber = indexList
-                    .Connect()
+                var collectionBuilder = indexList.Connect()
                     .Sort(SortExpressionComparer<Index>.Ascending(si => si.Start))
                     .ToCollection()
-                    .Scan((IndexCollection) null,(previous, notification) => new IndexCollection(notification, previous, fileInfo, encoding))
-                    .SubscribeSafe(observer);
+                    .CombineLatest(tailWatcher, (collection, tail) => new { Collection = collection, Tail = tail})
+                    .Scan((IndexCollection) null, (previous, x) =>
+                    {
+                        return new IndexCollection(x.Collection,x.Tail, previous, fileInfo, encoding);
+                    }).SubscribeSafe(observer);
 
 
                 //2. continual indexing of the tail + replace tail index whenether there are new scan results
-                var tailScanner = shared
-                    .Select(segments => segments.TailInfo)
-                    .DistinctUntilChanged()
+                var tailScanner = tailWatcher
                     .Scan((Index) null, (previous, tail) =>
                     {
                         //index the tail
@@ -118,7 +123,7 @@ namespace TailBlazer.Domain.FileHandling
                             });
                         }
                     });
-                return new CompositeDisposable(shared.Connect(), subscriber, tailScanner, indexList, headSubscriber, infoSubscriber);
+                return new CompositeDisposable(shared.Connect(), collectionBuilder, tailScanner, indexList, headSubscriber, infoSubscriber);
             });
         }
 

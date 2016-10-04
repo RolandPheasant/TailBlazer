@@ -17,7 +17,7 @@ namespace TailBlazer.Domain.FileHandling
         public bool IsSearching { get; }
         public bool HasReachedLimit { get; }
         public int Maximum { get; }
-        public TailInfo TailInfo { get; }
+        public FileTailInfo TailInfo { get; }
 
         private readonly IDictionary<FileSegmentKey, FileSegmentSearch> _allSearches;
 
@@ -28,6 +28,7 @@ namespace TailBlazer.Domain.FileHandling
         private long Size { get; }
 
         public FileSearchCollection(FileSegmentSearch initial,
+            FileTailInfo fileTailInfo,
             FileInfo info,
             Encoding encoding,
             int limit)
@@ -44,7 +45,7 @@ namespace TailBlazer.Domain.FileHandling
             Segments = 1;
             SegmentsCompleted = IsSearching ? 0 : 1;
             Matches = initial.Lines.ToArray();
-            TailInfo = TailInfo.None;
+            TailInfo = fileTailInfo;
             Size = 0;
             Maximum = limit;
             HasReachedLimit = false;
@@ -52,6 +53,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public FileSearchCollection(FileSearchCollection previous, 
             FileSegmentSearch current,
+            FileTailInfo fileTailInfo,
             FileInfo info,
             Encoding encoding,
             int limit)
@@ -62,21 +64,21 @@ namespace TailBlazer.Domain.FileHandling
             Encoding = encoding;
 
             _allSearches = previous._allSearches.Values.ToDictionary(fss => fss.Key);
+            TailInfo = fileTailInfo;
+            //var lastTail = _allSearches.Lookup(FileSegmentKey.Tail);
+            //if (current.Segment.Type == FileSegmentType.Tail)
+            //{
+            //    TailInfo = lastTail.HasValue 
+            //                ? new TailInfo(lastTail.Value.Segment.End) 
+            //                : new TailInfo(current.Segment.End);
+            //}
+            //else
+            //{
+            //    TailInfo = lastTail.HasValue 
+            //                ? previous.TailInfo 
+            //                : TailInfo.None;
+            //}
 
-            var lastTail = _allSearches.Lookup(FileSegmentKey.Tail);
-            if (current.Segment.Type == FileSegmentType.Tail)
-            {
-                TailInfo = lastTail.HasValue 
-                            ? new TailInfo(lastTail.Value.Segment.End) 
-                            : new TailInfo(current.Segment.End);
-            }
-            else
-            {
-                TailInfo = lastTail.HasValue 
-                            ? previous.TailInfo 
-                            : TailInfo.None;
-            }
-            
             _allSearches[current.Key] = current;
             var all = _allSearches.Values.ToArray();
 
@@ -94,6 +96,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             Matches = new long[0];
             HasReachedLimit = false;
+            TailInfo = FileTailInfo.Empty;
         }
 
         public bool IsEmpty => this == None;
@@ -131,7 +134,7 @@ namespace TailBlazer.Domain.FileHandling
                         var endPosition = reader.AbsolutePosition();
                         var info = new LineInfo(i + 1, i, startPosition, endPosition);
                         
-                        var ontail = endPosition >= TailInfo.TailStartsAt && DateTime.UtcNow.Subtract(TailInfo.LastTail).TotalSeconds<1
+                        var ontail = endPosition >= TailInfo.Start && DateTime.UtcNow.Subtract(TailInfo.DateTime).TotalSeconds<1
                                     ? DateTime.UtcNow 
                                     : (DateTime?)null; 
 
@@ -196,8 +199,7 @@ namespace TailBlazer.Domain.FileHandling
 
             return -1;
         }
-
-
+        
 
         #region Equality
 

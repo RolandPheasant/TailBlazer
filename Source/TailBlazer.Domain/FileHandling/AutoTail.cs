@@ -25,23 +25,18 @@ namespace TailBlazer.Domain.FileHandling
            return _lineProvider.CombineLatest(_pageSize, (lp, pge) => new { LineProvider = lp, PageSize = pge })
                     .Scan(AutoTailResponse.Empty, (last, latest) =>
                     {
-                        Line[] result;
-
-                        if (last == AutoTailResponse.Empty && last.PageSize == latest.PageSize && last.TailInfo.TailStartsAt == latest.LineProvider.TailInfo.TailStartsAt)
+                        if (last == AutoTailResponse.Empty && last.PageSize == latest.PageSize && last.TailInfo.Start == latest.LineProvider.TailInfo.Start)
                             return last;
 
                         AutoTailReason reason;
                         if (latest.PageSize != last.PageSize)
                         {
                             reason = AutoTailReason.LoadTail;
-                            result = latest.LineProvider.ReadLines(new ScrollRequest(latest.PageSize)).ToArray();
+                            var result = latest.LineProvider.ReadLines(new ScrollRequest(latest.PageSize)).ToArray();
+                            return new AutoTailResponse(new FileTailInfo(result), latest.PageSize, reason);
                         }
-                        else
-                        {
-                            reason = AutoTailReason.NewLines;
-                            result = latest.LineProvider.ReadLines(new ScrollRequest(ScrollReason.TailOnly, latest.PageSize, latest.LineProvider.TailInfo.TailStartsAt)).ToArray();
-                        }
-                        return new AutoTailResponse(latest.LineProvider.TailInfo, latest.PageSize, result, reason);
+                        reason = AutoTailReason.NewLines;
+                        return new AutoTailResponse(latest.LineProvider.TailInfo.Trim(latest.PageSize), latest.PageSize, reason);
                     })
                     .DistinctUntilChanged()
                     .Where(result => result.Lines.Length != 0)

@@ -20,7 +20,10 @@ namespace TailBlazer.Fixtures
             {
                 file.Append(CreateLines(1, 100));
 
-                var autoTailer = new UserScroll(file.Info.WatchFile(scheduler: scheduler).Index(), scrollRequest);
+                var autoTailer = new UserScroll(file.Info.WatchFile(scheduler: scheduler)
+                    .WithSegments()
+                    .WithTail()
+                    .Index(), scrollRequest);
 
                 UserScrollResponse result = null;
                 int counter = 0;
@@ -40,14 +43,14 @@ namespace TailBlazer.Fixtures
                     scrollRequest.OnNext(new ScrollRequest(ScrollReason.User,15,20));
                     counter.Should().Be(2);
                     result.Count.Should().Be(15);
-                     expected = CreateLines(21, 15);
+                     expected = CreateLines(20, 15);
                     result.Lines.Select(l => l.Text).ShouldBeEquivalentTo(expected);
                 }
             }
         }
 
         [Fact]
-        public void TailsLatestValuesOnly_ForFilteredValues()
+        public void ScrollToValuesOnly_ForFilteredValues()
         {
             var scheduler = new TestScheduler();
             var scrollRequest = new BehaviorSubject<ScrollRequest>(new ScrollRequest(ScrollReason.User, 5, 0));
@@ -56,7 +59,10 @@ namespace TailBlazer.Fixtures
             {
                 file.Append(CreateLines(1, 100));
 
-                var autoTailer = new UserScroll(file.Info.WatchFile(scheduler: scheduler).Search(str => str.Contains("9")), scrollRequest);
+                var autoTailer = new UserScroll(file.Info.WatchFile(scheduler: scheduler)
+                    .WithSegments()
+                    .WithTail()
+                    .Search(str => str.Contains("9")), scrollRequest);
 
                 UserScrollResponse result = null;
                 int counter = 0;
