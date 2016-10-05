@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using DynamicData;
 using DynamicData.Kernel;
@@ -62,58 +64,71 @@ namespace TailBlazer.Domain.FileHandling
                         fileInfo = fswt.Segments.Info;
                     });
 
+                //manually maintained search results and status
+                var searchData = new SourceCache<FileSegmentSearch, FileSegmentKey>(s => s.Key);
+
                 //Create a cache of segments which are to be searched
-                var segmentCache = shared.Select(s => s.Segments.Segments)
+                var segmentLoader = shared.Select(s => s.Segments.Segments)
                     .ToObservableChangeSet(s => s.Key)
                     .IgnoreUpdateWhen((current, previous) => current == previous)
-                    .AsObservableCache();
+                    .Transform(fs => new FileSegmentSearch(fs))
+                    .WhereReasonsAre(ChangeReason.Add)
+                    .PopulateInto(searchData);
+
+
+
+                //TODO: ADD TAIL TO RESULT
+                 
 
                 var tailWatcher = shared
                     .Select(segments => segments.TailInfo)
-                    .DistinctUntilChanged();
+                    .DistinctUntilChanged()
+                    .Scan((FileSegmentSearchWithTail) null, (previous, tail) =>
+                    {
+                        var tailSegment = searchData.Lookup(FileSegmentKey.Tail)
+                            .ValueOrThrow(() => new MissingKeyException("Tail is missing"));
 
-                //manually maintained search results and status
-                var searchData = new SourceCache<FileSegmentSearch, FileSegmentKey>(s => s.Key);
+                        Line[] lines;
+                        if (previous == null)
+                        {
+                             lines = SearchLines(fileInfo.FullName, encoding, 
+                                 tailSegment.Segment.Start,
+                                tailSegment.Segment.End, _predicate).ToArray();
+                        }
+                        else
+                        {
+                             lines = tail.Lines.Where(line => _predicate(line.Text)).ToArray();
+
+                        }
+                        var indicies = lines.Select(l => l.LineInfo.Start).ToArray();
+                        var result = new FileSegmentSearchResult(tail.Start, tail.End, indicies);
+                        var search = new FileSegmentSearch(tailSegment, result);
+                        return new FileSegmentSearchWithTail(search, new FileTailInfo(lines));
+                    })
+                    .DistinctUntilChanged()
+                    .Publish();
+
 
                 var publisher = searchData.Connect()
                     .Flatten()
                     .Select(change => change.Current)
                     .CombineLatest(tailWatcher, (segment, tail) => new { Segment = segment, Tail = tail })
                     .Scan((FileSearchCollection)null, (previous, current) => previous == null
-                        ? new FileSearchCollection(current.Segment, current.Tail, fileInfo, encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered)
-                        : new FileSearchCollection(previous, current.Segment, current.Tail, fileInfo, encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
+                        ? new FileSearchCollection(current.Segment, current.Tail.FileTail, fileInfo, encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered)
+                        : new FileSearchCollection(previous, current.Segment, current.Tail.FileTail, fileInfo, encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
                     .StartWith(FileSearchCollection.None)
                     .SubscribeSafe(observer);   
 
                 //initialise a pending state for all segments
-                var cacheLoader = segmentCache.Connect()
-                    .Transform(fs => new FileSegmentSearch(fs))
-                    .WhereReasonsAre(ChangeReason.Add)
-                    .PopulateInto(searchData);
+                //var cacheLoader = segmentCache.Connect()
+                //    .Transform(fs => new FileSegmentSearch(fs))
+                //    .WhereReasonsAre(ChangeReason.Add)
+                //    .PopulateInto(searchData);
 
                 //continual indexing of the tail + replace tail index whenether there are new scan results
                 var tailScanner = tailWatcher
-                    .Scan((FileSegmentSearch)null, (previous, tail) =>
-                    {
-                        var tailSegment = searchData.Lookup(FileSegmentKey.Tail)
-                            .ValueOrThrow(()=>new MissingKeyException("Tail is missing"));
 
-                        
-                        if (previous == null)
-                        {
-                            var result = Search(fileInfo.FullName, encoding, tailSegment.Segment.Start, tailSegment.Segment.End);
-                            return new FileSegmentSearch(tailSegment, result);
-                        }
-                        else
-                        {
-                            var lines = tail.Lines.Where(line => _predicate(line.Text)).ToArray();
-                            var indicies = lines.Select(l => l.LineInfo.Start).ToArray();
-                            var result = new FileSegmentSearchResult(tail.Start, tail.End, indicies);
-                            return new FileSegmentSearch(tailSegment, result);
-                        }
-                    })
-                    .DistinctUntilChanged()
-                    .Subscribe(tail => searchData.AddOrUpdate(tail));
+                    .Subscribe(tail => searchData.AddOrUpdate(tail.FileSegmentSearch));
 
 
                 //load the rest of the file segment by segment, reporting status after each search
@@ -151,30 +166,65 @@ namespace TailBlazer.Domain.FileHandling
                     .Subscribe(head => searchData.AddOrUpdate(head));
 
                 return new CompositeDisposable(
-                    segmentCache,
+                    segmentLoader,
                     publisher,
-                    cacheLoader,
+                    searchData,
                     tailScanner,
                     headSubscriber,
+                    tailWatcher.Connect(),
                     shared.Connect(),
+                    
                     infoSubscriber,
                     searchData);
             });
         }
 
 
-        //private class FileSegmentSearchWithTail
-        //{
-        //    public FileSegmentSearch FileSegmentSearch { get; }
-        //    public FileTailInfo FileTail { get; }
+        private class FileSegmentSearchWithTail
+        {
+            public FileSegmentSearch FileSegmentSearch { get; }
+            public FileTailInfo FileTail { get; }
 
-        //    public FileSegmentSearchWithTail(FileSegmentSearch fileSegmentSearch, FileTailInfo fileTail)
-        //    {
-        //        FileSegmentSearch = fileSegmentSearch;
-        //        FileTail = fileTail;
-        //    }
+            public FileSegmentSearchWithTail(FileSegmentSearch fileSegmentSearch, FileTailInfo fileTail)
+            {
+                FileSegmentSearch = fileSegmentSearch;
+                FileTail = fileTail;
+            }
 
-        //}
+        }
+
+        private IEnumerable<Line> SearchLines(string fileName, Encoding encoding, long start, long end, Func<string,bool> predicate)
+        {
+            int i = 0;
+            using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            {
+                if (stream.Length < start)
+                {
+                    start = 0;
+                    end = stream.Length;
+                }
+                using (var reader = new StreamReaderExtended(stream, encoding, false))
+                {
+                    stream.Seek(start, SeekOrigin.Begin);
+                    if (reader.EndOfStream)
+                        yield break;
+
+                    long previousPostion = reader.AbsolutePosition();
+
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        long position = reader.AbsolutePosition();
+
+                        if (predicate(line))
+                            yield return  new Line(new LineInfo(i+1,1, previousPostion, position), line,null);
+
+                        previousPostion = position;
+                        i++;
+                    }
+                }
+            }
+        }
 
         private FileSegmentSearchResult Search(string fileName, Encoding encoding, long start, long end)
         {

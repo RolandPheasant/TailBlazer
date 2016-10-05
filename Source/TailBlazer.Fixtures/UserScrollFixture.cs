@@ -57,17 +57,18 @@ namespace TailBlazer.Fixtures
 
             using (var file = new TestFile("TailsLatestValuesOnly_ForFilteredValues"))
             {
-                file.Append(CreateLines(1, 100));
+  
 
                 var autoTailer = new UserScroll(file.Info.WatchFile(scheduler: scheduler)
                     .WithSegments()
                     .WithTail()
-                    .Search(str => str.Contains("9")), scrollRequest);
+                    .Search(str => str.Contains("9"), scheduler), scrollRequest);
 
                 UserScrollResponse result = null;
                 int counter = 0;
                 using (autoTailer.Scroll().Subscribe(x => { result = x; counter++; }))
                 {
+                    file.Append(CreateLines(1, 100));
                     //check that intial values are loaded
                     scheduler.AdvanceBySeconds(1);
                     counter.Should().Be(1);

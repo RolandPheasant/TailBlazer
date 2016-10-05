@@ -7,7 +7,7 @@ namespace TailBlazer.Domain.FileHandling
     {
         public FileTailInfo TailInfo { get; }
         public int PageSize { get; }
-        public int FirstIndex { get; set; }
+        public int FirstIndex { get;  }
         public Line[] Lines { get; }
 
         public int Count => Lines.Length;

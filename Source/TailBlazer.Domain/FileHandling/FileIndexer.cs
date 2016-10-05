@@ -34,7 +34,7 @@ namespace TailBlazer.Domain.FileHandling
             Result = BuildObservable();
 
         }
-
+        
         private IObservable<IndexCollection> BuildObservable()
         {
             return Observable.Create<IndexCollection>(observer =>
@@ -67,10 +67,7 @@ namespace TailBlazer.Domain.FileHandling
                     .Sort(SortExpressionComparer<Index>.Ascending(si => si.Start))
                     .ToCollection()
                     .CombineLatest(tailWatcher, (collection, tail) => new { Collection = collection, Tail = tail})
-                    .Scan((IndexCollection) null, (previous, x) =>
-                    {
-                        return new IndexCollection(x.Collection,x.Tail, previous, fileInfo, encoding);
-                    }).SubscribeSafe(observer);
+                    .Scan((IndexCollection) null, (previous, x) => new IndexCollection(x.Collection,x.Tail, previous, fileInfo, encoding)).SubscribeSafe(observer);
 
 
                 //2. continual indexing of the tail + replace tail index whenether there are new scan results
