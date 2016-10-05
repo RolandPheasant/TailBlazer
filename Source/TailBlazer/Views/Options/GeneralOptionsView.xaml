@@ -69,6 +69,7 @@
                     Grid.Column="1" Minimum="80" Maximum="200"
                     SmallChange="5"
                     LargeChange="5"
+                    IsSnapToTickEnabled="True"
                     Value="{Binding Scale}" />
             <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding ScaleText.Value}" />
 

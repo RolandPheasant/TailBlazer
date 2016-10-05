@@ -78,6 +78,7 @@
     <Compile Include="FileHandling\EmptyLineProvider.cs" />
     <Compile Include="FileHandling\FileIndexer.cs" />
     <Compile Include="FileHandling\FileInfoEx.cs" />
+    <Compile Include="FileHandling\FileNameAndSize.cs" />
     <Compile Include="FileHandling\FileRewriter.cs" />
     <Compile Include="FileHandling\FileSearchEx.cs" />
     <Compile Include="FileHandling\FileSearchIndexer.cs" />
@@ -94,7 +95,7 @@
     <Compile Include="FileHandling\FileSegmentsWithTail.cs" />
     <Compile Include="FileHandling\FileSegmentType.cs" />
     <Compile Include="FileHandling\FileStatus.cs" />
-    <Compile Include="FileHandling\FileTailInfo.cs" />
+    <Compile Include="FileHandling\TailInfoEx.cs" />
     <Compile Include="FileHandling\FileTailMonitor.cs" />
     <Compile Include="FileHandling\FileWatcher.cs" />
     <Compile Include="FileHandling\IAutoTail.cs" />
@@ -143,6 +144,7 @@
     <Compile Include="FileHandling\StreamReaderExtended.cs" />
     <Compile Include="FileHandling\Search\SearchInfoCollection.cs" />
     <Compile Include="FileHandling\Search\SearchInfo.cs" />
+    <Compile Include="FileHandling\TailInfo.cs" />
     <Compile Include="FileHandling\TextAssociations\ITextAssociationCollection.cs" />
     <Compile Include="FileHandling\TextAssociations\TextAssociation.cs" />
     <Compile Include="FileHandling\TextAssociations\TextAssociationCollection.cs" />

@@ -65,20 +65,6 @@ namespace TailBlazer.Domain.FileHandling
 
             _allSearches = previous._allSearches.Values.ToDictionary(fss => fss.Key);
             TailInfo = tailInfo;
-            //var lastTail = _allSearches.Lookup(FileSegmentKey.Tail);
-            //if (current.Segment.Type == FileSegmentType.Tail)
-            //{
-            //    TailInfo = lastTail.HasValue 
-            //                ? new TailInfo(lastTail.Value.Segment.End) 
-            //                : new TailInfo(current.Segment.End);
-            //}
-            //else
-            //{
-            //    TailInfo = lastTail.HasValue 
-            //                ? previous.TailInfo 
-            //                : TailInfo.None;
-            //}
-
             _allSearches[current.Key] = current;
             var all = _allSearches.Values.ToArray();
 

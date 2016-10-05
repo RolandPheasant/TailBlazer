@@ -163,12 +163,11 @@ namespace TailBlazer.Views.Tail
             .DistinctUntilChanged();
 
             //User feedback to show file size
-            FileSizeText = fileWatcher.Latest.Select(fn=>fn.Size)
+            FileSizeText = fileWatcher.Size
                 .Select(size => size.FormatWithAbbreviation())
                 .DistinctUntilChanged()
                 .ForBinding();
-
-
+            
             //tailer is the main object used to tail, scroll and filter in a file
             var selectedProvider = SearchCollection.Latest.ObserveOn(schedulerProvider.Background);
             
@@ -182,7 +181,7 @@ namespace TailBlazer.Views.Tail
 
             var loader = lineScroller.Lines.Connect()
                 .LogChanges(logger, "Received")
-                .Transform(lineProxyFactory.Create, new ParallelisationOptions(ParallelType.Ordered,5))
+                .Transform(lineProxyFactory.Create)
                 .LogChanges(logger, "Sorting")
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
                 .ObserveOn(schedulerProvider.MainThread)

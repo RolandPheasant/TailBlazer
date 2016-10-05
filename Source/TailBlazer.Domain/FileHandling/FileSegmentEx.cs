@@ -9,15 +9,16 @@ namespace TailBlazer.Domain.FileHandling
     {
         public static IObservable<FileSegmentCollection> WithSegments(this IObservable<FileNotification> source, int initialTail= 100000)
         {
-            var shared = source.Replay(1).RefCount();
+            return new FileSegmenter(source, initialTail).Segments;
+            //var shared = source.Replay(1).RefCount();
 
-            return Observable.Create<FileSegmentCollection>(observer =>
-            {
-                var filtered = source.Where(f=>f.Exists);
-                var segments = new FileSegmenter(filtered, initialTail).Segments;
-                return segments.SubscribeSafe(observer);
-            })
-            .TakeUntil(shared.Where(f => !f.Exists));
+            //return Observable.Create<FileSegmentCollection>(observer =>
+            //{
+            //    var filtered = source.Where(f=>f.Exists);
+            //    var segments = new FileSegmenter(filtered, initialTail).Segments;
+            //    return segments.SubscribeSafe(observer);
+            //})
+            //.TakeUntil(shared.Where(f => !f.Exists));
         }
 
         public static IObservable<TailInfo> Tail([NotNull] this IObservable<FileSegmentCollection> source)

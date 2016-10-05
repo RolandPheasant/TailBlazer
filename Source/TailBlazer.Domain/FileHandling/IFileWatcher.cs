@@ -4,8 +4,13 @@ namespace TailBlazer.Domain.FileHandling
 {
     public interface IFileWatcher
     {
-        IObservable<FileNotification> Latest { get; }
         IObservable<FileStatus> Status { get; }
+        IObservable<FileSegmentsWithTail> Segments { get; }
+        IObservable<long> Size { get; }
+
+        IObservable<ILineProvider> Search(Func<string, bool> predicate);
+        IObservable<ILineProvider> Index();
+
         string FullName { get; }
         string Name { get; }
         string Folder { get; }

@@ -58,7 +58,8 @@ namespace TailBlazer.Domain.FileHandling
 
                 var tailWatcher = shared
                     .Select(segments => segments.TailInfo)
-                    .DistinctUntilChanged();
+                    .DistinctUntilChanged()
+                    .Publish();
 
                 //1. create  a resulting index object from the collection of index fragments
                 var indexList = new SourceList<Index>();
@@ -67,8 +68,10 @@ namespace TailBlazer.Domain.FileHandling
                     .Sort(SortExpressionComparer<Index>.Ascending(si => si.Start))
                     .ToCollection()
                     .CombineLatest(tailWatcher, (collection, tail) => new { Collection = collection, Tail = tail})
-                    .Scan((IndexCollection) null, (previous, x) => new IndexCollection(x.Collection,x.Tail, previous, fileInfo, encoding)).SubscribeSafe(observer);
-
+                    .Scan((IndexCollection) null, (previous, x) => new IndexCollection(x.Collection,x.Tail, previous, fileInfo, encoding))
+                    .StartWith(IndexCollection.Empty)
+                    .SubscribeSafe(observer);
+                    
 
                 //2. continual indexing of the tail + replace tail index whenether there are new scan results
                 var tailScanner = tailWatcher
@@ -120,7 +123,7 @@ namespace TailBlazer.Domain.FileHandling
                             });
                         }
                     });
-                return new CompositeDisposable(shared.Connect(), collectionBuilder, tailScanner, indexList, headSubscriber, infoSubscriber);
+                return new CompositeDisposable(tailWatcher.Connect(), shared.Connect(), collectionBuilder, tailScanner, indexList, headSubscriber, infoSubscriber);
             });
         }
 
