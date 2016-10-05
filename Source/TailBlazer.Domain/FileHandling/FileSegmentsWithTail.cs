@@ -12,10 +12,10 @@ namespace TailBlazer.Domain.FileHandling
 
     public class FileSegmentsWithTail
     {
-        public FileTailInfo TailInfo { get; }
+        public TailInfo TailInfo { get; }
         public FileSegmentCollection Segments { get; }
 
-        public FileSegmentsWithTail([NotNull] FileSegmentCollection segments, [NotNull] FileTailInfo tailInfo)
+        public FileSegmentsWithTail([NotNull] FileSegmentCollection segments, [NotNull] TailInfo tailInfo)
         {
             if (segments == null) throw new ArgumentNullException(nameof(segments));
             if (tailInfo == null) throw new ArgumentNullException(nameof(tailInfo));

@@ -103,7 +103,7 @@ namespace TailBlazer.Domain.FileHandling
                         var indicies = lines.Select(l => l.LineInfo.Start).ToArray();
                         var result = new FileSegmentSearchResult(tail.Start, tail.End, indicies);
                         var search = new FileSegmentSearch(tailSegment, result);
-                        return new FileSegmentSearchWithTail(search, new FileTailInfo(lines));
+                        return new FileSegmentSearchWithTail(search, new TailInfo(lines));
                     })
                     .DistinctUntilChanged()
                     .Publish();
@@ -114,8 +114,8 @@ namespace TailBlazer.Domain.FileHandling
                     .Select(change => change.Current)
                     .CombineLatest(tailWatcher, (segment, tail) => new { Segment = segment, Tail = tail })
                     .Scan((FileSearchCollection)null, (previous, current) => previous == null
-                        ? new FileSearchCollection(current.Segment, current.Tail.FileTail, fileInfo, encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered)
-                        : new FileSearchCollection(previous, current.Segment, current.Tail.FileTail, fileInfo, encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
+                        ? new FileSearchCollection(current.Segment, current.Tail.Tail, fileInfo, encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered)
+                        : new FileSearchCollection(previous, current.Segment, current.Tail.Tail, fileInfo, encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
                     .StartWith(FileSearchCollection.None)
                     .SubscribeSafe(observer);   
 
@@ -183,12 +183,12 @@ namespace TailBlazer.Domain.FileHandling
         private class FileSegmentSearchWithTail
         {
             public FileSegmentSearch FileSegmentSearch { get; }
-            public FileTailInfo FileTail { get; }
+            public TailInfo Tail { get; }
 
-            public FileSegmentSearchWithTail(FileSegmentSearch fileSegmentSearch, FileTailInfo fileTail)
+            public FileSegmentSearchWithTail(FileSegmentSearch fileSegmentSearch, TailInfo tail)
             {
                 FileSegmentSearch = fileSegmentSearch;
-                FileTail = fileTail;
+                Tail = tail;
             }
 
         }

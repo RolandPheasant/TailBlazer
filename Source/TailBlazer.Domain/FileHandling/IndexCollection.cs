@@ -14,10 +14,10 @@ namespace TailBlazer.Domain.FileHandling
         private Index[] Indicies { get; }
         private FileInfo Info { get; }
         private Encoding Encoding { get; }
-        public FileTailInfo TailInfo { get; }
+        public TailInfo TailInfo { get; }
 
         public IndexCollection(IReadOnlyCollection<Index> latest,
-                                    FileTailInfo fileTailInfo,
+                                    TailInfo tailInfo,
                                     IndexCollection previous,
                                     FileInfo info,
                                     Encoding encoding)
@@ -27,7 +27,7 @@ namespace TailBlazer.Domain.FileHandling
             Count = latest.Select(idx => idx.LineCount).Sum();
             Indicies = latest.ToArray();
             Diff = Count - (previous?.Count ?? 0);
-            TailInfo = fileTailInfo;
+            TailInfo = tailInfo;
             ////need to check whether
             //if (previous == null)
             //{

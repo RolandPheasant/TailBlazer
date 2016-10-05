@@ -17,7 +17,7 @@ namespace TailBlazer.Domain.FileHandling
         public bool IsSearching { get; }
         public bool HasReachedLimit { get; }
         public int Maximum { get; }
-        public FileTailInfo TailInfo { get; }
+        public TailInfo TailInfo { get; }
 
         private readonly IDictionary<FileSegmentKey, FileSegmentSearch> _allSearches;
 
@@ -28,7 +28,7 @@ namespace TailBlazer.Domain.FileHandling
         private long Size { get; }
 
         public FileSearchCollection(FileSegmentSearch initial,
-            FileTailInfo fileTailInfo,
+            TailInfo tailInfo,
             FileInfo info,
             Encoding encoding,
             int limit)
@@ -45,7 +45,7 @@ namespace TailBlazer.Domain.FileHandling
             Segments = 1;
             SegmentsCompleted = IsSearching ? 0 : 1;
             Matches = initial.Lines.ToArray();
-            TailInfo = fileTailInfo;
+            TailInfo = tailInfo;
             Size = 0;
             Maximum = limit;
             HasReachedLimit = false;
@@ -53,7 +53,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public FileSearchCollection(FileSearchCollection previous, 
             FileSegmentSearch current,
-            FileTailInfo fileTailInfo,
+            TailInfo tailInfo,
             FileInfo info,
             Encoding encoding,
             int limit)
@@ -64,7 +64,7 @@ namespace TailBlazer.Domain.FileHandling
             Encoding = encoding;
 
             _allSearches = previous._allSearches.Values.ToDictionary(fss => fss.Key);
-            TailInfo = fileTailInfo;
+            TailInfo = tailInfo;
             //var lastTail = _allSearches.Lookup(FileSegmentKey.Tail);
             //if (current.Segment.Type == FileSegmentType.Tail)
             //{
@@ -96,7 +96,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             Matches = new long[0];
             HasReachedLimit = false;
-            TailInfo = FileTailInfo.Empty;
+            TailInfo = TailInfo.Empty;
         }
 
         public bool IsEmpty => this == None;

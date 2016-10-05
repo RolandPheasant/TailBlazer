@@ -20,7 +20,7 @@ namespace TailBlazer.Domain.FileHandling
             .TakeUntil(shared.Where(f => !f.Exists));
         }
 
-        public static IObservable<FileTailInfo> Tail([NotNull] this IObservable<FileSegmentCollection> source)
+        public static IObservable<TailInfo> Tail([NotNull] this IObservable<FileSegmentCollection> source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             return new FileTailReader(source).Tail();

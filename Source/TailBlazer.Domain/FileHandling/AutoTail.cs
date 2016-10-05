@@ -33,7 +33,7 @@ namespace TailBlazer.Domain.FileHandling
                         {
                             reason = AutoTailReason.LoadTail;
                             var result = latest.LineProvider.ReadLines(new ScrollRequest(latest.PageSize)).ToArray();
-                            return new AutoTailResponse(new FileTailInfo(result), latest.PageSize, reason);
+                            return new AutoTailResponse(new TailInfo(result), latest.PageSize, reason);
                         }
                         reason = AutoTailReason.NewLines;
                         return new AutoTailResponse(latest.LineProvider.TailInfo.Trim(latest.PageSize), latest.PageSize, reason);

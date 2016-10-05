@@ -17,15 +17,15 @@ namespace TailBlazer.Domain.FileHandling
             _fileSegmentCollection = fileSegmentCollection;
         }
         
-        public IObservable<FileTailInfo> Tail()
+        public IObservable<TailInfo> Tail()
         {
             //1. Load tail of an initial size when stream starts
             //2. Load subsequent tail as changes are made
 
             //continually return a changing tail 
-            return Observable.Create<FileTailInfo>(observer =>
+            return Observable.Create<TailInfo>(observer =>
             {
-                var lastTail = FileTailInfo.Empty;
+                var lastTail = TailInfo.Empty;
                 Encoding encoding = null;
                 var locker = new object();
 
@@ -34,7 +34,7 @@ namespace TailBlazer.Domain.FileHandling
                     .Select(fsc =>
                     {
                         if (fsc.Count == 0)
-                            return FileTailInfo.Empty;
+                            return TailInfo.Empty;
 
                         if (encoding == null)
                             encoding = fsc.Info.GetEncoding();
@@ -45,7 +45,7 @@ namespace TailBlazer.Domain.FileHandling
                         
                         //calculate last tail => either inital size or scan from end
                         var lines = ReadTail(fsc.Info.FullName, tailFromPosition, encoding).ToArray();
-                        var tail = new FileTailInfo(lines);
+                        var tail = new TailInfo(lines);
                         lastTail = tail;
                         return tail;
                     })

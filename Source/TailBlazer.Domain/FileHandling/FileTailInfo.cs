@@ -5,7 +5,7 @@ namespace TailBlazer.Domain.FileHandling
 {
     public static class FileTailInfoEx
     {
-        public static FileTailInfo Trim([NotNull] this FileTailInfo source, int size)
+        public static TailInfo Trim([NotNull] this TailInfo source, int size)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
 
@@ -13,14 +13,14 @@ namespace TailBlazer.Domain.FileHandling
                 return source;
             var trimmed = new Line[size];
             Array.Copy(source.Lines, source.Count-size, trimmed, 0, size);
-            return new FileTailInfo(trimmed);
+            return new TailInfo(trimmed);
         }
     }
 
     /// <summary>
     /// Container which provides the latest tail changes
     /// </summary>
-    public sealed class FileTailInfo : IEquatable<FileTailInfo>
+    public sealed class TailInfo : IEquatable<TailInfo>
     {
         public Line[] Lines { get; }
         public int Count => Lines.Length;
@@ -30,9 +30,9 @@ namespace TailBlazer.Domain.FileHandling
 
         public DateTime DateTime { get; }
 
-        public static readonly FileTailInfo Empty = new FileTailInfo(new Line[0]);
+        public static readonly TailInfo Empty = new TailInfo(new Line[0]);
 
-        public FileTailInfo(Line[] lines)
+        public TailInfo(Line[] lines)
         {
             DateTime = DateTime.UtcNow;
             Lines = lines;
@@ -43,7 +43,7 @@ namespace TailBlazer.Domain.FileHandling
 
         #region Equality
 
-        public bool Equals(FileTailInfo other)
+        public bool Equals(TailInfo other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -55,7 +55,7 @@ namespace TailBlazer.Domain.FileHandling
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((FileTailInfo) obj);
+            return Equals((TailInfo) obj);
         }
 
         public override int GetHashCode()
@@ -68,12 +68,12 @@ namespace TailBlazer.Domain.FileHandling
             }
         }
 
-        public static bool operator ==(FileTailInfo left, FileTailInfo right)
+        public static bool operator ==(TailInfo left, TailInfo right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(FileTailInfo left, FileTailInfo right)
+        public static bool operator !=(TailInfo left, TailInfo right)
         {
             return !Equals(left, right);
         }
