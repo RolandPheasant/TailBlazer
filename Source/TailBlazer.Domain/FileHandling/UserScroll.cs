@@ -26,10 +26,11 @@ namespace TailBlazer.Domain.FileHandling
                         var request = latest.Request;
 
                         //only scroll if it comes from a new user request
-                        //if (last.PageSize == request.PageSize 
-                        //            && last.FirstIndex == request.FirstIndex
-                        //            && latest.LineProvider.Count ==)
-                        //    return last;
+                        //[or when the returned result is less than the request page size]
+                        if (last.PageSize == request.PageSize
+                                    && last.FirstIndex == request.FirstIndex
+                                    && last.Count >= request.PageSize)
+                            return last;
 
                         var result = latest.LineProvider.ReadLines(request).ToArray();
                         return new UserScrollResponse(latest.LineProvider.TailInfo, request.PageSize, request.FirstIndex, result);

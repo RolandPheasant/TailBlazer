@@ -92,8 +92,8 @@ namespace TailBlazer.Domain.FileHandling
                         if (previous == null)
                         {
                              lines = SearchLines(fileInfo.FullName, encoding, 
-                                 tailSegment.Segment.Start,
-                                tailSegment.Segment.End, _predicate).ToArray();
+                                    tailSegment.Segment.Start,
+                                    tailSegment.Segment.End, _predicate).ToArray();
                         }
                         else
                         {

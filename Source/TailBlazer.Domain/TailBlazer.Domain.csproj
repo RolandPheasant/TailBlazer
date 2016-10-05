@@ -143,7 +143,6 @@
     <Compile Include="FileHandling\StreamReaderExtended.cs" />
     <Compile Include="FileHandling\Search\SearchInfoCollection.cs" />
     <Compile Include="FileHandling\Search\SearchInfo.cs" />
-    <Compile Include="FileHandling\TailInfo.cs" />
     <Compile Include="FileHandling\TextAssociations\ITextAssociationCollection.cs" />
     <Compile Include="FileHandling\TextAssociations\TextAssociation.cs" />
     <Compile Include="FileHandling\TextAssociations\TextAssociationCollection.cs" />
