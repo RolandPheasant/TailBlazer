@@ -106,8 +106,7 @@ namespace TailBlazer.Domain.FileHandling
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
             return Segments.Search(predicate);
         }
-
-
+        
         public void ScanFrom(long scanFrom)
         {
             _scanFrom.OnNext(scanFrom);

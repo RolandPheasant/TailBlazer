@@ -132,21 +132,21 @@ namespace TailBlazer.Domain.FileHandling
 
         private Page GetPage(ScrollRequest scroll)
         {
-            //TODO: 
-            if (scroll.SpecifiedByPosition && scroll.Mode == ScrollReason.TailOnly)
-            {
-                int j = 0;
-                for (var i = Matches.Length - 1; i >= 0; i--)
-                {
-                    j++;
-                    var match = Matches[i];
-                    if (match <= scroll.Position)
-                    {
+            ////TODO: 
+            //if (scroll.SpecifiedByPosition && scroll.Mode == ScrollReason.TailOnly)
+            //{
+            //    int j = 0;
+            //    for (var i = Matches.Length - 1; i >= 0; i--)
+            //    {
+            //        j++;
+            //        var match = Matches[i];
+            //        if (match <= scroll.Position)
+            //        {
 
-                        return new Page(i + 1, match == scroll.Position ? j : j-1);
-                    }
-                }
-            }
+            //            return new Page(i + 1, match == scroll.Position ? j : j-1);
+            //        }
+            //    }
+            //}
 
             int first;
             if (scroll.SpecifiedByPosition)

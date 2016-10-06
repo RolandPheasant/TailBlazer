@@ -78,6 +78,7 @@
     <Compile Include="FileHandling\EmptyLineProvider.cs" />
     <Compile Include="FileHandling\FileIndexer.cs" />
     <Compile Include="FileHandling\FileInfoEx.cs" />
+    <Compile Include="FileHandling\FileMonitor.cs" />
     <Compile Include="FileHandling\FileNameAndSize.cs" />
     <Compile Include="FileHandling\FileRewriter.cs" />
     <Compile Include="FileHandling\FileSearchEx.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="FileHandling\FileSegmentsWithTail.cs" />
     <Compile Include="FileHandling\FileSegmentType.cs" />
     <Compile Include="FileHandling\FileStatus.cs" />
+    <Compile Include="FileHandling\ILineMonitor.cs" />
     <Compile Include="FileHandling\TailInfoEx.cs" />
     <Compile Include="FileHandling\FileTailMonitor.cs" />
     <Compile Include="FileHandling\FileWatcher.cs" />

@@ -29,17 +29,17 @@ namespace TailBlazer.Domain.FileHandling
                             return last;
 
                         AutoTailReason reason;
-                        if (latest.PageSize != last.PageSize)
+                        if (latest.PageSize != last.PageSize || latest.LineProvider.Count < last.Count)
                         {
                             reason = AutoTailReason.LoadTail;
                             var result = latest.LineProvider.ReadLines(new ScrollRequest(latest.PageSize)).ToArray();
-                            return new AutoTailResponse(new TailInfo(result), latest.PageSize, reason);
+                            return new AutoTailResponse(new TailInfo(result), latest.PageSize, latest.LineProvider.Count, reason);
                         }
                         reason = AutoTailReason.NewLines;
-                        return new AutoTailResponse(latest.LineProvider.TailInfo.Trim(latest.PageSize), latest.PageSize, reason);
+                        return new AutoTailResponse(latest.LineProvider.TailInfo.Trim(latest.PageSize), latest.PageSize, latest.LineProvider.Count, reason);
                     })
                     .DistinctUntilChanged()
-                    .Where(result => result.Lines.Length != 0)
+                    .Where(result => result.Lines.Length != 0 || result.Reason== AutoTailReason.LoadTail)
                     .Select(info => info);
         }
     }

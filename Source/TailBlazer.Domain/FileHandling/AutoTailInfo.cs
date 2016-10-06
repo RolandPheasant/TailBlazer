@@ -16,10 +16,11 @@ namespace TailBlazer.Domain.FileHandling
         public Line[] Lines { get; }
         public AutoTailReason Reason { get;  }
         public int Count => Lines.Length;
+        public int TotalCount { get; }
 
         public static readonly AutoTailResponse Empty = new AutoTailResponse();
 
-        public AutoTailResponse(TailInfo tailInfo, int pageSize,  AutoTailReason reason)
+        public AutoTailResponse(TailInfo tailInfo, int pageSize, int totalCount, AutoTailReason reason)
         {
             PageSize = pageSize;
             TailInfo = tailInfo;
