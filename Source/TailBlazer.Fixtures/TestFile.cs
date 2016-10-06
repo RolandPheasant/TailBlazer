@@ -16,40 +16,44 @@ namespace TailBlazer.Fixtures
             if (name == null)
             {
                 Name = Name = Path.GetTempFileName(); ;
+
             }
             else
             {
                 var path = Path.GetTempPath();
-                var fullPath = Path.Combine(path, name);
+                var fullPath = Path.Combine(path, name + ".txt");
                 if (File.Exists(fullPath)) File.Delete(fullPath);
                 Name = fullPath;
             }
         }
 
-        public void Append(IEnumerable<string> lines)
-        {
-
-            File.AppendAllLines(Name, lines);
-            //using (var fs = new FileStream(Name, FileMode.OpenOrCreate, FileAccess.Read, FileShare.Read))
-            //{
-
-            //    using (var writer = TextWriter)
-            //    {
-                    
-            //    }
-
-            //    byte[] newline = Encoding.ASCII.GetBytes(Environment.NewLine)
-            //    fs.Write(b, 0, b.Length);
-            //    byte[] newline = Encoding.ASCII.GetBytes(Environment.NewLine);
-            //    fs.Write(newline, 0, newline.Length);
-
-            //}
-           
-        }
-
         public void Append(string line)
         {
-            File.AppendAllLines(Name, new[]{line});
+            Append(new[] { line });
+        }
+
+        public void Append(IEnumerable<string> lines)
+        {
+            //Do not use File.AppendAllLines as it seems to create an exclusive lock
+            using (var fs = File.Open(Info.FullName, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Delete | FileShare.ReadWrite))
+            {
+                fs.Seek(0, SeekOrigin.End);
+
+                using (StreamWriter file = new System.IO.StreamWriter(fs))
+                {
+                    foreach (string line in lines)
+                    {
+                        file.WriteLine(line);
+                    }
+                }
+                fs.Close();
+            }
+        }
+
+
+        public void Clear()
+        {
+            
         }
 
         public void Delete()

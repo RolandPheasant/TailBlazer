@@ -12,6 +12,9 @@ namespace TailBlazer.Domain.FileHandling
 
     public class FileMonitor: ILineMonitor, IDisposable
     {
+        private readonly IObservable<FileSegmentsWithTail> _fileSegments;
+        private readonly IObservable<ScrollRequest> _scrollRequest;
+        private readonly IScheduler _scheduler;
         private readonly IDisposable _cleanUp;
 
         public IObservableCache<Line, LineKey> Lines { get; } 
@@ -22,48 +25,89 @@ namespace TailBlazer.Domain.FileHandling
 
 
         public FileMonitor([NotNull] IObservable<FileSegmentsWithTail> fileSegments,
-            IObservable<ScrollRequest> scrollRequest,
+            [NotNull] IObservable<ScrollRequest> scrollRequest,
             int compression = 10,
             int sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing = 250000000,
             IScheduler scheduler = null)
         {
             if (fileSegments == null) throw new ArgumentNullException(nameof(fileSegments));
+            if (scrollRequest == null) throw new ArgumentNullException(nameof(scrollRequest));
+
+            _fileSegments = fileSegments;
+            _scrollRequest = scrollRequest;
+            _scheduler = scheduler;
+
             
             var cache = new SourceCache<Line, LineKey>(l => l.Key);
             Lines = cache.AsObservableCache();
 
-            var locker = new object();
+            var observables = CreateObservables(compression, sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing);
 
-            //set up synchronised scrolling
-            var published = fileSegments.Synchronize(locker).Publish();
-            var scroll = scrollRequest.Synchronize(locker);
-            var indexer = new Indexer(published, compression, sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing, scheduler)
-                                .Result
-                                .Do(x=> {},ex=>{Console.WriteLine(ex);})
-                                .Synchronize(locker);
+            Size = observables.Select(obs => obs.Size).Switch();
+            TotalLines = observables.Select(obs => obs.TotalLines).Switch();
 
-            //set up file info observables
-            var nameChanged = published.Select(fsc => fsc.Segments.Info.Name).DistinctUntilChanged().Skip(1).ToUnit();
-            var sizeChanged = published.Select(fsc => fsc.Segments.SizeDiff).Where(sizeDiff => sizeDiff < 0).ToUnit();
-            var tail = published.Select(fsc => fsc.TailInfo).DistinctUntilChanged();
-            var invalidated = nameChanged.Merge(sizeChanged);
+            var rolloverDisposable = new SerialDisposable();
+            var monitor = observables.Subscribe(obs=> rolloverDisposable.Disposable = PopulateData(cache, obs.ScrollInfo)) ;
 
-            TotalLines = indexer.Select(idx => idx.Count).Replay(1).RefCount();
-            Size = published.Select(fsc => fsc.Segments.SizeDiff).Replay(1).RefCount(); 
-
-            //keep monitoring until the file has been invalidated i.e. rollover or file name changed
-            var  scrollInfo = indexer
-                .CombineLatest(scroll, tail, (idx, scrl, t) => new IndiciesWithScroll(idx, scrl, t))
-                .Scan((IndiciesWithScroll)null,(state,latest)=> state==null 
-                            ? new IndiciesWithScroll(latest.IndexCollection,latest.Scroll, latest.TailInfo) 
-                            : new IndiciesWithScroll(state,latest.IndexCollection, latest.Scroll, latest.TailInfo))
-                .StartWith(IndiciesWithScroll.Empty)
-                .TakeUntil(invalidated);
-
-            var monitor = PopulateData(cache, scrollInfo);
-
-            _cleanUp = new CompositeDisposable(published.Connect(), Lines, cache, monitor);
+            _cleanUp = new CompositeDisposable(rolloverDisposable, monitor, Lines, cache, monitor);
         }
+
+        private IObservable<MonitorObservables> CreateObservables(int compression, int sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing)
+        {
+            return Observable.Create<MonitorObservables>(observer =>
+            {
+                var locker = new object();
+                //set up synchronised scrolling
+                var published = _fileSegments.Synchronize(locker).Publish();
+                var scroll = _scrollRequest.Synchronize(locker);
+                var indexer = new Indexer(published, compression, sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing, _scheduler)
+                                    .Result
+                                    .Synchronize(locker);
+
+                //set up file info observables
+                var nameChanged = published.Select(fsc => fsc.Segments.Info.Name).DistinctUntilChanged().Skip(1).ToUnit();
+                var sizeChanged = published.Select(fsc => fsc.Segments.SizeDiff).Where(sizeDiff => sizeDiff < 0).ToUnit();
+                var tail = published.Select(fsc => fsc.TailInfo).DistinctUntilChanged();
+
+                //kill the stream when file rolls over, or when the name has changed
+                var invalidated = nameChanged.Merge(sizeChanged);
+
+                var totalLines = indexer.Select(idx => idx.Count).Replay(1).RefCount();
+                var size = published.Select(fsc => fsc.Segments.FileSize).Replay(1).RefCount();
+
+                //keep monitoring until the file has been invalidated i.e. rollover or file name changed
+                var scrollInfo = indexer
+                    .CombineLatest(scroll, tail, (idx, scrl, t) => new IndiciesWithScroll(idx, scrl, t))
+                    .Scan((IndiciesWithScroll) null, (state, latest) => state == null
+                        ? new IndiciesWithScroll(latest.IndexCollection, latest.Scroll, latest.TailInfo)
+                        : new IndiciesWithScroll(state, latest.IndexCollection, latest.Scroll, latest.TailInfo))
+                    .StartWith(IndiciesWithScroll.Empty)
+                    .TakeUntil(invalidated)
+                    .FinallySafe(()=> observer.OnCompleted());
+
+                observer.OnNext(new MonitorObservables(scrollInfo, totalLines, size));
+
+                return new CompositeDisposable(published.Connect()); 
+            }).Repeat();
+        }
+
+        private class MonitorObservables
+        {
+            public IObservable<int> TotalLines { get; }
+
+            public IObservable<long> Size { get; }
+
+            public IObservable<IndiciesWithScroll> ScrollInfo { get; }
+
+            public MonitorObservables(IObservable<IndiciesWithScroll> scrollInfo, IObservable<int> totalLines, IObservable<long> size)
+            {
+                ScrollInfo = scrollInfo;
+                TotalLines = totalLines;
+                Size = size;
+            }
+        }
+
+
 
         private IDisposable PopulateData(SourceCache<Line, LineKey> cache, IObservable<IndiciesWithScroll> scrollInfo)
         {
