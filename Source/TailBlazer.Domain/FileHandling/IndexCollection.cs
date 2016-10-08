@@ -6,7 +6,7 @@ using System.Text;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class FileIndexCollection 
+    public class FileIndexCollection: ILineReader
     {
         public int Count { get; }
         public int Diff { get; }

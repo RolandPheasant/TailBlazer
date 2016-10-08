@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class FileSearchCollection: ILineProvider, IEquatable<FileSearchCollection>, IHasLimitationOfLines, IProgressInfo
+    public interface IHasTailInfo
+    {
+        TailInfo TailInfo { get; }
+    }
+
+    public class FileSearchCollection: ILineReader, IHasTailInfo, IEquatable<FileSearchCollection>, IHasLimitationOfLines, IProgressInfo
     {
         public static readonly FileSearchCollection None = new FileSearchCollection();
         public long[] Matches { get; }
         public int Count => Matches.Length;
+        public int Diff { get; }
         public int SegmentsCompleted { get; }
         public int Segments { get; }
         public bool IsSearching { get; }
@@ -49,6 +54,7 @@ namespace TailBlazer.Domain.FileHandling
             Size = 0;
             Maximum = limit;
             HasReachedLimit = false;
+            Diff = Matches.Length;
         }
 
         public FileSearchCollection(FileSearchCollection previous, 
@@ -62,9 +68,8 @@ namespace TailBlazer.Domain.FileHandling
             LastSearch = current;
             Info = info;
             Encoding = encoding;
-
-            _allSearches = previous._allSearches.Values.ToDictionary(fss => fss.Key);
             TailInfo = tailInfo;
+            _allSearches = previous._allSearches.Values.ToDictionary(fss => fss.Key);
             _allSearches[current.Key] = current;
             var all = _allSearches.Values.ToArray();
 
@@ -76,6 +81,7 @@ namespace TailBlazer.Domain.FileHandling
             //For large sets this could be very inefficient
             Matches = all.SelectMany(s => s.Lines).OrderBy(l=>l).ToArray();
             HasReachedLimit = Matches.Length >= limit;
+            Diff =  Matches.Length - previous.Matches.Length;
         }
 
         private FileSearchCollection()
@@ -119,12 +125,8 @@ namespace TailBlazer.Domain.FileHandling
                         var line = reader.ReadLine();
                         var endPosition = reader.AbsolutePosition();
                         var info = new LineInfo(i + 1, i, startPosition, endPosition);
-                        
-                        var ontail = endPosition >= TailInfo.Start && DateTime.UtcNow.Subtract(TailInfo.DateTime).TotalSeconds<1
-                                    ? DateTime.UtcNow 
-                                    : (DateTime?)null; 
 
-                        yield return new Line(info, line, ontail);
+                        yield return new Line(info, line, (DateTime?)null);
                     }
                 }
             }
@@ -132,22 +134,6 @@ namespace TailBlazer.Domain.FileHandling
 
         private Page GetPage(ScrollRequest scroll)
         {
-            ////TODO: 
-            //if (scroll.SpecifiedByPosition && scroll.Mode == ScrollReason.TailOnly)
-            //{
-            //    int j = 0;
-            //    for (var i = Matches.Length - 1; i >= 0; i--)
-            //    {
-            //        j++;
-            //        var match = Matches[i];
-            //        if (match <= scroll.Position)
-            //        {
-
-            //            return new Page(i + 1, match == scroll.Position ? j : j-1);
-            //        }
-            //    }
-            //}
-
             int first;
             if (scroll.SpecifiedByPosition)
             {

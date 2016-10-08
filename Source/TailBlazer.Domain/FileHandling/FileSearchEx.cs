@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -32,24 +30,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-
-            var published = source.Replay(1).RefCount();
-            var nameChanged = published.Select(fsc => fsc.Segments.Info.Name).DistinctUntilChanged().Skip(1);
-            var diff = published.Select(fsc => fsc.Segments.SizeDiff);
-
-            var searcher = Observable.Create<FileSearchCollection>(observer =>
-            {
-                var fileSearch = new FileSearchIndexer(published, predicate, scheduler: scheduler);
-                return fileSearch.SearchResult.SubscribeSafe(observer);
-            });
-
-            var searchFactory = searcher.CombineLatest(diff, (search, sizeDiff) => new { search, sizeDiff });
-
-            //this is the magic which allows the search to be recreated when a log file rolls
-            return searchFactory
-                .TakeUntil(nameChanged)
-                .TakeWhile(x => x.sizeDiff >= 0).Repeat()
-                .Select(x => x.search);
+            return new FileSearchIndexer(source, predicate, scheduler: scheduler).SearchResult;
         }
 
 

@@ -111,7 +111,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AutoTailFixture.cs" />
     <Compile Include="ColourProviderFixture.cs" />
     <Compile Include="DefaultColourSelectorFixture.cs" />
     <Compile Include="DefaultIconSelectorFixture.cs" />
@@ -126,7 +125,6 @@
     <Compile Include="FileSearchFixture.cs" />
     <Compile Include="FileSegmentFixture.cs" />
     <Compile Include="FileSegmentUsingExtensionFixture.cs" />
-    <Compile Include="FileTailerFixture.cs" />
     <Compile Include="FileWatchFixture.cs" />
     <Compile Include="LargeFileGenerator.cs" />
     <Compile Include="LogFixtures.cs" />
@@ -140,7 +138,6 @@
     <Compile Include="SplitFileByMatchingTextFixture.cs" />
     <Compile Include="StringExFixture.cs" />
     <Compile Include="TestFile.cs" />
-    <Compile Include="UserScrollFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

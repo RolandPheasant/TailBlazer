@@ -93,6 +93,7 @@ namespace TailBlazer.Domain.FileHandling
 
 
             _cleanUp = shared.Connect();
+            _cleanUp = shared.Connect();
         }
         
 
@@ -103,8 +104,9 @@ namespace TailBlazer.Domain.FileHandling
 
         public IObservable<ILineProvider> Search([NotNull] Func<string, bool> predicate)
         {
-            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-            return Segments.Search(predicate);
+           throw new Exception();
+        //    if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+        //    return Segments.Search(predicate);
         }
         
         public void ScanFrom(long scanFrom)

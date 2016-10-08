@@ -5,8 +5,7 @@ using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
 {
-
-
+    
     public class AutoTail: IAutoTail
     {
         private readonly IObservable<ILineProvider> _lineProvider;

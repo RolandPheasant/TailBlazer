@@ -13,17 +13,19 @@ using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
+
+
     /// <summary>
     /// Responsive and flexible file searching.
     /// See https://github.com/RolandPheasant/TailBlazer/issues/42
     /// </summary>
-    public class FileSearchIndexer 
+    public class FileSearchIndexer
     {
         private readonly IScheduler _scheduler;
         private readonly IObservable<FileSegmentsWithTail> _fileSegments;
         private readonly Func<string, bool> _predicate;
         private readonly int _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered;
-        
+
         public IObservable<FileSearchCollection> SearchResult { get; }
 
         public FileSearchIndexer([NotNull] IObservable<FileSegmentsWithTail> fileSegments,
@@ -77,33 +79,33 @@ namespace TailBlazer.Domain.FileHandling
 
 
                 //TODO: ADD TAIL TO RESULT
-                 
+
 
                 var tailWatcher = shared
                     .Select(segments => segments.TailInfo)
                     .DistinctUntilChanged()
-                    .Scan((FileSegmentSearchWithTail) null, (previous, tail) =>
-                    {
-                        var tailSegment = searchData.Lookup(FileSegmentKey.Tail)
-                            .ValueOrThrow(() => new MissingKeyException("Tail is missing"));
+                    .Scan((FileSegmentSearchWithTail)null, (previous, tail) =>
+                   {
+                       var tailSegment = searchData.Lookup(FileSegmentKey.Tail)
+                           .ValueOrThrow(() => new MissingKeyException("Tail is missing"));
 
-                        Line[] lines;
-                        if (previous == null)
-                        {
-                             lines = SearchLines(fileInfo.FullName, encoding, 
-                                    tailSegment.Segment.Start,
-                                    tailSegment.Segment.End, _predicate).ToArray();
-                        }
-                        else
-                        {
-                             lines = tail.Lines.Where(line => _predicate(line.Text)).ToArray();
+                       Line[] lines;
+                       if (previous == null)
+                       {
+                           lines = SearchLines(fileInfo.FullName, encoding,
+                                   tailSegment.Segment.Start,
+                                   tailSegment.Segment.End, _predicate).ToArray();
+                       }
+                       else
+                       {
+                           lines = tail.Lines.Where(line => _predicate(line.Text)).ToArray();
 
-                        }
-                        var indicies = lines.Select(l => l.LineInfo.Start).ToArray();
-                        var result = new FileSegmentSearchResult(tail.Start, tail.End, indicies);
-                        var search = new FileSegmentSearch(tailSegment, result);
-                        return new FileSegmentSearchWithTail(search, new TailInfo(lines));
-                    })
+                       }
+                       var indicies = lines.Select(l => l.LineInfo.Start).ToArray();
+                       var result = new FileSegmentSearchResult(tail.Start, tail.End, indicies);
+                       var search = new FileSegmentSearch(tailSegment, result);
+                       return new FileSegmentSearchWithTail(search, new TailInfo(lines));
+                   })
                     .DistinctUntilChanged()
                     .Publish();
 
@@ -116,7 +118,7 @@ namespace TailBlazer.Domain.FileHandling
                         ? new FileSearchCollection(current.Segment, current.Tail.Tail, fileInfo, encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered)
                         : new FileSearchCollection(previous, current.Segment, current.Tail.Tail, fileInfo, encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
                     .StartWith(FileSearchCollection.None)
-                    .SubscribeSafe(observer);   
+                    .SubscribeSafe(observer);
 
                 //initialise a pending state for all segments
                 //var cacheLoader = segmentCache.Connect()
@@ -143,14 +145,14 @@ namespace TailBlazer.Domain.FileHandling
                         .Do(head => searchData.AddOrUpdate(new FileSegmentSearch(head.Segment, FileSegmentSearchStatus.Searching)))
                         .Select(fileSegmentSearch =>
                         {
-                                /*
-                                    This hack imposes a limitation on the number of items returned as memory can be 
-                                    absolutely hammered [I have seen 20MB memory when searching a 1 GB file - obviously not an option]
-                                   TODO: A proper solution. 
-                                           1. How about index to file?
-                                           2. Allow auto pipe of large files
-                                           3. Allow user to have some control here
-                               */
+                            /*
+                                This hack imposes a limitation on the number of items returned as memory can be 
+                                absolutely hammered [I have seen 20MB memory when searching a 1 GB file - obviously not an option]
+                               TODO: A proper solution. 
+                                       1. How about index to file?
+                                       2. Allow auto pipe of large files
+                                       3. Allow user to have some control here
+                           */
 
                             var sum = searchData.Items.Sum(fss => fss.Lines.Length);
 
@@ -172,7 +174,7 @@ namespace TailBlazer.Domain.FileHandling
                     headSubscriber,
                     tailWatcher.Connect(),
                     shared.Connect(),
-                    
+
                     infoSubscriber,
                     searchData);
             });
@@ -192,7 +194,7 @@ namespace TailBlazer.Domain.FileHandling
 
         }
 
-        private IEnumerable<Line> SearchLines(string fileName, Encoding encoding, long start, long end, Func<string,bool> predicate)
+        private IEnumerable<Line> SearchLines(string fileName, Encoding encoding, long start, long end, Func<string, bool> predicate)
         {
             int i = 0;
             using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
@@ -216,7 +218,7 @@ namespace TailBlazer.Domain.FileHandling
                         long position = reader.AbsolutePosition();
 
                         if (predicate(line))
-                            yield return  new Line(new LineInfo(i+1,1, previousPostion, position), line,null);
+                            yield return new Line(new LineInfo(i + 1, 1, previousPostion, position), line, null);
 
                         previousPostion = position;
                         i++;
