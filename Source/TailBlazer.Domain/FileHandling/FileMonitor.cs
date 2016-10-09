@@ -9,6 +9,42 @@ using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
+    public sealed class SwitchableLineMonitor:  ILineMonitor
+    {
+        public IObservableCache<Line, LineKey> Lines { get; }
+        public IObservable<int> TotalLines { get; }
+
+        private readonly IDisposable _cleanUp;
+
+        public SwitchableLineMonitor([NotNull] IObservable<ILineMonitor> lineProviderObs)
+        {
+            if (lineProviderObs == null) throw new ArgumentNullException(nameof(lineProviderObs));
+
+            var cache = new SourceCache<Line, LineKey>(l => l.Key);
+
+            var shared = lineProviderObs.Publish();
+            var switchableLoader = shared.Select(monitor =>
+                {
+                    return monitor.Lines
+                        .Connect()
+                        .FinallySafe(() => cache.Clear());
+                }).Switch()
+                .PopulateInto(cache);
+
+            TotalLines = shared.Select(monitor => monitor.TotalLines).Switch();
+            Lines = cache.AsObservableCache();
+
+            _cleanUp = new CompositeDisposable(shared.Connect(), cache, switchableLoader, Lines);
+
+        }
+
+        public void Dispose()
+        {
+            _cleanUp.Dispose();
+        }
+    }
+
+
     public class FileMonitor: ILineMonitor, IDisposable
     {
         private readonly IObservable<FileSegmentsWithTail> _fileSegments;
@@ -22,6 +58,7 @@ namespace TailBlazer.Domain.FileHandling
         public FileMonitor([NotNull] IObservable<FileSegmentsWithTail> fileSegments,
             [NotNull] IObservable<ScrollRequest> scrollRequest,
             Func<string, bool> predicate = null,
+            IObservable<Func<string, bool>> predicateObs = null,
             IScheduler scheduler = null)
         {
             if (fileSegments == null) throw new ArgumentNullException(nameof(fileSegments));
@@ -33,9 +70,24 @@ namespace TailBlazer.Domain.FileHandling
             var rolloverDisposable = new SerialDisposable();
             
             var cache = new SourceCache<Line, LineKey>(l => l.Key);
-            Lines = cache.AsObservableCache();
+            Lines = cache.Connect()
+                        .IgnoreUpdateWhen((current, previous) => current.Key == previous.Key)
+                        .AsObservableCache();
 
-            var observables = CreateObservables(fsg=> fsg.Monitor(predicate, scheduler));
+           
+            IObservable<MonitorObservables> observables;
+            if (predicateObs != null)
+            {
+                observables = predicateObs
+                    .Select(pred => CreateObservables(fsg => fsg.Monitor(pred, scheduler)))
+                    .Switch();
+            }
+            else
+            {
+                observables = CreateObservables(fsg => fsg.Monitor(predicate, scheduler));
+            }
+
+           // IObservable<MonitorObservables> observables = CreateObservables(fsg=> fsg.Monitor(predicate, scheduler));
             Size = observables.Select(obs => obs.Size).Switch();
             TotalLines = observables.Select(obs => obs.TotalLines).Switch();
             var monitor = observables.Subscribe(obs=> rolloverDisposable.Disposable = PopulateData(cache, obs.ScrollInfo)) ;
@@ -51,7 +103,7 @@ namespace TailBlazer.Domain.FileHandling
 
                 //ensure input streams are synchronised
                 var published = _fileSegments.Synchronize(locker).Publish();
-                var scroll = _scrollRequest.Synchronize(locker);
+                var scroll = _scrollRequest.DistinctUntilChanged().Synchronize(locker);
                 var indexer = lineReaderFactory(_fileSegments).Synchronize(locker);
 
                 //set up file info observables
@@ -73,7 +125,7 @@ namespace TailBlazer.Domain.FileHandling
                         : new IndiciesWithScroll(state, latest.LineReader, latest.Scroll, latest.TailInfo))
                     .StartWith(IndiciesWithScroll.Empty)
                     .TakeUntil(invalidated)
-                    .FinallySafe(() => observer.OnCompleted()); 
+                    .FinallySafe(() =>     observer.OnCompleted()); 
 
                 observer.OnNext(new MonitorObservables(scrollInfo, totalLines, size));
 

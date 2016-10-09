@@ -12,6 +12,8 @@ using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Views.Searching
 {
+    //TODO: Add scroll stuff to here
+
     public class SearchCollection: AbstractNotifyPropertyChanged, IDisposable
     {
         private readonly ReadOnlyObservableCollection<SearchViewModel> _items;
@@ -21,15 +23,23 @@ namespace TailBlazer.Views.Searching
         private readonly IObservableCache<SearchViewModel, string> _viewModels;
 
         public ReadOnlyObservableCollection<SearchViewModel> Items => _items;
-        public IObservable<ILineProvider> Latest { get; }
 
-        public SearchCollection(ISearchInfoCollection searchInfoCollection, ISchedulerProvider schedulerProvider)
+        public ILineMonitor Current { get; }
+
+
+        public SearchCollection(ISearchInfoCollection searchInfoCollection, 
+            IObservable<ScrollRequest> scrollRequest,
+            IFileWatcher fileWatcher,
+            ISchedulerProvider schedulerProvider)
         {
+        
             _viewModels = searchInfoCollection.Searches.Connect()
-                .Transform(tail => new SearchViewModel(tail, vm =>
+                .Transform(searchInfo =>
                 {
-                    searchInfoCollection.Remove(vm.Text);
-                }))
+                    //var
+                    var monitor = fileWatcher.Monitor(scrollRequest, searchInfo.Filter);
+                    return new SearchViewModel(searchInfo, monitor, vm => searchInfoCollection.Remove(vm.Text));
+                })
                 .DisposeMany()
                 .AsObservableCache();
             
@@ -37,7 +47,7 @@ namespace TailBlazer.Views.Searching
 
             var binderLoader = shared
                 .Sort(SortExpressionComparer<SearchViewModel>
-                               .Ascending(tvm => tvm.SearchType== SearchType.All ? 1:2)
+                               .Ascending(tvm => tvm.SearchType== SearchType.All ? 1 : 2)
                                .ThenByAscending(tvm => tvm.Text))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _items)
@@ -59,14 +69,13 @@ namespace TailBlazer.Views.Searching
                 .Where(x => x == null)
                 .Subscribe(x => Selected =_viewModels.Items.First());
 
+            var switcher = this.WhenValueChanged(sc => sc.Selected)
+                .Where(x => x != null)
+                .Select(svm => svm.LineMonitor);
 
-           Latest = this.WhenValueChanged(sc => sc.Selected)
-                .Where(x=>x!=null)
-                .Select(svm => svm.Latest)
-                .Switch()
-                .Replay(1).RefCount();
-            
-            _cleanUp = new CompositeDisposable(_viewModels, binderLoader, counter, removed, autoSelector, nullDodger);
+            Current = new SwitchableLineMonitor(switcher);
+        
+            _cleanUp = new CompositeDisposable(_viewModels, binderLoader, counter, removed, autoSelector, nullDodger, Current);
         }
 
         public void Select(string item)

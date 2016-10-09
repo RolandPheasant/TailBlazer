@@ -7,8 +7,8 @@ namespace TailBlazer.Domain.FileHandling.Search
     {
         IObservableCache<SearchInfo, string> Searches { get; }
 
-        IObservable<ILineProvider> All { get; }
-
+        IObservable<Func<string, bool>> AllFilter { get; }
+        
         void Add(string searchText, bool useRegex);
         void Remove(string searchText);
     }

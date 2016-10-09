@@ -21,6 +21,8 @@ namespace TailBlazer.Domain.FileHandling
 
         private FileInfo FileInfo { get;  }
 
+
+
         public string FullName => FileInfo.FullName;
 
         public string Name => FileInfo.Name;
@@ -96,6 +98,16 @@ namespace TailBlazer.Domain.FileHandling
             _cleanUp = shared.Connect();
         }
         
+
+        public ILineMonitor Monitor(IObservable<ScrollRequest> scrollRequest, Func<string, bool> predicate = null)
+        {
+            return new FileMonitor(Segments, scrollRequest, predicate);
+        }
+
+        public ILineMonitor Monitor(IObservable<ScrollRequest> scrollRequest, IObservable<Func<string, bool>> predicateObs)
+        {
+            return new FileMonitor(Segments, scrollRequest, predicateObs: predicateObs);
+        }
 
         public IObservable<ILineProvider> Index()
         {

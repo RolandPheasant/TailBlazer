@@ -12,25 +12,21 @@ namespace TailBlazer.Domain.FileHandling.Search
         private readonly ISearchMetadataCollection _localMetadataCollection;
         private readonly ICombinedSearchMetadataCollection _combinedSearchMetadataCollection;
         private readonly ISearchMetadataFactory _searchMetadataFactory;
-        private readonly IFileWatcher _fileWatcher;
         private readonly IDisposable _cleanUp;
 
         public IObservableCache<SearchInfo, string> Searches { get; }
         
-        public IObservable<ILineProvider> All { get; }
-        
+
+        public IObservable<Func<string, bool>> AllFilter { get;  }
+
         public SearchInfoCollection(ICombinedSearchMetadataCollection combinedSearchMetadataCollection,
-            ISearchMetadataFactory searchMetadataFactory,
-            IFileWatcher fileWatcher)
+            ISearchMetadataFactory searchMetadataFactory)
         {
             _localMetadataCollection = combinedSearchMetadataCollection.Local;
             _combinedSearchMetadataCollection = combinedSearchMetadataCollection;
             _searchMetadataFactory = searchMetadataFactory;
-            _fileWatcher = fileWatcher;
-
-            //var sharedTail = _fileWatcher.Segments;
-
-            var exclusionPredicate = combinedSearchMetadataCollection.Combined.Connect()
+            
+            AllFilter = combinedSearchMetadataCollection.Combined.Connect()
                     .IncludeUpdateWhen((current, previous) => !SearchMetadata.EffectsFilterComparer.Equals(current, previous))
                     .Filter(meta=> meta.IsExclusion)
                     .ToCollection()
@@ -50,18 +46,9 @@ namespace TailBlazer.Domain.FileHandling.Search
                     }).StartWith((Func<string, bool>)null)
                     .Replay(1).RefCount();
 
-            All = exclusionPredicate.Select(predicate =>
-            {
-                if (predicate==null)
-                    return _fileWatcher.Index();
-
-                return _fileWatcher.Search(predicate);
-
-            }).Switch().Replay(1).RefCount();
-
             //create a collection with 1 item, which is used to show entire file
             var systemSearches = new SourceCache<SearchInfo, string>(t => t.SearchText);
-            systemSearches.AddOrUpdate(new SearchInfo("<All>", false, All, SearchType.All));
+            systemSearches.AddOrUpdate(new SearchInfo("<All>", false, AllFilter,  SearchType.All));
             
             //create a collection of all possible user filters
             var userSearches = combinedSearchMetadataCollection.Combined
@@ -69,26 +56,23 @@ namespace TailBlazer.Domain.FileHandling.Search
                 .IgnoreUpdateWhen((current,previous)=> SearchMetadata.EffectsFilterComparer.Equals(current, previous))
                 .Transform(meta =>
                 {
-                    var latest = exclusionPredicate
-                                .Select(exclpredicate =>
-                                {
-                                    Func<string, bool> resultingPredicate;
-                                    if (exclpredicate == null)
-                                    {
-                                        resultingPredicate = meta.BuildPredicate();
-                                    }
-                                    else
-                                    {
-                                        var toMatch = meta.BuildPredicate();
-                                        resultingPredicate =  str=> toMatch(str) && exclpredicate(str);
-                                    }
-                                    return _fileWatcher.Search(resultingPredicate);
+                    var predicate = AllFilter
+                        .Select(exclpredicate =>
+                        {
+                            Func<string, bool> resultingPredicate;
+                            if (exclpredicate == null)
+                            {
+                                resultingPredicate = meta.BuildPredicate();
+                            }
+                            else
+                            {
+                                var toMatch = meta.BuildPredicate();
+                                resultingPredicate = str => toMatch(str) && exclpredicate(str);
+                            }
+                            return resultingPredicate;
+                        });
 
-                                })
-                                .Switch()
-                                .Replay(1).RefCount();
-
-                    return new SearchInfo(meta.SearchText, meta.IsGlobal, latest, SearchType.User);
+                    return new SearchInfo(meta.SearchText, meta.IsGlobal, predicate,  SearchType.User);
                 });
 
             //combine te results into a single collection
@@ -98,7 +82,7 @@ namespace TailBlazer.Domain.FileHandling.Search
 
             _cleanUp = new CompositeDisposable(Searches, systemSearches);
         }
-
+        
         public void Add([NotNull] string searchText, bool useRegex)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));

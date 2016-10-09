@@ -100,7 +100,7 @@
     <Compile Include="FileHandling\ILineMonitor.cs" />
     <Compile Include="FileHandling\ILineReader.cs" />
     <Compile Include="FileHandling\TailInfoEx.cs" />
-    <Compile Include="FileHandling\FileTailMonitor.cs" />
+    <Compile Include="FileHandling\FileTailReader.cs" />
     <Compile Include="FileHandling\FileWatcher.cs" />
     <Compile Include="FileHandling\IAutoTail.cs" />
     <Compile Include="FileHandling\IFileWatcher.cs" />

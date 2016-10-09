@@ -8,6 +8,9 @@ namespace TailBlazer.Domain.FileHandling
         IObservable<FileSegmentsWithTail> Segments { get; }
         IObservable<long> Size { get; }
 
+        ILineMonitor Monitor(IObservable<ScrollRequest> scrollRequest, Func<string, bool> predicate = null);
+        ILineMonitor Monitor(IObservable<ScrollRequest> scrollRequest, IObservable<Func<string, bool>> predicate);
+
         IObservable<ILineProvider> Search(Func<string, bool> predicate);
         IObservable<ILineProvider> Index();
 

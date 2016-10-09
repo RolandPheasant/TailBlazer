@@ -3,9 +3,10 @@ using DynamicData;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public interface ILineMonitor
+    public interface ILineMonitor: IDisposable
     {
         IObservableCache<Line, LineKey> Lines { get; }
         IObservable<int> TotalLines { get; }
     }
+
 }

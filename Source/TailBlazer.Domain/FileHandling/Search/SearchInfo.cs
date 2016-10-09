@@ -7,16 +7,18 @@ namespace TailBlazer.Domain.FileHandling.Search
     {
         public string SearchText { get;  }
         public bool IsGlobal { get;  }
-        public IObservable<ILineProvider> Latest { get;  }
+
+        public IObservable<Func<string, bool>> Filter { get; }
+
         public SearchType SearchType { get;  }
         
-        public SearchInfo([NotNull] string searchText, bool isGlobal, [NotNull] IObservable<ILineProvider> latest, SearchType searchType)
+        public SearchInfo([NotNull] string searchText, bool isGlobal, [NotNull] IObservable<Func<string, bool>> filter, SearchType searchType)
         {
             if (searchText == null) throw new ArgumentNullException(nameof(searchText));
-            if (latest == null) throw new ArgumentNullException(nameof(latest));
+            if (filter == null) throw new ArgumentNullException(nameof(filter));
             SearchText = searchText;
             IsGlobal = isGlobal;
-            Latest = latest;
+            Filter = filter;
             SearchType = searchType;
         }
         

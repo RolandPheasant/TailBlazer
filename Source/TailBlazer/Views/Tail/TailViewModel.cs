@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -9,7 +10,6 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
-using DynamicData.PLinq;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Search;
@@ -58,7 +58,6 @@ namespace TailBlazer.Views.Tail
         public IProperty<FileStatus> FileStatus { get; }
         public IProperty<bool> InlineViewerVisible { get; }
         public IProperty<bool> CanViewInline { get; }
-
         public IProperty<int> MaximumChars { get; }
 
         public ICommand CopyToClipboardCommand { get; }
@@ -70,9 +69,7 @@ namespace TailBlazer.Views.Tail
         public ICommand UnClearCommand { get; }
         public ICommand KeyAutoTail { get; }
         public string Name { get; }
-
-
-
+        
         public TailViewModel([NotNull] ILogger logger,
             [NotNull] ISchedulerProvider schedulerProvider,
             [NotNull] IFileWatcher fileWatcher,
@@ -87,13 +84,11 @@ namespace TailBlazer.Views.Tail
             [NotNull] SearchHints searchHints,
             [NotNull] ITailViewStateControllerFactory tailViewStateControllerFactory,
             [NotNull] IThemeProvider themeProvider,
-            [NotNull] SearchCollection searchCollection, 
             [NotNull] ITextFormatter textFormatter,
             [NotNull] ILineMatches lineMatches,
             [NotNull] IObjectProvider objectProvider,
             [NotNull] IDialogCoordinator dialogCoordinator)
         {
-         
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (fileWatcher == null) throw new ArgumentNullException(nameof(fileWatcher));
@@ -104,7 +99,6 @@ namespace TailBlazer.Views.Tail
             if (stateBucketService == null) throw new ArgumentNullException(nameof(stateBucketService));
             if (searchHints == null) throw new ArgumentNullException(nameof(searchHints));
             if (themeProvider == null) throw new ArgumentNullException(nameof(themeProvider));
-            if (searchCollection == null) throw new ArgumentNullException(nameof(searchCollection));
             if (textFormatter == null) throw new ArgumentNullException(nameof(textFormatter));
             if (lineMatches == null) throw new ArgumentNullException(nameof(lineMatches));
             if (objectProvider == null) throw new ArgumentNullException(nameof(objectProvider));
@@ -136,7 +130,6 @@ namespace TailBlazer.Views.Tail
                 .Where(selected => !selected)
                 .Subscribe(_ => dialogCoordinator.Close());
 
-            SearchCollection = searchCollection;
             SearchMetadataCollection = combinedSearchMetadataCollection.Local;
 
             var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
@@ -152,6 +145,7 @@ namespace TailBlazer.Views.Tail
             //command to add the current search to the tail collection
             var searchInvoker = SearchHints.SearchRequested.Subscribe(request => searchInfoCollection.Add(request.Text, request.UseRegEx));
 
+            //-------------------------------
             //An observable which acts as a scroll command
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
             var scroller = _userScrollRequested.CombineLatest(autoChanged, (user, auto) =>
@@ -162,6 +156,14 @@ namespace TailBlazer.Views.Tail
             .Do(x => logger.Info("Scrolling to {0}/{1}", x.FirstIndex, x.PageSize))
             .DistinctUntilChanged();
 
+            SearchCollection = objectProvider.Get<SearchCollection>(new []
+            {
+                new Argument<IObservable<ScrollRequest>>(scroller),
+                (IArgument)new Argument<IFileWatcher>(fileWatcher),
+                (IArgument)new Argument<ISearchInfoCollection>(searchInfoCollection)
+            });
+
+            //-------------------------------
             //User feedback to show file size
             FileSizeText = fileWatcher.Size
                 .Select(size => size.FormatWithAbbreviation())
@@ -169,17 +171,17 @@ namespace TailBlazer.Views.Tail
                 .ForBinding();
             
             //tailer is the main object used to tail, scroll and filter in a file
-            var selectedProvider = SearchCollection.Latest.ObserveOn(schedulerProvider.Background);
+         //   IObservable<ILineProvider> selectedProvider = SearchCollection.Latest.ObserveOn(schedulerProvider.Background);
             
-            var lineScroller = new LineScroller(selectedProvider, scroller);
+           // var lineScroller = new LineScroller(selectedProvider, scroller);
             
-            MaximumChars = lineScroller.MaximumLines()
+            MaximumChars = SearchCollection.Current.MaximumLines()
                             .ObserveOn(schedulerProvider.MainThread)
                             .ForBinding();
 
             var lineProxyFactory = new LineProxyFactory(textFormatter, lineMatches, horizonalScrollArgs.DistinctUntilChanged(), themeProvider);
 
-            var loader = lineScroller.Lines.Connect()
+            var loader = SearchCollection.Current.Lines.Connect()
                 .LogChanges(logger, "Received")
                 .Transform(lineProxyFactory.Create)
                 .LogChanges(logger, "Sorting")
@@ -192,12 +194,12 @@ namespace TailBlazer.Views.Tail
                 .Subscribe();
             
             //monitor matching lines and start index,
-            Count = searchInfoCollection.All.Select(latest=>latest.Count).ForBinding();
-            CountText = searchInfoCollection.All.Select(latest => $"{latest.Count.ToString("##,###")} lines").ForBinding();
-            LatestCount = SearchCollection.Latest.Select(latest => latest.Count).ForBinding();
+            Count = SearchCollection.Current.TotalLines.ForBinding();
+            CountText = SearchCollection.Current.TotalLines.Select(latest => $"{latest.ToString("##,###")} lines").ForBinding();
+            LatestCount = SearchCollection.Current.TotalLines.ForBinding();
 
             ////track first visible index
-            var firstIndexMonitor = lineScroller.Lines.Connect()
+            var firstIndexMonitor = SearchCollection.Current.Lines.Connect()
                 .Buffer(TimeSpan.FromMilliseconds(25)).FlattenBufferResult()
                 .ToCollection()
                 .Select(lines => lines.Count == 0 ? 0 : lines.Select(l => l.Index).Max() - lines.Count + 1)
@@ -222,11 +224,11 @@ namespace TailBlazer.Views.Tail
             InlineViewerVisible = inlineViewerVisible.ForBinding();
 
             //return an empty line provider unless user is viewing inline - this saves needless trips to the file
-            var inline = searchInfoCollection.All.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : EmptyLineProvider.Instance);
+     //       var inline = searchInfoCollection.All.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : EmptyLineProvider.Instance);
 
-            InlineViewer = inlineViewerFactory. Create(combinedSearchMetadataCollection, inline, this.WhenValueChanged(vm => vm.SelectedItem));
+         //   InlineViewer = inlineViewerFactory. Create(combinedSearchMetadataCollection, inline, this.WhenValueChanged(vm => vm.SelectedItem));
 
-            _cleanUp = new CompositeDisposable(lineScroller,
+            _cleanUp = new CompositeDisposable(
                 loader,
                 firstIndexMonitor,
                 FileStatus,
@@ -234,7 +236,7 @@ namespace TailBlazer.Views.Tail
                 LatestCount,
                 FileSizeText,
                 CanViewInline,
-                InlineViewer,
+              //  InlineViewer,
                 InlineViewerVisible,
                 SearchCollection,
                 searchInfoCollection,
