@@ -70,6 +70,7 @@ namespace TailBlazer.Views.Searching
                 .Subscribe(x => Selected =_viewModels.Items.First());
 
             var switcher = this.WhenValueChanged(sc => sc.Selected)
+                .DistinctUntilChanged()
                 .Where(x => x != null)
                 .Select(svm => svm.LineMonitor);
 

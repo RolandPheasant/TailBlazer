@@ -15,9 +15,6 @@ namespace TailBlazer.Domain.FileHandling.Search
         private readonly IDisposable _cleanUp;
 
         public IObservableCache<SearchInfo, string> Searches { get; }
-        
-
-        public IObservable<Func<string, bool>> AllFilter { get;  }
 
         public SearchInfoCollection(ICombinedSearchMetadataCollection combinedSearchMetadataCollection,
             ISearchMetadataFactory searchMetadataFactory)
@@ -26,7 +23,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             _combinedSearchMetadataCollection = combinedSearchMetadataCollection;
             _searchMetadataFactory = searchMetadataFactory;
             
-            AllFilter = combinedSearchMetadataCollection.Combined.Connect()
+            var exclusionFilter = combinedSearchMetadataCollection.Combined.Connect()
                     .IncludeUpdateWhen((current, previous) => !SearchMetadata.EffectsFilterComparer.Equals(current, previous))
                     .Filter(meta=> meta.IsExclusion)
                     .ToCollection()
@@ -44,11 +41,12 @@ namespace TailBlazer.Domain.FileHandling.Search
                         };
                         return predicate;
                     }).StartWith((Func<string, bool>)null)
+                    .DistinctUntilChanged()
                     .Replay(1).RefCount();
 
             //create a collection with 1 item, which is used to show entire file
             var systemSearches = new SourceCache<SearchInfo, string>(t => t.SearchText);
-            systemSearches.AddOrUpdate(new SearchInfo("<All>", false, AllFilter,  SearchType.All));
+            systemSearches.AddOrUpdate(new SearchInfo("<All>", false, exclusionFilter,  SearchType.All));
             
             //create a collection of all possible user filters
             var userSearches = combinedSearchMetadataCollection.Combined
@@ -56,7 +54,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                 .IgnoreUpdateWhen((current,previous)=> SearchMetadata.EffectsFilterComparer.Equals(current, previous))
                 .Transform(meta =>
                 {
-                    var predicate = AllFilter
+                    var predicate = exclusionFilter
                         .Select(exclpredicate =>
                         {
                             Func<string, bool> resultingPredicate;
