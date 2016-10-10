@@ -19,7 +19,7 @@ namespace TailBlazer.Domain.FileHandling
 
     public sealed class FileSegmenter
     {
-        private  FileInfo _info;
+       // private  FileInfo _info;
         private readonly int _initialTail;
         private readonly int _segmentSize;
 
@@ -35,44 +35,42 @@ namespace TailBlazer.Domain.FileHandling
             
             //TODO: Re-segment as file grows + account for rollover
             Segments = notifications
+                .MonitorChanges()
                 .Scan((FileSegmentCollection) null, (previous, current) =>
                 {
-                   _info = (FileInfo)current;
+
+ // _info = (FileInfo)current;
                 
                     //var nameHasChanged = previous != null && (previous.Info.Name != current.Name);
 
              
-                    if (previous == null) 
+                    if (previous == null || current.Invalidated) 
                     {
-                        var encoding = _info.GetEncoding();
-                        var segments = LoadSegments().ToArray();
-                        return new FileSegmentCollection(_info, segments, current.Size, encoding);
+                        var segments = LoadSegments(current.FullName).ToArray();
+                        return new FileSegmentCollection(current, segments, current.Size, current.Encoding);
                     }
 
                     //if file size has not changed, do not reload segment
-                    if (previous.FileLength == _info.Length)
-                    {
-                        return previous;
-                    }
+                    if (current.NoChange) return previous;
 
-                    var newLength = current.Size;
-
-                    ////if file is smaller, treat it as a new file
-                    if (newLength < previous.FileLength)
-                    {
-                        var encoding = _info.GetEncoding();
-                        var sizeDiff = newLength - previous.FileLength;
-                        var segments = LoadSegments().ToArray();
-                        return new FileSegmentCollection(_info, segments, sizeDiff, encoding);
-                    }
 
                     return new FileSegmentCollection(current.Size, previous);
+                    //  var newLength = current.Size;
+
+                    //////if file is smaller, treat it as a new file
+                    //if (newLength < previous.FileLength)
+                    //{
+                    //    var encoding = current.GetEncoding();
+                    //    var segments = LoadSegments().ToArray();
+                    //    return new FileSegmentCollection(current, segments, current.SizeDiff, encoding);
+                    //}
+
                 }).DistinctUntilChanged();
         }
 
-        private IEnumerable<FileSegment> LoadSegments()
+        private IEnumerable<FileSegment> LoadSegments(string name)
         {
-            using (var stream = File.Open(_info.FullName, FileMode.Open, FileAccess.Read,FileShare.Delete | FileShare.ReadWrite))
+            using (var stream = File.Open(name, FileMode.Open, FileAccess.Read,FileShare.Delete | FileShare.ReadWrite))
             {
                 var fileLength = stream.Length;
 

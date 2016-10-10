@@ -15,9 +15,10 @@ namespace TailBlazer.Domain.FileHandling
         public IObservable<FileStatus> Status { get; }
         public IObservable<FileSegmentsWithTail> Segments { get; }
         public IObservable<long> Size { get; }
+
         public IObservable<Unit> Invalidated { get; }
 
-        public IObservable<FileNameAndSize> FileMonitor { get; }
+      //  public IObservable<FileNameAndSize> FileMonitor { get; }
 
         private FileInfo FileInfo { get;  }
 
@@ -46,6 +47,8 @@ namespace TailBlazer.Domain.FileHandling
                 .Select(metrics=> TimeSpan.FromMilliseconds(metrics.RefreshRate))
                 .Wait();
 
+
+
             //switch the file when it is rolled over, or when it is cleared
             var shared = _scanFrom.Select(start => start == 0
                 ? fileInfo.WatchFile(scheduler: scheduler, refreshPeriod: refreshRate)
@@ -53,18 +56,13 @@ namespace TailBlazer.Domain.FileHandling
                 .DistinctUntilChanged()
                 .Switch()
                 .TakeWhile(notification => notification.Exists)
-                .Repeat()
+             //   .Repeat()
                 .Publish();
 
-            FileMonitor = shared.Scan((FileNameAndSize) null, (state, latest) =>
-            {
-                return state == null ? new FileNameAndSize(latest) : new FileNameAndSize(state, latest);
-            }).Publish().RefCount();
-
             //file is invalidated at roll-over and and when the file is cleared
-            Invalidated = shared.Scan((FileNameAndSize) null, (state, latest) =>
+            Invalidated = shared.Scan((FileChanges) null, (state, latest) =>
                 {
-                    return state == null ? new FileNameAndSize(latest) : new FileNameAndSize(state, latest);
+                    return state == null ? new FileChanges(latest) : new FileChanges(state, latest);
                 })
                 .Select(nameAndSize => nameAndSize.Invalidated)
                 .Where(invalidated => invalidated)
@@ -99,14 +97,14 @@ namespace TailBlazer.Domain.FileHandling
         }
         
 
-        public ILineMonitor Monitor(IObservable<ScrollRequest> scrollRequest, Func<string, bool> predicate = null)
+        public ILineMonitor Monitor(IObservable<ScrollRequest> scrollRequest, Func<string, bool> predicate = null, IScheduler scheduler = null)
         {
-            return new FileMonitor(Segments, scrollRequest, predicate);
+            return new FileMonitor(Segments, scrollRequest, predicate, scheduler: scheduler);
         }
 
-        public ILineMonitor Monitor(IObservable<ScrollRequest> scrollRequest, IObservable<Func<string, bool>> predicateObs)
+        public ILineMonitor Monitor(IObservable<ScrollRequest> scrollRequest, IObservable<Func<string, bool>> predicateObs, IScheduler scheduler = null)
         {
-            return new FileMonitor(Segments, scrollRequest, predicateObs: predicateObs);
+            return new FileMonitor(Segments, scrollRequest, predicateObs: predicateObs, scheduler: scheduler);
         }
 
         public IObservable<ILineProvider> Index()

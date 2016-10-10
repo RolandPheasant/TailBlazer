@@ -1,9 +1,10 @@
 using System;
 using System.IO;
+using System.Text;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public sealed class FileNotification : IEquatable<FileNotification>
+    public sealed class FileNotification : IEquatable<FileNotification>, IFileMetrics
     {
         private FileInfo Info { get; }
         public bool Exists { get; }
@@ -14,6 +15,7 @@ namespace TailBlazer.Domain.FileHandling
         public FileNotificationType NotificationType { get; }
         public Exception Error { get; }
 
+        public Encoding Encoding { get; }
 
         public FileNotification(FileInfo fileInfo)
         {
@@ -25,6 +27,7 @@ namespace TailBlazer.Domain.FileHandling
             {
                 NotificationType = FileNotificationType.CreatedOrOpened;
                 Size = Info.Length;
+                Encoding = this.GetEncoding();
             }
             else
             {
@@ -50,6 +53,7 @@ namespace TailBlazer.Domain.FileHandling
             if (Exists)
             {
                 Size = Info.Length;
+                Encoding = this.GetEncoding();
 
                 if (!previous.Exists)
                 {

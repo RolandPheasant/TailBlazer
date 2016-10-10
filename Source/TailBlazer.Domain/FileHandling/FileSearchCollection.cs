@@ -27,19 +27,17 @@ namespace TailBlazer.Domain.FileHandling
         private readonly IDictionary<FileSegmentKey, FileSegmentSearch> _allSearches;
 
         private FileSegmentSearch LastSearch { get; }
-        private FileInfo Info { get;  }
-        private Encoding Encoding { get;  }
+
+        public IFileMetrics  Metrics { get; }
 
         private long Size { get; }
 
         public FileSearchCollection(FileSegmentSearch initial,
             TailInfo tailInfo,
-            FileInfo info,
-            Encoding encoding,
+            IFileMetrics metrics,
             int limit)
         {
-            Info = info;
-            Encoding = encoding;
+            Metrics = metrics;
             LastSearch = initial;
             _allSearches = new Dictionary<FileSegmentKey, FileSegmentSearch>
             {
@@ -60,14 +58,12 @@ namespace TailBlazer.Domain.FileHandling
         public FileSearchCollection(FileSearchCollection previous, 
             FileSegmentSearch current,
             TailInfo tailInfo,
-            FileInfo info,
-            Encoding encoding,
+             IFileMetrics metrics,
             int limit)
         {
             Maximum = limit;
             LastSearch = current;
-            Info = info;
-            Encoding = encoding;
+            Metrics = metrics;
             TailInfo = tailInfo;
             _allSearches = previous._allSearches.Values.ToDictionary(fss => fss.Key);
             _allSearches[current.Key] = current;
@@ -99,10 +95,10 @@ namespace TailBlazer.Domain.FileHandling
 
             if (page.Size == 0) yield break;
 
-            using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read,FileShare.Delete | FileShare.ReadWrite))
+            using (var stream = File.Open(Metrics.FullName, FileMode.Open, FileAccess.Read,FileShare.Delete | FileShare.ReadWrite))
             {
 
-                using (var reader = new StreamReaderExtended(stream, Encoding, false))
+                using (var reader = new StreamReaderExtended(stream, Metrics.Encoding, false))
                 {
 
                     if (page.Size == 0) yield break;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
 using DynamicData.Kernel;
@@ -11,6 +12,19 @@ namespace TailBlazer.Domain.FileHandling
 {
     public static class FileInfoEx
     {
+        public static IObservable<FileChanges> MonitorChanges(this IObservable<FileNotification> source)
+        {
+            return source.Where(notification => notification.Exists)
+                .Scan((FileChanges) null, (state, latest) =>
+                {
+
+                    if (state==null)
+                        return new FileChanges(latest);
+
+                    return new FileChanges(state, latest);
+                });
+        }
+
         /// <summary>
         /// A simpler alternative to the irritatingly useless FileSystemWatcher
         /// </summary>
@@ -26,16 +40,29 @@ namespace TailBlazer.Domain.FileHandling
                 var refresh = refreshPeriod ?? TimeSpan.FromMilliseconds(250);
                 scheduler = scheduler ?? Scheduler.Default;
 
-                FileNotification notification = null;
+                var notification = new FileNotification(file);
+
+                scheduler.Schedule(() => observer.OnNext(notification));
+               // observer.OnNext(notification);
+
+                
+               // SerialDisposable nextSchedule = new SerialDisposable();
+
+
+                //Func<FileNotification> 
+
+                //nextSchedule.Disposable = scheduler.Schedule(refresh, () =>
+                //{
+
+                //});
+
+                //new FileNotification(file)
+
                 return scheduler.ScheduleRecurringAction(refresh, () =>
                 {
                     try
                     {
-                        notification = notification == null
-                            ? new FileNotification(file)
-                            : new FileNotification(notification);
-
-                        observer.OnNext(notification);
+                        observer.OnNext(new FileNotification(notification));
                     }
                     catch (Exception ex)
                     {
@@ -44,7 +71,8 @@ namespace TailBlazer.Domain.FileHandling
                     }
                 });
 
-            }).DistinctUntilChanged();
+            })
+            .DistinctUntilChanged();
         }
 
 
@@ -58,11 +86,19 @@ namespace TailBlazer.Domain.FileHandling
 
 
 
+        //FileMonitor = shared.Scan((FileNameAndSize) null, (state, latest) =>
+        //{
+        //    return state == null ? new FileNameAndSize(latest) : new FileNameAndSize(state, latest);
+        //}).Publish().RefCount();
+
+
+
+
         /// <summary>
         /// Determines the encoding of a file
         /// </summary>
         /// <returns></returns>
-        public static Encoding GetEncoding(this FileInfo source)
+        public static Encoding GetEncoding(this IFileMetrics source)
         {
             using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {

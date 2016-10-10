@@ -116,6 +116,7 @@
     <Compile Include="DefaultIconSelectorFixture.cs" />
     <Compile Include="DisplayTextFixture.cs" />
     <Compile Include="FileDropFixture.cs" />
+    <Compile Include="FileMonitorFixture.cs" />
     <Compile Include="IconDescriptionFixture.cs" />
     <Compile Include="IconProviderFixture.cs" />
     <Compile Include="LinesEx.cs" />

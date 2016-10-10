@@ -51,20 +51,9 @@ namespace TailBlazer.Domain.FileHandling
             {
                 var shared = _fileSegments.Publish();
 
-                //0.5 ensure we have the latest file info and encoding
-                Encoding encoding = null;
-                FileInfo fileInfo = null;
-
-                //TODO: This is shit. We need a better way of passing around the Encoding / File meta data
-                var infoSubscriber = shared
-                    .Where(fs => fs.Segments.Encoding != null)
-                    .Take(1)
-                    .Subscribe(fswt =>
-                    {
-                        encoding = fswt.Segments.Encoding;
-                        fileInfo = fswt.Segments.Info;
-                    });
-
+                //0.5 ensure we have the latest file metrics
+                var metrics = shared.Select(fs => fs.Segments.Metrics).Take(1).Wait();
+                
                 //manually maintained search results and status
                 var searchData = new SourceCache<FileSegmentSearch, FileSegmentKey>(s => s.Key);
 
@@ -92,7 +81,7 @@ namespace TailBlazer.Domain.FileHandling
                        Line[] lines;
                        if (previous == null)
                        {
-                           lines = SearchLines(fileInfo.FullName, encoding,
+                           lines = SearchLines(metrics,
                                    tailSegment.Segment.Start,
                                    tailSegment.Segment.End, _predicate).ToArray();
                        }
@@ -115,8 +104,8 @@ namespace TailBlazer.Domain.FileHandling
                     .Select(change => change.Current)
                     .CombineLatest(tailWatcher, (segment, tail) => new { Segment = segment, Tail = tail })
                     .Scan((FileSearchCollection)null, (previous, current) => previous == null
-                        ? new FileSearchCollection(current.Segment, current.Tail.Tail, fileInfo, encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered)
-                        : new FileSearchCollection(previous, current.Segment, current.Tail.Tail, fileInfo, encoding, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
+                        ? new FileSearchCollection(current.Segment, current.Tail.Tail, metrics, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered)
+                        : new FileSearchCollection(previous, current.Segment, current.Tail.Tail, metrics, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
                     .StartWith(FileSearchCollection.None)
                     .SubscribeSafe(observer);
 
@@ -160,7 +149,7 @@ namespace TailBlazer.Domain.FileHandling
                             {
                                 return new FileSegmentSearch(fileSegmentSearch, FileSegmentSearchStatus.Complete);
                             }
-                            var result = Search(fileInfo.FullName, encoding, fileSegmentSearch.Segment.Start, fileSegmentSearch.Segment.End);
+                            var result = Search(metrics.FullName, metrics.Encoding, fileSegmentSearch.Segment.Start, fileSegmentSearch.Segment.End);
                             return new FileSegmentSearch(fileSegmentSearch, result);
                         });
                 })
@@ -174,8 +163,6 @@ namespace TailBlazer.Domain.FileHandling
                     headSubscriber,
                     tailWatcher.Connect(),
                     shared.Connect(),
-
-                    infoSubscriber,
                     searchData);
             });
         }
@@ -194,17 +181,17 @@ namespace TailBlazer.Domain.FileHandling
 
         }
 
-        private IEnumerable<Line> SearchLines(string fileName, Encoding encoding, long start, long end, Func<string, bool> predicate)
+        private IEnumerable<Line> SearchLines(IFileMetrics metrics, long start, long end, Func<string, bool> predicate)
         {
             int i = 0;
-            using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            using (var stream = File.Open(metrics.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
                 if (stream.Length < start)
                 {
                     start = 0;
                     end = stream.Length;
                 }
-                using (var reader = new StreamReaderExtended(stream, encoding, false))
+                using (var reader = new StreamReaderExtended(stream, metrics.Encoding, false))
                 {
                     stream.Seek(start, SeekOrigin.Begin);
                     if (reader.EndOfStream)

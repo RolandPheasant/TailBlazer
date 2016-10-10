@@ -12,18 +12,15 @@ namespace TailBlazer.Domain.FileHandling
         public int Diff { get; }
         public bool IsEmpty => Count != 0;
         private Index[] Indicies { get; }
-        private FileInfo Info { get; }
-        private Encoding Encoding { get; }
+        private IFileMetrics Metrics { get; }
 
         public static readonly FileIndexCollection Empty = new FileIndexCollection();
 
         public FileIndexCollection(IReadOnlyCollection<Index> latest,
                                     FileIndexCollection previous,
-                                    FileInfo info,
-                                    Encoding encoding)
+                                    IFileMetrics metrics)
         {
-            Info = info;
-            Encoding = encoding;
+            Metrics = metrics;
             Count = latest.Select(idx => idx.LineCount).Sum();
             Indicies = latest.ToArray();
             Diff = Count - (previous?.Count ?? 0);
@@ -62,9 +59,9 @@ namespace TailBlazer.Domain.FileHandling
 
             var offset = relativeIndex.LinesOffset;
 
-            using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            using (var stream = File.Open(Metrics.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
-                using (var reader = new StreamReaderExtended(stream, Encoding, false))
+                using (var reader = new StreamReaderExtended(stream, Metrics.Encoding, false))
                 {
                     //go to starting point
                     stream.Seek(relativeIndex.Start, SeekOrigin.Begin);
@@ -105,10 +102,10 @@ namespace TailBlazer.Domain.FileHandling
 
             //scroll from specified position
 
-            using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            using (var stream = File.Open(Metrics.Name, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
                 int taken = 0;
-                using (var reader = new StreamReaderExtended(stream, Encoding, false))
+                using (var reader = new StreamReaderExtended(stream, Metrics.Encoding, false))
                 {
 
                     var startPosition = scroll.Position;
@@ -283,8 +280,7 @@ namespace TailBlazer.Domain.FileHandling
         public int Diff { get; }
         public bool IsEmpty => Count != 0;
         private Index[] Indicies { get; }
-        private FileInfo Info { get; }
-        private Encoding Encoding { get; }
+        private IFileMetrics Metrics { get; }
         public TailInfo TailInfo { get; }
 
         public static readonly IndexCollection Empty = new IndexCollection();
@@ -292,11 +288,9 @@ namespace TailBlazer.Domain.FileHandling
         public IndexCollection(IReadOnlyCollection<Index> latest,
                                     TailInfo tailInfo,
                                     IndexCollection previous,
-                                    FileInfo info,
-                                    Encoding encoding)
+                                    IFileMetrics metrics)
         {
-            Info = info;
-            Encoding = encoding;
+            Metrics = metrics;
             Count = latest.Select(idx => idx.LineCount).Sum();
             Indicies = latest.ToArray();
             Diff = Count - (previous?.Count ?? 0);
@@ -337,9 +331,9 @@ namespace TailBlazer.Domain.FileHandling
 
             var offset = relativeIndex.LinesOffset;
 
-            using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            using (var stream = File.Open(Metrics.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
-                using (var reader = new StreamReaderExtended(stream, Encoding, false))
+                using (var reader = new StreamReaderExtended(stream, Metrics.Encoding, false))
                 {
                     //go to starting point
                     stream.Seek(relativeIndex.Start, SeekOrigin.Begin);
@@ -379,10 +373,10 @@ namespace TailBlazer.Domain.FileHandling
    
             //scroll from specified position
 
-            using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read,FileShare.Delete | FileShare.ReadWrite))
+            using (var stream = File.Open(Metrics.FullName, FileMode.Open, FileAccess.Read,FileShare.Delete | FileShare.ReadWrite))
             {
                 int taken = 0;
-                using (var reader = new StreamReaderExtended(stream, Encoding, false))
+                using (var reader = new StreamReaderExtended(stream, Metrics.Encoding, false))
                 {
 
                     var startPosition = scroll.Position;

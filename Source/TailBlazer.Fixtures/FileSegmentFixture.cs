@@ -19,8 +19,7 @@ namespace TailBlazer.Fixtures
             var file = Path.GetTempFileName();
             var info = new FileInfo(file);
 
-            File.AppendAllLines(file,
-                Enumerable.Range(1, 1000).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
+            File.AppendAllLines(file, Enumerable.Range(1, 1000).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
 
             var refresher = new Subject<Unit>();
 
@@ -62,8 +61,7 @@ namespace TailBlazer.Fixtures
             {
                 result.Should().NotBeNull();
 
-                File.AppendAllLines(file,
-                    Enumerable.Range(1, 10000).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
+                File.AppendAllLines(file, Enumerable.Range(1, 10000).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
                 refresher.Once();
 
                 result.Should().NotBeNull();

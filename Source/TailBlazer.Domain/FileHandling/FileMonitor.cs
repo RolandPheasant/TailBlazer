@@ -38,13 +38,19 @@ namespace TailBlazer.Domain.FileHandling
                         .IgnoreUpdateWhen((current, previous) => current.Key == previous.Key)
                         .AsObservableCache();
 
-           
+
+
+            IObservable<Func<string, bool>> xxx;
             IObservable<MonitorObservables> observables;
             if (predicateObs != null)
             {
-                observables = predicateObs
-                    .Select(pred => CreateObservables(fsg => fsg.Monitor(pred, scheduler)))
-                    .Switch();
+
+
+                var pred = predicateObs.Take(1).Wait();
+                observables = CreateObservables(fsg => fsg.Monitor(pred, scheduler));
+                //observables = predicateObs
+                //    .Select(pred => CreateObservables(fsg => fsg.Monitor(pred, scheduler)))
+                //    .Switch();
             }
             else
             {
@@ -71,7 +77,7 @@ namespace TailBlazer.Domain.FileHandling
                 var indexer = lineReaderFactory(_fileSegments).Synchronize(locker);
 
                 //set up file info observables
-                var nameChanged = published.Select(fsc => fsc.Segments.Info.Name).DistinctUntilChanged().Skip(1).ToUnit();
+                var nameChanged = published.Select(fsc => fsc.Segments.Metrics.Name).DistinctUntilChanged().Skip(1).ToUnit();
                 var sizeChanged = published.Select(fsc => fsc.Segments.SizeDiff).Where(sizeDiff => sizeDiff < 0).ToUnit();
                 var tail = published.Select(fsc => fsc.TailInfo).DistinctUntilChanged();
 

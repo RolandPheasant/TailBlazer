@@ -6,6 +6,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
+using System.Threading;
 using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.Annotations;
@@ -42,20 +43,8 @@ namespace TailBlazer.Domain.FileHandling
             {
                 var shared = _fileSegments.Publish();
 
-                //0.5 ensure we have the latest file info and encoding
-                Encoding encoding = null;
-                FileInfo fileInfo = null;
-
-                //TODO: This is shit. We need a better way of passing around the Encoding / File meta data
-                var infoSubscriber = shared
-                    .Where(fs => fs.Segments.Encoding != null)
-                    .Take(1)
-                    .Subscribe(fswt =>
-                    {
-                        encoding = fswt.Segments.Encoding;
-                        fileInfo = fswt.Segments.Info;
-                    });
-
+                //0.5 ensure we have the latest file metrics
+                var metrics = shared.Select(fs => fs.Segments.Metrics).Take(1).Wait();
 
                 var tailWatcher = shared
                     .Select(segments => segments.TailInfo)
@@ -69,7 +58,7 @@ namespace TailBlazer.Domain.FileHandling
                     .Sort(SortExpressionComparer<Index>.Ascending(si => si.Start))
                     .ToCollection()
                     .CombineLatest(tailWatcher, (collection, tail) => new { Collection = collection, Tail = tail })
-                    .Scan((FileIndexCollection)null, (previous, x) => new FileIndexCollection(x.Collection,  previous, fileInfo, encoding))
+                    .Scan((FileIndexCollection)null, (previous, x) => new FileIndexCollection(x.Collection,  previous, metrics))
                     .StartWith(FileIndexCollection.Empty)
                     .SubscribeSafe(observer);
 
@@ -116,7 +105,7 @@ namespace TailBlazer.Domain.FileHandling
                             //Perhaps we could correctly use segments an index entire file
                             //todo: index first and last segment for large sized file
                             //Produce indicies 
-                            var actual = Scan(segment.Info.FullName, segment.Encoding, 0, tail.Start, _compression);
+                            var actual = Scan(segment.Metrics.FullName, segment.Encoding, 0, tail.Start, _compression);
                             indexList.Edit(innerList =>
                             {
                                 innerList.Remove(estimate);
@@ -124,7 +113,7 @@ namespace TailBlazer.Domain.FileHandling
                             });
                         }
                     });
-                return new CompositeDisposable(tailWatcher.Connect(), shared.Connect(), collectionBuilder, tailScanner, indexList, headSubscriber, infoSubscriber);
+                return new CompositeDisposable(tailWatcher.Connect(), shared.Connect(), collectionBuilder, tailScanner, indexList, headSubscriber);
             });
         }
 
@@ -238,22 +227,11 @@ namespace TailBlazer.Domain.FileHandling
             {
                 var shared = _fileSegments.Publish();
 
-                //0.5 ensure we have the latest file info and encoding
-                Encoding encoding = null;
-                FileInfo fileInfo = null;
+                IFileMetrics metrics =null;
 
-                //TODO: This is shit. We need a better way of passing around the Encoding / File meta data
-                var infoSubscriber = shared
-                    .Where(fs => fs.Segments.Encoding != null)
-                    .Take(1)
-                    .Subscribe(fswt =>
-                    {
-                        encoding = fswt.Segments.Encoding;
-                        fileInfo = fswt.Segments.Info;
-                    });
-                
-
+                //ensure we have the latest file metrics + monitor tail
                 var tailWatcher = shared
+                    .Do(segments => Interlocked.Exchange(ref metrics, segments.Segments.Metrics))
                     .Select(segments => segments.TailInfo)
                     .DistinctUntilChanged()
                     .Publish();
@@ -265,7 +243,7 @@ namespace TailBlazer.Domain.FileHandling
                     .Sort(SortExpressionComparer<Index>.Ascending(si => si.Start))
                     .ToCollection()
                     .CombineLatest(tailWatcher, (collection, tail) => new { Collection = collection, Tail = tail})
-                    .Scan((IndexCollection) null, (previous, x) => new IndexCollection(x.Collection,x.Tail, previous, fileInfo, encoding))
+                    .Scan((IndexCollection) null, (previous, x) => new IndexCollection(x.Collection,x.Tail, previous, metrics))
                     .StartWith(IndexCollection.Empty)
                     .SubscribeSafe(observer);
                     
@@ -312,7 +290,7 @@ namespace TailBlazer.Domain.FileHandling
                             //Perhaps we could correctly use segments an index entire file
                             //todo: index first and last segment for large sized file
                             //Produce indicies 
-                            var actual = Scan(segment.Info.FullName, segment.Encoding, 0, tail.Start, _compression);
+                            var actual = Scan(segment.Metrics.FullName, segment.Encoding, 0, tail.Start, _compression);
                             indexList.Edit(innerList =>
                             {
                                 innerList.Remove(estimate);
@@ -320,7 +298,7 @@ namespace TailBlazer.Domain.FileHandling
                             });
                         }
                     });
-                return new CompositeDisposable(tailWatcher.Connect(), shared.Connect(), collectionBuilder, tailScanner, indexList, headSubscriber, infoSubscriber);
+                return new CompositeDisposable(tailWatcher.Connect(), shared.Connect(), collectionBuilder, tailScanner, indexList, headSubscriber);
             });
         }
 

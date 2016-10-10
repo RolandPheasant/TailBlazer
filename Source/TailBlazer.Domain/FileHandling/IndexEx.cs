@@ -19,7 +19,7 @@ namespace TailBlazer.Domain.FileHandling
             if (source == null) throw new ArgumentNullException(nameof(source));
 
             var published = source.Replay(1).RefCount();
-            var nameChanged = published.Select(fsc => fsc.Segments.Info.Name).DistinctUntilChanged().Skip(1);
+            var nameChanged = published.Select(fsc => fsc.Segments.Metrics.FullName).DistinctUntilChanged().Skip(1);
             var diff = published.Select(fsc => fsc.Segments.SizeDiff);
 
             var idx = Observable.Create<IndexCollection>(observer =>

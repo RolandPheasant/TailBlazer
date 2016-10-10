@@ -1,4 +1,5 @@
 using System;
+using System.Reactive.Concurrency;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -8,8 +9,8 @@ namespace TailBlazer.Domain.FileHandling
         IObservable<FileSegmentsWithTail> Segments { get; }
         IObservable<long> Size { get; }
 
-        ILineMonitor Monitor(IObservable<ScrollRequest> scrollRequest, Func<string, bool> predicate = null);
-        ILineMonitor Monitor(IObservable<ScrollRequest> scrollRequest, IObservable<Func<string, bool>> predicate);
+        ILineMonitor Monitor(IObservable<ScrollRequest> scrollRequest, Func<string, bool> predicate = null, IScheduler scheduler = null);
+        ILineMonitor Monitor(IObservable<ScrollRequest> scrollRequest, IObservable<Func<string, bool>> predicate, IScheduler scheduler=null);
 
         IObservable<ILineProvider> Search(Func<string, bool> predicate);
         IObservable<ILineProvider> Index();

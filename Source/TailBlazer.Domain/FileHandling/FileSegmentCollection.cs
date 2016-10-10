@@ -7,7 +7,7 @@ namespace TailBlazer.Domain.FileHandling
 {
     public sealed class FileSegmentCollection : IEquatable<FileSegmentCollection>
     {
-        public FileInfo Info { get;  }
+        public IFileMetrics Metrics { get;  }
         public FileSegment[] Segments { get;  }
         public long TailStartsAt { get;  }
         public int Count { get;  }
@@ -18,12 +18,12 @@ namespace TailBlazer.Domain.FileHandling
         public long SizeDiff { get; }
         public Encoding Encoding { get;  }
 
-        public FileSegmentCollection(FileInfo fileInfo, FileSegment[] segments, long sizeDiff, Encoding encoding)
+        public FileSegmentCollection(IFileMetrics fileInfo, FileSegment[] segments, long sizeDiff, Encoding encoding)
         {
             if (segments.Length == 0)
                 throw new ArgumentException("Argument is empty collection", nameof(segments));
 
-            Info = fileInfo;
+            Metrics = fileInfo;
             Segments = segments;
             TailStartsAt = segments.Max(fs => fs.End);
             Count = Segments.Length;
@@ -39,7 +39,7 @@ namespace TailBlazer.Domain.FileHandling
 
             //All this assumes it is the tail which has changed, but that may not be so
             Reason = FileSegmentChangedReason.Tailed;
-            Info = previous.Info;
+            Metrics = previous.Metrics;
 
             var last = previous.Tail;
             TailStartsAt = last.End;
@@ -47,12 +47,16 @@ namespace TailBlazer.Domain.FileHandling
             var segments = previous.Segments;
             segments[segments.Length-1] = new FileSegment(last, newLength);
             Segments = segments;
-            Encoding = previous.Encoding ?? Info.GetEncoding();
+            Encoding = previous.Encoding ?? Metrics.GetEncoding();
             Count = Segments.Length;
             FileSize = newLength;
 
         }
-        
+
+        //private FileSegmentCollection()
+        //{
+        //}
+
         #region Equality
 
         public bool Equals(FileSegmentCollection other)

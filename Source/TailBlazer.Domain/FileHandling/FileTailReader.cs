@@ -33,18 +33,18 @@ namespace TailBlazer.Domain.FileHandling
                     .Synchronize(locker)
                     .Select(fsc =>
                     {
-                        if (fsc.Count == 0)
+                        if (fsc.Count == 0 || fsc.SizeDiff < 0)
                             return TailInfo.Empty;
 
-                        if (encoding == null)
-                            encoding = fsc.Info.GetEncoding();
+                        //if (encoding == null)
+                        //    encoding = fsc.Info.GetEncoding();
 
                         var tailFromPosition = fsc.Reason == FileSegmentChangedReason.Loaded 
                                 ? fsc.Tail.Start
                                 : lastTail.End;
                         
                         //calculate last tail => either inital size or scan from end
-                        var lines = ReadTail(fsc.Info.FullName, tailFromPosition, encoding).ToArray();
+                        var lines = ReadTail(fsc.Metrics.FullName, tailFromPosition, fsc.Metrics.Encoding).ToArray();
                         var tail = new TailInfo(lines);
                         lastTail = tail;
                         return tail;

@@ -37,7 +37,7 @@ namespace TailBlazer.Views.Searching
                 .Transform(searchInfo =>
                 {
                     //var
-                    var monitor = fileWatcher.Monitor(scrollRequest, searchInfo.Filter);
+                    var monitor = fileWatcher.Monitor(scrollRequest, searchInfo.Filter, schedulerProvider.Background);
                     return new SearchViewModel(searchInfo, monitor, vm => searchInfoCollection.Remove(vm.Text));
                 })
                 .DisposeMany()
@@ -72,6 +72,7 @@ namespace TailBlazer.Views.Searching
             var switcher = this.WhenValueChanged(sc => sc.Selected)
                 .DistinctUntilChanged()
                 .Where(x => x != null)
+                .ObserveOn(schedulerProvider.Background)
                 .Select(svm => svm.LineMonitor);
 
             Current = new SwitchableLineMonitor(switcher);

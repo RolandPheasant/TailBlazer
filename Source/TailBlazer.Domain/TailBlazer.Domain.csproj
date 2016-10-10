@@ -80,7 +80,7 @@
     <Compile Include="FileHandling\FileInfoEx.cs" />
     <Compile Include="FileHandling\FileMonitor.cs" />
     <Compile Include="FileHandling\FileMonitorEx.cs" />
-    <Compile Include="FileHandling\FileNameAndSize.cs" />
+    <Compile Include="FileHandling\FileChanges.cs" />
     <Compile Include="FileHandling\FileRewriter.cs" />
     <Compile Include="FileHandling\FileSearchEx.cs" />
     <Compile Include="FileHandling\FileSearchIndexer.cs" />
@@ -97,6 +97,7 @@
     <Compile Include="FileHandling\FileSegmentsWithTail.cs" />
     <Compile Include="FileHandling\FileSegmentType.cs" />
     <Compile Include="FileHandling\FileStatus.cs" />
+    <Compile Include="FileHandling\IFileMetrics.cs" />
     <Compile Include="FileHandling\ILineMonitor.cs" />
     <Compile Include="FileHandling\ILineReader.cs" />
     <Compile Include="FileHandling\SwitchableLineMonitor.cs" />
