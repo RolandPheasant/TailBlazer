@@ -99,6 +99,7 @@
     <Compile Include="FileHandling\FileStatus.cs" />
     <Compile Include="FileHandling\ILineMonitor.cs" />
     <Compile Include="FileHandling\ILineReader.cs" />
+    <Compile Include="FileHandling\SwitchableLineMonitor.cs" />
     <Compile Include="FileHandling\TailInfoEx.cs" />
     <Compile Include="FileHandling\FileTailReader.cs" />
     <Compile Include="FileHandling\FileWatcher.cs" />

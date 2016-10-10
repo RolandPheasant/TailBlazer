@@ -66,57 +66,57 @@ namespace TailBlazer.Fixtures
         //    }
         //}
 
-        [Fact]
-        public void AutoTailWithFilter()
-        {
+        //[Fact]
+        //public void AutoTailWithFilter()
+        //{
 
-            var scheduler = new TestScheduler();
-            var autoTailer = Observable.Return(new ScrollRequest(10));
+        //    var scheduler = new TestScheduler();
+        //    var autoTailer = Observable.Return(new ScrollRequest(10));
 
-            Func<string, bool> predicate = s => s.Contains("odd");
-            using (var file = new TestFile())
-            {
+        //    Func<string, bool> predicate = s => s.Contains("odd");
+        //    using (var file = new TestFile())
+        //    {
 
-                file.Append(Enumerable.Range(1, 100).Select(i => i%2 == 1 ? $"{i} is an odd number" : $"{i} is an even number").ToArray());
-                var search = file.Info.Search(predicate,  scheduler);
+        //        file.Append(Enumerable.Range(1, 100).Select(i => i%2 == 1 ? $"{i} is an odd number" : $"{i} is an even number").ToArray());
+        //        var search = file.Info.Search(predicate,  scheduler);
 
-                using (var tailer = new LineScroller(file.Info, search, autoTailer, new NullLogger(), scheduler))
-                {
+        //        using (var tailer = new LineScroller(file.Info, search, autoTailer, new NullLogger(), scheduler))
+        //        {
 
-                    //lines which contain "1"
-                    var expectedLines = Enumerable.Range(1, 100)
-                        .Select(i => i%2 == 1 ? $"{i} is an odd number" : $"{i} is an even number")
-                        .Where(s => s.Contains("odd"))
-                        .Reverse()
-                        .Take(10)
-                        .Reverse()
-                        .ToArray();
+        //            //lines which contain "1"
+        //            var expectedLines = Enumerable.Range(1, 100)
+        //                .Select(i => i%2 == 1 ? $"{i} is an odd number" : $"{i} is an even number")
+        //                .Where(s => s.Contains("odd"))
+        //                .Reverse()
+        //                .Take(10)
+        //                .Reverse()
+        //                .ToArray();
 
-                    scheduler.AdvanceBySeconds(1);
+        //            scheduler.AdvanceBySeconds(1);
 
-                    tailer.Lines.Items.Select(l => l.Text).ShouldAllBeEquivalentTo(expectedLines);
-
-
-                    file.Append( Enumerable.Range(101, 10).Select(i => i%2 == 1 ? $"{i} is an odd number" : $"{i} is an even number").ToArray());
-
-                    scheduler.AdvanceBySeconds(1);
-
-                    expectedLines = Enumerable.Range(1, 110)
-                        .Select(i => i%2 == 1 ? $"{i} is an odd number" : $"{i} is an even number")
-                        .Where(s => s.Contains("odd"))
-                        .Reverse()
-                        .Take(10)
-                        .Reverse()
-                        .ToArray();
+        //            tailer.Lines.Items.Select(l => l.Text).ShouldAllBeEquivalentTo(expectedLines);
 
 
-                    scheduler.AdvanceBySeconds(1);
+        //            file.Append( Enumerable.Range(101, 10).Select(i => i%2 == 1 ? $"{i} is an odd number" : $"{i} is an even number").ToArray());
+
+        //            scheduler.AdvanceBySeconds(1);
+
+        //            expectedLines = Enumerable.Range(1, 110)
+        //                .Select(i => i%2 == 1 ? $"{i} is an odd number" : $"{i} is an even number")
+        //                .Where(s => s.Contains("odd"))
+        //                .Reverse()
+        //                .Take(10)
+        //                .Reverse()
+        //                .ToArray();
 
 
-                    tailer.Lines.Items.Select(l => l.Text).ShouldAllBeEquivalentTo(expectedLines);
-                }
-            }
-        }
+        //            scheduler.AdvanceBySeconds(1);
+
+
+        //            tailer.Lines.Items.Select(l => l.Text).ShouldAllBeEquivalentTo(expectedLines);
+        //        }
+        //    }
+        //}
 
 
         //[Fact]

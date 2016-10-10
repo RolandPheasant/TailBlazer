@@ -116,15 +116,15 @@
     <Compile Include="DefaultIconSelectorFixture.cs" />
     <Compile Include="DisplayTextFixture.cs" />
     <Compile Include="FileDropFixture.cs" />
-    <Compile Include="FileMonitorFixture.cs" />
-    <Compile Include="FileTailMonitorFixture.cs" />
     <Compile Include="IconDescriptionFixture.cs" />
     <Compile Include="IconProviderFixture.cs" />
     <Compile Include="LinesEx.cs" />
+    <Compile Include="SearchHintEx.cs" />
     <Compile Include="StartFromFixture.cs" />
     <Compile Include="FileSearchFixture.cs" />
     <Compile Include="FileSegmentFixture.cs" />
     <Compile Include="FileSegmentUsingExtensionFixture.cs" />
+    <Compile Include="FileTailerFixture.cs" />
     <Compile Include="FileWatchFixture.cs" />
     <Compile Include="LargeFileGenerator.cs" />
     <Compile Include="LogFixtures.cs" />
