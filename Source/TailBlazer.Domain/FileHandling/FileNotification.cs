@@ -53,7 +53,8 @@ namespace TailBlazer.Domain.FileHandling
             if (Exists)
             {
                 Size = Info.Length;
-                Encoding = this.GetEncoding();
+
+                Encoding = previous.Encoding ?? this.GetEncoding();
 
                 if (!previous.Exists)
                 {

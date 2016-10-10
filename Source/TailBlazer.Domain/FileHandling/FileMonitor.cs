@@ -44,20 +44,15 @@ namespace TailBlazer.Domain.FileHandling
             IObservable<MonitorObservables> observables;
             if (predicateObs != null)
             {
-
-
-                var pred = predicateObs.Take(1).Wait();
-                observables = CreateObservables(fsg => fsg.Monitor(pred, scheduler));
-                //observables = predicateObs
-                //    .Select(pred => CreateObservables(fsg => fsg.Monitor(pred, scheduler)))
-                //    .Switch();
+                observables = predicateObs
+                    .Select(pred => CreateObservables(fsg => fsg.Monitor(pred, scheduler)))
+                    .Switch();
             }
             else
             {
                 observables = CreateObservables(fsg => fsg.Monitor(predicate, scheduler));
             }
 
-           // IObservable<MonitorObservables> observables = CreateObservables(fsg=> fsg.Monitor(predicate, scheduler));
             Size = observables.Select(obs => obs.Size).Switch();
             TotalLines = observables.Select(obs => obs.TotalLines).Switch();
             var monitor = observables.Subscribe(obs=> rolloverDisposable.Disposable = PopulateData(cache, obs.ScrollInfo)) ;

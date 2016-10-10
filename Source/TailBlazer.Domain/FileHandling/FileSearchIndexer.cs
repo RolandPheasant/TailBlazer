@@ -6,6 +6,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
+using System.Threading;
 using DynamicData;
 using DynamicData.Kernel;
 using TailBlazer.Domain.Annotations;
@@ -52,8 +53,19 @@ namespace TailBlazer.Domain.FileHandling
                 var shared = _fileSegments.Publish();
 
                 //0.5 ensure we have the latest file metrics
-                var metrics = shared.Select(fs => fs.Segments.Metrics).Take(1).Wait();
-                
+
+
+                //0.5 ensure we have the latest file info and encoding
+                //TODO: This is shit. We need a better way of passing around the Encoding / File meta data
+                IFileMetrics metrics = null;
+                shared
+                    .Where(fs => fs.Segments.Metrics != null)
+                    .Take(1)
+                    .Subscribe(fswt => metrics = fswt.Segments.Metrics);
+
+
+
+
                 //manually maintained search results and status
                 var searchData = new SourceCache<FileSegmentSearch, FileSegmentKey>(s => s.Key);
 

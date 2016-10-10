@@ -16,9 +16,8 @@ namespace TailBlazer.Domain.FileHandling
         public long FileLength => Tail.End;
         public long FileSize { get; }
         public long SizeDiff { get; }
-        public Encoding Encoding { get;  }
 
-        public FileSegmentCollection(IFileMetrics fileInfo, FileSegment[] segments, long sizeDiff, Encoding encoding)
+        public FileSegmentCollection(IFileMetrics fileInfo, FileSegment[] segments, long sizeDiff)
         {
             if (segments.Length == 0)
                 throw new ArgumentException("Argument is empty collection", nameof(segments));
@@ -29,7 +28,6 @@ namespace TailBlazer.Domain.FileHandling
             Count = Segments.Length;
             FileSize = TailStartsAt;
             SizeDiff = sizeDiff;
-            Encoding = encoding;
             Reason = FileSegmentChangedReason.Loaded;
         }
 
@@ -47,7 +45,6 @@ namespace TailBlazer.Domain.FileHandling
             var segments = previous.Segments;
             segments[segments.Length-1] = new FileSegment(last, newLength);
             Segments = segments;
-            Encoding = previous.Encoding ?? Metrics.GetEncoding();
             Count = Segments.Length;
             FileSize = newLength;
 

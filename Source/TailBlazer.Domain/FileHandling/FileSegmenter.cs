@@ -47,7 +47,7 @@ namespace TailBlazer.Domain.FileHandling
                     if (previous == null || current.Invalidated) 
                     {
                         var segments = LoadSegments(current.FullName).ToArray();
-                        return new FileSegmentCollection(current, segments, current.Size, current.Encoding);
+                        return new FileSegmentCollection(current, segments, current.Size);
                     }
 
                     //if file size has not changed, do not reload segment

@@ -44,7 +44,11 @@ namespace TailBlazer.Domain.FileHandling
                 var shared = _fileSegments.Publish();
 
                 //0.5 ensure we have the latest file metrics
-                var metrics = shared.Select(fs => fs.Segments.Metrics).Take(1).Wait();
+                //TODO: This is shit. We need a better way of passing around the Encoding / File meta data
+                IFileMetrics metrics = null;
+                shared.Where(fs => fs.Segments.Metrics != null)
+                    .Take(1)
+                    .Subscribe(fswt => metrics = fswt.Segments.Metrics);
 
                 var tailWatcher = shared
                     .Select(segments => segments.TailInfo)
@@ -105,7 +109,7 @@ namespace TailBlazer.Domain.FileHandling
                             //Perhaps we could correctly use segments an index entire file
                             //todo: index first and last segment for large sized file
                             //Produce indicies 
-                            var actual = Scan(segment.Metrics.FullName, segment.Encoding, 0, tail.Start, _compression);
+                            var actual = Scan(segment.Metrics, 0, tail.Start, _compression);
                             indexList.Edit(innerList =>
                             {
                                 innerList.Remove(estimate);
@@ -132,14 +136,14 @@ namespace TailBlazer.Domain.FileHandling
             return (int)estimatedLines;
         }
 
-        private Index Scan(string fileName, Encoding encoding, long start, long end, int compression)
+        private Index Scan(IFileMetrics metrics, long start, long end, int compression)
         {
             int count = 0;
             long lastPosition = 0;
-            using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            using (var stream = File.Open(metrics.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
                 long[] lines;
-                using (var reader = new StreamReaderExtended(stream, encoding, false))
+                using (var reader = new StreamReaderExtended(stream, metrics.Encoding, false))
                 {
                     var currentPosition = reader.AbsolutePosition();
                     if (currentPosition != start)
@@ -290,7 +294,7 @@ namespace TailBlazer.Domain.FileHandling
                             //Perhaps we could correctly use segments an index entire file
                             //todo: index first and last segment for large sized file
                             //Produce indicies 
-                            var actual = Scan(segment.Metrics.FullName, segment.Encoding, 0, tail.Start, _compression);
+                            var actual = Scan(segment.Metrics, 0, tail.Start, _compression);
                             indexList.Edit(innerList =>
                             {
                                 innerList.Remove(estimate);
@@ -317,14 +321,14 @@ namespace TailBlazer.Domain.FileHandling
             return (int)estimatedLines;
         }
 
-        private Index Scan(string fileName, Encoding encoding, long start, long end, int compression)
+        private Index Scan(IFileMetrics metrics, long start, long end, int compression)
         {
             int count = 0;
             long lastPosition = 0;
-            using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            using (var stream = File.Open(metrics.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
             {
                 long[] lines;
-                using (var reader = new StreamReaderExtended(stream, encoding, false))
+                using (var reader = new StreamReaderExtended(stream, metrics.Encoding, false))
                 {
                     var currentPosition = reader.AbsolutePosition();
                     if (currentPosition!= start)
