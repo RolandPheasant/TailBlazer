@@ -1,11 +1,9 @@
 using System;
 using System.IO;
-using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using TailBlazer.Domain.Annotations;
-using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Ratings;
 
 namespace TailBlazer.Domain.FileHandling
@@ -16,14 +14,8 @@ namespace TailBlazer.Domain.FileHandling
         public IObservable<FileSegmentsWithTail> Segments { get; }
         public IObservable<long> Size { get; }
 
-        public IObservable<Unit> Invalidated { get; }
-
-      //  public IObservable<FileNameAndSize> FileMonitor { get; }
-
         private FileInfo FileInfo { get;  }
-
-
-
+        
         public string FullName => FileInfo.FullName;
 
         public string Name => FileInfo.Name;
@@ -56,24 +48,16 @@ namespace TailBlazer.Domain.FileHandling
                 .DistinctUntilChanged()
                 .Switch()
                 .TakeWhile(notification => notification.Exists)
-             //   .Repeat()
+               // .Repeat()
                 .Publish();
 
-            //file is invalidated at roll-over and and when the file is cleared
-            Invalidated = shared.Scan((FileChanges) null, (state, latest) =>
-                {
-                    return state == null ? new FileChanges(latest) : new FileChanges(state, latest);
-                })
-                .Select(nameAndSize => nameAndSize.Invalidated)
-                .Where(invalidated => invalidated)
-                .Select(x=> x)
-                .ToUnit()
-                .Publish().RefCount();
+
 
             Size = shared.Select(fn => fn.Size).Replay(1).RefCount();
 
-            Segments = shared.WithSegments().WithTail()
-                .TakeUntil(Invalidated)
+            Segments = shared.WithSegments()
+                .WithTail()
+                //.TakeUntil(Invalidated)
                 .Repeat()
                 .Replay(1).RefCount()
                 .Select(x => x);

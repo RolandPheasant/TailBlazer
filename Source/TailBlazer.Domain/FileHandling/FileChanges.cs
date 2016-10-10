@@ -21,7 +21,6 @@ namespace TailBlazer.Domain.FileHandling
 
         public bool NoChange { get; }
 
-
         public bool Invalidated { get; }
 
         public FileChanges(FileNotification fileNotification)

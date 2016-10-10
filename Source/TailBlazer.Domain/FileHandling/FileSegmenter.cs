@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
 namespace TailBlazer.Domain.FileHandling
@@ -28,43 +29,57 @@ namespace TailBlazer.Domain.FileHandling
         public FileSegmenter(IObservable<FileNotification> notifications, 
                                 int initialTail= 500000, 
                                 int segmentSize=25000000)
+            :this(notifications.MonitorChanges(), initialTail, segmentSize)
+        {
+            }
+
+        public FileSegmenter(IObservable<FileChanges> notifications,
+                        int initialTail = 500000,
+                        int segmentSize = 25000000)
         {
             if (notifications == null) throw new ArgumentNullException(nameof(notifications));
             _initialTail = initialTail;
             _segmentSize = segmentSize;
-            
+
+
+            Segments = Observable.Create<FileSegmentCollection>(observer =>
+            {
+                var shared = notifications.Publish();
+
+                var notifier = shared
+                    .TakeUntil(shared.Where(fc=>fc.Invalidated))
+                    .Scan((FileSegmentCollection) null, (previous, current) =>
+                    {
+                        if (previous == null || current.Invalidated)
+                        {
+                            var segments = LoadSegments(current.FullName).ToArray();
+                            return new FileSegmentCollection(current, segments, current.Size);
+                        }
+                        //if file size has not changed, do not reload segment
+                        if (current.NoChange) return previous;
+
+                        return new FileSegmentCollection(current.Size, previous);
+                    })
+                    .Repeat()
+                    .SubscribeSafe(observer);
+
+
+                return new CompositeDisposable(notifier, shared.Connect());
+            });
+
             //TODO: Re-segment as file grows + account for rollover
             Segments = notifications
-                .MonitorChanges()
-                .Scan((FileSegmentCollection) null, (previous, current) =>
+                .Scan((FileSegmentCollection)null, (previous, current) =>
                 {
-
- // _info = (FileInfo)current;
-                
-                    //var nameHasChanged = previous != null && (previous.Info.Name != current.Name);
-
-             
-                    if (previous == null || current.Invalidated) 
+                    if (previous == null || current.Invalidated)
                     {
                         var segments = LoadSegments(current.FullName).ToArray();
                         return new FileSegmentCollection(current, segments, current.Size);
                     }
-
                     //if file size has not changed, do not reload segment
                     if (current.NoChange) return previous;
 
-
                     return new FileSegmentCollection(current.Size, previous);
-                    //  var newLength = current.Size;
-
-                    //////if file is smaller, treat it as a new file
-                    //if (newLength < previous.FileLength)
-                    //{
-                    //    var encoding = current.GetEncoding();
-                    //    var segments = LoadSegments().ToArray();
-                    //    return new FileSegmentCollection(current, segments, current.SizeDiff, encoding);
-                    //}
-
                 }).DistinctUntilChanged();
         }
 

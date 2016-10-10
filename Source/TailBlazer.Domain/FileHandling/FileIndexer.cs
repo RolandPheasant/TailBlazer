@@ -13,7 +13,6 @@ using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
 {
-
     public class Indexer
     {
         private readonly IObservable<FileSegmentsWithTail> _fileSegments;
