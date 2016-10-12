@@ -6,7 +6,6 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
-using System.Threading;
 using DynamicData;
 using DynamicData.Kernel;
 using TailBlazer.Domain.Annotations;
@@ -14,8 +13,6 @@ using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
-
-
     /// <summary>
     /// Responsive and flexible file searching.
     /// See https://github.com/RolandPheasant/TailBlazer/issues/42

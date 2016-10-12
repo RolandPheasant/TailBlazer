@@ -82,7 +82,6 @@ namespace TailBlazer.Domain.FileHandling
                 //keep monitoring until the file has been invalidated i. e. rollover or file name changed
                 var scrollInfo = indexer
                     .CombineLatest(scroll, tail, (idx, scrl, t) => new IndiciesWithScroll(idx, scrl, t))
-                    .Throttle(TimeSpan.FromMilliseconds(50))
                     .Scan((IndiciesWithScroll) null, (state, latest) =>
                     {
                        return state == null 
