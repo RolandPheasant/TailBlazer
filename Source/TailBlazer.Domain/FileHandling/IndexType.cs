@@ -2,7 +2,7 @@ namespace TailBlazer.Domain.FileHandling
 {
     public enum IndexType
     {
-        Tail,
-        Page
+        Tail=1,
+        Page=0
     }
 }

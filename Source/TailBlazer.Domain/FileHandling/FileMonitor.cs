@@ -69,22 +69,20 @@ namespace TailBlazer.Domain.FileHandling
                 //ensure input streams are synchronised
                 var published = _fileSegments.Synchronize(locker).Publish();
                 var scroll = _scrollRequest.DistinctUntilChanged().Synchronize(locker);
-                var indexer = lineReaderFactory(_fileSegments).Synchronize(locker);
+                var indexer = lineReaderFactory(published).Synchronize(locker);
 
                 //set up file info observables
                var tail = published.Select(fsc => fsc.TailInfo).DistinctUntilChanged();
 
-                //kill the stream when file rolls over, or when the name has changed
-                var invalidated = published.Where(fsr=>fsr.Changes.Invalidated)
-                            .DistinctUntilChanged();
-
                 var totalLines = indexer.Select(idx => idx.Count).Replay(1).RefCount();
                 var size = published.Select(fsc => fsc.Segments.FileSize).Replay(1).RefCount();
+
+              //  var invalidated = 
 
                 //keep monitoring until the file has been invalidated i. e. rollover or file name changed
                 var scrollInfo = indexer
                     .CombineLatest(scroll, tail, (idx, scrl, t) => new IndiciesWithScroll(idx, scrl, t))
-                    .Sample(TimeSpan.FromMilliseconds(50), _scheduler)
+                    .Throttle(TimeSpan.FromMilliseconds(50))
                     .Scan((IndiciesWithScroll) null, (state, latest) =>
                     {
                        return state == null 
@@ -92,7 +90,7 @@ namespace TailBlazer.Domain.FileHandling
                             : new IndiciesWithScroll(state, latest.LineReader, latest.Scroll, latest.TailInfo);
                     })
                     .StartWith(IndiciesWithScroll.Empty)
-                    .TakeUntil(invalidated)
+                   // .TakeUntil(invalidated)
                     .FinallySafe(() => observer.OnCompleted()); 
 
                 observer.OnNext(new MonitorObservables(scrollInfo, totalLines, size));
@@ -118,9 +116,23 @@ namespace TailBlazer.Domain.FileHandling
                     }
                     else if (latest.Reason == IndiciesWithScrollReason.InitialLoad)
                     {
-                        var result = latest.LineReader.ReadLines(latest.Scroll).ToArray();
+    
                         innerCache.Clear();
-                        innerCache.AddOrUpdate(result);
+
+
+                        if (latest.TailInfo.Count != 0)
+                        {
+                            var size = latest.TailInfo.Count;
+                            var pageSize = latest.Scroll.PageSize;
+                            var toAdd = latest.TailInfo.Lines.Skip(size - pageSize);
+                            innerCache.AddOrUpdate(toAdd);
+                        }
+                        else
+                        {
+                            var result = latest.LineReader.ReadLines(latest.Scroll).ToArray();
+                            innerCache.AddOrUpdate(result);
+                        }
+
                     }
                     else if (latest.Reason == IndiciesWithScrollReason.TailChanged)
                     {
@@ -205,7 +217,7 @@ namespace TailBlazer.Domain.FileHandling
                 TailInfo = (lineReader as IHasTailInfo)?.TailInfo ?? tail;
                 LineReader = lineReader;
                 PageSizeChanged = false;
-                Reason = IndiciesWithScrollReason.None;
+                Reason = IndiciesWithScrollReason.InitialLoad;
             }
 
             public IndiciesWithScroll(IndiciesWithScroll previous, ILineReader lineReader, ScrollRequest scroll, TailInfo tail)
@@ -215,7 +227,10 @@ namespace TailBlazer.Domain.FileHandling
                 LineReader = lineReader;
                 PageSizeChanged = previous.Scroll.PageSize != scroll.PageSize;
 
-                if (lineReader.Diff < 0)
+
+
+
+                if (lineReader.Count ==0 ||  lineReader.Count < previous.LineReader.Count)
                 {
                     Reason = IndiciesWithScrollReason.InitialLoad;
                 }

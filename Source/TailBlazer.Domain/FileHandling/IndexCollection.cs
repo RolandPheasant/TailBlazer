@@ -22,7 +22,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             Metrics = metrics;
             Count = latest.Select(idx => idx.LineCount).Sum();
-            Indicies = latest.ToArray();
+            Indicies = latest.OrderBy(idx=>idx.Type).ToArray();
             Diff = Count - (previous?.Count ?? 0);
         }
 

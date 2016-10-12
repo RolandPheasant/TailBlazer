@@ -11,7 +11,7 @@ namespace TailBlazer.Domain.FileHandling
         public int Count { get;  }
         public FileSegmentChangedReason Reason { get; }
         public FileSegment Tail => Segments[Count - 1];
-        public long FileLength => Tail.Size;
+        public long TailSize => Tail.Size;
         public long FileSize { get; }
         public long SizeDiff { get; }
 
@@ -45,7 +45,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public FileSegmentCollection(IFileMetrics fileInfo, FileSegmentCollection previous)
         {
-            SizeDiff = fileInfo.Size - previous.FileLength;
+            SizeDiff = fileInfo.Size - previous.FileSize;
 
             //All this assumes it is the tail which has changed, but that may not be so
             Reason = FileSegmentChangedReason.Tailed;

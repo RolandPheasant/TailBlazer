@@ -32,6 +32,20 @@ namespace TailBlazer.Fixtures
             Append(new[] { line });
         }
 
+        public string[] Append(int startingLineNumber, int numberOfLines)
+        {
+            var lines = Enumerable.Range(startingLineNumber, numberOfLines).Select(i => $"This is line number {i:00000000}").ToArray();
+            Append(lines);
+            return lines;
+        }
+
+        public string[] Append(int[] values)
+        {
+            var lines = values.Select(i => $"This is line number {i:00000000}").ToArray();
+            Append(lines);
+            return lines;
+        }
+
         public void Append(IEnumerable<string> lines)
         {
             //Do not use File.AppendAllLines as it seems to create an exclusive lock
@@ -63,7 +77,12 @@ namespace TailBlazer.Fixtures
 
         public void Create()
         {
-            File.Create(Name);
+            // File.Create(Name);
+
+            using (var fs = File.Open(Info.FullName, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Delete | FileShare.ReadWrite))
+            {
+                fs.Close();
+            }
         }
 
         public void Dispose()

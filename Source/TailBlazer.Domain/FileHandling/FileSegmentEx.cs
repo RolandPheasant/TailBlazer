@@ -23,14 +23,17 @@ namespace TailBlazer.Domain.FileHandling
             return new FileTailReader(source).Tail();
         }
 
-        public static IObservable<FileSegmentReport> SegmentWithReport([NotNull] this IObservable<FileNotification> source)
+        public static IObservable<FileSegmentReport> SegmentWithReport([NotNull] this IObservable<FileNotification> source, int initialTail = 100000)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
 
             return Observable.Create<FileSegmentReport>(observer =>
             {
                 var changes = source.MonitorChanges().DistinctUntilChanged().Publish();
-                var segments = changes.WithSegments().DistinctUntilChanged().Publish();
+                var segments = changes.WithSegments(initialTail).DistinctUntilChanged().Publish();
+
+              //  var zipped = changes.Zip(segments, (c, s) => new );
+
                 var fileTail = segments.Tail().DistinctUntilChanged();
                 var combined = segments.CombineLatest(fileTail, changes, (segment, tail, change) => new FileSegmentReport(segment, tail, change));
 

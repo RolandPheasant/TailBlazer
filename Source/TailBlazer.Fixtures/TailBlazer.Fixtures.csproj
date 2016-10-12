@@ -124,7 +124,6 @@
     <Compile Include="StartFromFixture.cs" />
     <Compile Include="FileSearchFixture.cs" />
     <Compile Include="FileSegmentFixture.cs" />
-    <Compile Include="FileSegmentUsingExtensionFixture.cs" />
     <Compile Include="FileTailerFixture.cs" />
     <Compile Include="FileWatchFixture.cs" />
     <Compile Include="LargeFileGenerator.cs" />

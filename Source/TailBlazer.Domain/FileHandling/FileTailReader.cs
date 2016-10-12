@@ -26,7 +26,6 @@ namespace TailBlazer.Domain.FileHandling
             return Observable.Create<TailInfo>(observer =>
             {
                 var lastTail = TailInfo.Empty;
-                Encoding encoding = null;
                 var locker = new object();
 
                 return _fileSegmentCollection
@@ -47,11 +46,10 @@ namespace TailBlazer.Domain.FileHandling
                         lastTail = tail;
                         return tail;
                     })
-                    .Where(info => info.Count != 0)
+                    //.Where(info => info.Count != 0)
                     .SubscribeSafe(observer);
             });
         }
-        
         
         private IEnumerable<Line> ReadTail(string fileName, long position, Encoding encoding)
         {

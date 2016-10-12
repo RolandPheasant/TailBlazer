@@ -43,7 +43,7 @@ namespace TailBlazer.Domain.FileHandling
             if (source == null) throw new ArgumentNullException(nameof(source));
 
             if (filter == null)
-                return new Indexer(source, scheduler: scheduler).Result;
+                return new FileIndexer(source).Result;
 
             return Observable.Never<ILineReader>();
             //return new FileSearchIndexer(source, filter, scheduler: scheduler).SearchResult;

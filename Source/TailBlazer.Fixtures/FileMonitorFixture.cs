@@ -26,7 +26,7 @@ namespace TailBlazer.Fixtures
                 using (var monitor = new FileMonitor(segments, scrollRequest, scheduler: scheduler))
                 {
                     //monitors inital tail
-                    scheduler.AdvanceByMilliSeconds(250);
+                    scheduler.AdvanceByMilliSeconds(350);
                     var actual = TransformToString(monitor.Lines);
                     var expected = CreateLines(91, 10);
                     CollectionAssert.AreEqual(actual, expected);
@@ -76,7 +76,7 @@ namespace TailBlazer.Fixtures
 
             using (var file = new TestFile("FileMonitorFixture.Filter"))
             {
-                file.Append(CreateLines(1, 100));
+                file.Append(1, 100);
 
                 var segments = file.Info.WatchFile(scheduler: scheduler)
                     .SegmentWithReport();

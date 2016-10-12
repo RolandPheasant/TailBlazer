@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Subjects;
 using FluentAssertions;
+using Microsoft.Reactive.Testing;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Infrastructure;
 using Xunit;
@@ -15,71 +16,72 @@ namespace TailBlazer.Fixtures
         [Fact]
         public void FileChanged()
         {
-            //need to make this test
-            var file = Path.GetTempFileName();
-            var info = new FileInfo(file);
-
-            File.AppendAllLines(file, Enumerable.Range(1, 1000).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
-
-            var refresher = new Subject<Unit>();
-
-            var segmenter = new FileSegmenter(info.WatchFile(refresher), 1000);
-            FileSegmentCollection result = null;
-
-            using (var indexer = segmenter.Segments.Subscribe(segment => result = segment))
+            using (var file = new TestFile())
             {
-                result.Should().NotBeNull();
-                result.Count.Should().BeGreaterOrEqualTo(2);
-                result.Segments.Select(fs => fs.Type).Should().Contain(FileSegmentType.Head);
-                result.Segments.Select(fs => fs.Type).Should().Contain(FileSegmentType.Tail);
-                result.FileLength.Should().Be(info.Length);
+                var info = file.Info;
 
+                file.Append(1,1000);
 
-                File.AppendAllLines(file, Enumerable.Range(101, 10).Select(i => $"{i}"));
-                refresher.Once();
-                info.Refresh();
-                result.FileLength.Should().Be(info.Length);
+                var refresher = new Subject<Unit>();
 
-                File.Delete(file);
+                var segmenter = new FileSegmenter(info.WatchFile(refresher), 1000);
+                FileSegmentCollection result = null;
+
+                using (segmenter.Segments.Subscribe(segment => result = segment))
+                {
+                    result.Should().NotBeNull();
+                    result.Count.Should().BeGreaterOrEqualTo(2);
+                    result.Segments.Select(fs => fs.Type).Should().Contain(FileSegmentType.Head);
+                    result.Segments.Select(fs => fs.Type).Should().Contain(FileSegmentType.Tail);
+                    result.FileSize.Should().Be(info.Length);
+                    
+                    file.Append(101,10);
+                    refresher.Once();
+                    info.Refresh();
+                    result.FileSize.Should().Be(info.Length);
+                }
             }
-
-            File.Delete(file);
         }
 
         [Fact]
         public void NotifiesOfSegmentWhenFileIsCreated()
         {
             //need to make this test
-            var file = Path.GetTempFileName();
-            var info = new FileInfo(file);
-            var refresher = new Subject<Unit>();
+            var scheduler = new TestScheduler();
 
-            var segmenter = new FileSegmenter(info.WatchFile(refresher), 1000);
-            FileSegmentCollection result = null;
-
-            using (var indexer = segmenter.Segments.Subscribe(segment => result = segment))
+            using (var file = new TestFile())
             {
-                result.Should().NotBeNull();
+                file.Delete();
+                var info = file.Info;
 
-                File.AppendAllLines(file, Enumerable.Range(1, 10000).Select(i => $"This is line number {i.ToString("00000000")}").ToArray());
-                refresher.Once();
+                var segmenter = new FileSegmenter(info.WatchFile(scheduler: scheduler), 1000);
+                FileSegmentCollection result = null;
 
-                result.Should().NotBeNull();
-                result.Count.Should().BeGreaterOrEqualTo(2);
-                result.Segments.Select(fs => fs.Type).Should().Contain(FileSegmentType.Head);
-                result.Segments.Select(fs => fs.Type).Should().Contain(FileSegmentType.Tail);
-                result.FileLength.Should().Be(info.Length);
+                using (segmenter.Segments.Subscribe(segment => result = segment))
+                {
+                    scheduler.AdvanceByMilliSeconds(250);
+                    file.Create();
+                    scheduler.AdvanceByMilliSeconds(250);
+
+                    result.Should().NotBeNull();
+
+                    file.Append(1, 10000);
+                    scheduler.AdvanceByMilliSeconds(250);
+
+                    result.Should().NotBeNull();
+                    result.Count.Should().BeGreaterOrEqualTo(2);
+                    result.Segments.Select(fs => fs.Type).Should().Contain(FileSegmentType.Head);
+                    result.Segments.Select(fs => fs.Type).Should().Contain(FileSegmentType.Tail);
+                    result.FileSize.Should().Be(info.Length);
 
 
-                File.AppendAllLines(file, Enumerable.Range(101, 10).Select(i => $"{i}"));
-                refresher.Once();
-                info.Refresh();
-                result.FileLength.Should().Be(info.Length);
+                    file.Append(101, 10);
+                     scheduler.AdvanceByMilliSeconds(250);
+                    info.Refresh();
+                    result.FileSize.Should().Be(info.Length);
+                }
 
-                File.Delete(file);
             }
-
-            File.Delete(file);
         }
     }
 }
