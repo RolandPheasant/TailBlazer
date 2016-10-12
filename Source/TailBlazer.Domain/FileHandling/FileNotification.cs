@@ -12,7 +12,7 @@ namespace TailBlazer.Domain.FileHandling
         public string FullName => Info.FullName;
         public string Name => Info.Name;
         public string Folder => Info.DirectoryName;
-        public FileNotificationType NotificationType { get; }
+        public FileNotificationReason Reason { get; }
         public Exception Error { get; }
 
         public Encoding Encoding { get; }
@@ -25,13 +25,13 @@ namespace TailBlazer.Domain.FileHandling
 
             if (Exists)
             {
-                NotificationType = FileNotificationType.CreatedOrOpened;
+                Reason = FileNotificationReason.CreatedOrOpened;
                 Size = Info.Length;
                 Encoding = this.GetEncoding();
             }
             else
             {
-                NotificationType = FileNotificationType.Missing;
+                Reason = FileNotificationReason.Missing;
             }
         }
 
@@ -40,7 +40,7 @@ namespace TailBlazer.Domain.FileHandling
             Info = fileInfo;
             Error = error;
             Exists = false;
-            NotificationType = FileNotificationType.Error;
+            Reason = FileNotificationReason.Error;
         }
 
         public FileNotification(FileNotification previous)
@@ -58,27 +58,27 @@ namespace TailBlazer.Domain.FileHandling
 
                 if (!previous.Exists)
                 {
-                    NotificationType = FileNotificationType.CreatedOrOpened;
+                    Reason = FileNotificationReason.CreatedOrOpened;
                 }
                 else if (Size > previous.Size)
                 {
-                    NotificationType = FileNotificationType.Changed;
+                    Reason = FileNotificationReason.Changed;
                 }
                 else if (Size < previous.Size)
                 {
                     //File has shrunk. We need it's own notification
-                    NotificationType = FileNotificationType.CreatedOrOpened;
+                    Reason = FileNotificationReason.CreatedOrOpened;
                 }
 
                 else
                 {
-                    NotificationType = FileNotificationType.None;
+                    Reason = FileNotificationReason.None;
                 }
 
             }
             else
             {
-                NotificationType = FileNotificationType.Missing;
+                Reason = FileNotificationReason.Missing;
             }
         }
 
@@ -96,7 +96,7 @@ namespace TailBlazer.Domain.FileHandling
             return Equals(FullName, other.FullName) 
                    && Exists == other.Exists 
                    && Size == other.Size 
-                   && NotificationType == other.NotificationType;
+                   && Reason == other.Reason;
         }
 
         public override bool Equals(object obj)
@@ -114,7 +114,7 @@ namespace TailBlazer.Domain.FileHandling
                 var hashCode = FullName?.GetHashCode() ?? 0;
                 hashCode = (hashCode*397) ^ Exists.GetHashCode();
                 hashCode = (hashCode*397) ^ Size.GetHashCode();
-                hashCode = (hashCode*397) ^ (int) NotificationType;
+                hashCode = (hashCode*397) ^ (int) Reason;
                 return hashCode;
             }
         }
@@ -133,7 +133,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public override string ToString()
         {
-            return $"{Name}  Size: {Size}, Type: {NotificationType}";
+            return $"{Name}  Size: {Size}, Type: {Reason}";
         }
     }
 }

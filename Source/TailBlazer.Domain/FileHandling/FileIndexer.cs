@@ -15,14 +15,14 @@ namespace TailBlazer.Domain.FileHandling
 {
     public class Indexer
     {
-        private readonly IObservable<FileSegmentsWithTail> _fileSegments;
+        private readonly IObservable<FileSegmentReport> _fileSegments;
         private readonly int _compression;
         private readonly int _sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing;
         private readonly IScheduler _scheduler;
 
         public IObservable<FileIndexCollection> Result { get; }
 
-        public Indexer([NotNull] IObservable<FileSegmentsWithTail> fileSegments,
+        public Indexer([NotNull] IObservable<FileSegmentReport> fileSegments,
             int compression = 10,
             int sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing = 250000000,
             IScheduler scheduler = null)
@@ -41,87 +41,125 @@ namespace TailBlazer.Domain.FileHandling
             return Observable.Create<FileIndexCollection>(observer =>
             {
                 var shared = _fileSegments.Publish();
+                var existing = shared.TakeWhile(fsr => fsr.Changes.Exists);
 
-                //0.5 ensure we have the latest file metrics
-                //TODO: This is shit. We need a better way of passing around the Encoding / File meta data
-                IFileMetrics metrics = null;
-                shared.Where(fs => fs.Segments.Metrics != null)
-                    .Take(1)
-                    .Subscribe(fswt => metrics = fswt.Segments.Metrics);
+                var doesNotExist = shared
+                    .Where(fsr => fsr.Changes.Reason == FileNotificationReason.CreatedOrOpened)
+                    .Skip(1)
+                    //.DistinctUntilChanged()
+                    .Do(x =>
+                    {
+                        Console.WriteLine(x);
+                    });
 
-                var tailWatcher = shared
-                    .Select(segments => segments.TailInfo)
+
+                var publisher = BuildIndicies(existing)
+                    .TakeUntil(doesNotExist)
+                    .Repeat()
+                    .SubscribeSafe(observer);
+
+                return new CompositeDisposable(shared.Connect(), publisher);
+            });
+
+            return _fileSegments.Publish(shared =>
+            {
+                var existing = shared.TakeWhile(fsr => fsr.Changes.Exists);
+
+                var doesNotExist = shared
+                    .Where(fsr => fsr.Changes.Invalidated)
                     .DistinctUntilChanged()
-                    .Publish();
+                    .Do(x =>
+                    {
+                        Console.WriteLine(x);
+                    });
 
+
+                return BuildIndicies(existing)
+                    .TakeUntil(doesNotExist)
+                    .Repeat();
+            });
+        }
+        private IObservable<FileIndexCollection> BuildIndicies(IObservable<FileSegmentReport> shared)
+        {
+            return Observable.Create<FileIndexCollection>(observer =>
+            {
                 //1. create  a resulting index object from the collection of index fragments
-                var indexList = new SourceList<Index>();
+                var indexList = new SourceCache<Index, IndexType>(idx => idx.Type);
 
+                var indexClearer = shared.Select(fsr => fsr.Changes.Invalidated)
+                    .DistinctUntilChanged()
+                    .Where(invalid => invalid)
+                    .Subscribe(_ => indexList.Clear());
+
+                var indexer =  CreateIndicies(shared)
+                    .Subscribe(index =>
+                    {
+                        indexList.AddOrUpdate(index);
+                    });
+
+                //2. From those indicies, combine and build a new collection
                 var collectionBuilder = indexList.Connect()
                     .Sort(SortExpressionComparer<Index>.Ascending(si => si.Start))
                     .ToCollection()
-                    .CombineLatest(tailWatcher, (collection, tail) => new { Collection = collection, Tail = tail })
-                    .Scan((FileIndexCollection)null, (previous, x) => new FileIndexCollection(x.Collection,  previous, metrics))
+                    .CombineLatest(shared, (collection, report) => new { Collection = collection, Report = report })
+                    .Scan((FileIndexCollection)null, (previous, x) =>
+                    {
+                        var changes = x.Report.Changes;
+                        var segments = x.Report.Segments;
+                        if (segments.Count == 0 || !changes.Exists)
+                        {
+                            return new FileIndexCollection(x.Collection, null, changes);
+                        }
+                        return new FileIndexCollection(x.Collection, previous, changes);
+                    })
                     .StartWith(FileIndexCollection.Empty)
+                    .DistinctUntilChanged()
                     .SubscribeSafe(observer);
 
-
-                //2. continual indexing of the tail + replace tail index whenether there are new scan results
-                var tailScanner = tailWatcher
-                    .Scan((Index)null, (previous, tail) =>
-                    {
-                        //index the tail
-                        var indicies = tail.Lines.Select(l => l.LineInfo.Start).ToArray();
-                        var index = new Index(tail.Start, tail.End, indicies, 1, tail.Count, IndexType.Tail);
-                        return previous == null ? index : new Index(index, previous);
-                    }).Subscribe(tail =>
-                    {
-                        //write tail  
-                        indexList.Edit(innerList =>
-                        {
-                            var existing = innerList.FirstOrDefault(si => si.Type == IndexType.Tail);
-                            if (existing != null) innerList.Remove(existing);
-                            innerList.Add(tail);
-                        });
-                    });
-
-
-                //3. Index the remainer of the file, only after the head has been indexed
-                var headSubscriber = shared
-                    .FirstAsync()
-                    .ObserveOn(_scheduler)
-                    .Subscribe(segments =>
-                    {
-                        var tail = segments.TailInfo;
-                        var segment = segments.Segments;
-
-                        if (tail.Start == 0) return;
-
-                        //add an estimate for the file size
-                        var estimateLines = EstimateNumberOfLines(segments);
-                        var estimate = new Index(0, tail.Start, _compression, estimateLines, IndexType.Page);
-                        indexList.Add(estimate);
-
-                        if (tail.Start < _sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing)
-                        {
-                            //keep it as an estimate for files over 250 meg [for now]
-                            //Perhaps we could correctly use segments an index entire file
-                            //todo: index first and last segment for large sized file
-                            //Produce indicies 
-                            var actual = Scan(segment.Metrics, 0, tail.Start, _compression);
-                            indexList.Edit(innerList =>
-                            {
-                                innerList.Remove(estimate);
-                                innerList.Add(actual);
-                            });
-                        }
-                    });
-                return new CompositeDisposable(tailWatcher.Connect(), shared.Connect(), collectionBuilder, tailScanner, indexList, headSubscriber);
+                return new CompositeDisposable(indexer, indexClearer, collectionBuilder, indexList);
             });
         }
 
+        private IObservable<Index> CreateIndicies(IObservable<FileSegmentReport> shared)
+        {
+            //Do initial scan of tail, 
+            //then index rest of the file + continue to index the tail 
+            var tailScanner = shared
+                .Select(report => report.TailInfo)
+                .DistinctUntilChanged()
+                .Scan((Index) null, (previous, tail) =>
+                {
+                    //index the tail
+                    var indicies = tail.Lines.Select(l => l.LineInfo.Start).ToArray();
+                    var index = new Index(tail.Start, tail.End, indicies, 1, tail.Count, IndexType.Tail);
+                    return previous == null ? index : new Index(index, previous);
+                });
 
-        private int EstimateNumberOfLines(FileSegmentsWithTail fileSegmentsWithTail)
+            var estimater = shared
+                .Select(report =>
+                {
+                    var estimatedLines = EstimateNumberOfLines(report);
+                    return new Index(0, report.TailInfo.Start, _compression, estimatedLines, IndexType.Page);
+                }).Take(1);
+
+            var headIndexer = shared
+                .FirstAsync()
+                .Where(segments => segments.TailInfo.Start < _sizeOfFileAtWhichThereIsAbsolutelyNoPointInIndexing)
+                .Take(1)
+                .Select(segments =>
+                {
+                    var tail = segments.TailInfo;
+                    var segment = segments.Segments;
+                    return Scan(segment.Metrics, 0, tail.Start, _compression);
+                });
+
+            var indexer = estimater.Concat(headIndexer);
+
+            return tailScanner.Merge(indexer);
+        }
+
+
+        private int EstimateNumberOfLines(FileSegmentReport fileSegmentsWithTail)
         {
             var tail = fileSegmentsWithTail.TailInfo;
             var segment = fileSegmentsWithTail.Segments;

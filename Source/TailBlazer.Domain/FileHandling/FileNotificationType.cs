@@ -3,7 +3,7 @@ using System;
 namespace TailBlazer.Domain.FileHandling
 {
     [Flags]
-    public enum FileNotificationType
+    public enum FileNotificationReason
     {
         None ,
         CreatedOrOpened,

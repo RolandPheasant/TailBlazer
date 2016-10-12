@@ -27,11 +27,12 @@ namespace TailBlazer.Domain.FileHandling
         public IObservable<FileSegmentCollection> Segments { get; }
 
         public FileSegmenter(IObservable<FileNotification> notifications, 
-                                int initialTail= 500000, 
+                                int initialTail= 10000, 
                                 int segmentSize=25000000)
             :this(notifications.MonitorChanges(), initialTail, segmentSize)
         {
             }
+
 
         public FileSegmenter(IObservable<FileChanges> notifications,
                         int initialTail = 500000,
@@ -46,41 +47,52 @@ namespace TailBlazer.Domain.FileHandling
             {
                 var shared = notifications.Publish();
 
+                var notExists = shared.Where(fc => !fc.Exists);
+
                 var notifier = shared
-                    .TakeUntil(shared.Where(fc=>fc.Invalidated))
+                    //.Where(fc=>fc.Exists)
                     .Scan((FileSegmentCollection) null, (previous, current) =>
                     {
-                        if (previous == null || current.Invalidated)
+                        if (previous == null || current.Reason == FileNotificationReason.CreatedOrOpened)
                         {
                             var segments = LoadSegments(current.FullName).ToArray();
                             return new FileSegmentCollection(current, segments, current.Size);
                         }
-                        //if file size has not changed, do not reload segment
-                        if (current.NoChange) return previous;
+                        
+                        if (!current.Exists || current.Invalidated) 
+                            return new FileSegmentCollection(current);
 
-                        return new FileSegmentCollection(current.Size, previous);
+
+                        //if file size has not changed, do not reload segment
+                        //if (current.NoChange)
+                        //    return previous;
+
+                        return new FileSegmentCollection(current, previous);
                     })
-                    .Repeat()
+                    //.TakeUntil(notExists)
+                    //.Repeat()
+                    .DistinctUntilChanged()
+
                     .SubscribeSafe(observer);
 
 
                 return new CompositeDisposable(notifier, shared.Connect());
             });
 
-            //TODO: Re-segment as file grows + account for rollover
-            Segments = notifications
-                .Scan((FileSegmentCollection)null, (previous, current) =>
-                {
-                    if (previous == null || current.Invalidated)
-                    {
-                        var segments = LoadSegments(current.FullName).ToArray();
-                        return new FileSegmentCollection(current, segments, current.Size);
-                    }
-                    //if file size has not changed, do not reload segment
-                    if (current.NoChange) return previous;
+            ////TODO: Re-segment as file grows + account for rollover
+            //Segments = notifications
+            //    .Scan((FileSegmentCollection)null, (previous, current) =>
+            //    {
+            //        if (previous == null || current.Invalidated)
+            //        {
+            //            var segments = LoadSegments(current.FullName).ToArray();
+            //            return new FileSegmentCollection(current, segments, current.Size);
+            //        }
+            //        //if file size has not changed, do not reload segment
+            //        if (current.NoChange) return previous;
 
-                    return new FileSegmentCollection(current.Size, previous);
-                }).DistinctUntilChanged();
+            //        return new FileSegmentCollection(current.Size, previous);
+            //    }).DistinctUntilChanged();
         }
 
         private IEnumerable<FileSegment> LoadSegments(string name)

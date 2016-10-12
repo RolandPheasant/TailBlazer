@@ -23,4 +23,21 @@ namespace TailBlazer.Domain.FileHandling
             Segments = segments;
         }
     }
+
+    public class FileSegmentReport
+    {
+        public TailInfo TailInfo { get; }
+        public FileChanges Changes { get;  }
+        public FileSegmentCollection Segments { get; }
+
+        public FileSegmentReport([NotNull] FileSegmentCollection segments, [NotNull] TailInfo tailInfo, FileChanges changes)
+        {
+            if (segments == null) throw new ArgumentNullException(nameof(segments));
+            if (tailInfo == null) throw new ArgumentNullException(nameof(tailInfo));
+            if (changes == null) throw new ArgumentNullException(nameof(changes));
+            TailInfo =   tailInfo;
+            Changes = changes;
+            Segments = segments;
+        }
+    }
 }

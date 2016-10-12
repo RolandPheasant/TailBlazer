@@ -28,6 +28,7 @@ namespace TailBlazer.Domain.FileHandling
 
         private FileIndexCollection()
         {
+            Indicies = new Index[0] {};
         }
 
         /// <summary>
@@ -37,6 +38,9 @@ namespace TailBlazer.Domain.FileHandling
         /// <returns></returns>
         public IEnumerable<Line> ReadLines(ScrollRequest scroll)
         {
+            if (Indicies.Length==0)
+                yield break;
+
             if (scroll.SpecifiedByPosition)
             {
                 foreach (var line in ReadLinesByPosition(scroll))

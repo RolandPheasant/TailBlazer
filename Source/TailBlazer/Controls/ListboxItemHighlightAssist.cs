@@ -98,7 +98,7 @@ namespace TailBlazer.Controls
 
             var foreground = GetHighlightForegroundBrush(sender);
             var background = GetHighlightBackgroundBrush(sender);
-            if (foreground == null || background == null)
+            if (foreground == null  || background == null)
                 return;
 
             //Foreground

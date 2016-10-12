@@ -114,8 +114,8 @@ namespace TailBlazer.Views.Tail
             OpenFileCommand = new Command(() => Process.Start(fileWatcher.FullName));
             OpenFolderCommand = new Command(() => Process.Start(fileWatcher.Folder));
             CopyPathToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(fileWatcher.FullName));
-            UnClearCommand = new Command(fileWatcher.Reset);
-            ClearCommand = new Command(fileWatcher.Clear);
+            UnClearCommand = new Command(async () => await Task.Run(() => fileWatcher.Reset()));
+            ClearCommand = new Command(async ()=> await Task.Run(() => fileWatcher.Clear()));
             KeyAutoTail = new Command(() => { AutoTail = true; });
             OpenSearchOptionsCommand = new Command(async () =>
             {
@@ -185,7 +185,7 @@ namespace TailBlazer.Views.Tail
                 .LogChanges(logger, "Received")
                 .Transform(lineProxyFactory.Create)
                 .LogChanges(logger, "Sorting")
-                .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
+                .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy.Start))
                 .ObserveOn(schedulerProvider.MainThread)
                 .Bind(out _data,100)
                 .LogChanges(logger, "Bound")

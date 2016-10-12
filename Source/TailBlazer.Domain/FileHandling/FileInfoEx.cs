@@ -17,7 +17,6 @@ namespace TailBlazer.Domain.FileHandling
             return source.Where(notification => notification.Exists)
                 .Scan((FileChanges) null, (state, latest) =>
                 {
-
                     if (state==null)
                         return new FileChanges(latest);
 
@@ -35,34 +34,21 @@ namespace TailBlazer.Domain.FileHandling
         public static IObservable<FileNotification> WatchFile(this FileInfo file, TimeSpan? refreshPeriod = null,
             IScheduler scheduler = null)
         {
-           return Observable.Create<FileNotification>(observer =>
+            return Observable.Create<FileNotification>(observer =>
             {
                 var refresh = refreshPeriod ?? TimeSpan.FromMilliseconds(250);
                 scheduler = scheduler ?? Scheduler.Default;
 
-                var notification = new FileNotification(file);
-
-                scheduler.Schedule(() => observer.OnNext(notification));
-               // observer.OnNext(notification);
-
-                
-               // SerialDisposable nextSchedule = new SerialDisposable();
-
-
-                //Func<FileNotification> 
-
-                //nextSchedule.Disposable = scheduler.Schedule(refresh, () =>
-                //{
-
-                //});
-
-                //new FileNotification(file)
-
+                FileNotification notification = null;
                 return scheduler.ScheduleRecurringAction(refresh, () =>
                 {
                     try
                     {
-                        observer.OnNext(new FileNotification(notification));
+                        notification = notification == null
+                            ? new FileNotification(file)
+                            : new FileNotification(notification);
+
+                        observer.OnNext(notification);
                     }
                     catch (Exception ex)
                     {
@@ -71,8 +57,7 @@ namespace TailBlazer.Domain.FileHandling
                     }
                 });
 
-            })
-            .DistinctUntilChanged();
+            }).DistinctUntilChanged();
         }
 
 

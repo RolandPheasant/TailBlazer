@@ -1,7 +1,5 @@
 using System;
-using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -13,27 +11,41 @@ namespace TailBlazer.Domain.FileHandling
         public int Count { get;  }
         public FileSegmentChangedReason Reason { get; }
         public FileSegment Tail => Segments[Count - 1];
-        public long FileLength => Tail.End;
+        public long FileLength => Tail.Size;
         public long FileSize { get; }
         public long SizeDiff { get; }
 
         public FileSegmentCollection(IFileMetrics fileInfo, FileSegment[] segments, long sizeDiff)
         {
-            if (segments.Length == 0)
-                throw new ArgumentException("Argument is empty collection", nameof(segments));
+            Segments = segments.Length != 0 
+                ? segments 
+                : new[] {new FileSegment(0,0,0,FileSegmentType.Tail) };
 
             Metrics = fileInfo;
-            Segments = segments;
-            TailStartsAt = segments.Max(fs => fs.End);
+         
+            TailStartsAt = segments.Length==0 ? 0 : segments.Max(fs => fs.End);
             Count = Segments.Length;
             FileSize = TailStartsAt;
             SizeDiff = sizeDiff;
             Reason = FileSegmentChangedReason.Loaded;
         }
 
-        public FileSegmentCollection(long newLength, FileSegmentCollection previous)
+        public FileSegmentCollection(IFileMetrics fileInfo)
         {
-            SizeDiff = newLength - previous.FileLength;
+            Segments = new[] {new FileSegment(0, 0, 0, FileSegmentType.Tail)};
+
+            Metrics = fileInfo;
+
+            TailStartsAt = 0;
+            Count = Segments.Length;
+            FileSize = TailStartsAt;
+            SizeDiff = 0;
+            Reason = FileSegmentChangedReason.Loaded;
+        }
+
+        public FileSegmentCollection(IFileMetrics fileInfo, FileSegmentCollection previous)
+        {
+            SizeDiff = fileInfo.Size - previous.FileLength;
 
             //All this assumes it is the tail which has changed, but that may not be so
             Reason = FileSegmentChangedReason.Tailed;
@@ -43,10 +55,10 @@ namespace TailBlazer.Domain.FileHandling
             TailStartsAt = last.End;
 
             var segments = previous.Segments;
-            segments[segments.Length-1] = new FileSegment(last, newLength);
+            segments[segments.Length-1] = new FileSegment(last, fileInfo.Size);
             Segments = segments;
             Count = Segments.Length;
-            FileSize = newLength;
+            FileSize = fileInfo.Size;
 
         }
 

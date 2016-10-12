@@ -22,7 +22,7 @@ namespace TailBlazer.Fixtures
             {
                 file.Append(CreateLines(1, 100));
 
-                var segments = file.Info.WatchFile(scheduler: scheduler).WithSegments().WithTail();
+                var segments = file.Info.WatchFile(scheduler: scheduler).SegmentWithReport();
                 using (var monitor = new FileMonitor(segments, scrollRequest, scheduler: scheduler))
                 {
                     //monitors inital tail
@@ -79,7 +79,7 @@ namespace TailBlazer.Fixtures
                 file.Append(CreateLines(1, 100));
 
                 var segments = file.Info.WatchFile(scheduler: scheduler)
-                    .WithSegments().WithTail();
+                    .SegmentWithReport();
 
                 using (var monitor = new FileMonitor(segments, scrollRequest, str => str.Contains("9"), scheduler: scheduler))
                 {

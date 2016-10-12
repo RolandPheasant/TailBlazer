@@ -1,8 +1,5 @@
 using System;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using TailBlazer.Domain.Annotations;
@@ -13,6 +10,20 @@ namespace DynamicData.Binding
 {
     public static class DynamicDataEx
     {
+        public static IObservable<IChangeSet<TObject, TKey>> Switch<TObject, TKey>(this
+            IObservable<IChangeSet<TObject, TKey>>  source)
+        {
+            return Observable.Create<IChangeSet<TObject, TKey>>(observer =>
+            {
+
+
+                return new CompositeDisposable();
+            });
+
+
+
+        }
+
         public static IObservable<IChangeSet<T>> LogChanges<T>(this IObservable<IChangeSet<T>> source, ILogger logger,string label)
         {
             if (!Debugger.IsAttached)

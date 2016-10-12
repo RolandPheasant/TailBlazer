@@ -30,14 +30,12 @@ namespace TailBlazer.Domain.FileHandling
                 var locker = new object();
 
                 return _fileSegmentCollection
+                //    .Where(fsc=> fsc.Reason== FileSegmentChangedReason.Tailed)
                     .Synchronize(locker)
                     .Select(fsc =>
                     {
                         if (fsc.Count == 0 || fsc.SizeDiff < 0)
                             return TailInfo.Empty;
-
-                        //if (encoding == null)
-                        //    encoding = fsc.Info.GetEncoding();
 
                         var tailFromPosition = fsc.Reason == FileSegmentChangedReason.Loaded 
                                 ? fsc.Tail.Start

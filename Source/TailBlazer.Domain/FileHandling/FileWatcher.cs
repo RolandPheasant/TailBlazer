@@ -10,8 +10,9 @@ namespace TailBlazer.Domain.FileHandling
 {
     public sealed class FileWatcher : IFileWatcher, IDisposable
     {
+        private readonly IScheduler _scheduler;
         public IObservable<FileStatus> Status { get; }
-        public IObservable<FileSegmentsWithTail> Segments { get; }
+        public IObservable<FileSegmentReport> Segments { get; }
         public IObservable<long> Size { get; }
 
         private FileInfo FileInfo { get;  }
@@ -30,37 +31,33 @@ namespace TailBlazer.Domain.FileHandling
 
         public FileWatcher([NotNull] FileInfo fileInfo, IRatingService ratingsMetrics, IScheduler scheduler=null)
         {
+            _scheduler = scheduler ?? Scheduler.Default; ;
             FileInfo = fileInfo;
             if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
-
-            scheduler = scheduler ?? Scheduler.Default;
 
             var refreshRate = ratingsMetrics.Metrics.Take(1)
                 .Select(metrics=> TimeSpan.FromMilliseconds(metrics.RefreshRate))
                 .Wait();
-
-
-
+            
             //switch the file when it is rolled over, or when it is cleared
             var shared = _scanFrom.Select(start => start == 0
-                ? fileInfo.WatchFile(scheduler: scheduler, refreshPeriod: refreshRate)
-                : fileInfo.WatchFile(scheduler: scheduler, refreshPeriod: refreshRate).ScanFromEnd())
-                .DistinctUntilChanged()
+                ? fileInfo.WatchFile(scheduler: _scheduler, refreshPeriod: refreshRate)
+                : fileInfo.WatchFile(scheduler: _scheduler, refreshPeriod: refreshRate).ScanFromEnd())
                 .Switch()
-                .TakeWhile(notification => notification.Exists)
-               // .Repeat()
+                .DistinctUntilChanged()
+                // .TakeWhile(notification => notification.Exists)
+                // .Repeat()
                 .Publish();
 
 
 
             Size = shared.Select(fn => fn.Size).Replay(1).RefCount();
 
-            Segments = shared.WithSegments()
-                .WithTail()
+            Segments = shared.MonitorChanges()
+                .SegmentWithReport()
                 //.TakeUntil(Invalidated)
-                .Repeat()
-                .Replay(1).RefCount()
-                .Select(x => x);
+                // .Repeat()
+                .Replay(1).RefCount();
 
             //FileNameChanged = Segments.Select(fsc => fsc.Segments.Info.Name).DistinctUntilChanged().Skip(1);
             //SizeDiff = Segments.Select(fsc => fsc.Segments.SizeDiff);
@@ -75,8 +72,6 @@ namespace TailBlazer.Domain.FileHandling
             .StartWith(FileStatus.Loading)
             .DistinctUntilChanged();
 
-
-            _cleanUp = shared.Connect();
             _cleanUp = shared.Connect();
         }
         
@@ -89,18 +84,6 @@ namespace TailBlazer.Domain.FileHandling
         public ILineMonitor Monitor(IObservable<ScrollRequest> scrollRequest, IObservable<Func<string, bool>> predicateObs, IScheduler scheduler = null)
         {
             return new FileMonitor(Segments, scrollRequest, predicateObs: predicateObs, scheduler: scheduler);
-        }
-
-        public IObservable<ILineProvider> Index()
-        {
-            return Segments.Index();
-        }
-
-        public IObservable<ILineProvider> Search([NotNull] Func<string, bool> predicate)
-        {
-           throw new Exception();
-        //    if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-        //    return Segments.Search(predicate);
         }
         
         public void ScanFrom(long scanFrom)
@@ -115,6 +98,7 @@ namespace TailBlazer.Domain.FileHandling
         
         public void Reset()
         {
+            
             _scanFrom.OnNext(0);
         }
 

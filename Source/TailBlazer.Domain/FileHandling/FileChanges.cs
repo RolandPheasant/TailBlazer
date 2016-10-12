@@ -18,6 +18,10 @@ namespace TailBlazer.Domain.FileHandling
         public long Size => Notification.Size;
 
         public Encoding Encoding => Notification.Encoding;
+        
+        public bool Exists => Notification.Exists;
+
+        public FileNotificationReason Reason => Notification.Reason;
 
         public bool NoChange { get; }
 
@@ -37,7 +41,7 @@ namespace TailBlazer.Domain.FileHandling
             SizeDiff = fileNotification.Size - previous.Size;
            
             Invalidated = previous.FullName != fileNotification.FullName || previous.Size > fileNotification.Size;
-            NoChange = !Invalidated && previous.Size == fileNotification.Size;
+            NoChange = !(Invalidated || previous.Size != fileNotification.Size);
         }
 
         #region Equality

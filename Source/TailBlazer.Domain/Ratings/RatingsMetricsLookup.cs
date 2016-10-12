@@ -16,8 +16,8 @@ namespace TailBlazer.Domain.Ratings
                 [1] = new RatingsMetaData(30, 1000),
                 [2] = new RatingsMetaData(30, 750),
                 [3] = new RatingsMetaData(45, 600),
-                [4] = new RatingsMetaData(60, 400),
-                [5] = new RatingsMetaData(60, 250)
+                [4] = new RatingsMetaData(50, 450),
+                [5] = new RatingsMetaData(60, 350)
             };
         }
 

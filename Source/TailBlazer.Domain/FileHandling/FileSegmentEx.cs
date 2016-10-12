@@ -23,6 +23,38 @@ namespace TailBlazer.Domain.FileHandling
             return new FileTailReader(source).Tail();
         }
 
+        public static IObservable<FileSegmentReport> SegmentWithReport([NotNull] this IObservable<FileNotification> source)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+
+            return Observable.Create<FileSegmentReport>(observer =>
+            {
+                var changes = source.MonitorChanges().DistinctUntilChanged().Publish();
+                var segments = changes.WithSegments().DistinctUntilChanged().Publish();
+                var fileTail = segments.Tail().DistinctUntilChanged();
+                var combined = segments.CombineLatest(fileTail, changes, (segment, tail, change) => new FileSegmentReport(segment, tail, change));
+
+                return new CompositeDisposable(combined.SubscribeSafe(observer), segments.Connect(), changes.Connect());
+            });
+        }
+
+        public static IObservable<FileSegmentReport> SegmentWithReport([NotNull] this IObservable<FileChanges> source)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+
+            return Observable.Create<FileSegmentReport>(observer =>
+            {
+                var changes = source.Publish();
+                var segments = changes.WithSegments().Publish();
+                var fileTail = segments.Tail();
+                var combined = segments.CombineLatest(fileTail, changes, (segment, tail, change) => new FileSegmentReport(segment, tail, change));
+
+                return new CompositeDisposable(combined.SubscribeSafe(observer), segments.Connect(), changes.Connect());
+            });
+        }
+
+
+
         public static IObservable<FileSegmentsWithTail> WithTail([NotNull] this IObservable<FileSegmentCollection> source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));

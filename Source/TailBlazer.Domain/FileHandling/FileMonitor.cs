@@ -5,21 +5,21 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
 using TailBlazer.Domain.Annotations;
-using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling
 {
     public class FileMonitor: ILineMonitor, IDisposable
     {
-        private readonly IObservable<FileSegmentsWithTail> _fileSegments;
+        private readonly IObservable<FileSegmentReport> _fileSegments;
         private readonly IObservable<ScrollRequest> _scrollRequest;
+        private readonly IScheduler _scheduler;
         private readonly IDisposable _cleanUp;
 
         public IObservableCache<Line, LineKey> Lines { get; } 
         public IObservable<int> TotalLines { get; }
         public IObservable<long> Size { get; }
         
-        public FileMonitor([NotNull] IObservable<FileSegmentsWithTail> fileSegments,
+        public FileMonitor([NotNull] IObservable<FileSegmentReport> fileSegments,
             [NotNull] IObservable<ScrollRequest> scrollRequest,
             Func<string, bool> predicate = null,
             IObservable<Func<string, bool>> predicateObs = null,
@@ -30,7 +30,8 @@ namespace TailBlazer.Domain.FileHandling
 
             _fileSegments = fileSegments;
             _scrollRequest = scrollRequest;
-            
+            _scheduler = scheduler ?? Scheduler.Default;
+
             var rolloverDisposable = new SerialDisposable();
             
             var cache = new SourceCache<Line, LineKey>(l => l.Key);
@@ -38,9 +39,6 @@ namespace TailBlazer.Domain.FileHandling
                         .IgnoreUpdateWhen((current, previous) => current.Key == previous.Key)
                         .AsObservableCache();
 
-
-
-            IObservable<Func<string, bool>> xxx;
             IObservable<MonitorObservables> observables;
             if (predicateObs != null)
             {
@@ -53,14 +51,16 @@ namespace TailBlazer.Domain.FileHandling
                 observables = CreateObservables(fsg => fsg.Monitor(predicate, scheduler));
             }
 
-            Size = observables.Select(obs => obs.Size).Switch();
-            TotalLines = observables.Select(obs => obs.TotalLines).Switch();
-            var monitor = observables.Subscribe(obs=> rolloverDisposable.Disposable = PopulateData(cache, obs.ScrollInfo)) ;
+            var shared = observables.Publish();
 
-            _cleanUp = new CompositeDisposable(monitor, rolloverDisposable, Lines, cache);
+            Size = shared.Select(obs => obs.Size).Switch();
+            TotalLines = shared.Select(obs => obs.TotalLines).Switch();
+            var monitor = shared.Subscribe(obs=> rolloverDisposable.Disposable = PopulateData(cache, obs.ScrollInfo)) ;
+
+            _cleanUp = new CompositeDisposable(shared.Connect(), monitor, rolloverDisposable, Lines, cache);
         }
 
-        private IObservable<MonitorObservables> CreateObservables(Func<IObservable<FileSegmentsWithTail>,IObservable<ILineReader>> lineReaderFactory)
+        private IObservable<MonitorObservables> CreateObservables(Func<IObservable<FileSegmentReport>,IObservable<ILineReader>> lineReaderFactory)
         {
             return Observable.Create<MonitorObservables>(observer =>
             {
@@ -72,25 +72,28 @@ namespace TailBlazer.Domain.FileHandling
                 var indexer = lineReaderFactory(_fileSegments).Synchronize(locker);
 
                 //set up file info observables
-                var nameChanged = published.Select(fsc => fsc.Segments.Metrics.Name).DistinctUntilChanged().Skip(1).ToUnit();
-                var sizeChanged = published.Select(fsc => fsc.Segments.SizeDiff).Where(sizeDiff => sizeDiff < 0).ToUnit();
-                var tail = published.Select(fsc => fsc.TailInfo).DistinctUntilChanged();
+               var tail = published.Select(fsc => fsc.TailInfo).DistinctUntilChanged();
 
                 //kill the stream when file rolls over, or when the name has changed
-                var invalidated = nameChanged.Merge(sizeChanged);
+                var invalidated = published.Where(fsr=>fsr.Changes.Invalidated)
+                            .DistinctUntilChanged();
 
                 var totalLines = indexer.Select(idx => idx.Count).Replay(1).RefCount();
                 var size = published.Select(fsc => fsc.Segments.FileSize).Replay(1).RefCount();
 
-                //keep monitoring until the file has been invalidated i.e. rollover or file name changed
+                //keep monitoring until the file has been invalidated i. e. rollover or file name changed
                 var scrollInfo = indexer
                     .CombineLatest(scroll, tail, (idx, scrl, t) => new IndiciesWithScroll(idx, scrl, t))
-                    .Scan((IndiciesWithScroll) null, (state, latest) => state == null
-                        ? new IndiciesWithScroll(latest.LineReader, latest.Scroll, latest.TailInfo)
-                        : new IndiciesWithScroll(state, latest.LineReader, latest.Scroll, latest.TailInfo))
+                    .Sample(TimeSpan.FromMilliseconds(50), _scheduler)
+                    .Scan((IndiciesWithScroll) null, (state, latest) =>
+                    {
+                       return state == null 
+                            ? new IndiciesWithScroll(latest.LineReader, latest.Scroll, latest.TailInfo)
+                            : new IndiciesWithScroll(state, latest.LineReader, latest.Scroll, latest.TailInfo);
+                    })
                     .StartWith(IndiciesWithScroll.Empty)
                     .TakeUntil(invalidated)
-                    .FinallySafe(() =>     observer.OnCompleted()); 
+                    .FinallySafe(() => observer.OnCompleted()); 
 
                 observer.OnNext(new MonitorObservables(scrollInfo, totalLines, size));
 
@@ -127,12 +130,16 @@ namespace TailBlazer.Domain.FileHandling
                         if (latest.Scroll.Mode == ScrollReason.Tail)
                         {
                             if (latest.TailInfo.Count == 0) return;
-                            innerCache.AddOrUpdate(latest.TailInfo.Lines);
+
+                            var size = latest.TailInfo.Count;
+                            var pageSize = latest.Scroll.PageSize;
+                            var toAdd = latest.TailInfo.Lines.Skip(size - pageSize);
+                            innerCache.AddOrUpdate(toAdd);
 
                             //clear stale tail items
                             var toRemove = innerCache.Items
                                 .OrderBy(l => l.LineInfo.Start)
-                                .Take(cache.Count - latest.Scroll.PageSize)
+                                .Take(innerCache.Count - pageSize)
                                 .Select(line => line.Key)
                                 .ToArray();
                             innerCache.Remove(toRemove);
@@ -157,6 +164,7 @@ namespace TailBlazer.Domain.FileHandling
 
         private enum IndiciesWithScrollReason
         {
+            None,
             New,
             InitialLoad,
             TailChanged,
@@ -197,7 +205,7 @@ namespace TailBlazer.Domain.FileHandling
                 TailInfo = (lineReader as IHasTailInfo)?.TailInfo ?? tail;
                 LineReader = lineReader;
                 PageSizeChanged = false;
-                Reason = IndiciesWithScrollReason.InitialLoad;
+                Reason = IndiciesWithScrollReason.None;
             }
 
             public IndiciesWithScroll(IndiciesWithScroll previous, ILineReader lineReader, ScrollRequest scroll, TailInfo tail)
@@ -211,6 +219,7 @@ namespace TailBlazer.Domain.FileHandling
                 {
                     Reason = IndiciesWithScrollReason.InitialLoad;
                 }
+
                 else if (tail != previous.TailInfo)
                 {
                     Reason = IndiciesWithScrollReason.TailChanged;
@@ -223,6 +232,7 @@ namespace TailBlazer.Domain.FileHandling
                 {
                     Reason = IndiciesWithScrollReason.IndexChanged;
                 }
+
             }
 
             private IndiciesWithScroll()
