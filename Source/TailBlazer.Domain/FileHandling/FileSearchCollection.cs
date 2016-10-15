@@ -13,7 +13,7 @@ namespace TailBlazer.Domain.FileHandling
 
     public class FileSearchCollection: ILineReader, IHasTailInfo, IEquatable<FileSearchCollection>, IHasLimitationOfLines, IProgressInfo
     {
-        public static readonly FileSearchCollection None = new FileSearchCollection();
+        public static readonly FileSearchCollection Empty = new FileSearchCollection();
         public long[] Matches { get; }
         public int Count => Matches.Length;
         public int Diff { get; }
@@ -87,7 +87,7 @@ namespace TailBlazer.Domain.FileHandling
             TailInfo = TailInfo.Empty;
         }
 
-        public bool IsEmpty => this == None;
+        public bool IsEmpty => this == Empty;
 
         public IEnumerable<Line> ReadLines(ScrollRequest scroll)
         {
@@ -212,7 +212,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public override string ToString()
         {
-            return this == None ? "<None>" : $"Count: {Count}, Segments: {Segments}, Size: {Size}";
+            return this == Empty ? "<None>" : $"Count: {Count}, Segments: {Segments}, Size: {Size}";
         }
 
     }

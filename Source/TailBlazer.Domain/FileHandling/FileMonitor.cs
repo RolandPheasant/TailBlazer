@@ -173,6 +173,7 @@ namespace TailBlazer.Domain.FileHandling
             return new CompositeDisposable(shared.Connect(), loader);
         }
 
+
         private enum IndiciesWithScrollReason
         {
             None,

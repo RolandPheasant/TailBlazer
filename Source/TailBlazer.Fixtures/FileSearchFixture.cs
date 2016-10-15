@@ -23,7 +23,8 @@ namespace TailBlazer.Fixtures
             {
                 FileSearchCollection fileSearchCollection = null;
 
-                using (file.Info.WatchFile(scheduler: scheduler).WithSegments().WithTail()
+                using (file.Info.WatchFile(scheduler: scheduler)
+                    .SegmentWithReport()
                     .Search(str => str.Contains("9"), scheduler)
                     .Subscribe(x => fileSearchCollection = x))
                 {
@@ -39,7 +40,7 @@ namespace TailBlazer.Fixtures
         [Fact]
         public void NotExistingFile()
         {
-            var pulse = new Subject<Unit>();
+            var scheduler = new TestScheduler();
 
             using (var file = new TestFile())
             {
@@ -47,13 +48,13 @@ namespace TailBlazer.Fixtures
 
                 FileSearchCollection fileSearchCollection = null;
 
-                using (file.Info.WatchFile(pulse)
-                    .WithSegments()
-                    .WithTail()
-                    .Search(str => str.Contains("9"))
+                using (file.Info.WatchFile(scheduler: scheduler)
+                    .SegmentWithReport()
+                    .Search(str => str.Contains("9"), scheduler)
                     .Subscribe(x => fileSearchCollection = x))
                 {
-                    fileSearchCollection.Should().Be(FileSearchCollection.None);
+                    scheduler.AdvanceBySeconds(1);
+                    fileSearchCollection.Should().Be(FileSearchCollection.Empty);
                 }
             }
         }
@@ -62,7 +63,7 @@ namespace TailBlazer.Fixtures
         //Cannot recreate the file as something is hanging on to it.
         public void CreateFileLater()
         {
-            var pulse = new Subject<Unit>();
+            var scheduler = new TestScheduler();
 
             using (var file = new TestFile())
             {
@@ -70,15 +71,16 @@ namespace TailBlazer.Fixtures
 
                 FileSearchCollection fileSearchCollection = null;
 
-                using (new FileInfo(file.Name).WatchFile(pulse).WithSegments().WithTail()
-                    .Search(str => str.Contains("9"))
+                using (file.Info.WatchFile(scheduler: scheduler)
+                    .SegmentWithReport()
+                    .Search(str => str.Contains("9"), scheduler)
                     .Subscribe(x => fileSearchCollection = x))
                 {
-                    fileSearchCollection.Should().Be(FileSearchCollection.None);
+                    fileSearchCollection.Should().Be(FileSearchCollection.Empty);
                     file.Create();
                     file.Append(Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
-                    pulse.Once();
-                    fileSearchCollection.Should().NotBe(FileSearchCollection.None);
+                    scheduler.AdvanceByMilliSeconds(250);
+                    fileSearchCollection.Should().NotBe(FileSearchCollection.Empty);
                 }
             }
         }
@@ -92,7 +94,8 @@ namespace TailBlazer.Fixtures
             {
                 FileSearchCollection fileSearchCollection = null;
 
-                using (file.Info.WatchFile(scheduler: scheduler).WithSegments().WithTail()
+                using (file.Info.WatchFile(scheduler: scheduler)
+                    .SegmentWithReport()
                     .Search(str => str.Contains("9"), scheduler)
                     .Subscribe(x => fileSearchCollection = x))
                 {
@@ -121,12 +124,13 @@ namespace TailBlazer.Fixtures
             using (var file = new TestFile())
             {
                 FileSearchCollection fileSearchCollection = null;
-                
-                using (file.Info.WatchFile(scheduler:scheduler).WithSegments().WithTail()
+
+                using (file.Info.WatchFile(scheduler: scheduler)
+                    .SegmentWithReport()
                     .Search(str => str.Contains("9"), scheduler)
                     .Subscribe(x => fileSearchCollection = x))
                 {
-                    scheduler.AdvanceBy(1);
+                    scheduler.AdvanceByMilliSeconds(250);
                     file.Append(CreateLines(1,100));
                     scheduler.AdvanceByMilliSeconds(500);
                     fileSearchCollection.Matches.Length.Should().Be(19);
@@ -150,8 +154,8 @@ namespace TailBlazer.Fixtures
                 FileSearchCollection fileSearchCollection = null;
                 file.Append(CreateLines(1,100));
 
-                using (file.Info.WatchFile(scheduler:scheduler)
-                    .WithSegments().WithTail()
+                using (file.Info.WatchFile(scheduler: scheduler)
+                    .SegmentWithReport()
                     .Search(str => str.Contains("9"), scheduler)
                     .Subscribe(x => fileSearchCollection = x))
                 {
@@ -185,7 +189,7 @@ namespace TailBlazer.Fixtures
                 file.Append(1, 100);
 
                 using (file.Info.WatchFile(scheduler: scheduler)
-                    .WithSegments().WithTail()
+                    .SegmentWithReport()
                     .Search(str => str.Contains("9"), scheduler)
                     .Subscribe(x => fileSearchCollection = x))
                 {
@@ -214,8 +218,8 @@ namespace TailBlazer.Fixtures
                 IEnumerable<Line> lines = null;
                 file.Append(Enumerable.Range(1, 100000).Select(i => i.ToString()).ToArray());
 
-                using (file.Info.WatchFile(pulse)
-                    .WithSegments().WithTail()
+                using (file.Info.WatchFile(scheduler: scheduler)
+                    .SegmentWithReport()
                     .Search(str => str.Contains("9"), scheduler)
                     .Select(result => file.Info.ReadLinesByPosition(result.Matches).ToArray())
                     .Subscribe(x => lines=x))

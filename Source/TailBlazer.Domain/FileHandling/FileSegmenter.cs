@@ -57,7 +57,8 @@ namespace TailBlazer.Domain.FileHandling
                         {
                             if (previous == null 
                                 || current.Reason == FileNotificationReason.CreatedOrOpened
-                                || previous.Reason == FileSegmentChangedReason.New)
+                                || previous.Reason == FileSegmentChangedReason.New
+                                || previous.FileSize == 0)
                             {
                                 var segments = LoadSegments(current.FullName).ToArray();
                                 return new FileSegmentCollection(current, segments);

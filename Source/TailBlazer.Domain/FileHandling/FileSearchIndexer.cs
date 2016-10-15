@@ -20,13 +20,12 @@ namespace TailBlazer.Domain.FileHandling
     public class FileSearchIndexer
     {
         private readonly IScheduler _scheduler;
-        private readonly IObservable<FileSegmentsWithTail> _fileSegments;
         private readonly Func<string, bool> _predicate;
         private readonly int _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered;
 
         public IObservable<FileSearchCollection> SearchResult { get; }
 
-        public FileSearchIndexer([NotNull] IObservable<FileSegmentsWithTail> fileSegments,
+        public FileSearchIndexer([NotNull] IObservable<FileSegmentReport> fileSegments,
             [NotNull] Func<string, bool> predicate,
             int arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered = 50000,
             IScheduler scheduler = null)
@@ -34,20 +33,45 @@ namespace TailBlazer.Domain.FileHandling
             if (fileSegments == null) throw new ArgumentNullException(nameof(fileSegments));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
-            _fileSegments = fileSegments;
             _predicate = predicate;
             _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered = arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered;
             _scheduler = scheduler ?? Scheduler.Default;
 
-            SearchResult = BuildObservable();
+            SearchResult = BuildObservable(fileSegments);
         }
 
-        private IObservable<FileSearchCollection> BuildObservable()
+
+        private IObservable<FileSearchCollection> BuildObservable(IObservable<FileSegmentReport> fileSegments)
+        {
+            return fileSegments.Publish(shared =>
+            {
+                //TODO: WHEN FILE IS MISSING RETURN EMPTY
+
+                //always return an empty collection when the file does not exist
+
+                //Invoked at roll-over or file cleared
+                var newFileCreated = shared
+                    .Where(fsr => fsr.Changes.Reason == FileNotificationReason.CreatedOrOpened)
+                    .Skip(1);
+
+                //return empty when file does not exists
+                var whenEmpty = shared
+                    .Where(fsr => !fsr.Changes.ExistsAndIsValid())
+                    .Select(_ => FileSearchCollection.Empty);
+
+                var indexedFiles = BuildIndicies(shared)
+                    .TakeUntil(newFileCreated)
+                    .Repeat();
+
+                return indexedFiles.Merge(whenEmpty).DistinctUntilChanged();
+            });
+        }
+
+        private IObservable<FileSearchCollection> BuildIndicies(IObservable<FileSegmentReport> shared)
         {
 
             return Observable.Create<FileSearchCollection>(observer =>
             {
-                var shared = _fileSegments.Publish();
 
                 //0.5 ensure we have the latest file metrics
 
@@ -115,7 +139,7 @@ namespace TailBlazer.Domain.FileHandling
                     .Scan((FileSearchCollection)null, (previous, current) => previous == null
                         ? new FileSearchCollection(current.Segment, current.Tail.Tail, metrics, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered)
                         : new FileSearchCollection(previous, current.Segment, current.Tail.Tail, metrics, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
-                    .StartWith(FileSearchCollection.None)
+                    .StartWith(FileSearchCollection.Empty)
                     .SubscribeSafe(observer);
 
                 //initialise a pending state for all segments
@@ -171,7 +195,6 @@ namespace TailBlazer.Domain.FileHandling
                     tailScanner,
                     headSubscriber,
                     tailWatcher.Connect(),
-                    shared.Connect(),
                     searchData);
             });
         }
