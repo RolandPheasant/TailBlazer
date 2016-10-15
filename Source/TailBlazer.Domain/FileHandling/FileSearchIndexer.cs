@@ -84,9 +84,7 @@ namespace TailBlazer.Domain.FileHandling
                     .Take(1)
                     .Subscribe(fswt => metrics = fswt.Segments.Metrics);
 
-
-
-
+                
                 //manually maintained search results and status
                 var searchData = new SourceCache<FileSegmentSearch, FileSegmentKey>(s => s.Key);
 
@@ -162,7 +160,7 @@ namespace TailBlazer.Domain.FileHandling
                     return searchData.Connect(fss => fss.Segment.Type == FileSegmentType.Head)
                         .WhereReasonsAre(ChangeReason.Add)
                         .SelectMany(changes => changes.Select(c => c.Current).OrderByDescending(c => c.Segment.Index).ToArray())
-                        .ObserveOn(_scheduler)
+                       // .ObserveOn(_scheduler)
                         .Synchronize(locker)
                         .Do(head => searchData.AddOrUpdate(new FileSegmentSearch(head.Segment, FileSegmentSearchStatus.Searching)))
                         .Select(fileSegmentSearch =>

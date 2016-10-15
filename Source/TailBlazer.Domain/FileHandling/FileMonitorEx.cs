@@ -45,8 +45,7 @@ namespace TailBlazer.Domain.FileHandling
             if (filter == null)
                 return new FileIndexer(source).Result;
 
-            return Observable.Never<ILineReader>();
-            //return new FileSearchIndexer(source, filter, scheduler: scheduler).SearchResult;
+            return new FileSearchIndexer(source, filter, scheduler: scheduler).SearchResult;
         }
     }
 }

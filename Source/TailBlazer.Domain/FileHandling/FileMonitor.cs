@@ -77,8 +77,6 @@ namespace TailBlazer.Domain.FileHandling
                 var totalLines = indexer.Select(idx => idx.Count).Replay(1).RefCount();
                 var size = published.Select(fsc => fsc.Segments.FileSize).Replay(1).RefCount();
 
-              //  var invalidated = 
-
                 //keep monitoring until the file has been invalidated i. e. rollover or file name changed
                 var scrollInfo = indexer
                     .CombineLatest(scroll, tail, (idx, scrl, t) => new IndiciesWithScroll(idx, scrl, t))
@@ -89,7 +87,7 @@ namespace TailBlazer.Domain.FileHandling
                             : new IndiciesWithScroll(state, latest.LineReader, latest.Scroll, latest.TailInfo);
                     })
                     .StartWith(IndiciesWithScroll.Empty)
-                   // .TakeUntil(invalidated)
+
                     .FinallySafe(() => observer.OnCompleted()); 
 
                 observer.OnNext(new MonitorObservables(scrollInfo, totalLines, size));
@@ -197,6 +195,21 @@ namespace TailBlazer.Domain.FileHandling
                 Size = size;
             }
         }
+
+        private class Values
+        {
+            public int TotalLines { get; }
+            public long Size { get; }
+            public IndiciesWithScroll ScrollInfo { get; }
+
+            public Values(IndiciesWithScroll scrollInfo, int totalLines, long size)
+            {
+                ScrollInfo = scrollInfo;
+                TotalLines = totalLines;
+                Size = size;
+            }
+        }
+
 
         private class IndiciesWithScroll : IEquatable<IndiciesWithScroll>
         {

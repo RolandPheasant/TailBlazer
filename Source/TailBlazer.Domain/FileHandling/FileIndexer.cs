@@ -180,7 +180,6 @@ namespace TailBlazer.Domain.FileHandling
                     lastPosition = end;
                     lines = lines.Take(lines.Length - 1).ToArray();
                 }
-
                 return new Index(start, lastPosition, lines, compression, count, end == -1 ? IndexType.Tail : IndexType.Page);
             }
         }
