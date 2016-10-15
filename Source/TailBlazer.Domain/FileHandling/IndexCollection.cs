@@ -2,10 +2,27 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace TailBlazer.Domain.FileHandling
 {
+    public class NullLineReader: ILineReader
+    {
+        public static readonly ILineReader Empty = new NullLineReader();
+
+        public int Diff { get; }
+        public int Count { get; }
+        public IEnumerable<Line> ReadLines(ScrollRequest scroll)
+        {
+            yield break;
+        }
+
+        public NullLineReader()
+        {
+            Diff = 0;
+            Count = 0;
+        }
+    }
+
     public class FileIndexCollection: ILineReader
     {
         public int Count { get; }

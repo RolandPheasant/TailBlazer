@@ -1,4 +1,4 @@
-﻿
+﻿using System;
 using System.Linq;
 using System.Reactive.Subjects;
 using DynamicData;
@@ -25,6 +25,13 @@ namespace TailBlazer.Fixtures
                 var segments = file.Info.WatchFile(scheduler: scheduler).SegmentWithReport();
                 using (var monitor = new FileMonitor(segments, scrollRequest, scheduler: scheduler))
                 {
+                    long size = 0;
+                    long count = 0;
+                    var sizeSubscriber = monitor.Size.Subscribe(s => size = s);
+                    var countSubscriber = monitor.TotalLines.Subscribe(s => count = s);
+
+
+
                     //monitors inital tail
                     scheduler.AdvanceByMilliSeconds(350);
                     var actual = TransformToString(monitor.Lines);
@@ -70,11 +77,17 @@ namespace TailBlazer.Fixtures
                     actual = TransformToString(monitor.Lines);
                     expected = CreateLines(50, 5);
                     CollectionAssert.AreEqual(actual, expected);
+
+                    countSubscriber.Dispose();
+                    sizeSubscriber.Dispose();
                 }
+
             }
         }
 
-            
+
+
+
         [FactAttribute]
         public void Monitor_Filter()
         {
@@ -92,6 +105,9 @@ namespace TailBlazer.Fixtures
 
                 using (var monitor = new FileMonitor(segments, scrollRequest, str => str.Contains("9"), scheduler: scheduler))
                 {
+
+
+
                     //monitors initial tail
                     scheduler.AdvanceByMilliSeconds(250);
                     var actual = TransformToString(monitor.Lines);

@@ -8,10 +8,12 @@ using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class FileMonitor: ILineMonitor, IDisposable
+    public class FileMonitor: ILineMonitor
     {
         private readonly IObservable<FileSegmentReport> _fileSegments;
         private readonly IObservable<ScrollRequest> _scrollRequest;
+        private readonly IObservable<Func<string, bool>> _predicates;
+
         private readonly IScheduler _scheduler;
         private readonly IDisposable _cleanUp;
 
@@ -31,144 +33,115 @@ namespace TailBlazer.Domain.FileHandling
             _fileSegments = fileSegments;
             _scrollRequest = scrollRequest;
             _scheduler = scheduler ?? Scheduler.Default;
+            _predicates = predicateObs ?? (Observable.Return(predicate));
 
-            var rolloverDisposable = new SerialDisposable();
-            
             var cache = new SourceCache<Line, LineKey>(l => l.Key);
+
             Lines = cache.Connect()
                         .IgnoreUpdateWhen((current, previous) => current.Key == previous.Key)
                         .AsObservableCache();
 
-            IObservable<MonitorObservables> observables;
-            if (predicateObs != null)
-            {
-                observables = predicateObs
-                    .Select(pred => CreateObservables(fsg => fsg.Monitor(pred, scheduler)))
-                    .Switch();
-            }
-            else
-            {
-                observables = CreateObservables(fsg => fsg.Monitor(predicate, scheduler));
-            }
+            var shared = Monitor().Publish();
+            
+            Size = shared.Select(obs => (long)obs.LineReader.Count).DistinctUntilChanged().Replay(1).RefCount();
+            TotalLines = shared.Select(obs => obs.LineReader.Count).DistinctUntilChanged().Replay(1).RefCount();
 
-            var shared = observables.Publish();
+            var monitor = shared.Subscribe(obs=>  PopulateData(cache, obs)) ;
 
-            Size = shared.Select(obs => obs.Size).Switch();
-            TotalLines = shared.Select(obs => obs.TotalLines).Switch();
-            var monitor = shared.Subscribe(obs=> rolloverDisposable.Disposable = PopulateData(cache, obs.ScrollInfo)) ;
-
-            _cleanUp = new CompositeDisposable(shared.Connect(), monitor, rolloverDisposable, Lines, cache);
+            _cleanUp = new CompositeDisposable(shared.Connect(), monitor,  Lines, cache);
         }
 
-        private IObservable<MonitorObservables> CreateObservables(Func<IObservable<FileSegmentReport>,IObservable<ILineReader>> lineReaderFactory)
+        private IObservable<IndiciesWithScroll> Monitor()
         {
-            return Observable.Create<MonitorObservables>(observer =>
+            return _predicates.Select(predicate =>
             {
-                var locker = new object();
+                return _fileSegments.Publish(shared =>
+                {
+                    var locker = new object();
+                    var scroll = _scrollRequest.DistinctUntilChanged().Synchronize(locker);
+                    var indexer = shared.Monitor(predicate, _scheduler).Synchronize(locker);
 
-                //ensure input streams are synchronised
-                var published = _fileSegments.Synchronize(locker).Publish();
-                var scroll = _scrollRequest.DistinctUntilChanged().Synchronize(locker);
-                var indexer = lineReaderFactory(published).Synchronize(locker);
+                    ////set up file info observables
+                    var tail = shared.Select(fsc => fsc.TailInfo).DistinctUntilChanged();
 
-                //set up file info observables
-               var tail = published.Select(fsc => fsc.TailInfo).DistinctUntilChanged();
-
-                var totalLines = indexer.Select(idx => idx.Count).Replay(1).RefCount();
-                var size = published.Select(fsc => fsc.Segments.FileSize).Replay(1).RefCount();
-
-                //keep monitoring until the file has been invalidated i. e. rollover or file name changed
-                var scrollInfo = indexer
-                    .CombineLatest(scroll, tail, (idx, scrl, t) => new IndiciesWithScroll(idx, scrl, t))
-                    .Scan((IndiciesWithScroll) null, (state, latest) =>
-                    {
-                       return state == null 
-                            ? new IndiciesWithScroll(latest.LineReader, latest.Scroll, latest.TailInfo)
-                            : new IndiciesWithScroll(state, latest.LineReader, latest.Scroll, latest.TailInfo);
-                    })
-                    .StartWith(IndiciesWithScroll.Empty)
-
-                    .FinallySafe(() => observer.OnCompleted()); 
-
-                observer.OnNext(new MonitorObservables(scrollInfo, totalLines, size));
-
-                return new CompositeDisposable(published.Connect());
-            }).Repeat();
+                    return indexer
+                        .CombineLatest(scroll, tail, (idx, scrl, t) => new IndiciesWithScroll(idx, scrl, t))
+                        .Scan((IndiciesWithScroll) null, (state, latest) =>
+                        {
+                            return state == null
+                                ? new IndiciesWithScroll(latest.LineReader, latest.Scroll, latest.TailInfo)
+                                : new IndiciesWithScroll(state, latest.LineReader, latest.Scroll, latest.TailInfo);
+                        })
+                        .StartWith(IndiciesWithScroll.Empty);
+                });
+            }).Switch();
         }
 
-        
-        private IDisposable PopulateData(SourceCache<Line, LineKey> cache, IObservable<IndiciesWithScroll> scrollInfo)
+        private void PopulateData(SourceCache<Line, LineKey> cache, IndiciesWithScroll latest)
         {
             //load the cache with data matching the scroll request
-            var shared = scrollInfo.Publish();
-
-            //tail file
-            var loader = shared.Subscribe(latest =>
+            cache.Edit(innerCache =>
             {
-                cache.Edit(innerCache =>
+                if (latest.Reason == IndiciesWithScrollReason.New)
                 {
-                    if (latest.Reason == IndiciesWithScrollReason.New)
+                    innerCache.Clear();
+                }
+                else if (latest.Reason == IndiciesWithScrollReason.InitialLoad)
+                {
+
+                    innerCache.Clear();
+
+
+                    if (latest.TailInfo.Count != 0)
                     {
-                        innerCache.Clear();
+                        var size = latest.TailInfo.Count;
+                        var pageSize = latest.Scroll.PageSize;
+                        var toAdd = latest.TailInfo.Lines.Skip(size - pageSize);
+                        innerCache.AddOrUpdate(toAdd);
                     }
-                    else if (latest.Reason == IndiciesWithScrollReason.InitialLoad)
-                    {
-    
-                        innerCache.Clear();
-
-
-                        if (latest.TailInfo.Count != 0)
-                        {
-                            var size = latest.TailInfo.Count;
-                            var pageSize = latest.Scroll.PageSize;
-                            var toAdd = latest.TailInfo.Lines.Skip(size - pageSize);
-                            innerCache.AddOrUpdate(toAdd);
-                        }
-                        else
-                        {
-                            var result = latest.LineReader.ReadLines(latest.Scroll).ToArray();
-                            innerCache.AddOrUpdate(result);
-                        }
-
-                    }
-                    else if (latest.Reason == IndiciesWithScrollReason.TailChanged)
-                    {
-                        //TODO: If in scroll mode, auto tail only if page is not full
-
-                        //only load data if tailing or there is available spacce on the pages
-                        if (latest.Scroll.Mode == ScrollReason.Tail)
-                        {
-                            if (latest.TailInfo.Count == 0) return;
-
-                            var size = latest.TailInfo.Count;
-                            var pageSize = latest.Scroll.PageSize;
-                            var toAdd = latest.TailInfo.Lines.Skip(size - pageSize);
-                            innerCache.AddOrUpdate(toAdd);
-
-                            //clear stale tail items
-                            var toRemove = innerCache.Items
-                                .OrderBy(l => l.LineInfo.Start)
-                                .Take(innerCache.Count - pageSize)
-                                .Select(line => line.Key)
-                                .ToArray();
-                            innerCache.Remove(toRemove);
-                        }
-
-                    }
-                    else if (latest.Reason == IndiciesWithScrollReason.ScrollChanged)
+                    else
                     {
                         var result = latest.LineReader.ReadLines(latest.Scroll).ToArray();
-
-                        var previous = innerCache.Items.ToArray();
-                        var added = result.Except(previous, Line.TextStartComparer).ToArray();
-                        var removed = previous.Except(result, Line.TextStartComparer).ToArray();
-
-                        innerCache.AddOrUpdate(added);
-                        innerCache.Remove(removed);
+                        innerCache.AddOrUpdate(result);
                     }
-                });
+
+                }
+                else if (latest.Reason == IndiciesWithScrollReason.TailChanged)
+                {
+                    //TODO: If in scroll mode, auto tail only if page is not full
+
+                    //only load data if tailing or there is available spacce on the pages
+                    if (latest.Scroll.Mode == ScrollReason.Tail)
+                    {
+                        if (latest.TailInfo.Count == 0) return;
+
+                        var size = latest.TailInfo.Count;
+                        var pageSize = latest.Scroll.PageSize;
+                        var toAdd = latest.TailInfo.Lines.Skip(size - pageSize);
+                        innerCache.AddOrUpdate(toAdd);
+
+                        //clear stale tail items
+                        var toRemove = innerCache.Items
+                            .OrderBy(l => l.LineInfo.Start)
+                            .Take(innerCache.Count - pageSize)
+                            .Select(line => line.Key)
+                            .ToArray();
+                        innerCache.Remove(toRemove);
+                    }
+
+                }
+                else if (latest.Reason == IndiciesWithScrollReason.ScrollChanged)
+                {
+                    var result = latest.LineReader.ReadLines(latest.Scroll).ToArray();
+
+                    var previous = innerCache.Items.ToArray();
+                    var added = result.Except(previous, Line.TextStartComparer).ToArray();
+                    var removed = previous.Except(result, Line.TextStartComparer).ToArray();
+
+                    innerCache.AddOrUpdate(added);
+                    innerCache.Remove(removed);
+                }
             });
-            return new CompositeDisposable(shared.Connect(), loader);
         }
 
 
@@ -196,19 +169,6 @@ namespace TailBlazer.Domain.FileHandling
             }
         }
 
-        private class Values
-        {
-            public int TotalLines { get; }
-            public long Size { get; }
-            public IndiciesWithScroll ScrollInfo { get; }
-
-            public Values(IndiciesWithScroll scrollInfo, int totalLines, long size)
-            {
-                ScrollInfo = scrollInfo;
-                TotalLines = totalLines;
-                Size = size;
-            }
-        }
 
 
         private class IndiciesWithScroll : IEquatable<IndiciesWithScroll>
@@ -266,6 +226,7 @@ namespace TailBlazer.Domain.FileHandling
             private IndiciesWithScroll()
             {
                 Reason = IndiciesWithScrollReason.New;
+                LineReader = NullLineReader.Empty;
             }
 
             #region Equality
