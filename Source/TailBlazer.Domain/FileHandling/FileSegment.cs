@@ -28,6 +28,11 @@ namespace TailBlazer.Domain.FileHandling
             Type = previous.Type;
             Key = previous.Key;
         }
+        
+        public FileSegment(FileSegmentType type)
+        {
+            Type = type;
+        }
 
         #region Equality
 

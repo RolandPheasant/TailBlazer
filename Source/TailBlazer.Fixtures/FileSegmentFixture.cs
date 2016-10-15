@@ -22,13 +22,14 @@ namespace TailBlazer.Fixtures
 
                 file.Append(1,1000);
 
-                var refresher = new Subject<Unit>();
+                var scheduler = new TestScheduler();
 
-                var segmenter = new FileSegmenter(info.WatchFile(refresher), 1000);
+                var segmenter = new FileSegmenter(info.WatchFile(scheduler: scheduler), 1000);
                 FileSegmentCollection result = null;
 
                 using (segmenter.Segments.Subscribe(segment => result = segment))
                 {
+                    scheduler.AdvanceByMilliSeconds(250);
                     result.Should().NotBeNull();
                     result.Count.Should().BeGreaterOrEqualTo(2);
                     result.Segments.Select(fs => fs.Type).Should().Contain(FileSegmentType.Head);
@@ -36,7 +37,7 @@ namespace TailBlazer.Fixtures
                     result.FileSize.Should().Be(info.Length);
                     
                     file.Append(101,10);
-                    refresher.Once();
+                    scheduler.AdvanceByMilliSeconds(250);
                     info.Refresh();
                     result.FileSize.Should().Be(info.Length);
                 }

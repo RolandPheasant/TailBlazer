@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
 namespace TailBlazer.Domain.FileHandling
@@ -42,23 +41,35 @@ namespace TailBlazer.Domain.FileHandling
             _initialTail = initialTail;
             _segmentSize = segmentSize;
 
-            Segments = notifications
-                    .Scan((FileSegmentCollection)null, (previous, current) =>
-                    {
-                        if (previous == null
-                            || current.Reason == FileNotificationReason.CreatedOrOpened
-                            || previous.TailSize == 0)
-                        {
-                            var segments = LoadSegments(current.FullName).ToArray();
-                            return new FileSegmentCollection(current, segments, current.Size);
-                        }
 
-                        if (!current.Exists || current.Invalidated)
-                            return new FileSegmentCollection(current);
-                        
-                        return new FileSegmentCollection(current, previous);
-                    })
-                    .DistinctUntilChanged();
+
+            Segments = notifications.Publish(shared =>
+            {
+                //return empty when file does not exists
+                var whenEmpty = shared
+                    .Where(fc => !fc.ExistsAndIsValid())
+                    .Select(fc => new FileSegmentCollection(fc));
+
+                //
+                var whenNotEmpty = shared
+                        .Where(fc => fc.ExistsAndIsValid())
+                        .Scan((FileSegmentCollection)null, (previous, current) =>
+                        {
+                            if (previous == null 
+                                || current.Reason == FileNotificationReason.CreatedOrOpened
+                                || previous.Reason == FileSegmentChangedReason.New)
+                            {
+                                var segments = LoadSegments(current.FullName).ToArray();
+                                return new FileSegmentCollection(current, segments);
+                            }
+                            return new FileSegmentCollection(current, previous);
+                        })
+                        .DistinctUntilChanged();
+
+                return whenEmpty.Merge(whenNotEmpty).DistinctUntilChanged();
+            });
+
+
         }
 
         private IEnumerable<FileSegment> LoadSegments(string name)

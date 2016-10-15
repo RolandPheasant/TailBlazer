@@ -34,17 +34,25 @@ namespace TailBlazer.Domain.FileHandling
         {
             return _fileSegments.Publish(shared =>
             {
-                var doesNotExist = shared
-                    .Where(fsr => fsr.Changes.Reason == FileNotificationReason.CreatedOrOpened)
-                    .Skip(1)
-                    .Do(x =>
-                    {
-                        Console.WriteLine(x);
-                    });
+                //TODO: WHEN FILE IS MISSING RETURN EMPTY
 
-                return BuildIndicies(shared)
-                    .TakeUntil(doesNotExist)
+                //always return an empty collection when the file does not exist
+
+                //Invoked at roll-over or file cleared
+                var newFileCreated = shared
+                    .Where(fsr => fsr.Changes.Reason == FileNotificationReason.CreatedOrOpened)
+                    .Skip(1);
+
+                //return empty when file does not exists
+                var whenEmpty = shared
+                    .Where(fsr => !fsr.Changes.ExistsAndIsValid())
+                    .Select(_ => FileIndexCollection.Empty);
+
+                var indexedFiles = BuildIndicies(shared)
+                    .TakeUntil(newFileCreated)
                     .Repeat();
+                
+                return indexedFiles.Merge(whenEmpty).DistinctUntilChanged();
             });
         }
         private IObservable<FileIndexCollection> BuildIndicies(IObservable<FileSegmentReport> shared)
@@ -54,20 +62,8 @@ namespace TailBlazer.Domain.FileHandling
                 //1. create  a resulting index object from the collection of index fragments
                 var indexList = new SourceCache<Index, IndexType>(idx => idx.Type);
 
-                var indexClearer = shared.Select(fsr => fsr.Changes.Invalidated)
-                    .DistinctUntilChanged()
-                    .Where(invalid => invalid)
-                    .Subscribe(_ => indexList.Clear());
-
                 var indexer =  CreateIndicies(shared)
-                    .Subscribe(index =>
-                    {
-                        if (index == null)
-                        {
-                            Console.WriteLine();
-                        }
-                        indexList.AddOrUpdate(index);
-                    });
+                    .Subscribe(index => indexList.AddOrUpdate(index));
 
                 //2. From those indicies, combine and build a new collection
                 var collectionBuilder = indexList.Connect()
@@ -88,7 +84,7 @@ namespace TailBlazer.Domain.FileHandling
                     .DistinctUntilChanged()
                     .SubscribeSafe(observer);
 
-                return new CompositeDisposable(indexer, indexClearer, collectionBuilder, indexList);
+                return new CompositeDisposable(indexer,  collectionBuilder, indexList);
             });
         }
 

@@ -35,7 +35,18 @@ namespace TailBlazer.Domain.FileHandling
             if (segments == null) throw new ArgumentNullException(nameof(segments));
             if (tailInfo == null) throw new ArgumentNullException(nameof(tailInfo));
             if (changes == null) throw new ArgumentNullException(nameof(changes));
-            TailInfo =   tailInfo;
+
+            if (!changes.Exists)
+            {
+                TailInfo = TailInfo.Empty;
+
+            }
+            else
+            {
+                TailInfo = tailInfo;
+            }
+
+           // TailInfo = !Changes.Exists ? TailInfo.Empty : tailInfo;
             Changes = changes;
             Segments = segments;
         }

@@ -7,7 +7,6 @@ namespace TailBlazer.Domain.FileHandling
     {
         private FileNotification Notification { get;  }
 
-        public long SizeDiff { get; }
 
         public string FullName => Notification.FullName;
 
@@ -31,15 +30,12 @@ namespace TailBlazer.Domain.FileHandling
         {
             Notification = fileNotification;
             Invalidated = false;
-            SizeDiff = Size;
             NoChange = false;
         }
         
         public FileChanges(FileChanges previous, FileNotification fileNotification)
         {
             Notification = fileNotification;
-            SizeDiff = fileNotification.Size - previous.Size;
-           
             Invalidated = previous.FullName != fileNotification.FullName || previous.Size > fileNotification.Size;
             NoChange = !(Invalidated || previous.Size != fileNotification.Size);
         }
@@ -84,6 +80,16 @@ namespace TailBlazer.Domain.FileHandling
         public override string ToString()
         {
             return $"{Name} ({Size.FormatWithAbbreviation()}), StartScanning = {Invalidated}";
+        }
+
+
+    }
+
+    public static class FileChangeEx
+    {
+        public static bool ExistsAndIsValid(this FileChanges source)
+        {
+            return source.Exists && !source.Invalidated;
         }
     }
 }

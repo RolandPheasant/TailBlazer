@@ -53,11 +53,19 @@ namespace TailBlazer.Fixtures
                     CollectionAssert.AreEqual(actual, expected);
 
                     //simulate a file roll-over
-                    scrollRequest.OnNext(new ScrollRequest(10));
+                    ////simulate a file roll-over
+                    scrollRequest.OnNext(new ScrollRequest(5));
                     scheduler.AdvanceByMilliSeconds(250);
+
+                    //Check what happens before  load
                     file.Delete();
+                    scheduler.AdvanceByMilliSeconds(250);
+                    expected = new string[0];
+                    actual = TransformToString(monitor.Lines);
+                    CollectionAssert.AreEqual(actual, expected);
+
                     file.Append(CreateLines(50, 5));
-                    scheduler.AdvanceByMilliSeconds(2500);
+                    scheduler.AdvanceByMilliSeconds(250);
 
                     actual = TransformToString(monitor.Lines);
                     expected = CreateLines(50, 5);
@@ -104,8 +112,6 @@ namespace TailBlazer.Fixtures
                     CollectionAssert.AreEqual(actual, expected);
 
                     //scroll to a specific position
-
-                   // file.Append(CreateLines(98, 5));
                     scrollRequest.OnNext(new ScrollRequest(5, 10));
                     actual = TransformToString(monitor.Lines);
                     expected = CreateLines(new[] { 91, 92, 93, 94, 95});
@@ -114,9 +120,14 @@ namespace TailBlazer.Fixtures
                     ////simulate a file roll-over
                     scrollRequest.OnNext(new ScrollRequest(5));
                     scheduler.AdvanceByMilliSeconds(250);
+
+                    //Check what happens before  load
                     file.Delete();
+                    scheduler.AdvanceByMilliSeconds(50);
+
+
                     file.Append(CreateLines(50, 100));
-                    scheduler.AdvanceByMilliSeconds(2500);
+                    scheduler.AdvanceByMilliSeconds(250);
 
                     actual = TransformToString(monitor.Lines);
                     expected = CreateLines(new[] { 109, 119, 129, 139, 149 }); ;

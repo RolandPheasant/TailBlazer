@@ -29,11 +29,10 @@ namespace TailBlazer.Domain.FileHandling
                 var locker = new object();
 
                 return _fileSegmentCollection
-                //    .Where(fsc=> fsc.Reason== FileSegmentChangedReason.Tailed)
                     .Synchronize(locker)
                     .Select(fsc =>
                     {
-                        if (fsc.Count == 0 || fsc.SizeDiff < 0)
+                        if (fsc.Reason == FileSegmentChangedReason.New || fsc.Metrics.Size==0)
                             return TailInfo.Empty;
 
                         var tailFromPosition = fsc.Reason == FileSegmentChangedReason.Loaded 
@@ -77,5 +76,4 @@ namespace TailBlazer.Domain.FileHandling
             }
         }
     }
-
 }

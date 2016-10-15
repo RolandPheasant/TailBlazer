@@ -1,6 +1,7 @@
 using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using DynamicData;
 using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
@@ -31,9 +32,6 @@ namespace TailBlazer.Domain.FileHandling
             {
                 var changes = source.MonitorChanges().DistinctUntilChanged().Publish();
                 var segments = changes.WithSegments(initialTail).DistinctUntilChanged().Publish();
-
-              //  var zipped = changes.Zip(segments, (c, s) => new );
-
                 var fileTail = segments.Tail().DistinctUntilChanged();
                 var combined = segments.CombineLatest(fileTail, changes, (segment, tail, change) => new FileSegmentReport(segment, tail, change));
 

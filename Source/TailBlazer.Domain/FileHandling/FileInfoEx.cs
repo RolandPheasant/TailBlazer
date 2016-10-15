@@ -14,7 +14,8 @@ namespace TailBlazer.Domain.FileHandling
     {
         public static IObservable<FileChanges> MonitorChanges(this IObservable<FileNotification> source)
         {
-            return source.Where(notification => notification.Exists)
+            return source
+                //.Where(notification => notification.Exists)
                 .Scan((FileChanges) null, (state, latest) =>
                 {
                     if (state==null)
