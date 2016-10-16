@@ -10,12 +10,17 @@ namespace TailBlazer.Domain.FileHandling
 {
     public sealed class FileWatcher : IFileWatcher, IDisposable
     {
-        private readonly IScheduler _scheduler;
-        public IObservable<FileStatus> Status { get; }
-        public IObservable<FileSegmentReport> Segments { get; }
-        public IObservable<long> Size { get; }
+        private readonly ISubject<long> _scanFrom = new BehaviorSubject<long>(0);
 
-        private FileInfo FileInfo { get;  }
+        private readonly IDisposable _cleanUp;
+        private readonly IScheduler _scheduler;
+
+        private FileInfo FileInfo { get; }
+        private IObservable<FileSegmentReport> Segments { get; }
+
+        public IObservable<FileStatus> Status { get; }
+      
+        public IObservable<long> Size { get; }
         
         public string FullName => FileInfo.FullName;
 
@@ -23,12 +28,7 @@ namespace TailBlazer.Domain.FileHandling
         
         public string Folder => FileInfo.DirectoryName;
 
-        public string Extension => FileInfo.Extension;
-
-        private readonly ISubject<long> _scanFrom = new BehaviorSubject<long>(0);
-
-        private readonly IDisposable _cleanUp;
-
+        
         public FileWatcher([NotNull] FileInfo fileInfo, IRatingService ratingsMetrics, IScheduler scheduler=null)
         {
             _scheduler = scheduler ?? Scheduler.Default; ;
@@ -45,22 +45,13 @@ namespace TailBlazer.Domain.FileHandling
                 : fileInfo.WatchFile(scheduler: _scheduler, refreshPeriod: refreshRate).ScanFromEnd())
                 .Switch()
                 .DistinctUntilChanged()
-                // .TakeWhile(notification => notification.Exists)
-                // .Repeat()
                 .Publish();
-
-
-
+            
             Size = shared.Select(fn => fn.Size).Replay(1).RefCount();
 
             Segments = shared.MonitorChanges()
                 .SegmentWithReport()
-                //.TakeUntil(Invalidated)
-                // .Repeat()
                 .Replay(1).RefCount();
-
-            //FileNameChanged = Segments.Select(fsc => fsc.Segments.Info.Name).DistinctUntilChanged().Skip(1);
-            //SizeDiff = Segments.Select(fsc => fsc.Segments.SizeDiff);
 
             Status = fileInfo.WatchFile(scheduler: scheduler).Select(notificiation =>
             {
@@ -74,7 +65,6 @@ namespace TailBlazer.Domain.FileHandling
 
             _cleanUp = shared.Connect();
         }
-        
 
         public ILineMonitor Monitor(IObservable<ScrollRequest> scrollRequest, Func<string, bool> predicate = null, IScheduler scheduler = null)
         {

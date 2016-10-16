@@ -54,23 +54,22 @@ namespace TailBlazer.Views.Searching
             //    {
             //        var limited = lp as IHasLimitationOfLines;
             //        if (limited == null) return $"{lp.Count.ToString("#,###0")}";
-            //        return limited.HasReachedLimit 
-            //                    ? $"{limited.Maximum.ToString("#,###0")}+" 
+            //        return limited.HasReachedLimit
+            //                    ? $"{limited.Maximum.ToString("#,###0")}+"
             //                    : $"{lp.Count.ToString("#,###0")}";
             //    })
             //     .Subscribe(countText => CountText = countText);
 
 
-            //var progressMonitor = _info.Latest.OfType<IProgressInfo>().Subscribe(result =>
-            //{
-            //    Searching = result.IsSearching;
-            //    Segments = result.Segments;
-            //    SegmentsSearched = result.SegmentsCompleted;
-            //});
+            var progressMonitor = lineMonitor.Progress
+                .Subscribe(result =>
+            {
+                Searching = result.IsSearching;
+                Segments = result.Total;
+                SegmentsSearched = result.Completed;
+            });
 
-            //   _cleanUp = new CompositeDisposable(lineMonitor, progressMonitor, counter, counterTextFormatter);
-
-            _cleanUp = new CompositeDisposable(counter, lineMonitor, counterTextFormatter);
+            _cleanUp = new CompositeDisposable(counter, lineMonitor, progressMonitor, counterTextFormatter);
         }
 
 

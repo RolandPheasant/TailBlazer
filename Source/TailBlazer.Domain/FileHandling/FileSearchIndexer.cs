@@ -63,9 +63,11 @@ namespace TailBlazer.Domain.FileHandling
                     .TakeUntil(newFileCreated)
                     .Repeat();
 
-                return indexedFiles.Merge(whenEmpty).DistinctUntilChanged();
+                return whenEmpty.Merge(indexedFiles).DistinctUntilChanged();
             });
         }
+
+
 
         private IObservable<FileSearchCollection> BuildIndicies(IObservable<FileSegmentReport> shared)
         {
@@ -89,7 +91,9 @@ namespace TailBlazer.Domain.FileHandling
                 var searchData = new SourceCache<FileSegmentSearch, FileSegmentKey>(s => s.Key);
 
                 //Create a cache of segments which are to be searched
-                var segmentLoader = shared.Select(s => s.Segments.Segments)
+                var segmentLoader = shared
+                    .Select(s => s.Segments.Segments.Select(fs=>fs))
+
                     .ToObservableChangeSet(s => s.Key)
                     .IgnoreUpdateWhen((current, previous) => current == previous)
                     .Transform(fs => new FileSegmentSearch(fs))
@@ -148,8 +152,7 @@ namespace TailBlazer.Domain.FileHandling
 
                 //continual indexing of the tail + replace tail index whenether there are new scan results
                 var tailScanner = tailWatcher
-
-                    .Subscribe(tail => searchData.AddOrUpdate(tail.FileSegmentSearch));
+                .Subscribe(tail => searchData.AddOrUpdate(tail.FileSegmentSearch));
 
 
                 //load the rest of the file segment by segment, reporting status after each search
@@ -160,7 +163,7 @@ namespace TailBlazer.Domain.FileHandling
                     return searchData.Connect(fss => fss.Segment.Type == FileSegmentType.Head)
                         .WhereReasonsAre(ChangeReason.Add)
                         .SelectMany(changes => changes.Select(c => c.Current).OrderByDescending(c => c.Segment.Index).ToArray())
-                       // .ObserveOn(_scheduler)
+                        .ObserveOn(_scheduler)
                         .Synchronize(locker)
                         .Do(head => searchData.AddOrUpdate(new FileSegmentSearch(head.Segment, FileSegmentSearchStatus.Searching)))
                         .Select(fileSegmentSearch =>

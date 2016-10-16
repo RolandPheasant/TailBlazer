@@ -25,9 +25,8 @@ namespace TailBlazer.Fixtures
                 var segments = file.Info.WatchFile(scheduler: scheduler).SegmentWithReport();
                 using (var monitor = new FileMonitor(segments, scrollRequest, scheduler: scheduler))
                 {
-                    long size = 0;
                     long count = 0;
-                    var sizeSubscriber = monitor.Size.Subscribe(s => size = s);
+
                     var countSubscriber = monitor.TotalLines.Subscribe(s => count = s);
 
 
@@ -79,7 +78,6 @@ namespace TailBlazer.Fixtures
                     CollectionAssert.AreEqual(actual, expected);
 
                     countSubscriber.Dispose();
-                    sizeSubscriber.Dispose();
                 }
 
             }
@@ -88,7 +86,7 @@ namespace TailBlazer.Fixtures
 
 
 
-        [FactAttribute]
+        [Fact]
         public void Monitor_Filter()
         {
 

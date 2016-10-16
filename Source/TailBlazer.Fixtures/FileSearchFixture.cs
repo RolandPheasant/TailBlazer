@@ -28,8 +28,8 @@ namespace TailBlazer.Fixtures
                     .Subscribe(x => fileSearchCollection = x))
                 {
                     scheduler.AdvanceBySeconds(1);
-                    fileSearchCollection.Segments.Should().Be(1);
-                    fileSearchCollection.SegmentsCompleted.Should().Be(0);
+                    fileSearchCollection.Total.Should().Be(1);
+                    fileSearchCollection.Completed.Should().Be(0);
                     fileSearchCollection.IsSearching.Should().Be(false);
                     fileSearchCollection.Count.Should().Be(0);
                 }

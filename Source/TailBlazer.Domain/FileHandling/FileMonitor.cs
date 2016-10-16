@@ -4,6 +4,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
+using DynamicData.Kernel;
 using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling
@@ -19,8 +20,9 @@ namespace TailBlazer.Domain.FileHandling
 
         public IObservableCache<Line, LineKey> Lines { get; } 
         public IObservable<int> TotalLines { get; }
-        public IObservable<long> Size { get; }
-        
+
+        public IObservable<IProgressInfo> Progress { get; }
+
         public FileMonitor([NotNull] IObservable<FileSegmentReport> fileSegments,
             [NotNull] IObservable<ScrollRequest> scrollRequest,
             Func<string, bool> predicate = null,
@@ -41,52 +43,59 @@ namespace TailBlazer.Domain.FileHandling
                         .IgnoreUpdateWhen((current, previous) => current.Key == previous.Key)
                         .AsObservableCache();
 
-            var shared = Monitor().Publish();
+            var shared = Monitor()
+                .RetryWithBackOff<LineReaderInfo,Exception>((ex,i)=> TimeSpan.FromSeconds(1))
+                .Publish();
             
-            Size = shared.Select(obs => (long)obs.LineReader.Count).DistinctUntilChanged().Replay(1).RefCount();
-            TotalLines = shared.Select(obs => obs.LineReader.Count).DistinctUntilChanged().Replay(1).RefCount();
+            TotalLines = shared.Select(obs => obs.LineReader.Count)
+                .DistinctUntilChanged()
+                .Replay(1).RefCount();
+
+            Progress = shared.Select(lri => lri.LineReader).OfType<IProgressInfo>()
+                .Select(info=>new ProgressInfo(info.Completed, info.Total, info.IsSearching))
+                .DistinctUntilChanged()
+                .StartWith(ProgressInfo.Empty)
+                .Replay(1).RefCount();
 
             var monitor = shared.Subscribe(obs=>  PopulateData(cache, obs)) ;
 
             _cleanUp = new CompositeDisposable(shared.Connect(), monitor,  Lines, cache);
         }
 
-        private IObservable<IndiciesWithScroll> Monitor()
+        private IObservable<LineReaderInfo> Monitor()
         {
             return _predicates.Select(predicate =>
             {
                 return _fileSegments.Publish(shared =>
                 {
                     var locker = new object();
-                    var scroll = _scrollRequest.DistinctUntilChanged().Synchronize(locker);
-                    var indexer = shared.Monitor(predicate, _scheduler).Synchronize(locker);
-
-                    ////set up file info observables
-                    var tail = shared.Select(fsc => fsc.TailInfo).DistinctUntilChanged();
+                    var scroll = _scrollRequest.Synchronize(locker).DistinctUntilChanged();
+                    var indexer = shared.Synchronize(locker).Monitor(predicate, _scheduler);
+                    var tail = shared.Synchronize(locker).Select(fsc => fsc.TailInfo).DistinctUntilChanged();
 
                     return indexer
-                        .CombineLatest(scroll, tail, (idx, scrl, t) => new IndiciesWithScroll(idx, scrl, t))
-                        .Scan((IndiciesWithScroll) null, (state, latest) =>
+                        .CombineLatest(scroll, tail, (idx, scrl, t) => new LineReaderInfo(idx, scrl, t))
+                        .Scan((LineReaderInfo) null, (state, latest) =>
                         {
                             return state == null
-                                ? new IndiciesWithScroll(latest.LineReader, latest.Scroll, latest.TailInfo)
-                                : new IndiciesWithScroll(state, latest.LineReader, latest.Scroll, latest.TailInfo);
+                                ? new LineReaderInfo(latest.LineReader, latest.Scroll, latest.TailInfo)
+                                : new LineReaderInfo(state, latest.LineReader, latest.Scroll, latest.TailInfo);
                         })
-                        .StartWith(IndiciesWithScroll.Empty);
+                        .StartWith(LineReaderInfo.Empty);
                 });
             }).Switch();
         }
 
-        private void PopulateData(SourceCache<Line, LineKey> cache, IndiciesWithScroll latest)
+        private void PopulateData(SourceCache<Line, LineKey> cache, LineReaderInfo latest)
         {
             //load the cache with data matching the scroll request
             cache.Edit(innerCache =>
             {
-                if (latest.Reason == IndiciesWithScrollReason.New)
+                if (latest.Reason == LineReaderInfoChangedReason.New)
                 {
                     innerCache.Clear();
                 }
-                else if (latest.Reason == IndiciesWithScrollReason.InitialLoad)
+                else if (latest.Reason == LineReaderInfoChangedReason.InitialLoad)
                 {
 
                     innerCache.Clear();
@@ -106,7 +115,7 @@ namespace TailBlazer.Domain.FileHandling
                     }
 
                 }
-                else if (latest.Reason == IndiciesWithScrollReason.TailChanged)
+                else if (latest.Reason == LineReaderInfoChangedReason.TailChanged)
                 {
                     //TODO: If in scroll mode, auto tail only if page is not full
 
@@ -117,7 +126,7 @@ namespace TailBlazer.Domain.FileHandling
 
                         var size = latest.TailInfo.Count;
                         var pageSize = latest.Scroll.PageSize;
-                        var toAdd = latest.TailInfo.Lines.Skip(size - pageSize);
+                         var toAdd = latest.TailInfo.Lines.Skip(size - pageSize);
                         innerCache.AddOrUpdate(toAdd);
 
                         //clear stale tail items
@@ -130,7 +139,7 @@ namespace TailBlazer.Domain.FileHandling
                     }
 
                 }
-                else if (latest.Reason == IndiciesWithScrollReason.ScrollChanged)
+                else if (latest.Reason == LineReaderInfoChangedReason.ScrollChanged)
                 {
                     var result = latest.LineReader.ReadLines(latest.Scroll).ToArray();
 
@@ -145,7 +154,7 @@ namespace TailBlazer.Domain.FileHandling
         }
 
 
-        private enum IndiciesWithScrollReason
+        private enum LineReaderInfoChangedReason
         {
             None,
             New,
@@ -155,34 +164,18 @@ namespace TailBlazer.Domain.FileHandling
             ScrollChanged
         }
 
-        private class MonitorObservables
-        {
-            public IObservable<int> TotalLines { get; }
-            public IObservable<long> Size { get; }
-            public IObservable<IndiciesWithScroll> ScrollInfo { get; }
-
-            public MonitorObservables(IObservable<IndiciesWithScroll> scrollInfo, IObservable<int> totalLines, IObservable<long> size)
-            {
-                ScrollInfo = scrollInfo;
-                TotalLines = totalLines;
-                Size = size;
-            }
-        }
-
-
-
-        private class IndiciesWithScroll : IEquatable<IndiciesWithScroll>
+        private class LineReaderInfo : IEquatable<LineReaderInfo>
         {
             public ScrollRequest Scroll { get;  }
             public TailInfo TailInfo { get; }
             public ILineReader LineReader { get; }
 
             public bool PageSizeChanged { get; }
-            public IndiciesWithScrollReason Reason { get; }
+            public LineReaderInfoChangedReason Reason { get; }
 
-            public static readonly IndiciesWithScroll Empty = new IndiciesWithScroll();
+            public static readonly LineReaderInfo Empty = new LineReaderInfo();
 
-            public IndiciesWithScroll(ILineReader lineReader, ScrollRequest scroll, TailInfo tail)
+            public LineReaderInfo(ILineReader lineReader, ScrollRequest scroll, TailInfo tail)
             {
 
                 Scroll = scroll;
@@ -190,10 +183,10 @@ namespace TailBlazer.Domain.FileHandling
                 TailInfo = (lineReader as IHasTailInfo)?.TailInfo ?? tail;
                 LineReader = lineReader;
                 PageSizeChanged = false;
-                Reason = IndiciesWithScrollReason.InitialLoad;
+                Reason = LineReaderInfoChangedReason.InitialLoad;
             }
 
-            public IndiciesWithScroll(IndiciesWithScroll previous, ILineReader lineReader, ScrollRequest scroll, TailInfo tail)
+            public LineReaderInfo(LineReaderInfo previous, ILineReader lineReader, ScrollRequest scroll, TailInfo tail)
             {
                 Scroll = scroll;
                 TailInfo = tail;
@@ -205,33 +198,33 @@ namespace TailBlazer.Domain.FileHandling
 
                 if (lineReader.Count ==0 ||  lineReader.Count < previous.LineReader.Count)
                 {
-                    Reason = IndiciesWithScrollReason.InitialLoad;
+                    Reason = LineReaderInfoChangedReason.InitialLoad;
                 }
 
                 else if (tail != previous.TailInfo)
                 {
-                    Reason = IndiciesWithScrollReason.TailChanged;
+                    Reason = LineReaderInfoChangedReason.TailChanged;
                 }
                 else if (scroll!= previous.Scroll)
                 {
-                    Reason = IndiciesWithScrollReason.ScrollChanged;
+                    Reason = LineReaderInfoChangedReason.ScrollChanged;
                 }
                 else
                 {
-                    Reason = IndiciesWithScrollReason.IndexChanged;
+                    Reason = LineReaderInfoChangedReason.IndexChanged;
                 }
 
             }
 
-            private IndiciesWithScroll()
+            private LineReaderInfo()
             {
-                Reason = IndiciesWithScrollReason.New;
+                Reason = LineReaderInfoChangedReason.New;
                 LineReader = NullLineReader.Empty;
             }
 
             #region Equality
 
-            public bool Equals(IndiciesWithScroll other)
+            public bool Equals(LineReaderInfo other)
             {
                 if (ReferenceEquals(null, other)) return false;
                 if (ReferenceEquals(this, other)) return true;
@@ -243,7 +236,7 @@ namespace TailBlazer.Domain.FileHandling
                 if (ReferenceEquals(null, obj)) return false;
                 if (ReferenceEquals(this, obj)) return true;
                 if (obj.GetType() != this.GetType()) return false;
-                return Equals((IndiciesWithScroll) obj);
+                return Equals((LineReaderInfo) obj);
             }
 
             public override int GetHashCode()
@@ -257,12 +250,12 @@ namespace TailBlazer.Domain.FileHandling
                 }
             }
 
-            public static bool operator ==(IndiciesWithScroll left, IndiciesWithScroll right)
+            public static bool operator ==(LineReaderInfo left, LineReaderInfo right)
             {
                 return Equals(left, right);
             }
 
-            public static bool operator !=(IndiciesWithScroll left, IndiciesWithScroll right)
+            public static bool operator !=(LineReaderInfo left, LineReaderInfo right)
             {
                 return !Equals(left, right);
             }

@@ -25,8 +25,7 @@ namespace TailBlazer.Views.Searching
         public ReadOnlyObservableCollection<SearchViewModel> Items => _items;
 
         public ILineMonitor Current { get; }
-
-
+        
         public SearchCollection(ISearchInfoCollection searchInfoCollection, 
             IObservable<ScrollRequest> scrollRequest,
             IFileWatcher fileWatcher,

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace TailBlazer.Domain.FileHandling
 {
@@ -17,8 +16,8 @@ namespace TailBlazer.Domain.FileHandling
         public long[] Matches { get; }
         public int Count => Matches.Length;
         public int Diff { get; }
-        public int SegmentsCompleted { get; }
-        public int Segments { get; }
+        public int Completed { get; }
+        public int Total { get; }
         public bool IsSearching { get; }
         public bool HasReachedLimit { get; }
         public int Maximum { get; }
@@ -45,8 +44,8 @@ namespace TailBlazer.Domain.FileHandling
             };
 
             IsSearching = initial.Status != FileSegmentSearchStatus.Complete;
-            Segments = 1;
-            SegmentsCompleted = IsSearching ? 0 : 1;
+            Total = 1;
+            Completed = IsSearching ? 0 : 1;
             Matches = initial.Lines.ToArray();
             TailInfo = tailInfo;
             Size = 0;
@@ -70,8 +69,8 @@ namespace TailBlazer.Domain.FileHandling
             var all = _allSearches.Values.ToArray();
 
             IsSearching = all.Any(s => s.Segment.Type == FileSegmentType.Head && s.Status != FileSegmentSearchStatus.Complete);
-            Segments = all.Length;
-            SegmentsCompleted = all.Count(s => s.Segment.Type == FileSegmentType.Head && s.Status == FileSegmentSearchStatus.Complete);
+            Total = all.Length;
+            Completed = all.Count(s => s.Segment.Type == FileSegmentType.Head && s.Status == FileSegmentSearchStatus.Complete);
             Size = all.Last().Segment.End;
 
             //For large sets this could be very inefficient
@@ -175,7 +174,7 @@ namespace TailBlazer.Domain.FileHandling
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(Matches, other.Matches) && SegmentsCompleted == other.SegmentsCompleted && Segments == other.Segments && IsSearching == other.IsSearching;
+            return Equals(Matches, other.Matches) && Completed == other.Completed && Total == other.Total && IsSearching == other.IsSearching;
         }
 
         public override bool Equals(object obj)
@@ -191,8 +190,8 @@ namespace TailBlazer.Domain.FileHandling
             unchecked
             {
                 var hashCode = Matches?.GetHashCode() ?? 0;
-                hashCode = (hashCode*397) ^ SegmentsCompleted;
-                hashCode = (hashCode*397) ^ Segments;
+                hashCode = (hashCode*397) ^ Completed;
+                hashCode = (hashCode*397) ^ Total;
                 hashCode = (hashCode*397) ^ IsSearching.GetHashCode();
                 return hashCode;
             }
@@ -212,7 +211,7 @@ namespace TailBlazer.Domain.FileHandling
 
         public override string ToString()
         {
-            return this == Empty ? "<None>" : $"Count: {Count}, Segments: {Segments}, Size: {Size}";
+            return this == Empty ? "<None>" : $"Count: {Count}, Segments: {Total}, Size: {Size}";
         }
 
     }

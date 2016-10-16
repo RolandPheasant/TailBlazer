@@ -21,13 +21,13 @@ namespace TailBlazer.Domain.FileHandling
             _matches = new ImmutableArray<long>();
         }
 
-        public FileSegmentSearch(FileSegment segment, FileSegmentSearchResult result)
-        {
-            Key = segment.Key;
-            Segment = segment;
-            Status =  FileSegmentSearchStatus.Complete;
-            _matches = new ImmutableArray<long>(result.Indicies);
-        }
+        //public FileSegmentSearch(FileSegment segment, FileSegmentSearchResult result)
+        //{
+        //    Key = segment.Key;
+        //    Segment = segment;
+        //    Status =  FileSegmentSearchStatus.Complete;
+        //    _matches = new ImmutableArray<long>(result.Indicies);
+        //}
 
 
         public FileSegmentSearch(FileSegmentSearch segmentSearch, FileSegmentSearchResult result)

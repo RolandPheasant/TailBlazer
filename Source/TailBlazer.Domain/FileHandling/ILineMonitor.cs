@@ -7,6 +7,8 @@ namespace TailBlazer.Domain.FileHandling
     {
         IObservableCache<Line, LineKey> Lines { get; }
         IObservable<int> TotalLines { get; }
+
+        IObservable<IProgressInfo> Progress { get; }
     }
 
 }

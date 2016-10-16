@@ -111,8 +111,8 @@ namespace TailBlazer.Views.Tail
             SearchHints = searchHints;
 
             CopyToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
-            OpenFileCommand = new Command(() => Process.Start(fileWatcher.FullName));
-            OpenFolderCommand = new Command(() => Process.Start(fileWatcher.Folder));
+            OpenFileCommand = new Command(async () => await Task.Run(() => Process.Start(fileWatcher.FullName)));
+            OpenFolderCommand = new Command(async () => await Task.Run(() => Process.Start(fileWatcher.Folder)));
             CopyPathToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(fileWatcher.FullName));
             UnClearCommand = new Command(async () => await Task.Run(() => fileWatcher.Reset()));
             ClearCommand = new Command(async ()=> await Task.Run(() => fileWatcher.Clear()));
@@ -195,7 +195,7 @@ namespace TailBlazer.Views.Tail
             
             //monitor matching lines and start index,
             Count = SearchCollection.Current.TotalLines.ForBinding();
-            CountText = SearchCollection.Current.TotalLines.Select(latest => $"{latest.ToString("##,###")} lines").ForBinding();
+            CountText = SearchCollection.Current.TotalLines.Select(latest => $"{latest:##,###} lines").ForBinding();
             LatestCount = SearchCollection.Current.TotalLines.ForBinding();
 
             ////track first visible index

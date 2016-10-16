@@ -10,6 +10,7 @@ namespace TailBlazer.Domain.FileHandling
     {
         public IObservableCache<Line, LineKey> Lines { get; }
         public IObservable<int> TotalLines { get; }
+        public IObservable<IProgressInfo> Progress { get; }
 
         private readonly IDisposable _cleanUp;
 
@@ -29,6 +30,7 @@ namespace TailBlazer.Domain.FileHandling
                 .PopulateInto(cache);
 
             TotalLines = shared.Select(monitor => monitor.TotalLines).Switch();
+            Progress = shared.Select(monitor => monitor.Progress).Switch();
             Lines = cache.AsObservableCache();
 
             _cleanUp = new CompositeDisposable(shared.Connect(), cache, switchableLoader, Lines);
