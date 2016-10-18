@@ -71,15 +71,16 @@ namespace TailBlazer.Domain.FileHandling
                     var locker = new object();
                     var scroll = _scrollRequest.Synchronize(locker).DistinctUntilChanged();
                     var indexer = shared.Synchronize(locker).Monitor(predicate, _scheduler);
-                    var tail = shared.Synchronize(locker).Select(fsc => fsc.TailInfo).DistinctUntilChanged();
+                    
+                   // var tail = shared.Synchronize(locker).OfType<IHasTailInfo>().Select(fsc => fsc.TailInfo).DistinctUntilChanged();
 
                     return indexer
-                        .CombineLatest(scroll, tail, (idx, scrl, t) => new LineReaderInfo(idx, scrl, t))
+                        .CombineLatest(scroll,  (idx, scrl) => new LineReaderInfo(idx, scrl))
                         .Scan((LineReaderInfo) null, (state, latest) =>
                         {
                             return state == null
-                                ? new LineReaderInfo(latest.LineReader, latest.Scroll, latest.TailInfo)
-                                : new LineReaderInfo(state, latest.LineReader, latest.Scroll, latest.TailInfo);
+                                ? new LineReaderInfo(latest.LineReader, latest.Scroll)
+                                : new LineReaderInfo(state, latest.LineReader, latest.Scroll);
                         })
                         .StartWith(LineReaderInfo.Empty);
                 });
@@ -167,7 +168,7 @@ namespace TailBlazer.Domain.FileHandling
         private class LineReaderInfo : IEquatable<LineReaderInfo>
         {
             public ScrollRequest Scroll { get;  }
-            public TailInfo TailInfo { get; }
+            public TailInfo TailInfo => LineReader.TailInfo;
             public ILineReader LineReader { get; }
 
             public bool PageSizeChanged { get; }
@@ -175,33 +176,38 @@ namespace TailBlazer.Domain.FileHandling
 
             public static readonly LineReaderInfo Empty = new LineReaderInfo();
 
-            public LineReaderInfo(ILineReader lineReader, ScrollRequest scroll, TailInfo tail)
+            public LineReaderInfo(ILineReader lineReader, ScrollRequest scroll)
             {
 
                 Scroll = scroll;
                 //if the line reader provides it's own tail info, then use it
-                TailInfo = (lineReader as IHasTailInfo)?.TailInfo ?? tail;
+              //  TailInfo =  lineReader;
                 LineReader = lineReader;
                 PageSizeChanged = false;
                 Reason = LineReaderInfoChangedReason.InitialLoad;
             }
 
-            public LineReaderInfo(LineReaderInfo previous, ILineReader lineReader, ScrollRequest scroll, TailInfo tail)
+            public LineReaderInfo(LineReaderInfo previous, ILineReader lineReader, ScrollRequest scroll)
             {
                 Scroll = scroll;
-                TailInfo = tail;
+               // TailInfo = tail;
                 LineReader = lineReader;
                 PageSizeChanged = previous.Scroll.PageSize != scroll.PageSize;
 
 
 
-
-                if (lineReader.Count ==0 ||  lineReader.Count < previous.LineReader.Count)
+                if (lineReader.Count != 0 && previous.LineReader.Count == 0)
+                {
+                    //this condition is hit when FileSearch rolls over for the first time
+                    Reason = LineReaderInfoChangedReason.TailChanged;
+                }
+                else if (lineReader.Count ==0 ||  lineReader.Count < previous.LineReader.Count)
+                    
                 {
                     Reason = LineReaderInfoChangedReason.InitialLoad;
                 }
 
-                else if (tail != previous.TailInfo)
+                else if (lineReader.TailInfo != previous.LineReader.TailInfo)
                 {
                     Reason = LineReaderInfoChangedReason.TailChanged;
                 }

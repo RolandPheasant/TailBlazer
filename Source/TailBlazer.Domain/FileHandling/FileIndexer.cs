@@ -72,13 +72,14 @@ namespace TailBlazer.Domain.FileHandling
                     .CombineLatest(shared, (collection, report) => new { Collection = collection, Report = report })
                     .Scan((FileIndexCollection)null, (previous, x) =>
                     {
+                        var tail = x.Report.TailInfo;
                         var changes = x.Report.Changes;
                         var segments = x.Report.Segments;
                         if (segments.Count == 0 || !changes.Exists)
                         {
-                            return new FileIndexCollection(x.Collection, null, changes);
+                            return new FileIndexCollection(x.Collection, null, changes, tail);
                         }
-                        return new FileIndexCollection(x.Collection, previous, changes);
+                        return new FileIndexCollection(x.Collection, previous, changes, tail);
                     })
                     .StartWith(FileIndexCollection.Empty)
                     .DistinctUntilChanged()

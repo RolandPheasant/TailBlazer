@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Subjects;
 using DynamicData;
+using FluentAssertions;
 using Microsoft.Reactive.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TailBlazer.Domain.FileHandling;
@@ -81,10 +82,7 @@ namespace TailBlazer.Fixtures
 
             }
         }
-
-
-
-
+        
         [Fact]
         public void Monitor_Filter()
         {
@@ -135,8 +133,8 @@ namespace TailBlazer.Fixtures
 
                     //Check what happens before  load
                     file.Delete();
-                    scheduler.AdvanceByMilliSeconds(50);
-
+                    scheduler.AdvanceByMilliSeconds(250);
+                    monitor.Lines.Count.Should().Be(0);
 
                     file.Append(CreateLines(50, 100));
                     scheduler.AdvanceByMilliSeconds(250);

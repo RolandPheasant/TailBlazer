@@ -29,7 +29,7 @@ namespace TailBlazer.Fixtures
                 {
                     scheduler.AdvanceBySeconds(1);
                     fileSearchCollection.Total.Should().Be(1);
-                    fileSearchCollection.Completed.Should().Be(0);
+                    fileSearchCollection.Completed.Should().Be(1);
                     fileSearchCollection.IsSearching.Should().Be(false);
                     fileSearchCollection.Count.Should().Be(0);
                 }

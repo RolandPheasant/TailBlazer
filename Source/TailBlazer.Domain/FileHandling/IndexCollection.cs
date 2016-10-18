@@ -11,6 +11,8 @@ namespace TailBlazer.Domain.FileHandling
 
         public int Diff { get; }
         public int Count { get; }
+        public TailInfo TailInfo { get; }
+
         public IEnumerable<Line> ReadLines(ScrollRequest scroll)
         {
             yield break;
@@ -20,24 +22,28 @@ namespace TailBlazer.Domain.FileHandling
         {
             Diff = 0;
             Count = 0;
+            TailInfo = TailInfo.Empty;
         }
     }
 
-    public class FileIndexCollection: ILineReader
+    public class FileIndexCollection: ILineReader, IHasTailInfo
     {
         public int Count { get; }
         public int Diff { get; }
         public bool IsEmpty => Count != 0;
         private Index[] Indicies { get; }
         private IFileMetrics Metrics { get; }
+        public TailInfo TailInfo { get;  }
 
         public static readonly FileIndexCollection Empty = new FileIndexCollection();
 
         public FileIndexCollection(IReadOnlyCollection<Index> latest,
                                     FileIndexCollection previous,
-                                    IFileMetrics metrics)
+                                    IFileMetrics metrics,
+                                    TailInfo tailInfo)
         {
             Metrics = metrics;
+            TailInfo = tailInfo;
             Count = latest.Select(idx => idx.LineCount).Sum();
             Indicies = latest.OrderBy(idx=>idx.Type).ToArray();
             Diff = Count - (previous?.Count ?? 0);
@@ -46,6 +52,7 @@ namespace TailBlazer.Domain.FileHandling
         private FileIndexCollection()
         {
             Indicies = new Index[0] {};
+            TailInfo = new TailInfo(new Line[0]);
         }
 
         /// <summary>
