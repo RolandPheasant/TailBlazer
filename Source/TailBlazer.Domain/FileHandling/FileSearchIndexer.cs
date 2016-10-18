@@ -59,8 +59,7 @@ namespace TailBlazer.Domain.FileHandling
                     .Where(fsr => !fsr.Changes.ExistsAndIsValid())
                     .Select(_ => FileSearchCollection.Empty);
 
-                var indexedFiles = BuildIndicies(shared.Do(x=> {Console.WriteLine(x);}))
-                    
+                var indexedFiles = BuildIndicies(shared)
                     .TakeUntil(newFileCreated)
                     .Repeat();
 
@@ -153,7 +152,7 @@ namespace TailBlazer.Domain.FileHandling
                     .Scan((FileSearchCollection)null, (previous, current) => previous == null
                         ? new FileSearchCollection(current.Segment, current.Tail.Tail, metrics, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered)
                         : new FileSearchCollection(previous, current.Segment, current.Tail.Tail, metrics, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
-                    .StartWith(FileSearchCollection.Empty)
+                    //.StartWith(FileSearchCollection.Empty)
                     .SubscribeSafe(observer);
 
                 //initialise a pending state for all segments

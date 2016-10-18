@@ -75,7 +75,7 @@ namespace TailBlazer.Fixtures
                     .Search(str => str.Contains("9"), scheduler)
                     .Subscribe(x => fileSearchCollection = x))
                 {
-                    fileSearchCollection.Should().Be(FileSearchCollection.Empty);
+                    fileSearchCollection.Should().BeNull();
                     file.Create();
                     file.Append(Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
                     scheduler.AdvanceByMilliSeconds(250);

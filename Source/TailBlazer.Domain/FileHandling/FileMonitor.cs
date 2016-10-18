@@ -72,10 +72,7 @@ namespace TailBlazer.Domain.FileHandling
                     var scroll = _scrollRequest.Synchronize(locker).DistinctUntilChanged();
                     var indexer = shared.Synchronize(locker).Monitor(predicate, _scheduler);
                     
-                   // var tail = shared.Synchronize(locker).OfType<IHasTailInfo>().Select(fsc => fsc.TailInfo).DistinctUntilChanged();
-
-                    return indexer
-                        .CombineLatest(scroll,  (idx, scrl) => new LineReaderInfo(idx, scrl))
+                    return indexer.CombineLatest(scroll,  (idx, scrl) =>  new { LineReader = idx, Scroll=scrl})
                         .Scan((LineReaderInfo) null, (state, latest) =>
                         {
                             return state == null
@@ -178,10 +175,7 @@ namespace TailBlazer.Domain.FileHandling
 
             public LineReaderInfo(ILineReader lineReader, ScrollRequest scroll)
             {
-
                 Scroll = scroll;
-                //if the line reader provides it's own tail info, then use it
-              //  TailInfo =  lineReader;
                 LineReader = lineReader;
                 PageSizeChanged = false;
                 Reason = LineReaderInfoChangedReason.InitialLoad;
@@ -195,13 +189,7 @@ namespace TailBlazer.Domain.FileHandling
                 PageSizeChanged = previous.Scroll.PageSize != scroll.PageSize;
 
 
-
-                if (lineReader.Count != 0 && previous.LineReader.Count == 0)
-                {
-                    //this condition is hit when FileSearch rolls over for the first time
-                    Reason = LineReaderInfoChangedReason.TailChanged;
-                }
-                else if (lineReader.Count ==0 ||  lineReader.Count < previous.LineReader.Count)
+                if (lineReader.Count ==0 ||  lineReader.Count < previous.LineReader.Count)
                     
                 {
                     Reason = LineReaderInfoChangedReason.InitialLoad;

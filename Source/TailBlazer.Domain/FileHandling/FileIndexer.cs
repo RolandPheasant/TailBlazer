@@ -62,8 +62,6 @@ namespace TailBlazer.Domain.FileHandling
                 //1. create  a resulting index object from the collection of index fragments
                 var indexList = new SourceCache<Index, IndexType>(idx => idx.Type);
 
-                var indexer =  CreateIndicies(shared)
-                    .Subscribe(index => indexList.AddOrUpdate(index));
 
                 //2. From those indicies, combine and build a new collection
                 var collectionBuilder = indexList.Connect()
@@ -81,9 +79,13 @@ namespace TailBlazer.Domain.FileHandling
                         }
                         return new FileIndexCollection(x.Collection, previous, changes, tail);
                     })
-                    .StartWith(FileIndexCollection.Empty)
+                    //.StartWith(FileIndexCollection.Empty)
                     .DistinctUntilChanged()
                     .SubscribeSafe(observer);
+
+
+                var indexer = CreateIndicies(shared)
+                    .Subscribe(index => indexList.AddOrUpdate(index));
 
                 return new CompositeDisposable(indexer,  collectionBuilder, indexList);
             });
