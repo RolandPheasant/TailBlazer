@@ -29,8 +29,7 @@ namespace TailBlazer.Fixtures
 
                     var countSubscriber = monitor.TotalLines.Subscribe(s => count = s);
 
-
-
+                    
                     //monitors inital tail
                     scheduler.AdvanceByMilliSeconds(350);
                     var actual = TransformToString(monitor.Lines);
@@ -103,9 +102,6 @@ namespace TailBlazer.Fixtures
 
                 using (var monitor = new FileMonitor(segments, scrollRequest, str => str.Contains("9"), scheduler: scheduler))
                 {
-
-
-
                     //monitors initial tail
                     scheduler.AdvanceByMilliSeconds(250);
                     var actual = TransformToString(monitor.Lines);

@@ -31,6 +31,7 @@ namespace TailBlazer.Domain.FileHandling
 
         private long Size { get; }
 
+        
         public FileSearchCollection(FileSegmentSearch initial,
             TailInfo tailInfo,
             IFileMetrics metrics,
@@ -79,11 +80,26 @@ namespace TailBlazer.Domain.FileHandling
             Diff =  Matches.Length - previous.Matches.Length;
         }
 
+
+        //public FileSearchCollection(IFileMetrics metrics)
+        //{
+        //    Matches = new long[0];
+        //    HasReachedLimit = false;
+        //    TailInfo = TailInfo.Empty;
+        //}
+
         private FileSearchCollection()
         {
             Matches = new long[0];
             HasReachedLimit = false;
             TailInfo = TailInfo.Empty;
+
+            var segment = new FileSegment(FileSegmentType.Head);
+            _allSearches = new Dictionary<FileSegmentKey, FileSegmentSearch>
+            {
+               
+                [FileSegmentKey.Tail] = new FileSegmentSearch(segment)
+            };
         }
 
         public bool IsEmpty => this == Empty;

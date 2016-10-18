@@ -5,8 +5,11 @@ namespace TailBlazer.Domain.Infrastructure
 {
 
 
+
+
     public  static class Equality
     {
+
         public static IEqualityComparer<T> CompareOn<T, TValue>(Func<T, TValue> valueSelector)
         {
             return new GenericEqualityComparer<T>((t1, t2) => EqualityComparer<TValue>.Default.Equals(valueSelector(t1), valueSelector(t2)),
