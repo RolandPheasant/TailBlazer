@@ -51,7 +51,9 @@ namespace TailBlazer.Domain.FileHandling
 
                 //Invoked at roll-over or file cleared
                 var newFileCreated = shared
-                    .Where(fsr => fsr.Changes.Reason == FileNotificationReason.CreatedOrOpened)
+                    .Select(fsr => fsr.Changes.Reason)
+                    .DistinctUntilChanged()
+                    .Where(reason => reason == FileNotificationReason.CreatedOrOpened)
                     .Skip(1);
 
                 //return empty when file does not exists
@@ -152,7 +154,7 @@ namespace TailBlazer.Domain.FileHandling
                     .Scan((FileSearchCollection)null, (previous, current) => previous == null
                         ? new FileSearchCollection(current.Segment, current.Tail.Tail, metrics, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered)
                         : new FileSearchCollection(previous, current.Segment, current.Tail.Tail, metrics, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
-                    //.StartWith(FileSearchCollection.Empty)
+                        //.StartWith(FileSearchCollection.Empty)
                     .SubscribeSafe(observer);
 
                 //initialise a pending state for all segments

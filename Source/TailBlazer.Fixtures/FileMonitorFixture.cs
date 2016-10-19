@@ -73,6 +73,10 @@ namespace TailBlazer.Fixtures
                     file.Append(CreateLines(50, 5));
                     scheduler.AdvanceByMilliSeconds(250);
 
+
+                  //  file.Append(CreateLines(50, 5));
+                    scheduler.AdvanceByMilliSeconds(250);
+
                     actual = TransformToString(monitor.Lines);
                     expected = CreateLines(50, 5);
                     CollectionAssert.AreEqual(actual, expected);

@@ -40,7 +40,9 @@ namespace TailBlazer.Domain.FileHandling
 
                 //Invoked at roll-over or file cleared
                 var newFileCreated = shared
-                    .Where(fsr => fsr.Changes.Reason == FileNotificationReason.CreatedOrOpened)
+                    .Select(fsr => fsr.Changes.Reason)
+                    .DistinctUntilChanged()
+                    .Where(reason => reason == FileNotificationReason.CreatedOrOpened)
                     .Skip(1);
 
                 //return empty when file does not exists
