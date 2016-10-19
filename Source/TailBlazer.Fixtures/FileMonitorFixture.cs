@@ -29,34 +29,38 @@ namespace TailBlazer.Fixtures
                     long count = 0;
 
                     var countSubscriber = monitor.TotalLines.Subscribe(s => count = s);
-
-                    
                     //monitors inital tail
                     scheduler.AdvanceByMilliSeconds(350);
+                    
                     var actual = TransformToString(monitor.Lines);
                     var expected = CreateLines(91, 10);
-                    CollectionAssert.AreEqual(actual, expected);
+                    actual.ShouldAllBeEquivalentTo(expected);
+                    count.Should().Be(100);
+
 
                     //auto tails when new lines are added
                     file.Append(CreateLines(101, 5));
                     scheduler.AdvanceByMilliSeconds(250);
                     actual = TransformToString(monitor.Lines);
                     expected = CreateLines(96, 10);
-                    CollectionAssert.AreEqual(actual, expected);
+                    actual.ShouldAllBeEquivalentTo(expected);
+                    count.Should().Be(105);
 
                     //scrolls to a specified position
                     scrollRequest.OnNext(new ScrollRequest(10, 80));
                     scheduler.AdvanceByMilliSeconds(250);
                     actual = TransformToString(monitor.Lines);
                     expected = CreateLines(80, 10);
-                    CollectionAssert.AreEqual(actual, expected);
+                    actual.ShouldAllBeEquivalentTo(expected);
+                    count.Should().Be(105);
 
                     //scroll again
                     scrollRequest.OnNext(new ScrollRequest(10, 85));
                     scheduler.AdvanceByMilliSeconds(250);
                     actual = TransformToString(monitor.Lines);
                     expected = CreateLines(85, 10);
-                    CollectionAssert.AreEqual(actual, expected);
+                    actual.ShouldAllBeEquivalentTo(expected);
+                    count.Should().Be(105);
 
                     //simulate a file roll-over
                     ////simulate a file roll-over
@@ -68,18 +72,18 @@ namespace TailBlazer.Fixtures
                     scheduler.AdvanceByMilliSeconds(250);
                     expected = new string[0];
                     actual = TransformToString(monitor.Lines);
-                    CollectionAssert.AreEqual(actual, expected);
+                    actual.ShouldAllBeEquivalentTo(expected);
+                    count.Should().Be(0);
 
                     file.Append(CreateLines(50, 5));
                     scheduler.AdvanceByMilliSeconds(250);
 
-
-                  //  file.Append(CreateLines(50, 5));
                     scheduler.AdvanceByMilliSeconds(250);
 
                     actual = TransformToString(monitor.Lines);
                     expected = CreateLines(50, 5);
-                    CollectionAssert.AreEqual(actual, expected);
+                    actual.ShouldAllBeEquivalentTo(expected);
+                    count.Should().Be(5);
 
                     countSubscriber.Dispose();
                 }
@@ -104,32 +108,38 @@ namespace TailBlazer.Fixtures
 
                 using (var monitor = new FileMonitor(segments, scrollRequest, str => str.Contains("9"), scheduler: scheduler))
                 {
+                    long count = 0;
+                    var countSubscriber = monitor.TotalLines.Subscribe(s => count = s);
+
+
                     //monitors initial tail
                     scheduler.AdvanceByMilliSeconds(250);
                     var actual = TransformToString(monitor.Lines);
                     var expected = CreateLines(90, 10);
-                    CollectionAssert.AreEqual(actual, expected);
-                    
+                    actual.ShouldAllBeEquivalentTo(expected);
+                    count.Should().Be(19);
 
                     //When new lines not matching the filter are added, nothing should changed
                     file.Append(CreateLines(101, 5));
                     scheduler.AdvanceByMilliSeconds(250);
                     actual = TransformToString(monitor.Lines);
-                    CollectionAssert.AreEqual(actual, expected);
-                    
+                    actual.ShouldAllBeEquivalentTo(expected);
+                    count.Should().Be(19);
+
                     //add to see matching lines to see whether they are auto scrolled
-                    var linesToAdd = CreateLines(new[] {9, 19, 29, 39, 49});
-                    file.Append(linesToAdd);
+                    var linesToAdd = file.Append(new[] {9, 19, 29, 39, 49});
                     scheduler.AdvanceByMilliSeconds(250);
                     actual = TransformToString(monitor.Lines);
                     expected = CreateLines(new[] { 95, 96, 97, 98, 99, 9, 19, 29, 39, 49 });
-                    CollectionAssert.AreEqual(actual, expected);
+                    actual.ShouldAllBeEquivalentTo(expected);
+                    count.Should().Be(24);
 
                     //scroll to a specific position
                     scrollRequest.OnNext(new ScrollRequest(5, 10));
                     actual = TransformToString(monitor.Lines);
                     expected = CreateLines(new[] { 91, 92, 93, 94, 95});
-                    CollectionAssert.AreEqual(actual, expected);
+                    actual.ShouldAllBeEquivalentTo(expected);
+                    count.Should().Be(24);
 
                     ////simulate a file roll-over
                     scrollRequest.OnNext(new ScrollRequest(5));
@@ -139,13 +149,27 @@ namespace TailBlazer.Fixtures
                     file.Delete();
                     scheduler.AdvanceByMilliSeconds(250);
                     monitor.Lines.Count.Should().Be(0);
+                    count.Should().Be(0);
 
                     file.Append(CreateLines(50, 100));
                     scheduler.AdvanceByMilliSeconds(250);
 
                     actual = TransformToString(monitor.Lines);
                     expected = CreateLines(new[] { 109, 119, 129, 139, 149 }); ;
-                    CollectionAssert.AreEqual(actual, expected);
+                    actual.ShouldAllBeEquivalentTo(expected);
+                    count.Should().Be(19);
+                    countSubscriber.Dispose();
+
+                    //See whether the second load also gives the correct value
+
+                    file.Append(CreateLines(90, 10));
+                    scheduler.AdvanceByMilliSeconds(250);
+
+                    actual = TransformToString(monitor.Lines);
+                    expected = CreateLines(new[] { 109, 119, 129, 139, 149 }); ;
+                   // actual.ShouldAllBeEquivalentTo(expected);
+                    count.Should().Be(28);
+                    countSubscriber.Dispose();
                 }
             }
         }

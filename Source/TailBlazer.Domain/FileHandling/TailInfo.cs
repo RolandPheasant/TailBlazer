@@ -25,6 +25,14 @@ namespace TailBlazer.Domain.FileHandling
             End = lines.Length == 0 ? 0 : lines[lines.Length - 1].LineInfo.End;
         }
 
+        public TailInfo(Line[] lines, long start, long end)
+        {
+            DateTime = DateTime.UtcNow;
+            Lines = lines;
+            Start = start;
+            End = end;
+        }
+
 
         #region Equality
 

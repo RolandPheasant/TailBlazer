@@ -26,7 +26,7 @@ namespace TailBlazer.Domain.FileHandling
         }
     }
 
-    public class FileIndexCollection: ILineReader, IHasTailInfo
+    public class FileIndexCollection: ILineReader
     {
         public int Count { get; }
         public int Diff { get; }

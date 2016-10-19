@@ -69,17 +69,10 @@ namespace TailBlazer.Domain.FileHandling
             });
         }
 
-
-
         private IObservable<FileSearchCollection> BuildIndicies(IObservable<FileSegmentReport> shared)
         {
-
             return Observable.Create<FileSearchCollection>(observer =>
             {
-
-                //0.5 ensure we have the latest file metrics
-
-
                 //0.5 ensure we have the latest file info and encoding
                 //TODO: This is shit. We need a better way of passing around the Encoding / File meta data
                 IFileMetrics metrics = null;
@@ -87,26 +80,21 @@ namespace TailBlazer.Domain.FileHandling
                     .Where(fs => fs.Segments.Metrics != null)
                     .Take(1)
                     .Subscribe(fswt => metrics = fswt.Segments.Metrics);
-
-
+                
                 //manually maintained search results and status
                 var searchData = new SourceCache<FileSegmentSearch, FileSegmentKey>(s => s.Key);
 
                 //Create a cache of segments which are to be searched
                 var segmentLoader = shared
                     .Select(s => s.Segments.Segments.Select(fs => fs))
-
                     .ToObservableChangeSet(s => s.Key)
                     .IgnoreUpdateWhen((current, previous) => current == previous)
                     .Transform(fs => new FileSegmentSearch(fs))
                     .WhereReasonsAre(ChangeReason.Add)
                     .PopulateInto(searchData);
 
-
-
+                
                 //TODO: ADD TAIL TO RESULT
-
-
                 var tailWatcher = shared
                     .Select(segments => segments.TailInfo)
                     .DistinctUntilChanged()
@@ -117,7 +105,8 @@ namespace TailBlazer.Domain.FileHandling
 
                         FileSegmentSearch search;
                         Line[] lines;
-                        if (previous == null)
+                        TailInfo tailInfo;
+                        if (previous == null && tail.End!=0)
                         {
                             lines = SearchLines(metrics,
                                     tailSegment.Segment.Start,
@@ -125,22 +114,22 @@ namespace TailBlazer.Domain.FileHandling
 
                             var indicies = lines.Select(l => l.LineInfo.Start).ToArray();
                             var result = new FileSegmentSearchResult(tailSegment.Segment.Start, tailSegment.Segment.End, indicies);
-
                             search = new FileSegmentSearch(tailSegment, result);
+                            tailInfo = new TailInfo(lines, tailSegment.Segment.Start, tailSegment.Segment.End);
                         }
                         else
                         {
                             lines = tail.Lines.Where(line => _predicate(line.Text)).ToArray();
                             var indicies = lines.Select(l => l.LineInfo.Start).ToArray();
                             var result = new FileSegmentSearchResult(tail.Start, tail.End, indicies);
-
-                             search = new FileSegmentSearch(tailSegment, result);
-
+                            search = new FileSegmentSearch(tailSegment, result);
+                            tailInfo = new TailInfo(lines, tail.Start, tail.End);
                         }
 
-                        return new FileSegmentSearchWithTail(search, new TailInfo(lines));
+                        return new FileSegmentSearchWithTail(search, tailInfo);
                     })
                     .DistinctUntilChanged()
+                    .Where(result=>result.FileSegmentSearch.Lines.Length!=0)
                     .Publish();
 
                 //continual indexing of the tail + replace tail index whenether there are new scan results
@@ -156,15 +145,6 @@ namespace TailBlazer.Domain.FileHandling
                         : new FileSearchCollection(previous, current.Segment, current.Tail.Tail, metrics, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
                         //.StartWith(FileSearchCollection.Empty)
                     .SubscribeSafe(observer);
-
-                //initialise a pending state for all segments
-                //var cacheLoader = segmentCache.Connect()
-                //    .Transform(fs => new FileSegmentSearch(fs))
-                //    .WhereReasonsAre(ChangeReason.Add)
-                //    .PopulateInto(searchData);
-
-
-
 
                 //load the rest of the file segment by segment, reporting status after each search
                 var headSubscriber = shared.Take(1).WithContinuation(() =>

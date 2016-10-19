@@ -10,7 +10,7 @@ namespace TailBlazer.Domain.FileHandling
         TailInfo TailInfo { get; }
     }
 
-    public class FileSearchCollection: ILineReader, IHasTailInfo, IEquatable<FileSearchCollection>, IHasLimitationOfLines, IProgressInfo
+    public class FileSearchCollection: ILineReader, IEquatable<FileSearchCollection>, IHasLimitationOfLines, IProgressInfo
     {
         public static readonly FileSearchCollection Empty = new FileSearchCollection();
         public long[] Matches { get; }
@@ -80,21 +80,13 @@ namespace TailBlazer.Domain.FileHandling
             Diff =  Matches.Length - previous.Matches.Length;
         }
 
-
-        //public FileSearchCollection(IFileMetrics metrics)
-        //{
-        //    Matches = new long[0];
-        //    HasReachedLimit = false;
-        //    TailInfo = TailInfo.Empty;
-        //}
-
         private FileSearchCollection()
         {
             Matches = new long[0];
             HasReachedLimit = false;
             TailInfo = TailInfo.Empty;
 
-            var segment = new FileSegment(FileSegmentType.Head);
+            var segment = new FileSegment(FileSegmentType.Tail);
             _allSearches = new Dictionary<FileSegmentKey, FileSegmentSearch>
             {
                

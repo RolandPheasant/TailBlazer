@@ -48,7 +48,7 @@ namespace TailBlazer.Domain.FileHandling
                 var changes = source.Publish();
                 var segments = changes.WithSegments().Publish();
                 var fileTail = segments.Tail();
-                var combined = segments.CombineLatest(fileTail, changes, (segment, tail, change) => new FileSegmentReport(segment, tail, change));
+                var combined = segments.Zip(fileTail, changes, (segment, tail, change) => new FileSegmentReport(segment, tail, change));
 
                 return new CompositeDisposable(combined.SubscribeSafe(observer), segments.Connect(), changes.Connect());
             });
