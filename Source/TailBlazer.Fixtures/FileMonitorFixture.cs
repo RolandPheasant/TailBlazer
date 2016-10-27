@@ -4,7 +4,6 @@ using System.Reactive.Subjects;
 using DynamicData;
 using FluentAssertions;
 using Microsoft.Reactive.Testing;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TailBlazer.Domain.FileHandling;
 using Xunit;
 
@@ -158,7 +157,7 @@ namespace TailBlazer.Fixtures
                     expected = CreateLines(new[] { 109, 119, 129, 139, 149 }); ;
                     actual.ShouldAllBeEquivalentTo(expected);
                     count.Should().Be(19);
-                    countSubscriber.Dispose();
+                 //   countSubscriber.Dispose();
 
                     //See whether the second load also gives the correct value
 
@@ -166,9 +165,9 @@ namespace TailBlazer.Fixtures
                     scheduler.AdvanceByMilliSeconds(250);
 
                     actual = TransformToString(monitor.Lines);
-                    expected = CreateLines(new[] { 109, 119, 129, 139, 149 }); ;
-                   // actual.ShouldAllBeEquivalentTo(expected);
-                    count.Should().Be(28);
+                    expected = CreateLines(new[] { 99, 98, 97, 96, 95 }); ;
+                    actual.ShouldAllBeEquivalentTo(expected);
+                    count.Should().Be(29);
                     countSubscriber.Dispose();
                 }
             }

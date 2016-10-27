@@ -39,6 +39,39 @@ namespace TailBlazer.Domain.FileHandling
             });
         }
 
+
+        //public static IObservable<FileSegmentReport> HandleRollover<T>([NotNull] this IObservable<FileSegmentReport> source, Func<IObservable<FileNotification>,T> observableFactory)
+        //{
+        //    if (source == null) throw new ArgumentNullException(nameof(source));
+
+
+        //    return source.Publish(shared =>
+        //    {
+        //        //Invoked at roll-over or file cleared
+        //        var newFileCreated = shared
+        //            .Select(fsr => fsr.Changes.Reason)
+        //            .DistinctUntilChanged()
+        //            .Where(reason => reason == FileNotificationReason.CreatedOrOpened)
+        //            .Skip(1);
+
+        //        //return empty when file does not exists
+        //        var whenEmpty = shared
+        //            .Where(fsr => !fsr.Changes.ExistsAndIsValid())
+        //            .Select(_ => LineReaderInfo.Empty);
+        //    });
+
+        //    return Observable.Create<FileSegmentReport>(observer =>
+        //    {
+        //        var changes = source.MonitorChanges().DistinctUntilChanged().Publish();
+        //        var segments = changes.WithSegments(initialTail).DistinctUntilChanged().Publish();
+        //        var fileTail = segments.Tail().DistinctUntilChanged();
+        //        var combined = segments.CombineLatest(fileTail, changes, (segment, tail, change) => new FileSegmentReport(segment, tail, change));
+
+        //        return new CompositeDisposable(combined.SubscribeSafe(observer), segments.Connect(), changes.Connect());
+        //    });
+        //}
+
+
         public static IObservable<FileSegmentReport> SegmentWithReport([NotNull] this IObservable<FileChanges> source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));

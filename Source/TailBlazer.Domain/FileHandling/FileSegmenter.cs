@@ -40,34 +40,25 @@ namespace TailBlazer.Domain.FileHandling
             if (notifications == null) throw new ArgumentNullException(nameof(notifications));
             _initialTail = initialTail;
             _segmentSize = segmentSize;
-
-
-
+            
             Segments = notifications.Publish(shared =>
             {
-                //return empty when file does not exists
-                var whenEmpty = shared
-                    .Where(fc => !fc.ExistsAndIsValid())
-                    .Select(fc => new FileSegmentCollection(fc));
+                return shared.Scan((FileSegmentCollection) null, (previous, current) =>
+                    {
+                        if (!current.ExistsAndIsValid())
+                            return new FileSegmentCollection(current);
 
-                //
-                var whenNotEmpty = shared
-                        .Where(fc => fc.ExistsAndIsValid())
-                        .Scan((FileSegmentCollection)null, (previous, current) =>
+                        if (previous == null
+                            || current.Reason == FileNotificationReason.CreatedOrOpened
+                            || previous.Reason == FileSegmentChangedReason.New
+                            || previous.FileSize == 0)
                         {
-                            if (previous == null 
-                                || current.Reason == FileNotificationReason.CreatedOrOpened
-                                || previous.Reason == FileSegmentChangedReason.New
-                                || previous.FileSize == 0)
-                            {
-                                var segments = LoadSegments(current.FullName).ToArray();
-                                return new FileSegmentCollection(current, segments);
-                            }
-                            return new FileSegmentCollection(current, previous);
-                        })
-                        .DistinctUntilChanged();
-
-                return whenEmpty.Merge(whenNotEmpty).DistinctUntilChanged();
+                            var segments = LoadSegments(current.FullName).ToArray();
+                            return new FileSegmentCollection(current, segments);
+                        }
+                        return new FileSegmentCollection(current, previous);
+                    })
+                    .DistinctUntilChanged();
             });
 
 

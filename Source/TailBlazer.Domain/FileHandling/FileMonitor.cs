@@ -68,18 +68,39 @@ namespace TailBlazer.Domain.FileHandling
             {
                 return _fileSegments.Publish(shared =>
                 {
+                    //////Invoked at roll-over or file cleared
+                    var newFileCreated = shared
+                        .Select(fsr => fsr.Changes.Reason)
+                        .DistinctUntilChanged()
+                        .Where(reason => reason == FileNotificationReason.CreatedOrOpened)
+                        .Skip(1);
+
+                    //////return empty when file does not exists
+                    var whenEmpty = shared
+                        .Where(fsr => !fsr.Changes.ExistsAndIsValid())
+                        .Select(_ => LineReaderInfo.Empty);
+
+
                     var locker = new object();
                     var scroll = _scrollRequest.Synchronize(locker).DistinctUntilChanged();
                     var indexer = shared.Synchronize(locker).Monitor(predicate, _scheduler);
+
+
+                    var indexedFiles = indexer
                     
-                    return indexer.CombineLatest(scroll,  (idx, scrl) =>  new { LineReader = idx, Scroll=scrl})
+                    .CombineLatest(scroll,  (idx, scrl) =>  new { LineReader = idx, Scroll=scrl})
                         .Scan((LineReaderInfo) null, (state, latest) =>
                         {
                             return state == null
                                 ? new LineReaderInfo(latest.LineReader, latest.Scroll)
                                 : new LineReaderInfo(state, latest.LineReader, latest.Scroll);
                         })
-                        .StartWith(LineReaderInfo.Empty);
+                            .TakeUntil(newFileCreated)
+                            .Repeat();
+
+
+                    return indexedFiles.Merge(whenEmpty).DistinctUntilChanged();
+                    //   .StartWith(LineReaderInfo.Empty);
                 });
             }).Switch();
         }

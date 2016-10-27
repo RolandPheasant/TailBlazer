@@ -143,7 +143,7 @@ namespace TailBlazer.Domain.FileHandling
                     .Scan((FileSearchCollection)null, (previous, current) => previous == null
                         ? new FileSearchCollection(current.Segment, current.Tail.Tail, metrics, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered)
                         : new FileSearchCollection(previous, current.Segment, current.Tail.Tail, metrics, _arbitaryNumberOfMatchesBeforeWeBailOutBecauseMemoryGetsHammered))
-                        //.StartWith(FileSearchCollection.Empty)
+                        .StartWith(FileSearchCollection.Empty)
                     .SubscribeSafe(observer);
 
                 //load the rest of the file segment by segment, reporting status after each search
