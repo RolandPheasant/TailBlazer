@@ -58,7 +58,8 @@ namespace TailBlazer.Domain.FileHandling
                     }
                 });
 
-            }).DistinctUntilChanged();
+            }).Where(notification => notification.Reason != FileNotificationReason.None)
+            .DistinctUntilChanged();
         }
 
 

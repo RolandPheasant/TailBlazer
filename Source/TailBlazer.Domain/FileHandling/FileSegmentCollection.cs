@@ -22,8 +22,7 @@ namespace TailBlazer.Domain.FileHandling
             Metrics = fileInfo;
             Reason = FileSegmentChangedReason.Loaded;
         }
-
-
+        
         public FileSegmentCollection(IFileMetrics fileInfo, FileSegmentCollection previous)
         {
             Metrics = fileInfo;
@@ -37,8 +36,7 @@ namespace TailBlazer.Domain.FileHandling
             Segments = segments;
             Reason = FileSegmentChangedReason.Tailed;
         }
-
-
+        
         public FileSegmentCollection(IFileMetrics fileInfo)
         {
             var tail = new FileSegment(FileSegmentType.Tail);
@@ -46,7 +44,6 @@ namespace TailBlazer.Domain.FileHandling
             Tail = tail;
             Metrics = fileInfo;
             Reason = FileSegmentChangedReason.New;
-            
         }
 
         #region Equality

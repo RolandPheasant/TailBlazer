@@ -34,10 +34,6 @@ namespace TailBlazer.Domain.FileHandling
         {
             return _fileSegments.Publish(shared =>
             {
-                //TODO: WHEN FILE IS MISSING RETURN EMPTY
-
-                //always return an empty collection when the file does not exist
-
                 //Invoked at roll-over or file cleared
                 var newFileCreated = shared
                     .Select(fsr => fsr.Changes.Reason)
@@ -47,8 +43,9 @@ namespace TailBlazer.Domain.FileHandling
 
                 //return empty when file does not exists
                 var whenEmpty = shared
-                    .Where(fsr => !fsr.Changes.ExistsAndIsValid())
-                    .Select(_ => FileIndexCollection.Empty);
+                    .Where(fsr => !fsr.Changes.Exists)
+                    .Select(_ => FileIndexCollection.Empty)
+                    .DistinctUntilChanged();
 
                 var indexedFiles = BuildIndicies(shared)
                     .TakeUntil(newFileCreated)

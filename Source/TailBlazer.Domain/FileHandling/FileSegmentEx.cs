@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
@@ -22,6 +23,16 @@ namespace TailBlazer.Domain.FileHandling
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             return new FileTailReader(source).Tail();
+        }
+
+        public static IObservable<TailInfo> Filter([NotNull] this IObservable<TailInfo> source, Func<string, bool> predicate)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            return source.Select(tail =>
+            {
+                var lines = tail.Lines.Where(line => predicate(line.Text)).ToArray();
+                return new TailInfo(lines, tail.Start, tail.End);
+            });
         }
 
         public static IObservable<FileSegmentReport> SegmentWithReport([NotNull] this IObservable<FileNotification> source, int initialTail = 100000)
@@ -86,8 +97,6 @@ namespace TailBlazer.Domain.FileHandling
                 return new CompositeDisposable(combined.SubscribeSafe(observer), segments.Connect(), changes.Connect());
             });
         }
-
-
 
         public static IObservable<FileSegmentsWithTail> WithTail([NotNull] this IObservable<FileSegmentCollection> source)
         {

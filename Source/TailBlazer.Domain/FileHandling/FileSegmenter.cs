@@ -45,7 +45,7 @@ namespace TailBlazer.Domain.FileHandling
             {
                 return shared.Scan((FileSegmentCollection) null, (previous, current) =>
                     {
-                        if (!current.ExistsAndIsValid())
+                        if (!current.Exists)
                             return new FileSegmentCollection(current);
 
                         if (previous == null
