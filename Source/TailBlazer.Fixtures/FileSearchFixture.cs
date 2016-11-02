@@ -28,8 +28,8 @@ namespace TailBlazer.Fixtures
                     .Subscribe(x => fileSearchCollection = x))
                 {
                     scheduler.AdvanceBySeconds(1);
-                    fileSearchCollection.Total.Should().Be(1);
-                    fileSearchCollection.Completed.Should().Be(1);
+                    fileSearchCollection.Total.Should().Be(0);
+                    fileSearchCollection.Completed.Should().Be(0);
                     fileSearchCollection.IsSearching.Should().Be(false);
                     fileSearchCollection.Count.Should().Be(0);
                 }
@@ -75,7 +75,7 @@ namespace TailBlazer.Fixtures
                     .Search(str => str.Contains("9"), scheduler)
                     .Subscribe(x => fileSearchCollection = x))
                 {
-                    fileSearchCollection.Should().BeNull();
+                    fileSearchCollection.Should().Be(FileSearchCollection.Empty);
                     file.Create();
                     file.Append(Enumerable.Range(1, 100).Select(i => i.ToString()).ToArray());
                     scheduler.AdvanceByMilliSeconds(250);
