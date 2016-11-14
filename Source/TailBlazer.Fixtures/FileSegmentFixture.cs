@@ -1,12 +1,8 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
-using System.Reactive;
-using System.Reactive.Subjects;
 using FluentAssertions;
 using Microsoft.Reactive.Testing;
 using TailBlazer.Domain.FileHandling;
-using TailBlazer.Domain.Infrastructure;
 using Xunit;
 
 namespace TailBlazer.Fixtures

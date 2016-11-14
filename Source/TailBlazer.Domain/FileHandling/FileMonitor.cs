@@ -76,9 +76,9 @@ namespace TailBlazer.Domain.FileHandling
                         .Skip(1);
 
                     //////return empty when file does not exists
-                    var whenEmpty = shared
-                        .Where(fsr => !fsr.Changes.ExistsAndIsValid())
-                        .Select(_ => LineReaderInfo.Empty);
+                    //var whenEmpty = shared
+                    //    .Where(fsr => !fsr.Changes.ExistsAndIsValid())
+                    //    .Select(_ => LineReaderInfo.Empty);
 
 
                     var locker = new object();
@@ -87,19 +87,19 @@ namespace TailBlazer.Domain.FileHandling
 
 
                     var indexedFiles = indexer
-                    
-                    .CombineLatest(scroll,  (idx, scrl) =>  new { LineReader = idx, Scroll=scrl})
+
+                        .CombineLatest(scroll, (idx, scrl) => new {LineReader = idx, Scroll = scrl})
                         .Scan((LineReaderInfo) null, (state, latest) =>
                         {
                             return state == null
                                 ? new LineReaderInfo(latest.LineReader, latest.Scroll)
                                 : new LineReaderInfo(state, latest.LineReader, latest.Scroll);
-                        })
-                            .TakeUntil(newFileCreated)
-                            .Repeat();
+                        });
+                           // .TakeUntil(newFileCreated)
+                           // .Repeat();
 
-
-                    return indexedFiles.Merge(whenEmpty).DistinctUntilChanged();
+                    return indexedFiles;
+                   // return indexedFiles.Merge(whenEmpty).DistinctUntilChanged();
                     //   .StartWith(LineReaderInfo.Empty);
                 });
             }).Switch();

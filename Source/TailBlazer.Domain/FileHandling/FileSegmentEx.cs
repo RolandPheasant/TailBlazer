@@ -83,6 +83,8 @@ namespace TailBlazer.Domain.FileHandling
         //}
 
 
+
+
         public static IObservable<FileSegmentReport> SegmentWithReport([NotNull] this IObservable<FileChanges> source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
