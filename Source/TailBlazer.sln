@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TailBlazer", "TailBlazer\TailBlazer.csproj", "{EBF74AA2-F4C2-4AE9-A6CF-33F3414893B7}"
 EndProject
@@ -27,6 +27,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EBF74AA2-F4C2-4AE9-A6CF-33F3414893B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBF74AA2-F4C2-4AE9-A6CF-33F3414893B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBF74AA2-F4C2-4AE9-A6CF-33F3414893B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBF74AA2-F4C2-4AE9-A6CF-33F3414893B7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{332F8BEB-1743-4B41-8953-A66A57F2503D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{332F8BEB-1743-4B41-8953-A66A57F2503D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{332F8BEB-1743-4B41-8953-A66A57F2503D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -35,10 +39,6 @@ Global
 		{B7A99C2B-9833-4B7F-BE91-2329B22517B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7A99C2B-9833-4B7F-BE91-2329B22517B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7A99C2B-9833-4B7F-BE91-2329B22517B3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EBF74AA2-F4C2-4AE9-A6CF-33F3414893B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EBF74AA2-F4C2-4AE9-A6CF-33F3414893B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EBF74AA2-F4C2-4AE9-A6CF-33F3414893B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EBF74AA2-F4C2-4AE9-A6CF-33F3414893B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

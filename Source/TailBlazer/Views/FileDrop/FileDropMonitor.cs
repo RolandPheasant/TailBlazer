@@ -17,14 +17,14 @@ namespace TailBlazer.Views.FileDrop
     {
         private readonly SerialDisposable _cleanUp = new SerialDisposable();
         private readonly ISubject<FileInfo> _fileDropped = new Subject<FileInfo>();
-        private bool isLoaded;
+        private bool _isLoaded;
 
         public void Receive(DependencyObject value)
         {
-            if (isLoaded || null == value)
+            if (_isLoaded || null == value)
                 return;
 
-            isLoaded = true;
+            _isLoaded = true;
 
             var control = value as UIElement;
             if (null == control)
