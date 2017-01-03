@@ -17,7 +17,7 @@ namespace TailBlazer.Domain.FileHandling
                 .Index();
         }
 
-        public static IObservable<ILineProvider> Index(this IObservable<FileSegmentCollection> source)
+        public static IObservable<IndexCollection> Index(this IObservable<FileSegmentCollection> source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
 
@@ -42,7 +42,7 @@ namespace TailBlazer.Domain.FileHandling
 
         }
 
-        public static IObservable<ILineProvider> Index(this IObservable<FileNotification> source)
+        public static IObservable<IndexCollection> Index(this IObservable<FileNotification> source)
         {
             return source.WithSegments().Index();
         }

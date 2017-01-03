@@ -2,22 +2,23 @@ using System;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class TailInfo
+    [Obsolete]
+    public class LastTailInfo
     {
 
-        public static readonly TailInfo None = new TailInfo();
+        public static readonly LastTailInfo None = new LastTailInfo();
 
         public long TailStartsAt { get;  }
         public DateTime LastTail { get;  }
 
 
-        public TailInfo(long tailStartsAt)
+        public LastTailInfo(long tailStartsAt)
         {
             TailStartsAt = tailStartsAt;
             LastTail = DateTime.UtcNow;
         }
 
-        private TailInfo()
+        private LastTailInfo()
         {
         }
     }

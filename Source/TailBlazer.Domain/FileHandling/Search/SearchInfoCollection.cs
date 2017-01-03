@@ -51,7 +51,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             All = exclusionPredicate.Select(predicate =>
             {
                 if (predicate==null)
-                    return _fileWatcher.Latest.Index();
+                    return _fileWatcher.Latest.Index().Select(lp=>(ILineProvider)lp);
 
                 return _fileWatcher.Latest.Search(predicate);
 

@@ -44,8 +44,6 @@ namespace TailBlazer.Domain.FileHandling
         {
             if (fileSegments == null) throw new ArgumentNullException(nameof(fileSegments));
 
-            //TODO: When File segment has got smaller => roll-over [do something about it]
-
             scheduler = scheduler ?? Scheduler.Default;
 
             var shared = fileSegments.Replay(1).RefCount();
@@ -125,6 +123,18 @@ namespace TailBlazer.Domain.FileHandling
                 });
             
             _cleanUp = new CompositeDisposable(infoSubscriber, _indicies, tailSubscriber, tailSubscriber, headSubscriber);
+        }
+
+        private class IndexWithCompletion
+        {
+            private readonly Index _index;
+            private readonly bool _isComplete;
+
+            public IndexWithCompletion(Index index, bool isComplete=false)
+            {
+                _index = index;
+                _isComplete = isComplete;
+            }
         }
 
         private int EstimateNumberOfLines(Index tail, FileInfo info)

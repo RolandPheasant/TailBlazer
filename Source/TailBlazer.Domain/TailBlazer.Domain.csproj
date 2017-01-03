@@ -93,6 +93,7 @@
     <Compile Include="FileHandling\FileSegmentSearchStatus.cs" />
     <Compile Include="FileHandling\FileSegmentType.cs" />
     <Compile Include="FileHandling\FileStatus.cs" />
+    <Compile Include="FileHandling\Tailer\FileTailer.cs" />
     <Compile Include="FileHandling\FileWatcher.cs" />
     <Compile Include="FileHandling\IFileWatcher.cs" />
     <Compile Include="FileHandling\IHasLimitationOfLines.cs" />
@@ -138,6 +139,8 @@
     <Compile Include="FileHandling\StreamReaderExtended.cs" />
     <Compile Include="FileHandling\Search\SearchInfoCollection.cs" />
     <Compile Include="FileHandling\Search\SearchInfo.cs" />
+    <Compile Include="FileHandling\Tailer\TailInfo.cs" />
+    <Compile Include="FileHandling\Tailer\TailLineProvider.cs" />
     <Compile Include="FileHandling\TailInfo.cs" />
     <Compile Include="FileHandling\TextAssociations\ITextAssociationCollection.cs" />
     <Compile Include="FileHandling\TextAssociations\TextAssociation.cs" />
@@ -209,6 +212,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

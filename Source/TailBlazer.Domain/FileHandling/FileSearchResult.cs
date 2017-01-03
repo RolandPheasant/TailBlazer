@@ -23,7 +23,7 @@ namespace TailBlazer.Domain.FileHandling
         private FileSegmentSearch LastSearch { get; }
         private FileInfo Info { get;  }
         private Encoding Encoding { get;  }
-        private TailInfo TailInfo { get; }
+        private LastTailInfo LastTailInfo { get; }
         private long Size { get; }
 
         public FileSearchResult(FileSegmentSearch initial,
@@ -43,7 +43,7 @@ namespace TailBlazer.Domain.FileHandling
             Segments = 1;
             SegmentsCompleted = IsSearching ? 0 : 1;
             Matches = initial.Lines.ToArray();
-            TailInfo = TailInfo.None;
+            LastTailInfo = LastTailInfo.None;
             Size = 0;
             Maximum = limit;
             HasReachedLimit = false;
@@ -65,15 +65,15 @@ namespace TailBlazer.Domain.FileHandling
             var lastTail = _allSearches.Lookup(FileSegmentKey.Tail);
             if (current.Segment.Type == FileSegmentType.Tail)
             {
-                TailInfo = lastTail.HasValue 
-                            ? new TailInfo(lastTail.Value.Segment.End) 
-                            : new TailInfo(current.Segment.End);
+                LastTailInfo = lastTail.HasValue 
+                            ? new LastTailInfo(lastTail.Value.Segment.End) 
+                            : new LastTailInfo(current.Segment.End);
             }
             else
             {
-                TailInfo = lastTail.HasValue 
-                            ? previous.TailInfo 
-                            : TailInfo.None;
+                LastTailInfo = lastTail.HasValue 
+                            ? previous.LastTailInfo 
+                            : LastTailInfo.None;
             }
             
             _allSearches[current.Key] = current;
@@ -129,7 +129,7 @@ namespace TailBlazer.Domain.FileHandling
                         var endPosition = reader.AbsolutePosition();
                         var info = new LineInfo(i + 1, i, startPosition, endPosition);
                         
-                        var ontail = endPosition >= TailInfo.TailStartsAt && DateTime.UtcNow.Subtract(TailInfo.LastTail).TotalSeconds<1
+                        var ontail = endPosition >= LastTailInfo.TailStartsAt && DateTime.UtcNow.Subtract(LastTailInfo.LastTail).TotalSeconds<1
                                     ? DateTime.UtcNow 
                                     : (DateTime?)null; 
 
