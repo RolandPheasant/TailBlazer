@@ -13,8 +13,8 @@
              xmlns:fileHandling="clr-namespace:TailBlazer.Domain.FileHandling;assembly=TailBlazer.Domain"
              xmlns:converters="clr-namespace:Dragablz.Converters;assembly=Dragablz"
              xmlns:virtualisation="clr-namespace:TailBlazer.Infrastucture.Virtualisation"
-            TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
-            Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
+             TextElement.Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=(TextElement.Foreground)}"
+             Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Background}"
              x:Name="Control"
              mc:Ignorable="d" 
               FocusManager.FocusedElement="{Binding ElementName= SearchTextBox}"
@@ -52,8 +52,7 @@
 
     <UserControl.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Find"
-                        Executed="ApplicationCommandFind_Executed"
-                        />
+                        Executed="ApplicationCommandFind_Executed"/>
     </UserControl.CommandBindings>
     
     <wpf:DialogHost Identifier="{Binding Id}"

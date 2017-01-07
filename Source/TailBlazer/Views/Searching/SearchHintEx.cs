@@ -20,13 +20,16 @@ namespace TailBlazer.Views.Searching
             if ((!source.UseRegEx && source.Text.Contains(@"\")) || (source.TextWithoutExclusion.Trim().Length == 0))
                 return new SearchHintMessage(false, "Text contains illegal characters");
 
-            try
+            if (source.UseRegEx)
             {
-                var test = new Regex(source.TextWithoutExclusion);
-            }
-            catch (Exception)
-            {
-                return new SearchHintMessage(false, "Invalid regular expression");
+                try
+                {
+                    var test = new Regex(source.Text);
+                }
+                catch (Exception)
+                {
+                    return new SearchHintMessage(false, "Invalid regular expression");
+                }
             }
             
             var message = $"Hit enter to search using {(source.UseRegEx ? "regex" : "plain text")}";

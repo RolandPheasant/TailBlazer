@@ -79,7 +79,7 @@ Don't like new line highlight? Turn it off.
 
 For me to produce this application I have used several community led open source projects all of which I love. So if you like this app I recommend checking out the following.
 
- - [Dynamic Data](https://gitter.im/RolandPheasant/DynamicData) Rx based collections developed by me.
+ - [Dynamic Data](https://github.com/RolandPheasant/DynamicData) Rx based collections developed by me.
  - [Material Design ToolKit](https://github.com/ButchersBoy/MaterialDesignInXamlToolkit) by my friend and work colleage ButchersBoy. This brings WPF into the 21st century.
  - [Dragablz](https://github.com/ButchersBoy/Dragablz)  also by ButchersBoy. I think he is showing off now.
  - [MahApps](https://github.com/MahApps/MahApps.Metro) which was the first open source project to make WPF truly modern.

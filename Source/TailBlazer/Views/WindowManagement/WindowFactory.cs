@@ -14,7 +14,6 @@ namespace TailBlazer.Views.WindowManagement
             _objectProvider = objectProvider;
         }
 
-
         public MainWindow Create(IEnumerable<string> files = null)
         {
             var window = new MainWindow();
