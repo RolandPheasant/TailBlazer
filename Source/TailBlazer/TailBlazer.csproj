@@ -125,6 +125,8 @@
     <Compile Include="Controls\FilterIcon.cs" />
     <Compile Include="Controls\ListboxItemHighlightAssist.cs" />
     <Compile Include="Infrastucture\ISelectedAware.cs" />
+    <Compile Include="Infrastucture\Virtualisation2\IVirtualController.cs" />
+    <Compile Include="Infrastucture\Virtualisation2\VirtualisingController.cs" />
     <Compile Include="Infrastucture\Virtualisation\LineScrollDelegate.cs" />
     <Compile Include="Infrastucture\Virtualisation\LinesScrollPanel.cs" />
     <Compile Include="Controls\RegexIcon.cs" />
@@ -156,8 +158,8 @@
     <Compile Include="Infrastucture\IViewFactoryRegister.cs" />
     <Compile Include="Infrastucture\ViewFactoryService.cs" />
     <Compile Include="Infrastucture\Virtualisation\VirtualizingWrapPanel.cs" />
-    <Compile Include="Infrastucture\VirtualisingCollection.cs" />
-    <Compile Include="Infrastucture\VirtualisingCollectionLoader.cs" />
+    <Compile Include="Infrastucture\Virtualisation2\VirtualisingCollection.cs" />
+    <Compile Include="Infrastucture\Virtualisation2\ItemWithIndex.cs" />
     <Compile Include="Infrastucture\WindowAssist.cs" />
     <Compile Include="Infrastucture\KeyboardNavigation\IKeyboardNavigationHandler.cs" />
     <Compile Include="Infrastucture\KeyboardNavigation\IPageProvider.cs" />
