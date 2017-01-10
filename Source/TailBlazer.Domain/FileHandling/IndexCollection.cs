@@ -155,8 +155,8 @@ namespace TailBlazer.Domain.FileHandling
             else
             {
 
-                    if (scroll.FirstIndex + size >= Count)
-                        first = Count - size;
+                if (scroll.FirstIndex + size >= Count)
+                    first = Count - size;
 
             }
 

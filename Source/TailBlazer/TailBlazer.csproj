@@ -156,6 +156,8 @@
     <Compile Include="Infrastucture\IViewFactoryRegister.cs" />
     <Compile Include="Infrastucture\ViewFactoryService.cs" />
     <Compile Include="Infrastucture\Virtualisation\VirtualizingWrapPanel.cs" />
+    <Compile Include="Infrastucture\VirtualisingCollection.cs" />
+    <Compile Include="Infrastucture\VirtualisingCollectionLoader.cs" />
     <Compile Include="Infrastucture\WindowAssist.cs" />
     <Compile Include="Infrastucture\KeyboardNavigation\IKeyboardNavigationHandler.cs" />
     <Compile Include="Infrastucture\KeyboardNavigation\IPageProvider.cs" />
