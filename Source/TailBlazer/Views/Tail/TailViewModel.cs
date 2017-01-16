@@ -20,6 +20,7 @@ using TailBlazer.Domain.StateHandling;
 using TailBlazer.Infrastucture;
 using TailBlazer.Infrastucture.KeyboardNavigation;
 using TailBlazer.Infrastucture.Virtualisation;
+using TailBlazer.Infrastucture.Virtualisation2;
 using TailBlazer.Views.DialogServices;
 using TailBlazer.Views.Searching;
 
@@ -42,6 +43,7 @@ namespace TailBlazer.Views.Tail
         private bool _isDialogOpen;
         private object _dialogContent;
         private bool _isSelected;
+        private VirtualisingCollection<LineProxy> collection;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         public Guid Id { get; } = Guid.NewGuid();
@@ -152,6 +154,8 @@ namespace TailBlazer.Views.Tail
             //command to add the current search to the tail collection
             var searchInvoker = SearchHints.SearchRequested.Subscribe(request => searchInfoCollection.Add(request.Text, request.UseRegEx));
 
+
+
             //An observable which acts as a scroll command
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
             var scroller = _userScrollRequested.CombineLatest(autoChanged, (user, auto) =>
@@ -167,8 +171,7 @@ namespace TailBlazer.Views.Tail
                 .Select(size => size.FormatWithAbbreviation())
                 .DistinctUntilChanged()
                 .ForBinding();
-
-
+            
             //tailer is the main object used to tail, scroll and filter in a file
             var selectedProvider = SearchCollection.Latest.ObserveOn(schedulerProvider.Background);
             
@@ -179,6 +182,9 @@ namespace TailBlazer.Views.Tail
                             .ForBinding();
 
             var lineProxyFactory = new LineProxyFactory(textFormatter, lineMatches, horizonalScrollArgs.DistinctUntilChanged(), themeProvider);
+
+            var controller = new VirtualisingController(lineProxyFactory, selectedProvider, schedulerProvider);
+            this.collection = new VirtualisingCollection<LineProxy>(controller);
 
             var loader = lineScroller.Lines.Connect()
                 .LogChanges(logger, "Received")
@@ -300,6 +306,11 @@ namespace TailBlazer.Views.Tail
         {
             get { return _showInline; }
             set { SetAndRaise(ref _showInline, value); }
+        }
+
+        public VirtualisingCollection<LineProxy> Collection
+        {
+            get { return collection; }
         }
 
         #region Interact with scroll panel

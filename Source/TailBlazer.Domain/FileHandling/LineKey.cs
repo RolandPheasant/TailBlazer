@@ -13,6 +13,11 @@ namespace TailBlazer.Domain.FileHandling
             _start = start;
         }
 
+        public long Start
+        {
+            get { return _start; }
+        }
+
         #region Equality
 
         public bool Equals(LineKey other)

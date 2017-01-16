@@ -16,7 +16,7 @@ namespace TailBlazer.Infrastucture.Virtualisation2
             _controller = controller;
             var adder = controller.ItemsAdded.Subscribe(items =>
             {
-                if (items.Length > 25)
+                if (items.Length > 100)
                 {
                     Reset();
                 }
