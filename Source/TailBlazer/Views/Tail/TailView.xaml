@@ -288,7 +288,7 @@
                     ItemsSource="{Binding Lines}" 
                     SelectedItem="{Binding SelectedItem}"
                     Style="{StaticResource LinesListBoxStyle}"
-                    
+                    infrastucture:DependencyObjectHook.Receiver="{Binding ScrollToItem}"
                     infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}">
 
                     <ListBox.ItemsPanel>

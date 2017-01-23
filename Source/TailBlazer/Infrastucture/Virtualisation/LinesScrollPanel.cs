@@ -394,6 +394,8 @@ namespace TailBlazer.Infrastucture.Virtualisation
 
             var extentHeight = Math.Max(TotalItems * ItemHeight, viewPortSize.Height);
             var maxVerticalOffset = extentHeight;// extentHeight - viewPortSize.Height;
+
+           // var startIndex = 
             var verticalOffset = (StartIndex / (double)TotalItems) * maxVerticalOffset;
 
             //widest width

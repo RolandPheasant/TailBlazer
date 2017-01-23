@@ -16,7 +16,7 @@ namespace TailBlazer.Infrastucture.Virtualisation2
         private readonly ILineProxyFactory _proxyFactory;
         private readonly ISourceCache<LineProxy, int> _source = new SourceCache<LineProxy, int>(lp => lp.Index);
         private readonly IDisposable _cleanUp;
-        private readonly int _pageSize = 5000;
+        private readonly int _pageSize = 50;
         private readonly object _locker = new object();
         private ILineProvider _lineProvider;
         private int _count =-1;
@@ -68,7 +68,7 @@ namespace TailBlazer.Infrastucture.Virtualisation2
                 }
             }).Subscribe(lines =>
                 {
-                    _source.AddOrUpdate(lines.LineProvider);
+                    _source.AddOrUpdate(lines.Lines);
                 });
 
             ItemsAdded = _source.Connect()
@@ -93,7 +93,7 @@ namespace TailBlazer.Infrastucture.Virtualisation2
             public long LastLineRead { get; }
             public int Count { get; }
 
-            public LineProxy[] LineProvider { get; }
+            public LineProxy[] Lines { get; }
 
             public static readonly LastRead Empty = new LastRead(0,0,0,new LineProxy[0]);
 
@@ -102,7 +102,7 @@ namespace TailBlazer.Infrastucture.Virtualisation2
                 FirstIndex = firstIndex;
                 LastLineRead = lastLineRead;
                 Count = count;
-                LineProvider = lines;
+                Lines = lines;
             }
 
             #region equality

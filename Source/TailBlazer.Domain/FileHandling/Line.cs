@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class Line : IEquatable<Line>
+    public class Line : IEquatable<Line>, IComparable<Line>, IComparable
     {
         public int Number { get;  }
         public int Index { get; }
@@ -97,6 +97,16 @@ namespace TailBlazer.Domain.FileHandling
         public override string ToString()
         {
             return $"{Number}: {Text}";
+        }
+
+        public int CompareTo(object obj)
+        {
+            return CompareTo((Line) obj);
+        }
+
+        public int CompareTo(Line other)
+        {
+            return this.Start.CompareTo(other.Start);
         }
     }
 }

@@ -6,6 +6,9 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Automation.Peers;
+using System.Windows.Controls;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
@@ -25,6 +28,36 @@ using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {
+
+    public class ScrollToItem: IDependencyObjectReceiver, IDisposable
+    {
+        private readonly IObservable<LineProxy> _scrollTo;
+        private readonly SingleAssignmentDisposable _cleanUp  = new SingleAssignmentDisposable();
+        public ScrollToItem(IObservable<LineProxy> scrollTo)
+        {
+            _scrollTo = scrollTo;
+        }
+
+        public void Receive(DependencyObject value)
+        {
+            var listBox = (ListBox) value;
+
+            _cleanUp.Disposable = _scrollTo.Subscribe(proxy =>
+            {
+
+                listBox.Items.MoveCurrentToLast();
+                listBox.ScrollIntoView(listBox.Items.CurrentItem);
+         //       listBox.ScrollIntoView(proxy);
+            });
+
+        }
+
+        public void Dispose()
+        {
+            _cleanUp.Dispose();
+        }
+    }
+
     public class TailViewModel : AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentView, IDialogViewModel, IPageProvider, ISelectedAware
     {
         private readonly IDisposable _cleanUp;
@@ -70,8 +103,8 @@ namespace TailBlazer.Views.Tail
         public ICommand UnClearCommand { get; }
         public ICommand KeyAutoTail { get; }
         public string Name { get; }
-
-
+        
+        public ScrollToItem ScrollToItem { get; }
 
         public TailViewModel([NotNull] ILogger logger,
             [NotNull] ISchedulerProvider schedulerProvider,
@@ -172,17 +205,23 @@ namespace TailBlazer.Views.Tail
             //tailer is the main object used to tail, scroll and filter in a file
             var selectedProvider = SearchCollection.Latest.ObserveOn(schedulerProvider.Background);
 
-            var lineScroller = new LineScroller(selectedProvider, scroller);
+          //  var lineScroller = new LineScroller(selectedProvider, scroller);
+
+            var lineScroller = new LinesController(selectedProvider, scroller);
 
             MaximumChars = lineScroller.MaximumLines()
                             .ObserveOn(schedulerProvider.MainThread)
                             .ForBinding();
 
             var lineProxyFactory = new LineProxyFactory(textFormatter, lineMatches, horizonalScrollArgs.DistinctUntilChanged(), themeProvider);
+            
 
-            var loader = lineScroller.Lines.Connect()
+            var transformed = lineScroller.Lines.Connect()
                 .LogChanges(logger, "Received")
                 .Transform(lineProxyFactory.Create, new ParallelisationOptions(ParallelType.Ordered, 5))
+                .Publish();
+            
+            var loader = transformed
                 .LogChanges(logger, "Sorting")
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
                 .ObserveOn(schedulerProvider.MainThread)
@@ -191,20 +230,29 @@ namespace TailBlazer.Views.Tail
                 .DisposeMany()
                 .LogErrors(logger)
                 .Subscribe();
+            
+            var lastLine = transformed
+                .Buffer(TimeSpan.FromMilliseconds(50)).FlattenBufferResult()
+                .ToCollection()
+                .Select(items => items.Max(l => l))
+                .ObserveOn(schedulerProvider.MainThread);
 
+
+            ScrollToItem = new ScrollToItem(lastLine);
             //monitor matching lines and start index,
             Count = searchInfoCollection.All.Select(latest => latest.Count).ForBinding();
             CountText = searchInfoCollection.All.Select(latest => $"{latest.Count.ToString("##,###")} lines").ForBinding();
             LatestCount = SearchCollection.Latest.Select(latest => latest.Count).ForBinding();
 
-            ////track first visible index
+            ////////track first visible index
             var firstIndexMonitor = lineScroller.Lines.Connect()
                 .Buffer(TimeSpan.FromMilliseconds(25)).FlattenBufferResult()
                 .ToCollection()
-                .Select(lines => lines.Count == 0 ? 0 : lines.Select(l => l.Index).Max() - lines.Count + 1)
+                .Select(lines => lines.Count == 0 ? 0 : lines.Skip(lines.Count-20).Select(l => l.Index).Max() - lines.Count + 1)
                 .ObserveOn(schedulerProvider.MainThread)
                 .Subscribe(first =>
                 {
+
                     FirstIndex = first;
                 });
 
@@ -229,7 +277,8 @@ namespace TailBlazer.Views.Tail
 
             _cleanUp = new CompositeDisposable(lineScroller,
                 loader,
-                firstIndexMonitor,
+                transformed.Connect(),
+            //    firstIndexMonitor,
                 FileStatus,
                 Count,
                 LatestCount,
@@ -249,8 +298,10 @@ namespace TailBlazer.Views.Tail
                 _stateMonitor,
                 combinedSearchMetadataCollection,
                 horizonalScrollArgs.SetAsComplete(),
-                _userScrollRequested.SetAsComplete());
+                _userScrollRequested.SetAsComplete(),
+                ScrollToItem);
         }
+
 
         public TextScrollDelegate HorizonalScrollChanged { get; }
 
@@ -327,10 +378,7 @@ namespace TailBlazer.Views.Tail
                 AutoTail = false;
         }
 
-        void IScrollReceiver.ScrollDiff(int linesChanged)
-        {
-            _userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User, PageSize, FirstIndex + linesChanged));
-        }
+        void IScrollReceiver.ScrollDiff(int linesChanged) => _userScrollRequested.OnNext(new ScrollRequest(ScrollReason.User, PageSize, FirstIndex + linesChanged));
 
         #endregion
 
