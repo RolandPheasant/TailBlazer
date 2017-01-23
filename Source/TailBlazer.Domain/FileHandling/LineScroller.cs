@@ -73,7 +73,7 @@ namespace TailBlazer.Domain.FileHandling
 
             var aggregator = latest
                 .CombineLatest(scrollRequest, (currentLines, scroll) => new { currentLines, scroll})
-                .Sample(TimeSpan.FromMilliseconds(50))
+                .Sample(TimeSpan.FromMilliseconds(25))
                 .Select(x =>
                 {
                     if (x.scroll== ScrollRequest.None ||  x.scroll.PageSize == 0 || x.currentLines.Count == 0)

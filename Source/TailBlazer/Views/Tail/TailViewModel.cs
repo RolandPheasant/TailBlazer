@@ -20,22 +20,21 @@ using TailBlazer.Domain.StateHandling;
 using TailBlazer.Infrastucture;
 using TailBlazer.Infrastucture.KeyboardNavigation;
 using TailBlazer.Infrastucture.Virtualisation;
-using TailBlazer.Infrastucture.Virtualisation2;
 using TailBlazer.Views.DialogServices;
 using TailBlazer.Views.Searching;
 
 namespace TailBlazer.Views.Tail
 {
-    public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentView, IDialogViewModel, IPageProvider, ISelectedAware
+    public class TailViewModel : AbstractNotifyPropertyChanged, ILinesVisualisation, IPersistentView, IDialogViewModel, IPageProvider, ISelectedAware
     {
         private readonly IDisposable _cleanUp;
-        private readonly SingleAssignmentDisposable _stateMonitor= new SingleAssignmentDisposable();
+        private readonly SingleAssignmentDisposable _stateMonitor = new SingleAssignmentDisposable();
         private readonly ReadOnlyObservableCollection<LineProxy> _data;
         private readonly ISubject<ScrollRequest> _userScrollRequested = new ReplaySubject<ScrollRequest>(1);
         private readonly IPersistentView _persister;
         private readonly ITailViewStateControllerFactory _tailViewStateControllerFactory;
 
-        private bool _autoTail=true;
+        private bool _autoTail = true;
         private int _firstIndex;
         private int _pageSize;
         private LineProxy _selectedLine;
@@ -43,13 +42,12 @@ namespace TailBlazer.Views.Tail
         private bool _isDialogOpen;
         private object _dialogContent;
         private bool _isSelected;
-        private VirtualisingCollection<LineProxy> collection;
 
         public ReadOnlyObservableCollection<LineProxy> Lines => _data;
         public Guid Id { get; } = Guid.NewGuid();
         public ISelectionMonitor SelectionMonitor { get; }
-        public GeneralOptionBindings GeneralOptionBindings { get;  }
-        public SearchHints SearchHints { get;  }
+        public GeneralOptionBindings GeneralOptionBindings { get; }
+        public SearchHints SearchHints { get; }
         public SearchCollection SearchCollection { get; }
         internal ISearchMetadataCollection SearchMetadataCollection { get; }
         public InlineViewer InlineViewer { get; }
@@ -78,9 +76,9 @@ namespace TailBlazer.Views.Tail
         public TailViewModel([NotNull] ILogger logger,
             [NotNull] ISchedulerProvider schedulerProvider,
             [NotNull] IFileWatcher fileWatcher,
-            [NotNull] ISelectionMonitor selectionMonitor, 
-            [NotNull] IClipboardHandler clipboardHandler, 
-            [NotNull] ISearchInfoCollection searchInfoCollection, 
+            [NotNull] ISelectionMonitor selectionMonitor,
+            [NotNull] IClipboardHandler clipboardHandler,
+            [NotNull] ISearchInfoCollection searchInfoCollection,
             [NotNull] IInlineViewerFactory inlineViewerFactory,
             [NotNull] GeneralOptionBindings generalOptionBindings,
             [NotNull] ICombinedSearchMetadataCollection combinedSearchMetadataCollection,
@@ -89,13 +87,13 @@ namespace TailBlazer.Views.Tail
             [NotNull] SearchHints searchHints,
             [NotNull] ITailViewStateControllerFactory tailViewStateControllerFactory,
             [NotNull] IThemeProvider themeProvider,
-            [NotNull] SearchCollection searchCollection, 
+            [NotNull] SearchCollection searchCollection,
             [NotNull] ITextFormatter textFormatter,
             [NotNull] ILineMatches lineMatches,
             [NotNull] IObjectProvider objectProvider,
             [NotNull] IDialogCoordinator dialogCoordinator)
         {
-         
+
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (fileWatcher == null) throw new ArgumentNullException(nameof(fileWatcher));
@@ -143,7 +141,7 @@ namespace TailBlazer.Views.Tail
 
             var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
             HorizonalScrollChanged = args => horizonalScrollArgs.OnNext(args);
-            
+
             _tailViewStateControllerFactory = tailViewStateControllerFactory;
 
             //this deals with state when loading the system at start up and at shut-down
@@ -153,8 +151,6 @@ namespace TailBlazer.Views.Tail
 
             //command to add the current search to the tail collection
             var searchInvoker = SearchHints.SearchRequested.Subscribe(request => searchInfoCollection.Add(request.Text, request.UseRegEx));
-
-
 
             //An observable which acts as a scroll command
             var autoChanged = this.WhenValueChanged(vm => vm.AutoTail);
@@ -167,39 +163,37 @@ namespace TailBlazer.Views.Tail
             .DistinctUntilChanged();
 
             //User feedback to show file size
-            FileSizeText = fileWatcher.Latest.Select(fn=>fn.Size)
+            FileSizeText = fileWatcher.Latest.Select(fn => fn.Size)
                 .Select(size => size.FormatWithAbbreviation())
                 .DistinctUntilChanged()
                 .ForBinding();
-            
+
+
             //tailer is the main object used to tail, scroll and filter in a file
             var selectedProvider = SearchCollection.Latest.ObserveOn(schedulerProvider.Background);
-            
+
             var lineScroller = new LineScroller(selectedProvider, scroller);
-            
+
             MaximumChars = lineScroller.MaximumLines()
                             .ObserveOn(schedulerProvider.MainThread)
                             .ForBinding();
 
             var lineProxyFactory = new LineProxyFactory(textFormatter, lineMatches, horizonalScrollArgs.DistinctUntilChanged(), themeProvider);
 
-            var controller = new VirtualisingController(lineProxyFactory, selectedProvider, schedulerProvider);
-            this.collection = new VirtualisingCollection<LineProxy>(controller);
-
             var loader = lineScroller.Lines.Connect()
                 .LogChanges(logger, "Received")
-                .Transform(lineProxyFactory.Create, new ParallelisationOptions(ParallelType.Ordered,5))
+                .Transform(lineProxyFactory.Create, new ParallelisationOptions(ParallelType.Ordered, 5))
                 .LogChanges(logger, "Sorting")
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
                 .ObserveOn(schedulerProvider.MainThread)
-                .Bind(out _data,100)
+                .Bind(out _data, 100)
                 .LogChanges(logger, "Bound")
                 .DisposeMany()
                 .LogErrors(logger)
                 .Subscribe();
-            
+
             //monitor matching lines and start index,
-            Count = searchInfoCollection.All.Select(latest=>latest.Count).ForBinding();
+            Count = searchInfoCollection.All.Select(latest => latest.Count).ForBinding();
             CountText = searchInfoCollection.All.Select(latest => $"{latest.Count.ToString("##,###")} lines").ForBinding();
             LatestCount = SearchCollection.Latest.Select(latest => latest.Count).ForBinding();
 
@@ -216,7 +210,7 @@ namespace TailBlazer.Views.Tail
 
             //Create objects required for inline viewing
             var isUserDefinedChanged = SearchCollection.WhenValueChanged(sc => sc.Selected)
-                .Where(selected=> selected!=null)
+                .Where(selected => selected != null)
                 .Select(selected => selected.IsUserDefined)
                 .DistinctUntilChanged()
                 .Replay(1)
@@ -224,14 +218,14 @@ namespace TailBlazer.Views.Tail
 
             var showInline = this.WhenValueChanged(vm => vm.ShowInline);
             var inlineViewerVisible = isUserDefinedChanged.CombineLatest(showInline, (userDefined, showInlne) => userDefined && showInlne);
-            
+
             CanViewInline = isUserDefinedChanged.ForBinding();
             InlineViewerVisible = inlineViewerVisible.ForBinding();
 
             //return an empty line provider unless user is viewing inline - this saves needless trips to the file
             var inline = searchInfoCollection.All.CombineLatest(inlineViewerVisible, (index, ud) => ud ? index : EmptyLineProvider.Instance);
 
-            InlineViewer = inlineViewerFactory. Create(combinedSearchMetadataCollection, inline, this.WhenValueChanged(vm => vm.SelectedItem));
+            InlineViewer = inlineViewerFactory.Create(combinedSearchMetadataCollection, inline, this.WhenValueChanged(vm => vm.SelectedItem));
 
             _cleanUp = new CompositeDisposable(lineScroller,
                 loader,
@@ -257,7 +251,7 @@ namespace TailBlazer.Views.Tail
                 horizonalScrollArgs.SetAsComplete(),
                 _userScrollRequested.SetAsComplete());
         }
-     
+
         public TextScrollDelegate HorizonalScrollChanged { get; }
 
         public bool IsSelected
@@ -289,7 +283,7 @@ namespace TailBlazer.Views.Tail
             get { return _autoTail; }
             set { SetAndRaise(ref _autoTail, value); }
         }
-        
+
         public int PageSize
         {
             get { return _pageSize; }
@@ -306,11 +300,6 @@ namespace TailBlazer.Views.Tail
         {
             get { return _showInline; }
             set { SetAndRaise(ref _showInline, value); }
-        }
-
-        public VirtualisingCollection<LineProxy> Collection
-        {
-            get { return collection; }
         }
 
         #region Interact with scroll panel
@@ -350,7 +339,7 @@ namespace TailBlazer.Views.Tail
         public void ApplySettings()
         {
             //this controller responsible for loading and persisting user search stuff as the user changes stuff
-            _stateMonitor.Disposable = _tailViewStateControllerFactory.Create(this,true);
+            _stateMonitor.Disposable = _tailViewStateControllerFactory.Create(this, true);
         }
 
         ViewState IPersistentView.CaptureState()
@@ -364,11 +353,11 @@ namespace TailBlazer.Views.Tail
             _persister.Restore(state);
 
             //this controller responsible for loading and persisting user search stuff as the user changes stuff
-            _stateMonitor.Disposable = _tailViewStateControllerFactory.Create(this,false);
+            _stateMonitor.Disposable = _tailViewStateControllerFactory.Create(this, false);
         }
 
         #endregion
-        
+
         public void Dispose()
         {
             _cleanUp.Dispose();

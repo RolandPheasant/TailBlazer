@@ -49,7 +49,7 @@ namespace TailBlazer.Domain.Infrastructure
             }
             private set
             {
-               
+               // EnsureLoaded();
                 SetAndRaise(ref _value, value);
             }
         }
@@ -63,7 +63,5 @@ namespace TailBlazer.Domain.Infrastructure
         {
             _cleanUp.Dispose();
         }
-
-        //}
     }
 }

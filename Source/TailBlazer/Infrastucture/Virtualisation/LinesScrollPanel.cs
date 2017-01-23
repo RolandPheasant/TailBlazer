@@ -203,7 +203,7 @@ namespace TailBlazer.Infrastucture.Virtualisation
             _childLayouts.Clear();
             _extentInfo = GetExtentInfo(availableSize);
 
-            EnsureScrollOffsetIsWithinConstrains(_extentInfo);
+                EnsureScrollOffsetIsWithinConstrains(_extentInfo);
             var layoutInfo = GetLayoutInfo(availableSize, ItemHeight, _extentInfo);
 
             RecycleItems(layoutInfo);

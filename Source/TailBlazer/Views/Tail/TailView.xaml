@@ -54,7 +54,7 @@
         <CommandBinding Command="ApplicationCommands.Find"
                         Executed="ApplicationCommandFind_Executed"/>
     </UserControl.CommandBindings>
-    
+
     <wpf:DialogHost Identifier="{Binding Id}"
                     CloseOnClickAway="True"
                     IsOpen="{Binding IsDialogOpen}"
@@ -72,7 +72,7 @@
                 Value="50"
                 IsIndeterminate="True"/>
 
-              <StackPanel
+            <StackPanel
                     Visibility="{Binding FileStatus.Value, Converter={StaticResource EqualityToVisibilityConverter},ConverterParameter={x:Static fileHandling:FileStatus.Error}}"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center"
@@ -244,7 +244,7 @@
                         Padding="0"
                         VerticalAlignment="Center">
                         <controls:SettingsIcon  Width="14" Height="14"/>
-  
+
                     </Button>
 
                     <StackPanel    
@@ -278,31 +278,28 @@
                 <Border Grid.Row="0" Grid.Column="0" 
                             Visibility="Collapsed"
                             BorderThickness="0 0 0 1" BorderBrush="{DynamicResource PrimaryHueMidBrush}"/>
-               
+
                 <!--infrastucture:DependencyObjectHook.Receiver="{Binding KeyboardNavigationHandler}"-->
-                <!--Style="{StaticResource LinesListBoxStyle}"-->
+
                 <ListBox Margin="0 4 0 2"
                     Grid.Row="1" 
                     VerticalAlignment="Stretch"
                     MinHeight="50"     
-                    ItemsSource="{Binding Collection}" 
+                    ItemsSource="{Binding Lines}" 
                     SelectedItem="{Binding SelectedItem}"
                     Style="{StaticResource LinesListBoxStyle}"
-                        
-                
                     
                     infrastucture:ListBoxHelper.SelectionMonitor="{Binding SelectionMonitor}">
 
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <VirtualizingStackPanel Orientation="Vertical"/>
-                            <!--<virtualisation:LinesScrollPanel ItemHeight="20"
+                            <virtualisation:LinesScrollPanel ItemHeight="20"
                                                 ScrollReceiver="{Binding}"  
                                                 StartIndex="{Binding FirstIndex}"
                                                 TotalItems="{Binding LatestCount.Value}"
                                                 HorizontalScrollChanged="{Binding HorizonalScrollChanged}"       
                                                 CharacterWidth ="6.59666666666667"
-                                                TotalCharacters="{Binding MaximumChars.Value, UpdateSourceTrigger=PropertyChanged}"/>-->
+                                                TotalCharacters="{Binding MaximumChars.Value, UpdateSourceTrigger=PropertyChanged}"/>
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
 
@@ -323,9 +320,9 @@
                                         </Viewbox>
                                     </MenuItem.Icon>
                                 </MenuItem>
-                                
+
                                 <MenuItem Header="Clear" Command="{Binding ClearCommand}">
-                                        <MenuItem.Icon>
+                                    <MenuItem.Icon>
                                         <wpf:PackIcon Kind="Eraser" Width="16" Height="16"/>
                                     </MenuItem.Icon>
                                 </MenuItem>
@@ -333,7 +330,7 @@
                                     <MenuItem.Icon>
                                         <wpf:PackIcon Kind="Undo" Width="16" Height="16"/>
                                     </MenuItem.Icon>
-                                </MenuItem> 
+                                </MenuItem>
                             </ContextMenu.Items>
 
                         </ContextMenu>
@@ -383,8 +380,8 @@
                             <wpf:PopupBox.ToggleContent>
                                 <TextBlock FontSize="10" Text="{Binding Name}"/>
                             </wpf:PopupBox.ToggleContent>
-                            
-                            
+
+
                             <Grid Margin="6 0 6 0"
                                     TextOptions.TextFormattingMode="Ideal" 
                                     TextOptions.TextRenderingMode="Auto" 
@@ -455,7 +452,7 @@
                             Margin="4 2 2 0"
                             Opacity="0.56"
                             BorderThickness="1 0 0 0" BorderBrush="White"/>
-                        
+
                         <TextBlock  
                             Margin="4 0 0 0"
                             Text="{Binding  CountText.Value, StringFormat='\{0}.'}"
@@ -482,7 +479,7 @@
                                 Command="{Binding UnClearCommand}">
                             <wpf:PackIcon Kind="Undo" Width="16" Height="16"/>
                         </Button>
-                        
+
                         <Button  Width="22" Height="22"
                                  Margin="4 0 0 0" 
                                  Padding="0"
