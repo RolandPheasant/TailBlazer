@@ -5,11 +5,11 @@ using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Input;
 using DynamicData.Binding;
-using Microsoft.Expression.Interactivity.Core;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Ratings;
 using TailBlazer.Domain.Settings;
+using TailBlazer.Infrastucture;
 
 namespace TailBlazer.Views.Options
 {
@@ -41,7 +41,7 @@ namespace TailBlazer.Views.Options
                                     .HasChanged()
                                     .ForBinding();
 
-            RestartCommand = new ActionCommand(() =>
+            RestartCommand = new Command(() =>
             {
                 Process.Start(Application.ResourceAssembly.Location);
                 Application.Current.Shutdown();
