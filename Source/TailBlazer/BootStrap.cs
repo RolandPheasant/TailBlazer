@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Concurrency;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Threading;
@@ -7,6 +8,7 @@ using TailBlazer.Infrastucture;
 using TailBlazer.Infrastucture.AppState;
 using TailBlazer.Views.Layout;
 using TailBlazer.Views.WindowManagement;
+using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer
 {
@@ -34,10 +36,12 @@ namespace TailBlazer
             tempWindowToGetDispatcher.Close();
 
             var layoutServce = container.GetInstance<ILayoutService>();
+            var scheduler = container.GetInstance<ISchedulerProvider>();
+            scheduler.MainThread.Schedule(window.Show);
 
             var appStatePublisher = container.GetInstance<IApplicationStatePublisher>();
             app.Exit += (sender, e) => appStatePublisher.Publish(ApplicationState.ShuttingDown);
-            window.Show();
+
             app.Run();
         }
     }
