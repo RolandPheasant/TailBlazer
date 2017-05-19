@@ -211,7 +211,9 @@ namespace TailBlazer.Views.WindowManagement
                     _schedulerProvider.MainThread.Schedule(() =>
                     {
                         Views.Add(headeredView);
-                        Selected = headeredView;
+                        
+                        if (Selected == null)
+                            Selected = headeredView;
                     });
                 }
                 catch (Exception ex)
