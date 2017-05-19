@@ -5,6 +5,8 @@ using FluentAssertions;
 using TailBlazer.Domain.FileHandling.Recent;
 using TailBlazer.Domain.Formatting;
 using Xunit;
+using TailBlazer.Views.Tail;
+using TailBlazer.Domain.Settings;
 
 namespace TailBlazer.Fixtures
 {
@@ -36,6 +38,23 @@ namespace TailBlazer.Fixtures
         public void GeneralOptionsWithCultureEnUs()
         {
             SerializeAndDeserializeWithCulture("en-Us");
+        }
+
+        [Fact]
+        public void EmptySearchShouldReturnDefault()
+        {
+            var converter = new SearchMetadataToStateConverter();
+            var state = converter.Convert(State.Empty);
+            state.ShouldAllBeEquivalentTo(converter.GetDefaultValue());
+        }
+
+        [Fact]
+        public void NullSearchShouldReturnDefault()
+        {
+            var converter = new SearchMetadataToStateConverter();
+            State nullState = null;
+            var state = converter.Convert(nullState);
+            state.ShouldAllBeEquivalentTo(converter.GetDefaultValue());
         }
 
         private void SerializeAndDeserializeWithCulture(string cultureName)
