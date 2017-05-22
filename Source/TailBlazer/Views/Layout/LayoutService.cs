@@ -43,7 +43,7 @@ namespace TailBlazer.Views.Layout
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Problem loading layout");
+                _logger.Error(ex, "Problem saving layout");
             }
         }
 

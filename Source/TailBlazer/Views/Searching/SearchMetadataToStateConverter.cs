@@ -33,6 +33,9 @@ namespace TailBlazer.Views.Tail
 
         public SearchState[] Convert(State state)
         {
+            if (state == null || state == State.Empty)
+                return GetDefaultValue();
+                
             var doc = XDocument.Parse(state.Value);
             var root = doc.Element(Structure.Root);
 
