@@ -15,6 +15,7 @@ namespace TailBlazer.Domain.Formatting
             public const string Duration = "Duration";
             public const string Scale = "Scale";
             public const string Rating = "FrameRate";
+            public const string OpenRecentOnStartup = "OpenRecentOnStartup";
         }
 
         public GeneralOptions Convert(State state)
@@ -28,9 +29,10 @@ namespace TailBlazer.Domain.Formatting
             var highlight = root.ElementOrThrow(Structure.HighlightTail).ParseBool().ValueOr(() => defaults.HighlightTail);
             var duration = root.ElementOrThrow(Structure.Duration).ParseDouble().ValueOr(()=>defaults.HighlightDuration);
             var scale = root.ElementOrThrow(Structure.Scale).ParseInt().ValueOr(()=>defaults.Scale);
-
             var frameRate = root.OptionalElement(Structure.Rating).ConvertOr(rate=>rate.ParseInt().Value, () => defaults.Rating);
-            return new GeneralOptions(theme,highlight, duration,scale, frameRate);
+            var openRecent = root.ElementOrThrow(Structure.OpenRecentOnStartup).ParseBool().ValueOr(() => defaults.OpenRecentOnStartup);
+
+            return new GeneralOptions(theme,highlight, duration,scale, frameRate, openRecent);
         }
 
         public State Convert(GeneralOptions options)
@@ -41,6 +43,7 @@ namespace TailBlazer.Domain.Formatting
             root.Add(new XElement(Structure.Duration, options.HighlightDuration));
             root.Add(new XElement(Structure.Scale, options.Scale));
             root.Add(new XElement(Structure.Rating, options.Rating));
+            root.Add(new XElement(Structure.OpenRecentOnStartup, options.OpenRecentOnStartup));
             var doc = new XDocument(root);
             var value= doc.ToString();
             return new State(1, value);
@@ -48,7 +51,7 @@ namespace TailBlazer.Domain.Formatting
 
         public GeneralOptions GetDefaultValue()
         {
-            return new GeneralOptions(Theme.Light, true, 5, 100, 5);
+            return new GeneralOptions(Theme.Light, true, 5, 100, 5, true);
         }
     }
 }

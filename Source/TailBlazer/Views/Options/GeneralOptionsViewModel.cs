@@ -23,6 +23,7 @@ namespace TailBlazer.Views.Options
         private int _scale;
         private bool _useDarkTheme;
         private int _rating;
+        private bool _openRecentOnStartup;
 
         public GeneralOptionsViewModel(ISetting<GeneralOptions> setting, 
             IRatingService ratingService,
@@ -35,6 +36,7 @@ namespace TailBlazer.Views.Options
                 HighlightDuration = options.HighlightDuration;
                 Scale = options.Scale;
                 Rating = options.Rating;
+                OpenRecentOnStartup = options.OpenRecentOnStartup;
             });
 
             RequiresRestart = setting.Value.Select(options => options.Rating)
@@ -50,7 +52,7 @@ namespace TailBlazer.Views.Options
             var writter = this.WhenAnyPropertyChanged()
                 .Subscribe(vm =>
                 {
-                    setting.Write(new GeneralOptions(UseDarkTheme ? Theme.Dark : Theme.Light, HighlightTail, HighlightDuration, Scale, Rating));
+                    setting.Write(new GeneralOptions(UseDarkTheme ? Theme.Dark : Theme.Light, HighlightTail, HighlightDuration, Scale, Rating, OpenRecentOnStartup));
                 });
             
             HighlightDurationText = this.WhenValueChanged(vm=>vm.HighlightDuration)
@@ -110,7 +112,13 @@ namespace TailBlazer.Views.Options
             get { return _scale; }
             set { SetAndRaise(ref _scale, value); }
         }
-        
+
+        public bool OpenRecentOnStartup
+        {
+            get { return _openRecentOnStartup; }
+            set { SetAndRaise(ref _openRecentOnStartup, value); }
+        }
+
         void IDisposable.Dispose()
         {
             _cleanUp.Dispose();

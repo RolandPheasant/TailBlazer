@@ -7,14 +7,16 @@
         public double HighlightDuration { get; }
         public int Scale { get; }
         public int Rating { get; }
+        public bool OpenRecentOnStartup { get; }
 
-        public GeneralOptions(Theme theme, bool highlightTail, double highlightTailDuration, int scale, int rating)
+        public GeneralOptions(Theme theme, bool highlightTail, double highlightTailDuration, int scale, int rating, bool openRecentOnStartup)
         {
             Theme = theme;
             HighlightTail = highlightTail;
             HighlightDuration = highlightTailDuration;
             Scale = scale;
             Rating = rating;
+            OpenRecentOnStartup = openRecentOnStartup;
         }
 
     }

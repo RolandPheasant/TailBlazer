@@ -13,6 +13,7 @@ using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Infrastucture;
 using TailBlazer.Views.WindowManagement;
+using TailBlazer.Views.Options;
 
 namespace TailBlazer.Views.Layout
 {
@@ -27,6 +28,7 @@ namespace TailBlazer.Views.Layout
         private readonly IWindowFactory _windowFactory;
         private readonly IViewFactoryProvider _viewFactoryProvider;
         private readonly ISchedulerProvider _schedulerProvider;
+        private readonly GeneralOptionsViewModel _generalOptionsViewModel;
 
         private static class XmlStructure
         {
@@ -62,14 +64,17 @@ namespace TailBlazer.Views.Layout
 
         public LayoutConverter([NotNull] IWindowFactory windowFactory,
             [NotNull] IViewFactoryProvider viewFactoryProvider,
-            [NotNull] ISchedulerProvider schedulerProvider)
+            [NotNull] ISchedulerProvider schedulerProvider,
+            [NotNull] GeneralOptionsViewModel generalOptionsViewModel)
         {
             if (windowFactory == null) throw new ArgumentNullException(nameof(windowFactory));
             if (viewFactoryProvider == null) throw new ArgumentNullException(nameof(viewFactoryProvider));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
+            if (generalOptionsViewModel == null) throw new ArgumentNullException(nameof(generalOptionsViewModel));
             _windowFactory = windowFactory;
             _viewFactoryProvider = viewFactoryProvider;
             _schedulerProvider = schedulerProvider;
+            _generalOptionsViewModel = generalOptionsViewModel;
         }
 
         #region Capture state
@@ -168,7 +173,9 @@ namespace TailBlazer.Views.Layout
                 .ForEach(x =>
                 {
                     RestoreBranches(x.window, x.shellState);
-                    RestoreChildren(x.window, x.shellState);
+                    
+                    if (_generalOptionsViewModel.OpenRecentOnStartup)
+                        RestoreChildren(x.window, x.shellState);
                 });
         }
 
