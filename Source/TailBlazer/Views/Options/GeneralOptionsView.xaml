@@ -77,6 +77,12 @@
                       VerticalAlignment="Center"
                       Margin="4"
                       IsChecked="{Binding  HighlightTail}" />
+
+            <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center">Open Recent Files On Startup?</TextBlock>
+            <CheckBox Grid.Row="3" Grid.Column="1"
+                      VerticalAlignment="Center"
+                      Margin="4"
+                      IsChecked="{Binding  OpenRecentOnStartup}" />
         </Grid>
 
         <TextBlock

@@ -61,7 +61,7 @@ namespace TailBlazer.Fixtures
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo(cultureName);
 
-            var original = new GeneralOptions(Theme.Dark, false,0.5, 125,5);
+            var original = new GeneralOptions(Theme.Dark, false,0.5, 125,5, true);
             var converter = new GeneralOptionsConverter();
             var state = converter.Convert(original);
             var restored = converter.Convert(state);
