@@ -1,26 +1,43 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:controls="clr-namespace:TailBlazer.Controls">
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:TailBlazer.Controls">
 
 
     <Style TargetType="{x:Type controls:SearchResultIndicator}">
-        <Setter Property="Foreground" Value="{DynamicResource SecondaryAccentBrush}"/>
-        <Setter Property="Width" Value="18"/>
-        <Setter Property="Height" Value="18"/>
-        <Setter Property="Padding" Value="4"/>
-        <Setter Property="IsHitTestVisible" Value="True"/>
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryAccentBrush}" />
+        <Setter Property="Width" Value="18" />
+        <Setter Property="Height" Value="18" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="IsHitTestVisible" Value="True" />
         <Setter Property="Template">
 
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:SearchResultIndicator}">
-                    <Grid Margin="{TemplateBinding Padding}" Background="{TemplateBinding Background}" >
+                    <Grid Margin="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
+                        <controls:TextMatchedIcon
+                            x:Name="PART_TextImage"
+                            VerticalAlignment="Center"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Foreground="{TemplateBinding Foreground}"
+                            ToolTip="Matched using plain text"
+                            Visibility="Collapsed" />
+
+                        <controls:RegexMatchedIcon
+                            x:Name="PART_RegexImage"
+                            VerticalAlignment="Center"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Foreground="{TemplateBinding Foreground}"
+                            ToolTip="Matched using regex"
+                            Visibility="Collapsed" />
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="Indicator">
-                                <VisualState x:Name="None"/>
+                                <VisualState x:Name="None" />
                                 <VisualState x:Name="Regex">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility" 
-                                                                       Storyboard.TargetName="PART_RegexImage">
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_RegexImage" Storyboard.TargetProperty="Visibility">
                                             <DiscreteObjectKeyFrame KeyTime="0">
                                                 <DiscreteObjectKeyFrame.Value>
                                                     <Visibility>Visible</Visibility>
@@ -31,38 +48,22 @@
                                 </VisualState>
                                 <VisualState x:Name="Text">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="PART_TextImage">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_TextImage" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-
-                        <controls:TextMatchedIcon x:Name="PART_TextImage"
-                                Visibility="Collapsed"                      
-                				VerticalAlignment="Center"
-                                ToolTip="Matched using plain text"
-                				BorderThickness ="{TemplateBinding BorderThickness}"
-                				BorderBrush ="{TemplateBinding BorderBrush}"
-                				Foreground="{TemplateBinding Foreground}" />
-
-                        <controls:RegexMatchedIcon  x:Name="PART_RegexImage"
-                                Visibility="Collapsed"  
-                				VerticalAlignment="Center"
-                                ToolTip="Matched using regex"
-                				BorderThickness ="{TemplateBinding BorderThickness}"
-                				BorderBrush ="{TemplateBinding BorderBrush}"
-                				Foreground="{TemplateBinding Foreground}" />
                     </Grid>
 
 
                     <ControlTemplate.Triggers>
-                        <Trigger Property="Status" Value="Regex" >
-                            <Setter TargetName="PART_RegexImage" Property="Visibility" Value="Visible"/>
+                        <Trigger Property="Status" Value="Regex">
+                            <Setter TargetName="PART_RegexImage" Property="Visibility" Value="Visible" />
                         </Trigger>
-                        <Trigger Property="Status" Value="Text" >
-                            <Setter TargetName="PART_TextImage" Property="Visibility" Value="Visible"/>
+                        <Trigger Property="Status" Value="Text">
+                            <Setter TargetName="PART_TextImage" Property="Visibility" Value="Visible" />
                         </Trigger>
                     </ControlTemplate.Triggers>
 
