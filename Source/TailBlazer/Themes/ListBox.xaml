@@ -1,34 +1,40 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
     </ResourceDictionary.MergedDictionaries>
-    
-    <Style x:Key="FilterListBoxStyle" TargetType="{x:Type ListBox}" BasedOn="{StaticResource MaterialDesignListBox}">
-        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}"/>
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}"/>
-        <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}"/>
-        <Setter Property="VerticalAlignment" Value="Stretch"/>
+
+    <Style
+        x:Key="FilterListBoxStyle"
+        BasedOn="{StaticResource MaterialDesignListBox}"
+        TargetType="{x:Type ListBox}">
+        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
 
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate  TargetType="{x:Type ListBox}">
+                <ControlTemplate TargetType="{x:Type ListBox}">
 
-                    <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}"
-                        CornerRadius="8" 
-                         BorderThickness="4 0 0 0" >
+                    <Border
+                        x:Name="border"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="4,0,0,0"
+                        CornerRadius="8">
 
-                        <ScrollViewer x:Name="ScrollViewer" 
-                                              Margin="4 0 0 0"
-            		                            VerticalScrollBarVisibility="Auto"
-            		                            HorizontalScrollBarVisibility="Auto"
-            		                            CanContentScroll="True"
-            		                            Padding="{TemplateBinding Padding}"
-            		                            Background="{TemplateBinding Background}" 
-            		                            BorderBrush="Transparent" BorderThickness="0" 
-            		                            IsTabStop="False">
-                            <ItemsPresenter/>
+                        <ScrollViewer
+                            x:Name="ScrollViewer"
+                            Margin="4,0,0,0"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="Transparent"
+                            BorderThickness="0"
+                            CanContentScroll="True"
+                            HorizontalScrollBarVisibility="Auto"
+                            IsTabStop="False"
+                            VerticalScrollBarVisibility="Auto">
+                            <ItemsPresenter />
                         </ScrollViewer>
 
                     </Border>
@@ -36,16 +42,16 @@
 
 
                         <Trigger Property="IsEnabled" Value="false">
-                            <Setter Property="Opacity" TargetName="border" Value="0.56"/>
+                            <Setter TargetName="border" Property="Opacity" Value="0.56" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="true">
-                            <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="true">
-                            <Setter  Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
                         </Trigger>
                         <Trigger Property="IsFocused" Value="true">
-                            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueDarkBrush}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueDarkBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
 
