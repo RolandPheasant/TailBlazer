@@ -59,10 +59,9 @@
     </Reference>
     <Reference Include="MaterialDesignColors, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignColors.1.1.2\lib\net45\MaterialDesignColors.dll</HintPath>
-      <Private>True</Private>
     </Reference>
-    <Reference Include="MaterialDesignThemes.Wpf, Version=2.3.2.1016, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignThemes.2.3.2-ci1016\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=2.1.0.657, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.2.1.0.657\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="StructureMap, Version=4.5.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\StructureMap.4.5.3\lib\net45\StructureMap.dll</HintPath>

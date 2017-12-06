@@ -88,8 +88,7 @@ namespace TailBlazer.Controls
 
         private static void OnPropertyChanged(DependencyObject dependencyObject,DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
-            var sender = dependencyObject as ListBoxItem;
-            if (sender == null) return;
+            if (!(dependencyObject is ListBoxItem sender)) return;
 
             var enabled = GetIsEnabled(sender);
             var isRecent = GetIsRecent(sender);

@@ -30,14 +30,14 @@ namespace TailBlazer.Controls
 
         public Brush HighlightBackgroundBrush
         {
-            get { return (Brush) GetValue(HighlightBackgroundBrushProperty); }
-            set { SetValue(HighlightBackgroundBrushProperty, value); }
+            get => (Brush) GetValue(HighlightBackgroundBrushProperty);
+            set => SetValue(HighlightBackgroundBrushProperty, value);
         }
 
         public Brush HighlightForegroundBrush
         {
-            get { return (Brush) GetValue(HighlightForegroundBrushProperty); }
-            set { SetValue(HighlightForegroundBrushProperty, value); }
+            get => (Brush) GetValue(HighlightForegroundBrushProperty);
+            set => SetValue(HighlightForegroundBrushProperty, value);
         }
         
         public static readonly DependencyProperty FormattedTextProperty = DependencyProperty.Register(nameof(FormattedText), 
@@ -47,8 +47,8 @@ namespace TailBlazer.Controls
 
         public IEnumerable<DisplayText> FormattedText
         {
-            get { return (IEnumerable<DisplayText>) GetValue(FormattedTextProperty); }
-            set { SetValue(FormattedTextProperty, value); }
+            get => (IEnumerable<DisplayText>) GetValue(FormattedTextProperty);
+            set => SetValue(FormattedTextProperty, value);
         }
 
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register(nameof(Text), 
@@ -58,16 +58,16 @@ namespace TailBlazer.Controls
 
         public string Text
         {
-            get { return (string) GetValue(TextProperty); }
-            set { SetValue(TextProperty, value); }
+            get => (string) GetValue(TextProperty);
+            set => SetValue(TextProperty, value);
         }
 
         public static readonly DependencyProperty HighlightEnabledProperty = DependencyProperty.Register(nameof(HighlightEnabled), typeof (bool), typeof (HighlightTextControl), new PropertyMetadata(true, UpdateControlCallBack));
 
         public bool HighlightEnabled
         {
-            get { return (bool) GetValue(HighlightEnabledProperty); }
-            set { SetValue(HighlightEnabledProperty, value); }
+            get => (bool) GetValue(HighlightEnabledProperty);
+            set => SetValue(HighlightEnabledProperty, value);
         }
 
         private static void UpdateControlCallBack(DependencyObject d, DependencyPropertyChangedEventArgs e)

@@ -1,17 +1,19 @@
-﻿<UserControl x:Class="TailBlazer.Views.Searching.SearchOptionsView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
-             xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
-             xmlns:system="clr-namespace:System;assembly=mscorlib"
-             mc:Ignorable="d"
-             Width="485" Height="400"
-             d:DataContext="{d:DesignInstance searching:SearchOptionsViewModel}">
+﻿<UserControl
+    x:Class="TailBlazer.Views.Searching.SearchOptionsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
+    xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
+    xmlns:system="clr-namespace:System;assembly=mscorlib"
+    xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Width="485"
+    Height="400"
+    d:DataContext="{d:DesignInstance searching:SearchOptionsViewModel}"
+    mc:Ignorable="d">
 
     <Control.Resources>
         <ResourceDictionary>
@@ -33,10 +35,12 @@
             <infrastucture:EqualsToVisibilityConverter x:Key="EqualsToVisibilityConverter" />
             <infrastucture:NotEqualsToVisibilityConverter x:Key="NotEqualsToVisibilityConverter" />
 
-            <Style x:Key="SearchButton" TargetType="{x:Type Button}"
-                   BasedOn="{StaticResource MaterialDesignFlatButton}">
+            <Style
+                x:Key="SearchButton"
+                BasedOn="{StaticResource MaterialDesignFlatButton}"
+                TargetType="{x:Type Button}">
 
-                <Setter Property="Padding" Value="0 0 2 0" />
+                <Setter Property="Padding" Value="0,0,2,0" />
                 <Setter Property="Width" Value="24" />
                 <Setter Property="Height" Value="24" />
                 <Setter Property="BorderThickness" Value="0" />
@@ -49,7 +53,7 @@
 
             <DataTemplate x:Key="IncludedTemplate" DataType="{x:Type searching:SearchOptionsProxy}">
 
-                <Grid Margin="4 4 4 4" x:Name="Row">
+                <Grid x:Name="Row" Margin="4,4,4,4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="24" />
@@ -61,63 +65,74 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Column="0"
-                            ToolTip="{Binding ChangeScopeToolTip}"
-                            Command="{Binding ChangeScopeCommand}"
-                            Style="{StaticResource SearchButton}">
+                    <Button
+                        Grid.Column="0"
+                        Command="{Binding ChangeScopeCommand}"
+                        Style="{StaticResource SearchButton}"
+                        ToolTip="{Binding ChangeScopeToolTip}">
 
-                        <wpf:PackIcon Padding="2"
-                                      Kind="{Binding IsGlobal, Converter={StaticResource IsGlobalToIconConverter}}" />
+                        <materialDesign:PackIcon Padding="2" Kind="{Binding IsGlobal, Converter={StaticResource IsGlobalToIconConverter}}" />
 
                     </Button>
 
-                    <Button Grid.Column="1"
-                            Margin="2 0 0 0"
-                            Style="{StaticResource SearchButton}"
-                            Command="{Binding ShowIconSelectorCommand}"
-                            ToolTip="Change icon">
-                        <wpf:PackIcon
+                    <Button
+                        Grid.Column="1"
+                        Margin="2,0,0,0"
+                        Command="{Binding ShowIconSelectorCommand}"
+                        Style="{StaticResource SearchButton}"
+                        ToolTip="Change icon">
+                        <materialDesign:PackIcon
                             Padding="2"
                             Foreground="{Binding Background.Value}"
-                            Kind="{Binding IconKind,FallbackValue={x:Static wpf:PackIconKind.ArrowRightBold}}" />
+                            Kind="{Binding IconKind, FallbackValue={x:Static wpf:PackIconKind.ArrowRightBold}}" />
                     </Button>
 
 
-                    <TextBlock Padding="2" Margin="2 0 0 0"
-                               x:Name="Label"
-                               Grid.Column="2"
-                               ToolTip="{Binding Text}"
-                               Foreground="{Binding Foreground.Value}"
-                               Background="{Binding Background.Value}"
-                               Text="{Binding Text}"
-                               VerticalAlignment="Center" />
+                    <TextBlock
+                        x:Name="Label"
+                        Grid.Column="2"
+                        Margin="2,0,0,0"
+                        Padding="2"
+                        VerticalAlignment="Center"
+                        Background="{Binding Background.Value}"
+                        Foreground="{Binding Foreground.Value}"
+                        Text="{Binding Text}"
+                        ToolTip="{Binding Text}" />
 
-                    <wpf:PopupBox Grid.Column="3"
-                                  ToolTip="Change colour"
-                                  Margin="4 0 0 0"
-                                  FontFamily="{StaticResource MaterialDesignFont}"
-                                  PopupMode="Click">
-                        <wpf:PopupBox.ToggleContent>
-                            <wpf:PackIcon Kind="FormatPaint"
-                                          Width="14" Height="14"
-                                          Foreground="{Binding Background.Value}" />
-                        </wpf:PopupBox.ToggleContent>
+                    <materialDesign:PopupBox
+                        Grid.Column="3"
+                        Margin="4,0,0,0"
+                        FontFamily="{StaticResource MaterialDesignFont}"
+                        PopupMode="Click"
+                        ToolTip="Change colour">
+                        <materialDesign:PopupBox.ToggleContent>
+                            <materialDesign:PackIcon
+                                Width="14"
+                                Height="14"
+                                Foreground="{Binding Background.Value}"
+                                Kind="FormatPaint" />
+                        </materialDesign:PopupBox.ToggleContent>
 
-                        <ItemsControl ItemsSource="{Binding Hues}"
-                                      Margin="4"
-                                      Background="Transparent">
+                        <ItemsControl
+                            Margin="4"
+                            Background="Transparent"
+                            ItemsSource="{Binding Hues}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Viewbox Width="22" Height="22" Margin="2">
-                                        <Button Style="{StaticResource MaterialDesignFloatingActionButton}"
-                                                BorderBrush="{DynamicResource GrayBrush2}"
-                                                BorderThickness="0"
-                                                SnapsToDevicePixels="True"
-                                                UseLayoutRounding="True"
-                                                ToolTip="{Binding}"
-                                                Command="{Binding ElementName=Row,Path=DataContext.HighlightCommand}"
-                                                CommandParameter="{Binding}"
-                                                Margin="2">
+                                    <Viewbox
+                                        Width="22"
+                                        Height="22"
+                                        Margin="2">
+                                        <Button
+                                            Margin="2"
+                                            BorderBrush="{DynamicResource GrayBrush2}"
+                                            BorderThickness="0"
+                                            Command="{Binding ElementName=Row, Path=DataContext.HighlightCommand}"
+                                            CommandParameter="{Binding}"
+                                            SnapsToDevicePixels="True"
+                                            Style="{StaticResource MaterialDesignFloatingActionButton}"
+                                            ToolTip="{Binding}"
+                                            UseLayoutRounding="True">
                                             <Button.Background>
                                                 <SolidColorBrush Color="{Binding Background, Mode=OneTime}" />
                                             </Button.Background>
@@ -132,42 +147,49 @@
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                         </ItemsControl>
-                    </wpf:PopupBox>
+                    </materialDesign:PopupBox>
 
-                    <CheckBox Margin="4 0 0 0" Grid.Column="4"
-                              VerticalAlignment="Center"
-                              IsChecked="{Binding Highlight}"
-                              ToolTip="Highlight text within the line"
-                              Content="Highlight" />
-
-
-                    <CheckBox Margin="4 0 0 0" Grid.Column="5"
-                              VerticalAlignment="Center"
-                              IsChecked="{Binding Filter}"
-                              ToolTip="Create a filter which matches this value"
-                              Content="Filter" />
+                    <CheckBox
+                        Grid.Column="4"
+                        Margin="4,0,0,0"
+                        VerticalAlignment="Center"
+                        Content="Highlight"
+                        IsChecked="{Binding Highlight}"
+                        ToolTip="Highlight text within the line" />
 
 
-                    <CheckBox Margin="4 0 0 0" Grid.Column="6"
-                              VerticalAlignment="Center"
-                              IsChecked="{Binding CaseSensitive}"
-                              ToolTip="Is this search value case sensitive"
-                              Content="Case Sensitive" />
+                    <CheckBox
+                        Grid.Column="5"
+                        Margin="4,0,0,0"
+                        VerticalAlignment="Center"
+                        Content="Filter"
+                        IsChecked="{Binding Filter}"
+                        ToolTip="Create a filter which matches this value" />
 
-                    <Button Margin="10 0 4 0"
-                            Grid.Column="7"
-                            ToolTip="{Binding RemoveTooltip}"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            Command="{Binding RemoveCommand}"
-                            Style="{StaticResource CloseButtonStyle}" />
+
+                    <CheckBox
+                        Grid.Column="6"
+                        Margin="4,0,0,0"
+                        VerticalAlignment="Center"
+                        Content="Case Sensitive"
+                        IsChecked="{Binding CaseSensitive}"
+                        ToolTip="Is this search value case sensitive" />
+
+                    <Button
+                        Grid.Column="7"
+                        Margin="10,0,4,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Command="{Binding RemoveCommand}"
+                        Style="{StaticResource CloseButtonStyle}"
+                        ToolTip="{Binding RemoveTooltip}" />
                 </Grid>
 
             </DataTemplate>
 
             <DataTemplate x:Key="ExcludedTemplate" DataType="{x:Type searching:SearchOptionsProxy}">
 
-                <Grid Margin="4 4 4 4" x:Name="Row">
+                <Grid x:Name="Row" Margin="4,4,4,4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="24" />
@@ -176,46 +198,51 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Column="0"
-                            ToolTip="{Binding ChangeScopeToolTip}"
-                            Command="{Binding ChangeScopeCommand}"
-                            Style="{StaticResource SearchButton}">
+                    <Button
+                        Grid.Column="0"
+                        Command="{Binding ChangeScopeCommand}"
+                        Style="{StaticResource SearchButton}"
+                        ToolTip="{Binding ChangeScopeToolTip}">
 
-                        <wpf:PackIcon Padding="2"
-                                      Kind="{Binding IsGlobal, Converter={StaticResource IsGlobalToIconConverter}}" />
+                        <materialDesign:PackIcon Padding="2" Kind="{Binding IsGlobal, Converter={StaticResource IsGlobalToIconConverter}}" />
 
                     </Button>
 
-                    <wpf:PackIcon
+                    <materialDesign:PackIcon
                         Grid.Column="1"
-                        Margin="2 0 0 0"
                         Width="12"
                         Height="12"
-                        ToolTip="{Binding Text, StringFormat='\{}{0} will be excluded in search results'}"
-                        VerticalAlignment="Center"
+                        Margin="2,0,0,0"
                         HorizontalAlignment="Center"
-                        Kind="FilterRemoveOutline" />
+                        VerticalAlignment="Center"
+                        Kind="FilterRemoveOutline"
+                        ToolTip="{Binding Text, StringFormat='\{}{0} will be excluded in search results'}" />
 
-                    <TextBlock Padding="2" Margin="2 0 0 0"
-                               x:Name="Label"
-                               Grid.Column="2"
-                               Text="{Binding Text}"
-                               ToolTip="{Binding Text, StringFormat='\{}{0} will be excluded in search results'}"
-                               VerticalAlignment="Center" />
+                    <TextBlock
+                        x:Name="Label"
+                        Grid.Column="2"
+                        Margin="2,0,0,0"
+                        Padding="2"
+                        VerticalAlignment="Center"
+                        Text="{Binding Text}"
+                        ToolTip="{Binding Text, StringFormat='\{}{0} will be excluded in search results'}" />
 
-                    <CheckBox Margin="4 0 0 0" Grid.Column="3"
-                              VerticalAlignment="Center"
-                              IsChecked="{Binding CaseSensitive}"
-                              ToolTip="Is this search value case sensitive"
-                              Content="Case Sensitive" />
+                    <CheckBox
+                        Grid.Column="3"
+                        Margin="4,0,0,0"
+                        VerticalAlignment="Center"
+                        Content="Case Sensitive"
+                        IsChecked="{Binding CaseSensitive}"
+                        ToolTip="Is this search value case sensitive" />
 
-                    <Button Margin="10 0 4 0"
-                            Grid.Column="4"
-                            ToolTip="{Binding RemoveTooltip}"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            Command="{Binding RemoveCommand}"
-                            Style="{StaticResource CloseButtonStyle}" />
+                    <Button
+                        Grid.Column="4"
+                        Margin="10,0,4,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Command="{Binding RemoveCommand}"
+                        Style="{StaticResource CloseButtonStyle}"
+                        ToolTip="{Binding RemoveTooltip}" />
                 </Grid>
 
             </DataTemplate>
@@ -230,31 +257,35 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock Margin="0 4 0 0"
-                               Visibility="{Binding Excluded.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}"
-                               Text="Lines which match any text below will be excluded from results:" />
+                    <TextBlock
+                        Margin="0,4,0,0"
+                        Text="Lines which match any text below will be excluded from results:"
+                        Visibility="{Binding Excluded.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}" />
 
-                    <ScrollViewer Grid.Row="1" Margin="14 6 0 4"
-                                  MaxHeight="100"
-                                  VerticalScrollBarVisibility="Auto"
-                                  Visibility="{Binding Excluded.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}">
-                        <ItemsControl
-                            ItemTemplate="{StaticResource ExcludedTemplate}"
-                            ItemsSource="{Binding Excluded}">
-                        </ItemsControl>
+                    <ScrollViewer
+                        Grid.Row="1"
+                        MaxHeight="100"
+                        Margin="14,6,0,4"
+                        VerticalScrollBarVisibility="Auto"
+                        Visibility="{Binding Excluded.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}">
+                        <ItemsControl ItemTemplate="{StaticResource ExcludedTemplate}" ItemsSource="{Binding Excluded}" />
                     </ScrollViewer>
 
-                    <TextBlock Grid.Row="2" Margin="0 4 0 2"
-                               Visibility="{Binding Included.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}"
-                               Text="The following will be used for filters and highlighting:" />
+                    <TextBlock
+                        Grid.Row="2"
+                        Margin="0,4,0,2"
+                        Text="The following will be used for filters and highlighting:"
+                        Visibility="{Binding Included.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}" />
 
-                    <dragablz:DragablzItemsControl Grid.Row="3" Margin="0 6 0 12"
-                                                   Visibility="{Binding Included.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}"
-                                                   ItemContainerStyle="{StaticResource DragableItem}"
-                                                   HorizontalContentAlignment="Stretch"
-                                                   PositionMonitor="{Binding PositionMonitor}"
-                                                   ItemTemplate="{StaticResource IncludedTemplate}"
-                                                   ItemsSource="{Binding Included}">
+                    <dragablz:DragablzItemsControl
+                        Grid.Row="3"
+                        Margin="0,6,0,12"
+                        HorizontalContentAlignment="Stretch"
+                        ItemContainerStyle="{StaticResource DragableItem}"
+                        ItemTemplate="{StaticResource IncludedTemplate}"
+                        ItemsSource="{Binding Included}"
+                        PositionMonitor="{Binding PositionMonitor}"
+                        Visibility="{Binding Included.Count, Converter={StaticResource NotEqualsToVisibilityConverter}, ConverterParameter={StaticResource Zero}}">
 
                         <dragablz:DragablzItemsControl.ItemsOrganiser>
                             <dragablz:VerticalOrganiser />
@@ -266,8 +297,7 @@
         </ResourceDictionary>
     </Control.Resources>
 
-    <wpf:DialogHost
-        Identifier="{Binding Id}">
+    <materialDesign:DialogHost Identifier="{Binding Id}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -277,28 +307,28 @@
             </Grid.RowDefinitions>
 
             <TextBlock
-                Margin="6 8 6 0"
+                Margin="6,8,6,0"
                 FontSize="16"
                 FontWeight="DemiBold"
                 Text="Search and highlight options" />
 
-            <Grid
-                Grid.Row="1">
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <ToggleButton VerticalAlignment="Bottom"
-                              Margin="2 0 0 0"
-                              Padding="2"
-                              Width="32"
-                              Height="32"
-                              IsChecked="{Binding SearchHints.UseRegex}">
+                <ToggleButton
+                    Width="32"
+                    Height="32"
+                    Margin="2,0,0,0"
+                    Padding="2"
+                    VerticalAlignment="Bottom"
+                    IsChecked="{Binding SearchHints.UseRegex}">
 
                     <ToggleButton.Style>
-                        <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource  SearchToggleStyle}">
+                        <Style BasedOn="{StaticResource SearchToggleStyle}" TargetType="{x:Type ToggleButton}">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding SearchHints.IsValid.Value}" Value="False">
                                     <Setter Property="Foreground" Value="{DynamicResource ValidationErrorBrush}" />
@@ -308,33 +338,36 @@
                     </ToggleButton.Style>
                 </ToggleButton>
 
-                <TextBox Grid.Column="1"
-                         Margin="0 4 0 0"
-                         Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                         wpf:HintAssist.Hint="{Binding SearchHints.Message.Value}"
-                         VerticalAlignment="Center"
-                         wpf:ValidationAssist.UsePopup="False"
-                         Style="{StaticResource FloatingHintAndErrorTextBox}"
-                         Validation.ErrorTemplate="{StaticResource BorderOnlyValidationErrorTemplate}"
-                         MinWidth="180">
+                <TextBox
+                    Grid.Column="1"
+                    MinWidth="180"
+                    Margin="0,4,0,0"
+                    VerticalAlignment="Center"
+                    materialDesign:HintAssist.Hint="{Binding SearchHints.Message.Value}"
+                    materialDesign:ValidationAssist.UsePopup="False"
+                    Style="{StaticResource FloatingHintAndErrorTextBox}"
+                    Text="{Binding SearchHints.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                    Validation.ErrorTemplate="{StaticResource BorderOnlyValidationErrorTemplate}">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding SearchHints.AddSearchCommand}" />
                     </TextBox.InputBindings>
                 </TextBox>
 
-                <StackPanel Grid.Column="2"
-                            HorizontalAlignment="Right"
-                            Height="32"
-                            Margin="8 0 8 0" Orientation="Horizontal">
+                <StackPanel
+                    Grid.Column="2"
+                    Height="32"
+                    Margin="8,0,8,0"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
 
                     <TextBlock
-                        Margin="8 0 4 0"
-                        Opacity="0.56"
                         Width="43"
-                        TextAlignment="Center"
-                        TextWrapping="Wrap"
+                        Margin="8,0,4,0"
                         VerticalAlignment="Center"
-                        Text="Switch Scope" />
+                        Opacity="0.56"
+                        Text="Switch Scope"
+                        TextAlignment="Center"
+                        TextWrapping="Wrap" />
 
                     <ListBox
                         x:Name="Selector"
@@ -343,10 +376,10 @@
                         SelectedIndex="{Binding SelectedIndex}"
                         Style="{StaticResource FilterListBoxStyle}">
                         <ListBoxItem ToolTip="Amend local search and highlight options">
-                            <TextBlock Text="{Binding Local.Count.Value , StringFormat='Local ({0})'}" />
+                            <TextBlock Text="{Binding Local.Count.Value, StringFormat='Local ({0})'}" />
                         </ListBoxItem>
                         <ListBoxItem ToolTip="Amend global search and highlight options">
-                            <TextBlock Text="{Binding Global.Count.Value , StringFormat='Global ({0})'}" />
+                            <TextBlock Text="{Binding Global.Count.Value, StringFormat='Global ({0})'}" />
                         </ListBoxItem>
 
                         <ListBox.ItemsPanel>
@@ -358,16 +391,19 @@
                 </StackPanel>
             </Grid>
 
-            <materialDesign:Transitioner Grid.Row="2"
-                                         Margin="6 0 6 4"
-                                         SelectedIndex="{Binding SelectedIndex, ElementName=Selector}">
+            <materialDesign:Transitioner
+                Grid.Row="2"
+                Margin="6,0,6,4"
+                SelectedIndex="{Binding SelectedIndex, ElementName=Selector}">
 
 
                 <materialDesign:TransitionerSlide ClipToBounds="True">
                     <materialDesign:TransitionerSlide.OpeningEffects>
                         <materialDesign:TransitionEffect Kind="SlideInFromLeft" Duration="0:0:0.8" />
-                        <materialDesign:TransitionEffect Kind="SlideInFromBottom" Duration="0:0:0.8"
-                                                         OffsetTime="0:0:0.15" />
+                        <materialDesign:TransitionEffect
+                            Kind="SlideInFromBottom"
+                            OffsetTime="0:0:0.15"
+                            Duration="0:0:0.8" />
                     </materialDesign:TransitionerSlide.OpeningEffects>
                     <ContentControl Content="{Binding Local}" />
                 </materialDesign:TransitionerSlide>
@@ -375,20 +411,24 @@
                 <materialDesign:TransitionerSlide ClipToBounds="True">
                     <materialDesign:TransitionerSlide.OpeningEffects>
                         <materialDesign:TransitionEffect Kind="SlideInFromRight" Duration="0:0:0.8" />
-                        <materialDesign:TransitionEffect Kind="SlideInFromBottom" Duration="0:0:0.8"
-                                                         OffsetTime="0:0:0.15" />
+                        <materialDesign:TransitionEffect
+                            Kind="SlideInFromBottom"
+                            OffsetTime="0:0:0.15"
+                            Duration="0:0:0.8" />
                     </materialDesign:TransitionerSlide.OpeningEffects>
                     <ContentControl Content="{Binding Global}" />
                 </materialDesign:TransitionerSlide>
             </materialDesign:Transitioner>
 
-            <Button Grid.Row="3" IsDefault="True"
-                    Margin="0 2 6 4"
-                    HorizontalAlignment="Left"
-                    Style="{DynamicResource MaterialDesignFlatButton}"
-                    Content="Close"
-                    Command="{x:Static wpf:DialogHost.CloseDialogCommand}" />
+            <Button
+                Grid.Row="3"
+                Margin="0,2,6,4"
+                HorizontalAlignment="Left"
+                Command="{x:Static wpf:DialogHost.CloseDialogCommand}"
+                Content="Close"
+                IsDefault="True"
+                Style="{DynamicResource MaterialDesignFlatButton}" />
         </Grid>
 
-    </wpf:DialogHost>
+    </materialDesign:DialogHost>
 </UserControl>
