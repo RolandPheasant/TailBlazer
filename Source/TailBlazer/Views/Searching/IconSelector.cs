@@ -36,12 +36,11 @@ namespace TailBlazer.Views.Searching
                 .Throttle(TimeSpan.FromMilliseconds(250))
                 .Select(BuildFilter);
 
-            ReadOnlyObservableCollection<IconDescription> icons;
             var userOptions = iconsProvider.Icons.Connect()
                 .Filter(filter)
                 .Sort(SortExpressionComparer<IconDescription>.Ascending(icon => icon.Name))
                 .ObserveOn(schedulerProvider.MainThread)
-                .Bind(out icons)
+                .Bind(out var icons)
                 .Subscribe();
 
             HasSelection= this.WhenValueChanged(vm => vm.Selected)
@@ -55,14 +54,14 @@ namespace TailBlazer.Views.Searching
         
         public string SearchText
         {
-            get { return _iconSearchText; }
-            set { SetAndRaise(ref _iconSearchText, value); }
+            get => _iconSearchText;
+            set => SetAndRaise(ref _iconSearchText, value);
         }
 
         public  IconDescription Selected
         {
-            get { return _selected; }
-            set { SetAndRaise(ref _selected, value); }
+            get => _selected;
+            set => SetAndRaise(ref _selected, value);
         }
 
         private Func<IconDescription, bool> BuildFilter(string searchText)

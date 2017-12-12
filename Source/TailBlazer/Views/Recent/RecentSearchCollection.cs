@@ -18,8 +18,7 @@ namespace TailBlazer.Views.Recent
 
         public RecentSearchCollection(ILogger logger, ISetting<RecentSearch[]> setting)
         {
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Items = _files.Connect()
                         .RemoveKey()

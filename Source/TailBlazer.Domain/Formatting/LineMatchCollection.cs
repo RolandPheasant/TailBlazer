@@ -1,9 +1,10 @@
-using System.ComponentModel;
+
 using System.Linq;
+using DynamicData.Binding;
 
 namespace TailBlazer.Domain.Formatting
 {
-    public class LineMatchCollection: INotifyPropertyChanged
+    public class LineMatchCollection: AbstractNotifyPropertyChanged
     {
         public static  readonly LineMatchCollection Empty = new LineMatchCollection(new LineMatch[0]);
 
@@ -16,9 +17,6 @@ namespace TailBlazer.Domain.Formatting
         public bool IsRegex => FirstMatch!=null && FirstMatch.UseRegex;
         public bool IsFilter => FirstMatch != null && !FirstMatch.UseRegex;
         public bool HasMatches => Matches.Length != 0;
-
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public LineMatchCollection(LineMatch[] matches)
         {

@@ -18,8 +18,7 @@ namespace TailBlazer.Domain.FileHandling.TextAssociations
 
         public TextAssociationCollection(ILogger logger, ISetting<TextAssociation[]> setting)
         {
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Items = _textAssociations.Connect()
                 .RemoveKey()

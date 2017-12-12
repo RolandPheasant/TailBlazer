@@ -178,7 +178,6 @@
     <Compile Include="Views\Searching\IsGlobalToIconConverter.cs" />
     <Compile Include="Views\Searching\SearchHintMessage.cs" />
     <Compile Include="Views\Searching\SearchOptionsProxy.cs" />
-    <Compile Include="Views\Searching\SearchOptionsProxyDataTemplateSelector.cs" />
     <Compile Include="Views\Searching\SearchOptionsView.xaml.cs">
       <DependentUpon>SearchOptionsView.xaml</DependentUpon>
     </Compile>

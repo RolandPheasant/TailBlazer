@@ -225,9 +225,7 @@ namespace TailBlazer.Infrastucture.Virtualisation
 
                 for (var itemIndex = layoutInfo.FirstRealizedItemIndex; itemIndex <= layoutInfo.LastRealizedItemIndex; itemIndex++, visualIndex++)
                 {
-                    bool newlyRealized;
-
-                    var child = (UIElement)_itemsGenerator.GenerateNext(out newlyRealized);
+                    var child = (UIElement)_itemsGenerator.GenerateNext(out var newlyRealized);
                     if (child == null) continue;
 
                     children.Add(child);

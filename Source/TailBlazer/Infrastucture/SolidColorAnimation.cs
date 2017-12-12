@@ -7,14 +7,14 @@ namespace TailBlazer.Infrastucture
     {
         public SolidColorBrush ToBrush
         {
-            get { return To == null ? null : new SolidColorBrush(To.Value); }
-            set { To = value?.Color; }
+            get => To == null ? null : new SolidColorBrush(To.Value);
+            set => To = value?.Color;
         }
 
         public SolidColorBrush FromBrush
         {
-            get { return From == null ? null : new SolidColorBrush(From.Value); }
-            set { From = value?.Color; }
+            get => From == null ? null : new SolidColorBrush(From.Value);
+            set => From = value?.Color;
         }
     }
 }

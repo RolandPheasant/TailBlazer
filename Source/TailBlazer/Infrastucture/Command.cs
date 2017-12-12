@@ -14,9 +14,7 @@ namespace TailBlazer.Infrastucture
 
         public Command(Action<T> execute, Func<T,bool> canExecute = null)
         {
-            if (execute == null) throw new ArgumentNullException(nameof(execute));
-
-            _execute = execute;
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
             _canExecute = canExecute ?? (t => true);
         }
 

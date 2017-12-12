@@ -67,14 +67,10 @@ namespace TailBlazer.Views.Layout
             [NotNull] ISchedulerProvider schedulerProvider,
             [NotNull] GeneralOptionsViewModel generalOptionsViewModel)
         {
-            if (windowFactory == null) throw new ArgumentNullException(nameof(windowFactory));
-            if (viewFactoryProvider == null) throw new ArgumentNullException(nameof(viewFactoryProvider));
-            if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
-            if (generalOptionsViewModel == null) throw new ArgumentNullException(nameof(generalOptionsViewModel));
-            _windowFactory = windowFactory;
-            _viewFactoryProvider = viewFactoryProvider;
-            _schedulerProvider = schedulerProvider;
-            _generalOptionsViewModel = generalOptionsViewModel;
+            _windowFactory = windowFactory ?? throw new ArgumentNullException(nameof(windowFactory));
+            _viewFactoryProvider = viewFactoryProvider ?? throw new ArgumentNullException(nameof(viewFactoryProvider));
+            _schedulerProvider = schedulerProvider ?? throw new ArgumentNullException(nameof(schedulerProvider));
+            _generalOptionsViewModel = generalOptionsViewModel ?? throw new ArgumentNullException(nameof(generalOptionsViewModel));
         }
 
         #region Capture state

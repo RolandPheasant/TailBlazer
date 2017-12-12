@@ -17,15 +17,10 @@ namespace TailBlazer.Views.Tail
             [NotNull] ITailViewStateRestorer tailViewStateRestorer, 
             [NotNull] ILogFactory loggerFactory)
         {
-            if (stateBucketService == null) throw new ArgumentNullException(nameof(stateBucketService));
-            if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
-            if (tailViewStateRestorer == null) throw new ArgumentNullException(nameof(tailViewStateRestorer));
-      
-            if (loggerFactory == null) throw new ArgumentNullException(nameof(loggerFactory));
-            _stateBucketService = stateBucketService;
-            _schedulerProvider = schedulerProvider;
-            _tailViewStateRestorer = tailViewStateRestorer;
-            _loggerFactory = loggerFactory;
+            _stateBucketService = stateBucketService ?? throw new ArgumentNullException(nameof(stateBucketService));
+            _schedulerProvider = schedulerProvider ?? throw new ArgumentNullException(nameof(schedulerProvider));
+            _tailViewStateRestorer = tailViewStateRestorer ?? throw new ArgumentNullException(nameof(tailViewStateRestorer));
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         }
 
         public IDisposable Create(TailViewModel tailView, bool loadDefaults)

@@ -8,14 +8,13 @@ namespace TailBlazer.Domain.FileHandling
         public int Line { get; }
         public int Index { get; }
         public long Start { get; }
-        public long End { get; }
-        public long Size => End - Start;
         public int Offset { get; }
 
-        public bool EndOfTail { get; }
+        private LineIndexType Type { get; }
+        private long End { get; }
+        private long Size => End - Start;
 
-        public LineIndexType Type { get; }
-        public LineInfo(int line, int index, long startPosition, long endPosition, bool endOfTail=false)
+        public LineInfo(int line, int index, long startPosition, long endPosition)
         {
             Line = line;
             Index = index;
@@ -23,20 +22,7 @@ namespace TailBlazer.Domain.FileHandling
             End = endPosition;
             Offset = 0;
             Type= LineIndexType.Absolute;
-            EndOfTail = endOfTail;
         }
-
-        public LineInfo(int line, int index, long startPosition, int offset, bool endOfTail=false)
-        {
-            Line = line;
-            Index = index;
-            Start = startPosition;
-            End = -1;
-            Offset = offset;
-            Type= LineIndexType.Relative;
-            EndOfTail = endOfTail;
-        }
-
 
         #region Equality
 
@@ -50,8 +36,8 @@ namespace TailBlazer.Domain.FileHandling
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            return obj is LineInfo && Equals((LineInfo) obj);
+            if (obj is null) return false;
+            return obj is LineInfo info && Equals(info);
         }
 
         public override int GetHashCode()

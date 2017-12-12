@@ -104,7 +104,6 @@
     <Compile Include="FileHandling\FileNotificationType.cs" />
     <Compile Include="FileHandling\LineScroller.cs" />
     <Compile Include="FileHandling\LineInfo.cs" />
-    <Compile Include="FileHandling\LineReaderEx.cs" />
     <Compile Include="FileHandling\LinesChangedReason.cs" />
     <Compile Include="FileHandling\Page.cs" />
     <Compile Include="FileHandling\Recent\RecentFile.cs" />

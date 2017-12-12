@@ -29,22 +29,22 @@ namespace TailBlazer.Views.Recent
 
         public string Label
         {
-            get { return _label; }
-            set  { SetAndRaise(ref _label, value); }
+            get => _label;
+            set => SetAndRaise(ref _label, value);
         }
 
         #region Equality
 
         public bool Equals(RecentFileProxy other)
         {
-            if (ReferenceEquals(null, other)) return false;
+            if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
             return Equals(_recentFile, other._recentFile);
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals((RecentFileProxy) obj);

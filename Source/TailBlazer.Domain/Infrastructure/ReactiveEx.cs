@@ -90,12 +90,13 @@ namespace TailBlazer.Domain.Infrastructure
         {
             return Observable.Create<Unit>(observer =>
             {
-                Action onCompleted = () =>
+                void OnCompleted()
                 {
                     observer.OnNext(Unit.Default);
                     observer.OnCompleted();
-                };
-                return observable.Subscribe(_ => { }, observer.OnError, onCompleted);
+                }
+
+                return observable.Subscribe(_ => { }, observer.OnError, OnCompleted);
             });
         }
 

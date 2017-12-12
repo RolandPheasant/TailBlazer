@@ -17,9 +17,9 @@ namespace TailBlazer.Views.Searching
         {
             var hue = _colourProvider
                 .Lookup(new HueKey(state.Swatch, state.Hue))
-                .ValueOr(()=> _colourProvider.DefaultAccent);
-                        
-            return new SearchMetadata(state.Position, state.Text, state.Filter,state.Highlight, state.UseRegEx,state.IgnoreCase,
+                .ValueOr(() => _colourProvider.DefaultAccent);
+
+            return new SearchMetadata(state.Position, state.Text, state.Filter, state.Highlight, state.UseRegEx, state.IgnoreCase,
                 hue,
                 state.Icon,
                 isGlobal,
@@ -29,7 +29,7 @@ namespace TailBlazer.Views.Searching
         public SearchState Map(SearchMetadata search)
         {
             return new SearchState
-                (
+            (
                 search.SearchText,
                 search.Position,
                 search.UseRegex,

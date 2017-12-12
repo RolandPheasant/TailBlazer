@@ -85,14 +85,13 @@ namespace TailBlazer.Views.Searching
                 .Bind(collection, new ObservableCollectionAdaptor<SearchOptionsProxy, string>(0))
                 .DisposeMany()
                 .Subscribe();
-            
-            ReadOnlyObservableCollection<SearchOptionsProxy> excluded;
+
             var excludedLoader = proxyItems
                 .Connect(proxy => proxy.IsExclusion)
                 .Sort(SortExpressionComparer<SearchOptionsProxy>.Ascending(proxy => proxy.Text))
                 .ObserveOn(schedulerProvider.MainThread)
                 //force reset for each new or removed item dues to a bug in the underlying dragablz control which inserts in an incorrect position
-                .Bind(out excluded)
+                .Bind(out var excluded)
                 .DisposeMany()
                 .Subscribe();
 

@@ -23,14 +23,14 @@ namespace TailBlazer.Views.Recent
 
         public bool Equals(RecentSearch other)
         {
-            if (ReferenceEquals(null, other)) return false;
+            if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
             return Timestamp.Equals(other.Timestamp) && string.Equals(Text, other.Text);
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals((RecentSearch) obj);

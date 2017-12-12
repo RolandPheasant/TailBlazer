@@ -77,13 +77,13 @@ namespace TailBlazer.Views.Searching
         
         public SearchViewModel Selected
         {
-            get { return _selected; }
-            set { SetAndRaise(ref _selected,value);}
+            get => _selected;
+            set => SetAndRaise(ref _selected,value);
         }
         public int Count
         {
-            get { return _count; }
-            set { SetAndRaise(ref _count, value); }
+            get => _count;
+            set => SetAndRaise(ref _count, value);
         }
 
         public void Dispose()

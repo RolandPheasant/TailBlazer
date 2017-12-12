@@ -5,11 +5,11 @@
         public Theme Theme { get;  }
         public bool HighlightTail { get; }
         public double HighlightDuration { get; }
-        public int Scale { get; }
+        public double Scale { get; }
         public int Rating { get; }
         public bool OpenRecentOnStartup { get; }
 
-        public GeneralOptions(Theme theme, bool highlightTail, double highlightTailDuration, int scale, int rating, bool openRecentOnStartup)
+        public GeneralOptions(Theme theme, bool highlightTail, double highlightTailDuration, double scale, int rating, bool openRecentOnStartup)
         {
             Theme = theme;
             HighlightTail = highlightTail;

@@ -1,6 +1,6 @@
 namespace TailBlazer.Domain.FileHandling
 {
-    public class Page
+    public sealed class Page
     {
         public int Start { get;  }
         public int Size { get;  }

@@ -14,14 +14,14 @@ namespace TailBlazer.Views.Tail
 {
     public class TailViewStateController:IDisposable
     {
-        private readonly TailViewModel _tailView;
         private readonly IDisposable _cleanUp;
 
         public TailViewStateController([NotNull] TailViewModel tailView, IStateBucketService stateBucketService, ISchedulerProvider schedulerProvider, ITailViewStateRestorer tailViewStateRestorer, ILogger logger, bool loadDefaults)
         {
-            if (tailView == null) throw new ArgumentNullException(nameof(tailView));
+            if (tailView == null)
+                throw new ArgumentNullException(nameof(tailView));
 
-            _tailView = tailView;
+            var tailView1 = tailView;
 
 
             var converter = new TailViewToStateConverter();
@@ -60,14 +60,14 @@ namespace TailBlazer.Views.Tail
                     .Where(vm => vm !=null)
                     .Select(vm=>vm.Text);
 
-            var metaChanged = _tailView.SearchMetadataCollection.Metadata.Connect()
+            var metaChanged = tailView1.SearchMetadataCollection.Metadata.Connect()
                     .ToCollection()
                     .Select(metaData => metaData.ToArray());
 
             var writer = selectedChanged.CombineLatest(metaChanged,(selected, metadata)=>new { selected , metadata })
                         .Where(_=> !loadingSettings)
                         .Throttle(TimeSpan.FromMilliseconds(250))
-                        .Select(x => converter.Convert(_tailView.Name, x.selected, x.metadata))
+                        .Select(x => converter.Convert(tailView1.Name, x.selected, x.metadata))
                     .Subscribe(state =>
                     {
                         stateBucketService.Write(type, tailView.Name, state);

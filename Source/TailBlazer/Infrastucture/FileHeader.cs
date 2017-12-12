@@ -18,8 +18,8 @@ namespace TailBlazer.Infrastucture
 
         public string DisplayName
         {
-            get { return _displayName; }
-            set { SetAndRaise(ref _displayName,value);}
+            get => _displayName;
+            set => SetAndRaise(ref _displayName,value);
         }
 
 

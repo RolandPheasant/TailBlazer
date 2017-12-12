@@ -24,18 +24,13 @@ namespace TailBlazer.Views.Recent
             _recentFileCollection = recentFileCollection;
             if (recentFileCollection == null) throw new ArgumentNullException(nameof(recentFileCollection));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
-            
-            ReadOnlyObservableCollection<RecentFileProxy> data;
+
             var recentLoader = recentFileCollection.Items
                 .Connect()
-                .Transform(rf => new RecentFileProxy(rf, toOpen =>
-                                                            {
-                                                                _fileOpenRequest.OnNext(new FileInfo(toOpen.Name));
-                                                            },
-                                                            recentFileCollection.Remove))
+                .Transform(rf => new RecentFileProxy(rf, toOpen => _fileOpenRequest.OnNext(new FileInfo(toOpen.Name)),recentFileCollection.Remove))
                 .Sort(SortExpressionComparer<RecentFileProxy>.Descending(proxy => proxy.Timestamp))
                 .ObserveOn(schedulerProvider.MainThread)
-                .Bind(out data)
+                .Bind(out var data)
                 .Subscribe();
 
             Files = data;

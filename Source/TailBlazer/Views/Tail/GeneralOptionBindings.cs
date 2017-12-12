@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;

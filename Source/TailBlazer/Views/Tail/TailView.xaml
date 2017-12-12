@@ -55,7 +55,7 @@
                         Executed="ApplicationCommandFind_Executed"/>
     </UserControl.CommandBindings>
     
-    <wpf:DialogHost Identifier="{Binding Id}"
+    <wpf:DialogHost Identifier="{Binding Id}" 
                     CloseOnClickAway="True"
                     IsOpen="{Binding IsDialogOpen}"
                     DialogContent="{Binding DialogContent}"

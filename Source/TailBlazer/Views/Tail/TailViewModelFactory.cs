@@ -3,7 +3,6 @@ using System.IO;
 using System.Reactive.Concurrency;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
-using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Infrastucture;
@@ -17,11 +16,8 @@ namespace TailBlazer.Views.Tail
 
         public TailViewModelFactory([NotNull] IObjectProvider objectProvider, [NotNull] ISchedulerProvider schedulerProvider) 
         {
-            if (objectProvider == null) throw new ArgumentNullException(nameof(objectProvider));
-            if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
-
-            _objectProvider = objectProvider;
-            _schedulerProvider = schedulerProvider;
+            _objectProvider = objectProvider ?? throw new ArgumentNullException(nameof(objectProvider));
+            _schedulerProvider = schedulerProvider ?? throw new ArgumentNullException(nameof(schedulerProvider));
         }
         
         public HeaderedView Create(ViewState state)

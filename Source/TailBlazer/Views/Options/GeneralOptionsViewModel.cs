@@ -20,14 +20,12 @@ namespace TailBlazer.Views.Options
 
         private bool _highlightTail;
         private double _highlightDuration;
-        private int _scale;
+        private double _scale;
         private bool _useDarkTheme;
         private int _rating;
         private bool _openRecentOnStartup;
 
-        public GeneralOptionsViewModel(ISetting<GeneralOptions> setting, 
-            IRatingService ratingService,
-            ISchedulerProvider schedulerProvider)
+        public GeneralOptionsViewModel(ISetting<GeneralOptions> setting)
         {
             var reader = setting.Value.Subscribe(options =>
             {
@@ -107,7 +105,7 @@ namespace TailBlazer.Views.Options
             set { SetAndRaise(ref _rating, value); }
         }
 
-        public int Scale
+        public double Scale
         {
             get { return _scale; }
             set { SetAndRaise(ref _scale, value); }

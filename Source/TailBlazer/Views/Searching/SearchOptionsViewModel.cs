@@ -29,13 +29,13 @@ namespace TailBlazer.Views.Searching
             var global = combinedSearchMetadataCollection.Global;
             var local = combinedSearchMetadataCollection.Local;
 
-            Action<SearchMetadata> changeScopeAction = meta =>
+            void ChangeScopeAction(SearchMetadata meta)
             {
                 if (meta.IsGlobal)
                 {
                     //make global
                     global.Remove(meta.SearchText);
-                    var newValue = new SearchMetadata(meta, local.NextIndex(),false);
+                    var newValue = new SearchMetadata(meta, local.NextIndex(), false);
                     local.AddorUpdate(newValue);
                 }
                 else
@@ -45,10 +45,10 @@ namespace TailBlazer.Views.Searching
                     var newValue = new SearchMetadata(meta, global.NextIndex(), true);
                     global.AddorUpdate(newValue);
                 }
-            };
+            }
 
-            Local = searchProxyCollectionFactory.Create(local, Id, changeScopeAction);
-            Global = searchProxyCollectionFactory.Create(global, Id, changeScopeAction);
+            Local = searchProxyCollectionFactory.Create(local, Id, ChangeScopeAction);
+            Global = searchProxyCollectionFactory.Create(global, Id, ChangeScopeAction);
 
             //command to add the current search to the tail collection
             var searchInvoker = SearchHints.SearchRequested
@@ -83,8 +83,8 @@ namespace TailBlazer.Views.Searching
 
         public int SelectedIndex
         {
-            get { return _selectedIndex; }
-            set { SetAndRaise(ref _selectedIndex, value); }
+            get => _selectedIndex;
+            set => SetAndRaise(ref _selectedIndex, value);
         }
 
         public void Dispose()

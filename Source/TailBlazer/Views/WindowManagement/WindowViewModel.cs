@@ -113,14 +113,13 @@ namespace TailBlazer.Views.WindowManagement
             var selectedChange = this.WhenValueChanged(vm => vm.Selected)
                 .Subscribe(selected =>
                 {
-                    var currentSelection = selected?.Content as ISelectedAware;
-                    
-                    Views.Where(hv=> !hv.Equals(selected))
+
+                    Views.Where(hv => !hv.Equals(selected))
                         .Select(hv => hv.Content)
                         .OfType<ISelectedAware>()
                         .ForEach(selectedAware => selectedAware.IsSelected = false);
 
-                    if (currentSelection != null)
+                    if (selected?.Content is ISelectedAware currentSelection)
                         currentSelection.IsSelected = true;
                 });
 

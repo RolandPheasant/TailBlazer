@@ -73,12 +73,12 @@ namespace TailBlazer.Fixtures
             var scheduler = new TestScheduler();
             var autoTailer = Observable.Return(new ScrollRequest(10));
 
-            Func<string, bool> predicate = s => s.Contains("odd");
+            bool Predicate(string s) => s.Contains("odd");
             using (var file = new TestFile())
             {
 
                 file.Append(Enumerable.Range(1, 100).Select(i => i%2 == 1 ? $"{i} is an odd number" : $"{i} is an even number").ToArray());
-                var search = file.Info.Search(predicate,  scheduler);
+                var search = file.Info.Search(Predicate,  scheduler);
 
                 using (var tailer = new LineScroller(file.Info, search, autoTailer, new NullLogger(), scheduler))
                 {

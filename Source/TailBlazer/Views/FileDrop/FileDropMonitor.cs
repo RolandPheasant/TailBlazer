@@ -26,8 +26,7 @@ namespace TailBlazer.Views.FileDrop
 
             _isLoaded = true;
 
-            var control = value as UIElement;
-            if (null == control)
+            if (!(value is UIElement control))
                 return;
 
             control.AllowDrop = true;
@@ -113,11 +112,11 @@ namespace TailBlazer.Views.FileDrop
                 Effects = effects;
             }
 
-            private DragDropEffects Effects { get; set; }
+            private DragDropEffects Effects { get; }
 
             public Point MousePosition
             {
-                get { return _mousePositon; }
+                get => _mousePositon;
                 set
                 {
                     if (_mousePositon == value) return;

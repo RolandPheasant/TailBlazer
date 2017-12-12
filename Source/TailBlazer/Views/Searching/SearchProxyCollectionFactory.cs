@@ -24,18 +24,12 @@ namespace TailBlazer.Views.Searching
             [NotNull] ITextAssociationCollection textAssociationCollection,
             [NotNull] IThemeProvider themeProvider)
         {
-            if (searchMetadataFactory == null) throw new ArgumentNullException(nameof(searchMetadataFactory));
-            if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
-            if (colourProvider == null) throw new ArgumentNullException(nameof(colourProvider));
-            if (iconsProvider == null) throw new ArgumentNullException(nameof(iconsProvider));
-            if (textAssociationCollection == null) throw new ArgumentNullException(nameof(textAssociationCollection));
-            if (themeProvider == null) throw new ArgumentNullException(nameof(themeProvider));
-            SearchMetadataFactory = searchMetadataFactory;
-            SchedulerProvider = schedulerProvider;
-            ColourProvider = colourProvider;
-            IconsProvider = iconsProvider;
-            TextAssociationCollection = textAssociationCollection;
-            ThemeProvider = themeProvider;
+            SearchMetadataFactory = searchMetadataFactory ?? throw new ArgumentNullException(nameof(searchMetadataFactory));
+            SchedulerProvider = schedulerProvider ?? throw new ArgumentNullException(nameof(schedulerProvider));
+            ColourProvider = colourProvider ?? throw new ArgumentNullException(nameof(colourProvider));
+            IconsProvider = iconsProvider ?? throw new ArgumentNullException(nameof(iconsProvider));
+            TextAssociationCollection = textAssociationCollection ?? throw new ArgumentNullException(nameof(textAssociationCollection));
+            ThemeProvider = themeProvider ?? throw new ArgumentNullException(nameof(themeProvider));
         }
         public ISearchProxyCollection Create([NotNull] ISearchMetadataCollection metadataCollection, Guid id, Action<SearchMetadata> changeScopeAction)
         {

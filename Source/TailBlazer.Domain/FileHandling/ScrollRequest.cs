@@ -2,7 +2,7 @@
 
 namespace TailBlazer.Domain.FileHandling
 {
-    public class ScrollRequest : IEquatable<ScrollRequest>
+    public sealed class ScrollRequest : IEquatable<ScrollRequest>
     {
         public static readonly ScrollRequest None= new ScrollRequest();
 

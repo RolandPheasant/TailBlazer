@@ -97,14 +97,11 @@ namespace TailBlazer.Views.Tail
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
             if (fileWatcher == null) throw new ArgumentNullException(nameof(fileWatcher));
-            if (selectionMonitor == null) throw new ArgumentNullException(nameof(selectionMonitor));
             if (clipboardHandler == null) throw new ArgumentNullException(nameof(clipboardHandler));
             if (searchInfoCollection == null) throw new ArgumentNullException(nameof(searchInfoCollection));
             if (inlineViewerFactory == null) throw new ArgumentNullException(nameof(inlineViewerFactory));
             if (stateBucketService == null) throw new ArgumentNullException(nameof(stateBucketService));
-            if (searchHints == null) throw new ArgumentNullException(nameof(searchHints));
             if (themeProvider == null) throw new ArgumentNullException(nameof(themeProvider));
-            if (searchCollection == null) throw new ArgumentNullException(nameof(searchCollection));
             if (textFormatter == null) throw new ArgumentNullException(nameof(textFormatter));
             if (lineMatches == null) throw new ArgumentNullException(nameof(lineMatches));
             if (objectProvider == null) throw new ArgumentNullException(nameof(objectProvider));
@@ -112,9 +109,9 @@ namespace TailBlazer.Views.Tail
             if (combinedSearchMetadataCollection == null) throw new ArgumentNullException(nameof(combinedSearchMetadataCollection));
 
             Name = fileWatcher.FullName;
-            SelectionMonitor = selectionMonitor;
+            SelectionMonitor = selectionMonitor ?? throw new ArgumentNullException(nameof(selectionMonitor));
             GeneralOptionBindings = generalOptionBindings;
-            SearchHints = searchHints;
+            SearchHints = searchHints ?? throw new ArgumentNullException(nameof(searchHints));
 
             CopyToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
             OpenFileCommand = new Command(() => Process.Start(fileWatcher.FullName));
@@ -136,7 +133,7 @@ namespace TailBlazer.Views.Tail
                 .Where(selected => !selected)
                 .Subscribe(_ => dialogCoordinator.Close());
 
-            SearchCollection = searchCollection;
+            SearchCollection = searchCollection ?? throw new ArgumentNullException(nameof(searchCollection));
             SearchMetadataCollection = combinedSearchMetadataCollection.Local;
 
             var horizonalScrollArgs = new ReplaySubject<TextScrollInfo>(1);
@@ -182,7 +179,7 @@ namespace TailBlazer.Views.Tail
 
             var loader = lineScroller.Lines.Connect()
                 .LogChanges(logger, "Received")
-                .Transform(lineProxyFactory.Create, new ParallelisationOptions(ParallelType.Ordered,5))
+                .Transform(lineProxyFactory.Create)
                 .LogChanges(logger, "Sorting")
                 .Sort(SortExpressionComparer<LineProxy>.Ascending(proxy => proxy))
                 .ObserveOn(schedulerProvider.MainThread)
@@ -194,7 +191,7 @@ namespace TailBlazer.Views.Tail
             
             //monitor matching lines and start index,
             Count = searchInfoCollection.All.Select(latest=>latest.Count).ForBinding();
-            CountText = searchInfoCollection.All.Select(latest => $"{latest.Count.ToString("##,###")} lines").ForBinding();
+            CountText = searchInfoCollection.All.Select(latest => $"{latest.Count:##,###} lines").ForBinding();
             LatestCount = SearchCollection.Latest.Select(latest => latest.Count).ForBinding();
 
             ////track first visible index

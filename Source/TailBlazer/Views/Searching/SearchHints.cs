@@ -17,22 +17,12 @@ namespace TailBlazer.Views.Searching
 {
     public class SearchHints : AbstractNotifyPropertyChanged, IDisposable, IDataErrorInfo
     {
-        private readonly ReadOnlyObservableCollection<string> _hints;
         private readonly IDisposable _cleanUp;
-        private string _searchText;
-        private bool _useRegex;
+        private readonly ReadOnlyObservableCollection<string> _hints;
 
         private readonly RegexInspector _regexInspector = new RegexInspector();
-
-        public ReadOnlyObservableCollection<string> Hints => _hints;
-
-        public ICommand AddSearchCommand { get; }
-
-        public IObservable<SearchRequest> SearchRequested { get; }
-
-        public IProperty<bool> IsValid { get; }
-
-        public IProperty<string> Message { get; }
+        private string _searchText;
+        private bool _useRegex;
 
 
         public SearchHints(IRecentSearchCollection recentSearchCollection, ISchedulerProvider schedulerProvider)
@@ -53,14 +43,11 @@ namespace TailBlazer.Views.Searching
 
             var forceRefreshOfError = combined.Select(shm => shm.IsValid)
                 .DistinctUntilChanged()
-                .Subscribe(_ =>
-                {
-                    this.OnPropertyChanged("SearchText");
-                });
+                .Subscribe(_ => { OnPropertyChanged(nameof(SearchText)); });
 
             var predictRegex = this.WhenValueChanged(vm => vm.SearchText)
-                                        .Select(text => _regexInspector.DoesThisLookLikeRegEx(text))
-                                        .Subscribe(likeRegex => UseRegex = likeRegex);
+                .Select(text => _regexInspector.DoesThisLookLikeRegEx(text))
+                .Subscribe(likeRegex => UseRegex = likeRegex);
 
             //Handle adding new search
             var searchRequested = new Subject<SearchRequest>();
@@ -74,7 +61,6 @@ namespace TailBlazer.Views.Searching
                     SearchText = string.Empty;
                     UseRegex = false;
                 });
-
             }, () => IsValid.Value && SearchText.Length > 0);
 
 
@@ -89,23 +75,39 @@ namespace TailBlazer.Views.Searching
             _cleanUp = new CompositeDisposable(IsValid, Message, predictRegex, dataLoader, searchRequested.SetAsComplete(), combined.Connect(), forceRefreshOfError);
         }
 
+        public ReadOnlyObservableCollection<string> Hints => _hints;
+
+        public ICommand AddSearchCommand { get; }
+
+        public IObservable<SearchRequest> SearchRequested { get; }
+
+        public IProperty<bool> IsValid { get; }
+
+        public IProperty<string> Message { get; }
+
+        public string SearchText
+        {
+            get => _searchText;
+            set => SetAndRaise(ref _searchText, value);
+        }
+
+        public bool UseRegex
+        {
+            get => _useRegex;
+            set => SetAndRaise(ref _useRegex, value);
+        }
+
+
+        public void Dispose()
+        {
+            _cleanUp.Dispose();
+        }
+
         private Func<RecentSearch, bool> BuildFilter(string searchText)
         {
             if (string.IsNullOrEmpty(searchText)) return trade => true;
 
             return recentSearch => recentSearch.Text.StartsWith(searchText, StringComparison.OrdinalIgnoreCase);
-        }
-
-        public string SearchText
-        {
-            get { return _searchText; }
-            set { SetAndRaise(ref _searchText, value); }
-        }
-
-        public bool UseRegex
-        {
-            get { return _useRegex; }
-            set { SetAndRaise(ref _useRegex, value); }
         }
 
         #region Data error 
@@ -115,12 +117,5 @@ namespace TailBlazer.Views.Searching
         string IDataErrorInfo.Error => null;
 
         #endregion
-
-
-        public void Dispose()
-        {
-            _cleanUp.Dispose();
-        }
-
     }
 }

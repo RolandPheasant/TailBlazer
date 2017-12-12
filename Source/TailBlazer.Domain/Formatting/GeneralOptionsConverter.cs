@@ -28,7 +28,7 @@ namespace TailBlazer.Domain.Formatting
             var theme = root.ElementOrThrow(Structure.Theme).ParseEnum<Theme>().ValueOr(()=> defaults.Theme);
             var highlight = root.ElementOrThrow(Structure.HighlightTail).ParseBool().ValueOr(() => defaults.HighlightTail);
             var duration = root.ElementOrThrow(Structure.Duration).ParseDouble().ValueOr(()=>defaults.HighlightDuration);
-            var scale = root.ElementOrThrow(Structure.Scale).ParseInt().ValueOr(()=>defaults.Scale);
+            var scale = root.ElementOrThrow(Structure.Scale).ParseDouble().ValueOr(()=>defaults.Scale);
             var frameRate = root.OptionalElement(Structure.Rating).ConvertOr(rate=>rate.ParseInt().Value, () => defaults.Rating);
             var openRecent = root.ElementOrThrow(Structure.OpenRecentOnStartup).ParseBool().ValueOr(() => defaults.OpenRecentOnStartup);
 
