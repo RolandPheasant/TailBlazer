@@ -31,8 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DynamicData, Version=6.0.4.2351, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DynamicData.6.0.4.2351\lib\net45\DynamicData.dll</HintPath>
+    <Reference Include="DynamicData, Version=6.1.3.2378, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DynamicData.6.1.3.2378\lib\net45\DynamicData.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
@@ -92,6 +92,7 @@
     <Compile Include="FileHandling\IndexType.cs" />
     <Compile Include="FileHandling\IProgressInfo.cs" />
     <Compile Include="FileHandling\LineKey.cs" />
+    <Compile Include="FileHandling\New\FileMonitor.cs" />
     <Compile Include="FileHandling\Search\CombinedSearchMetadataCollection.cs" />
     <Compile Include="FileHandling\Search\GlobalSearchInfoCollection.cs" />
     <Compile Include="FileHandling\Search\ICombinedSearchMetadataCollection.cs" />

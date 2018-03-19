@@ -47,8 +47,8 @@
     <Reference Include="Dragablz, Version=0.0.3.197, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dragablz.0.0.3.197\lib\net45\Dragablz.dll</HintPath>
     </Reference>
-    <Reference Include="DynamicData, Version=6.0.4.2351, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DynamicData.6.0.4.2351\lib\net45\DynamicData.dll</HintPath>
+    <Reference Include="DynamicData, Version=6.1.3.2378, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DynamicData.6.1.3.2378\lib\net45\DynamicData.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>

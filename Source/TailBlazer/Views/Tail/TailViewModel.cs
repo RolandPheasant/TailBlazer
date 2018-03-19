@@ -229,6 +229,7 @@ namespace TailBlazer.Views.Tail
                 firstIndexMonitor,
                 FileStatus,
                 Count,
+                CountText,
                 LatestCount,
                 FileSizeText,
                 CanViewInline,
@@ -237,7 +238,6 @@ namespace TailBlazer.Views.Tail
                 SearchCollection,
                 searchInfoCollection,
                 searchHints,
-                combinedSearchMetadataCollection,
                 SelectionMonitor,
                 closeOnDeselect,
                 Disposable.Create(dialogCoordinator.Close),
@@ -253,50 +253,50 @@ namespace TailBlazer.Views.Tail
 
         public bool IsSelected
         {
-            get { return _isSelected; }
-            set { SetAndRaise(ref _isSelected, value); }
+            get => _isSelected;
+            set => SetAndRaise(ref _isSelected, value);
         }
 
         public bool IsDialogOpen
         {
-            get { return _isDialogOpen; }
-            set { SetAndRaise(ref _isDialogOpen, value); }
+            get => _isDialogOpen;
+            set => SetAndRaise(ref _isDialogOpen, value);
         }
 
         public object DialogContent
         {
-            get { return _dialogContent; }
-            set { SetAndRaise(ref _dialogContent, value); }
+            get => _dialogContent;
+            set => SetAndRaise(ref _dialogContent, value);
         }
 
         public LineProxy SelectedItem
         {
-            get { return _selectedLine; }
-            set { SetAndRaise(ref _selectedLine, value); }
+            get => _selectedLine;
+            set => SetAndRaise(ref _selectedLine, value);
         }
 
         public bool AutoTail
         {
-            get { return _autoTail; }
-            set { SetAndRaise(ref _autoTail, value); }
+            get => _autoTail;
+            set => SetAndRaise(ref _autoTail, value);
         }
         
         public int PageSize
         {
-            get { return _pageSize; }
-            set { SetAndRaise(ref _pageSize, value); }
+            get => _pageSize;
+            set => SetAndRaise(ref _pageSize, value);
         }
 
         public int FirstIndex
         {
-            get { return _firstIndex; }
-            set { SetAndRaise(ref _firstIndex, value); }
+            get => _firstIndex;
+            set => SetAndRaise(ref _firstIndex, value);
         }
 
         public bool ShowInline
         {
-            get { return _showInline; }
-            set { SetAndRaise(ref _showInline, value); }
+            get => _showInline;
+            set => SetAndRaise(ref _showInline, value);
         }
 
         #region Interact with scroll panel
