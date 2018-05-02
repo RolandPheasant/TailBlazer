@@ -89,7 +89,7 @@ namespace TailBlazer.Domain.FileHandling.Search
                     return new SearchInfo(meta.SearchText, meta.IsGlobal, latest, SearchType.User);
                 });
 
-            //combine te results into a single collection
+            //combine the results into a single collection
             Searches = systemSearches.Connect()
                     .Or(userSearches)
                     .AsObservableCache();
