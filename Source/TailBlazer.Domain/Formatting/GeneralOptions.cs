@@ -8,8 +8,9 @@
         public double Scale { get; }
         public int Rating { get; }
         public bool OpenRecentOnStartup { get; }
+        public bool ShowLineNumbers { get; }
 
-        public GeneralOptions(Theme theme, bool highlightTail, double highlightTailDuration, double scale, int rating, bool openRecentOnStartup)
+        public GeneralOptions(Theme theme, bool highlightTail, double highlightTailDuration, double scale, int rating, bool openRecentOnStartup, bool showLineNumbers)
         {
             Theme = theme;
             HighlightTail = highlightTail;
@@ -17,6 +18,7 @@
             Scale = scale;
             Rating = rating;
             OpenRecentOnStartup = openRecentOnStartup;
+            ShowLineNumbers = showLineNumbers;
         }
 
     }

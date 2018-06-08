@@ -7,7 +7,6 @@ using System.Windows.Input;
 using DynamicData.Binding;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
-using TailBlazer.Domain.Ratings;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Infrastucture;
 
@@ -24,6 +23,7 @@ namespace TailBlazer.Views.Options
         private bool _useDarkTheme;
         private int _rating;
         private bool _openRecentOnStartup;
+        private bool _showLineNumbers;
 
         public GeneralOptionsViewModel(ISetting<GeneralOptions> setting)
         {
@@ -35,6 +35,7 @@ namespace TailBlazer.Views.Options
                 Scale = options.Scale;
                 Rating = options.Rating;
                 OpenRecentOnStartup = options.OpenRecentOnStartup;
+                ShowLineNumbers = options.ShowLineNumbers;
             });
 
             RequiresRestart = setting.Value.Select(options => options.Rating)
@@ -50,7 +51,7 @@ namespace TailBlazer.Views.Options
             var writter = this.WhenAnyPropertyChanged()
                 .Subscribe(vm =>
                 {
-                    setting.Write(new GeneralOptions(UseDarkTheme ? Theme.Dark : Theme.Light, HighlightTail, HighlightDuration, Scale, Rating, OpenRecentOnStartup));
+                    setting.Write(new GeneralOptions(UseDarkTheme ? Theme.Dark : Theme.Light, HighlightTail, HighlightDuration, Scale, Rating, OpenRecentOnStartup, ShowLineNumbers));
                 });
             
             HighlightDurationText = this.WhenValueChanged(vm=>vm.HighlightDuration)
@@ -115,6 +116,12 @@ namespace TailBlazer.Views.Options
         {
             get { return _openRecentOnStartup; }
             set { SetAndRaise(ref _openRecentOnStartup, value); }
+        }
+
+        public bool ShowLineNumbers
+        {
+            get { return _showLineNumbers; }
+            set { SetAndRaise(ref _showLineNumbers, value); }
         }
 
         void IDisposable.Dispose()

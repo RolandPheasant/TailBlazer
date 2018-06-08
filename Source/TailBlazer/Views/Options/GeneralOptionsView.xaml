@@ -47,7 +47,8 @@
                 <RowDefinition Height="32"/>
                 <RowDefinition Height="32"/>
                 <RowDefinition Height="32"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="32"/>
+                <RowDefinition Height="32"/>
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -83,6 +84,13 @@
                       VerticalAlignment="Center"
                       Margin="4"
                       IsChecked="{Binding  OpenRecentOnStartup}" />
+
+            <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Show Line Numbers?</TextBlock>
+            <CheckBox Grid.Row="4" Grid.Column="1"
+                      VerticalAlignment="Center"
+                      Margin="4"
+                      IsChecked="{Binding ShowLineNumbers}" />
+
         </Grid>
 
         <TextBlock

@@ -19,7 +19,7 @@
     <DataTemplate DataType="{x:Type tail:LineProxy}">
         <Grid Margin="2,0,0,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
@@ -103,7 +103,15 @@
 
             </materialDesign:PopupBox>
 
-            <Grid Grid.Column="1" Margin="4,0,0,0">
+            <TextBlock Grid.Column="0"
+                       Opacity="0.5"
+                       TextAlignment="Right"
+                       VerticalAlignment="Center"
+                       Margin="8,0,0,0"
+                       Text="{Binding LineNumber.Value}"
+                       Visibility="{Binding Path=DataContext.GeneralOptionBindings.ShowLineNumbers.Value, ElementName=Control, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+            <Grid Grid.Column="1" Margin="16,0,0,0">
                 <controls:HighlightTextControl
                     VerticalAlignment="Center"
                     FormattedText="{Binding FormattedText.Value}"
