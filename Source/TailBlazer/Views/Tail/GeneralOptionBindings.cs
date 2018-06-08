@@ -12,6 +12,7 @@ namespace TailBlazer.Views.Tail
     {
         public IProperty<bool> HighlightTail { get; }
         public IProperty<bool> UsingDarkTheme { get; }
+        public IProperty<bool> ShowLineNumbers { get; }
         
         private readonly IDisposable _cleanUp;
 
@@ -27,7 +28,12 @@ namespace TailBlazer.Views.Tail
                 .Select(options => options.HighlightTail)
                 .ForBinding();
 
-            _cleanUp = new CompositeDisposable(UsingDarkTheme, HighlightTail);
+            ShowLineNumbers = generalOptions.Value
+                .ObserveOn(schedulerProvider.MainThread)
+                .Select(options => options.ShowLineNumbers)
+                .ForBinding();
+
+            _cleanUp = new CompositeDisposable(UsingDarkTheme, HighlightTail, ShowLineNumbers);
         }
 
         public void Dispose()

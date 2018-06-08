@@ -16,6 +16,7 @@ namespace TailBlazer.Domain.Formatting
             public const string Scale = "Scale";
             public const string Rating = "FrameRate";
             public const string OpenRecentOnStartup = "OpenRecentOnStartup";
+            public const string ShowLineNumbers = "ShowLineNumbers";
         }
 
         public GeneralOptions Convert(State state)
@@ -31,8 +32,9 @@ namespace TailBlazer.Domain.Formatting
             var scale = root.ElementOrThrow(Structure.Scale).ParseDouble().ValueOr(()=>defaults.Scale);
             var frameRate = root.OptionalElement(Structure.Rating).ConvertOr(rate=>rate.ParseInt().Value, () => defaults.Rating);
             var openRecent = root.ElementOrThrow(Structure.OpenRecentOnStartup).ParseBool().ValueOr(() => defaults.OpenRecentOnStartup);
+            var showLineNumbers = root.OptionalElement(Structure.ShowLineNumbers).ConvertOr(x => x.ParseBool().Value, () => defaults.ShowLineNumbers);
 
-            return new GeneralOptions(theme,highlight, duration,scale, frameRate, openRecent);
+            return new GeneralOptions(theme,highlight, duration,scale, frameRate, openRecent, showLineNumbers);
         }
 
         public State Convert(GeneralOptions options)
@@ -44,6 +46,7 @@ namespace TailBlazer.Domain.Formatting
             root.Add(new XElement(Structure.Scale, options.Scale));
             root.Add(new XElement(Structure.Rating, options.Rating));
             root.Add(new XElement(Structure.OpenRecentOnStartup, options.OpenRecentOnStartup));
+            root.Add(new XElement(Structure.ShowLineNumbers, options.ShowLineNumbers));
             var doc = new XDocument(root);
             var value= doc.ToString();
             return new State(1, value);
@@ -51,7 +54,7 @@ namespace TailBlazer.Domain.Formatting
 
         public GeneralOptions GetDefaultValue()
         {
-            return new GeneralOptions(Theme.Light, true, 5, 100, 5, true);
+            return new GeneralOptions(Theme.Light, true, 5, 100, 5, true, false);
         }
     }
 }

@@ -36,11 +36,12 @@ namespace TailBlazer.Views.Tail
         public IProperty<PackIconKind> IndicatorIcon { get; }
         public IProperty<IEnumerable<LineMatchProxy>> IndicatorMatches { get; }
         public IProperty<Visibility> ShowIndicator { get; }
+        public IProperty<string> LineNumber { get; }
 
         public LineProxy([NotNull] Line line, 
             [NotNull] IObservable<IEnumerable<DisplayText>> formattedText,
-            [NotNull] IObservable<LineMatchCollection> lineMatches, 
-            [NotNull] IObservable<TextScrollInfo> textScroll, 
+            [NotNull] IObservable<LineMatchCollection> lineMatches,
+            [NotNull] IObservable<TextScrollInfo> textScroll,
             [NotNull] IThemeProvider themeProvider)
         {
        
@@ -60,7 +61,11 @@ namespace TailBlazer.Views.Tail
 
             PlainText = textScrollShared
                         .Select(ts => line.Text.Virtualise(ts))
-                        .ForBinding(); 
+                        .ForBinding();
+
+            LineNumber = textScrollShared
+                        .Select(ts => line.Number.ToString())
+                        .ForBinding();
 
             FormattedText = formattedText
                         .CombineLatest(textScrollShared, (fmt, scroll) => fmt.Virtualise(scroll))
@@ -99,7 +104,6 @@ namespace TailBlazer.Views.Tail
                     .Subscribe(_ => IsRecent = false);
             }
 
-
             _cleanUp = new CompositeDisposable(FormattedText, 
                 IndicatorColour,
                 IndicatorMatches,
@@ -107,6 +111,7 @@ namespace TailBlazer.Views.Tail
                 ShowIndicator,
                 FormattedText,
                 PlainText,
+                LineNumber,
                 lineMatchesShared.Connect(),
                 textScrollShared.Connect());
         }
