@@ -90,18 +90,14 @@ namespace TailBlazer.Domain.Formatting
             }
             else
             {
-
                 foreach (var item in Yield2(input, tomatch))
                 {
-
                     if (!item.IsMatch)
                     {
                         yield return new MatchedString(item.Part);
                     }
                     else
                     {
-
-                        //yield return item;
                         yield return new MatchedString(item.Part, tomatch);
                     }
 
@@ -126,6 +122,12 @@ namespace TailBlazer.Domain.Formatting
             if (length == 1)
             {
                 yield return new MatchedString(input);
+                yield break;
+            }
+
+            if (meta.Highlight == HighlightingMode.Line)
+            {
+                yield return new MatchedString(input, meta);
                 yield break;
             }
 

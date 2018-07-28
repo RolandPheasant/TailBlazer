@@ -12,6 +12,8 @@ namespace TailBlazer.Domain.Formatting
 
         public Hue Hue => _metadata?.HighlightHue;
 
+        public Hue BackgroundHue { get; } = null;
+
         public MatchedString(string part)
         {
             Part = part;
@@ -29,6 +31,7 @@ namespace TailBlazer.Domain.Formatting
             _metadata = metadata;
             Part = part;
             IsMatch = true;
+            BackgroundHue = metadata.Highlight == HighlightingMode.Line ? metadata.HighlightHue : null;
         }
 
 
