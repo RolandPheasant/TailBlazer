@@ -13,7 +13,7 @@ namespace TailBlazer.Domain.FileHandling.Search
         public int Position { get;  }
         public string SearchText { get; }
         public bool Filter { get; }
-        public bool Highlight { get; }
+        public HighlightingMode Highlight { get; }
         public bool UseRegex { get; }
         public bool IgnoreCase { get; }
         public Optional<Regex> RegEx { get; }
@@ -61,7 +61,7 @@ namespace TailBlazer.Domain.FileHandling.Search
         }
 
         public SearchMetadata(int position, [NotNull] string searchText, bool filter, 
-            bool highlight, 
+            HighlightingMode highlight, 
             bool useRegex, 
             bool ignoreCase,
             Hue highlightHue,

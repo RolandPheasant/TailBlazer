@@ -14,7 +14,7 @@ namespace TailBlazer.Domain.Formatting
         public TextFormatter(ICombinedSearchMetadataCollection searchMetadataCollection)
         {
             _strings = searchMetadataCollection.Combined
-                .Connect(meta => meta.Highlight && !meta.IsExclusion)
+                .Connect(meta => (meta.Highlight == HighlightingMode.Text || meta.Highlight == HighlightingMode.Line) && !meta.IsExclusion)
                 .IgnoreUpdateWhen((current, previous) => SearchMetadata.EffectsHighlightComparer.Equals(current, previous))
                 .QueryWhenChanged(query => query.Items.OrderBy(m => m.Position))
                 .Replay(1)

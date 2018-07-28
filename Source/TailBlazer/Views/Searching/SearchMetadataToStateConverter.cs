@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.Xml.Linq;
 using DynamicData.Kernel;
+using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Views.Searching;
@@ -61,7 +62,7 @@ namespace TailBlazer.Views.Tail
                  var position = element.Attribute(Structure.Filter).Value.ParseInt().ValueOr(() => index);
                  var filter = element.Attribute(Structure.Filter).Value.ParseBool().ValueOr(() => true);
                  var useRegEx = element.Attribute(Structure.UseRegEx).Value.ParseBool().ValueOr(() => false);
-                 var highlight = element.Attribute(Structure.Highlight).Value.ParseBool().ValueOr(() => true);
+                 var highlight = element.Attribute(Structure.Highlight).Value.ParseEnum<HighlightingMode>().ValueOr(() => HighlightingMode.Disabled);
                  var alert = element.Attribute(Structure.Alert).Value.ParseBool().ValueOr(() => false);
                  var ignoreCase = element.Attribute(Structure.IgnoreCase).Value.ParseBool().ValueOr(() => true);
 

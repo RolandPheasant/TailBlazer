@@ -53,6 +53,7 @@
       <HintPath>..\packages\System.Reactive.Windows.Threading.3.1.1\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -95,6 +96,7 @@
     <Compile Include="FileHandling\New\FileMonitor.cs" />
     <Compile Include="FileHandling\Search\CombinedSearchMetadataCollection.cs" />
     <Compile Include="FileHandling\Search\GlobalSearchInfoCollection.cs" />
+    <Compile Include="FileHandling\Search\HighlightingMode.cs" />
     <Compile Include="FileHandling\Search\ICombinedSearchMetadataCollection.cs" />
     <Compile Include="FileHandling\Search\IDefaultColourSelector.cs" />
     <Compile Include="FileHandling\Search\IDefaultIconSelector.cs" />
@@ -153,6 +155,8 @@
     <Compile Include="Formatting\Theme.cs" />
     <Compile Include="Formatting\ThemeConstants.cs" />
     <Compile Include="Formatting\ThemeProvider.cs" />
+    <Compile Include="Infrastructure\EnumDescriptionTypeConverter.cs" />
+    <Compile Include="Infrastructure\EnumToItemsSource.cs" />
     <Compile Include="Infrastructure\NullLogger.cs" />
     <Compile Include="Infrastructure\DynamicDataEx.cs" />
     <Compile Include="Infrastructure\EnumerableEx.cs" />

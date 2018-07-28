@@ -111,9 +111,9 @@
                        Text="{Binding LineNumber.Value}"
                        Visibility="{Binding Path=DataContext.GeneralOptionBindings.ShowLineNumbers.Value, ElementName=Control, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-            <Grid Grid.Column="1" Margin="16,0,0,0">
+            <Grid Grid.Column="1">
                 <controls:HighlightTextControl
-                    VerticalAlignment="Center"
+                    VerticalAlignment="Stretch"
                     FormattedText="{Binding FormattedText.Value}"
                     HighlightBackgroundBrush="{DynamicResource SecondaryAccentBrush}"
                     HighlightForegroundBrush="{DynamicResource SecondaryAccentForegroundBrush}"
@@ -139,7 +139,8 @@
         <Style.Setters>
             <Setter Property="Padding" Value="0" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-            <Setter Property="Height" Value="20" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
         </Style.Setters>
 
         <Style.Triggers>
@@ -213,7 +214,7 @@
                     <virtualisation:LinesScrollPanel
                         CharacterWidth="6.59666666666667"
                         HorizontalScrollChanged="{Binding HorizonalScrollChanged}"
-                        ItemHeight="20"
+                        ItemHeight="22"
                         ScrollReceiver="{Binding}"
                         StartIndex="{Binding FirstIndex}"
                         TotalCharacters="{Binding MaximumChars.Value, UpdateSourceTrigger=PropertyChanged}"

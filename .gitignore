@@ -213,3 +213,6 @@ ModelManifest.xml
 /Source/TailBlazer.sln.GhostDoc.xml
 Source/TailBlazer/Themes/MaterialDesign.xaml
 *.DotSettings
+.idea
+*.iml
+*.DotSettings

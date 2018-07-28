@@ -48,7 +48,7 @@ namespace TailBlazer.Domain.FileHandling.Search
             
             return new SearchMetadata(index, searchText,
                isExclusion ? false: filter, 
-                true, 
+                HighlightingMode.Text, 
                 useRegex, 
                 true,
                 hue , 

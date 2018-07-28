@@ -23,7 +23,7 @@ namespace TailBlazer.Views.Searching
         private readonly SearchMetadata _searchMetadata;
         private bool _caseSensitive;
         private bool _filter;
-        private bool _highlight;
+        private HighlightingMode _highlight;
         private Hue _highlightHue;
         private PackIconKind _iconKind;
         private bool _isExclusion;
@@ -101,7 +101,7 @@ namespace TailBlazer.Views.Searching
             set => SetAndRaise(ref _iconKind, value);
         }
 
-        public bool Highlight
+        public HighlightingMode Highlight
         {
             get => _highlight;
             set => SetAndRaise(ref _highlight, value);
@@ -170,7 +170,7 @@ namespace TailBlazer.Views.Searching
         {
             return new SearchMetadata(proxy.Position,
                 proxy.Text, proxy.Filter,
-                proxy.Highlight,
+                proxy._highlight,
                 proxy.UseRegex,
                 !proxy.CaseSensitive,
                 proxy.HighlightHue,
