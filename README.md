@@ -4,8 +4,15 @@
 
 [![](https://img.shields.io/github/downloads/RolandPheasant/TailBlazer/total.svg)](https://github.com/RolandPheasant/TailBlazer/releases) [![](https://img.shields.io/chocolatey/dt/tailblazer.svg)](https://chocolatey.org/packages/tailblazer) [![](https://img.shields.io/chocolatey/v/tailblazer.svg)](https://chocolatey.org/packages/tailblazer)
 
-[![](https://sourcerer.io/fame/gwenaelp/gwenaelp/TailBlazer/images/0)](https://sourcerer.io/fame/gwenaelp/gwenaelp/TailBlazer/links/0)[![](https://sourcerer.io/fame/gwenaelp/gwenaelp/TailBlazer/images/1)](https://sourcerer.io/fame/gwenaelp/gwenaelp/TailBlazer/links/1)[![](https://sourcerer.io/fame/gwenaelp/gwenaelp/TailBlazer/images/2)](https://sourcerer.io/fame/gwenaelp/gwenaelp/TailBlazer/links/2)[![](https://sourcerer.io/fame/gwenaelp/gwenaelp/TailBlazer/images/3)](https://sourcerer.io/fame/gwenaelp/gwenaelp/TailBlazer/links/3)[![](https://sourcerer.io/fame/gwenaelp/gwenaelp/TailBlazer/images/4)](https://sourcerer.io/fame/gwenaelp/gwenaelp/TailBlazer/links/4)[![](https://sourcerer.io/fame/gwenaelp/gwenaelp/TailBlazer/images/5)](https://sourcerer.io/fame/gwenaelp/gwenaelp/TailBlazer/links/5)[![](https://sourcerer.io/fame/gwenaelp/gwenaelp/TailBlazer/images/6)](https://sourcerer.io/fame/gwenaelp/gwenaelp/TailBlazer/links/6)[![](https://sourcerer.io/fame/gwenaelp/gwenaelp/TailBlazer/images/7)](https://sourcerer.io/fame/gwenaelp/gwenaelp/TailBlazer/links/7)
 
+[![0](https://sourcerer.io/fame/RolandPheasant/RolandPheasant/TailBlazer/images/0)](https://sourcerer.io/fame/RolandPheasant/RolandPheasant/TailBlazer/links/0)
+[![1](https://sourcerer.io/fame/RolandPheasant/RolandPheasant/TailBlazer/images/1)](https://sourcerer.io/fame/RolandPheasant/RolandPheasant/TailBlazer/links/1)
+[![2](https://sourcerer.io/fame/RolandPheasant/RolandPheasant/TailBlazer/images/2)](https://sourcerer.io/fame/RolandPheasant/RolandPheasant/TailBlazer/links/2)
+[![3](https://sourcerer.io/fame/RolandPheasant/RolandPheasant/TailBlazer/images/3)](https://sourcerer.io/fame/RolandPheasant/RolandPheasant/TailBlazer/links/3)
+[![4](https://sourcerer.io/fame/RolandPheasant/RolandPheasant/TailBlazer/images/4)](https://sourcerer.io/fame/RolandPheasant/RolandPheasant/TailBlazer/links/4)
+[![5](https://sourcerer.io/fame/RolandPheasant/RolandPheasant/TailBlazer/images/5)](https://sourcerer.io/fame/RolandPheasant/RolandPheasant/TailBlazer/links/5)
+[![6](https://sourcerer.io/fame/RolandPheasant/RolandPheasant/TailBlazer/images/6)](https://sourcerer.io/fame/RolandPheasant/RolandPheasant/TailBlazer/links/6)
+[![7](https://sourcerer.io/fame/RolandPheasant/RolandPheasant/TailBlazer/images/7)](https://sourcerer.io/fame/RolandPheasant/RolandPheasant/TailBlazer/links/7)
 
 In my day to day professional life I am always tailing log files but have always been disappointed with the utilities on offer. The current crop of free ones all look like they were written in the 1990s, are very ugly and have limited functionality.
 
