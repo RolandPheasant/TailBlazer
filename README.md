@@ -1,17 +1,16 @@
 # Tail Blazer
 
-[![Join the chat at https://gitter.im/RolandPheasant/TailBlazer](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/RolandPheasant/TailBlazer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build status](https://ci.appveyor.com/api/projects/status/yot4rioy393j52eg?svg=true)](https://ci.appveyor.com/project/RolandPheasant/tailblazer) [![GitHub issues](https://img.shields.io/github/issues/RolandPheasant/TailBlazer.svg)](https://github.com/RolandPheasant/TailBlazer/issues) 
+[![Join the chat at https://gitter.im/RolandPheasant/TailBlazer](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/RolandPheasant/TailBlazer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build status](https://ci.appveyor.com/api/projects/status/yot4rioy393j52eg?svg=true)](https://ci.appveyor.com/project/RolandPheasant/tailblazer) [![GitHub issues](https://img.shields.io/github/issues/RolandPheasant/TailBlazer.svg)](https://github.com/RolandPheasant/TailBlazer/issues) [![Open Source Helpers](https://www.codetriage.com/rolandpheasant/tailblazer/badges/users.svg)](https://www.codetriage.com/rolandpheasant/tailblazer)
 
 [![](https://img.shields.io/github/downloads/RolandPheasant/TailBlazer/total.svg)](https://github.com/RolandPheasant/TailBlazer/releases) [![](https://img.shields.io/chocolatey/dt/tailblazer.svg)](https://chocolatey.org/packages/tailblazer) [![](https://img.shields.io/chocolatey/v/tailblazer.svg)](https://chocolatey.org/packages/tailblazer)
 
-
 In my day to day professional life I am always tailing log files but have always been disappointed with the utilities on offer. The current crop of free ones all look like they were written in the 1990s, are very ugly and have limited functionality.
 
-So I have decided to rectify this by creating a more modern version.  The mission statement is:  
+So I have decided to rectify this by creating a more modern version.  The mission statement is:
 
 >It has to be fast, intuitive, functionally rich and the code has to be 100% reactive.
 
-After several months of sacrificing my free time, Tail Blazer is finally begining to have a polished feel to it:  
+After several months of sacrificing my free time, Tail Blazer is finally begining to have a polished feel to it:
 
 ![Tail Blazer](Images//Release%20v0.9/Search%20and%20highlight.gif)
 
@@ -36,7 +35,7 @@ And I believe now that it is begining to look good.
  - Handle extemely large files (I have opened a 45 Gb file)
  - Dark and light theme
  - Remembers all your settings
- 
+
 ## Future feature list
 
  - Conditional Alerts
@@ -47,7 +46,7 @@ And I believe now that it is begining to look good.
 
 ## Feature requests and any other issues
 
-Feel free to get involved by reporting issues and submitting a feature request. Feedback is welcome and and is required to make this a first class system. But before raising an issue check out [issues](https://github.com/RolandPheasant/TailBlazer/issues) to see whether one has already been raised.  
+Feel free to get involved by reporting issues and submitting a feature request. Feedback is welcome and and is required to make this a first class system. But before raising an issue check out [issues](https://github.com/RolandPheasant/TailBlazer/issues) to see whether one has already been raised.
 
 ## Download Tail Blazer
 
@@ -71,7 +70,7 @@ Text too small? Then zoom.
 
 ![Zoom](Images/Zoom.gif)
 
-Don't like new line highlight? Turn it off. 
+Don't like new line highlight? Turn it off.
 
 ![Zoom](Images/NoHighlight.gif)
 
