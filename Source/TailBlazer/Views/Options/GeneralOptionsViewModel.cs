@@ -61,7 +61,7 @@ namespace TailBlazer.Views.Options
 
             ScaleText = this.WhenValueChanged(vm => vm.Scale)
                                         .DistinctUntilChanged()
-                                        .Select(value => $"{value} %" )
+                                        .Select(value => $"{(uint)value} %" )
                                         .ForBinding();
             
             ScaleRatio = this.WhenValueChanged(vm => vm.Scale)
