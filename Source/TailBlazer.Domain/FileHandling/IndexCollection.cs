@@ -67,36 +67,34 @@ namespace TailBlazer.Domain.FileHandling
 
             var offset = relativeIndex.LinesOffset;
 
-            using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            using var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite);
+            using (var reader = new StreamReaderExtended(stream, Encoding, false))
             {
-                using (var reader = new StreamReaderExtended(stream, Encoding, false))
+                //go to starting point
+                stream.Seek(relativeIndex.Start, SeekOrigin.Begin);
+                if (offset > 0)
                 {
-                    //go to starting point
-                    stream.Seek(relativeIndex.Start, SeekOrigin.Begin);
-                    if (offset > 0)
-                    {
-                        //skip number of lines offset
-                        for (int i = 0; i < offset; i++)
-                            reader.ReadLine();
-                    }
-
-                    //if estimate move to the next start of line
-                    if (relativeIndex.IsEstimate && relativeIndex.Start != 0)
+                    //skip number of lines offset
+                    for (int i = 0; i < offset; i++)
                         reader.ReadLine();
+                }
 
-                    foreach (var i in Enumerable.Range(page.Start, page.Size))
-                    {
-                        var startPosition = reader.AbsolutePosition();
-                        var line = reader.ReadLine();
-                        var endPosition = reader.AbsolutePosition();
-                        var info = new LineInfo(i + 1, i, startPosition, endPosition);
+                //if estimate move to the next start of line
+                if (relativeIndex.IsEstimate && relativeIndex.Start != 0)
+                    reader.ReadLine();
 
-                        var ontail = startPosition >= TailInfo.TailStartsAt && DateTime.UtcNow.Subtract(TailInfo.LastTail).TotalSeconds < 1
-                            ? DateTime.UtcNow
-                            : (DateTime?)null;
+                foreach (var i in Enumerable.Range(page.Start, page.Size))
+                {
+                    var startPosition = reader.AbsolutePosition();
+                    var line = reader.ReadLine();
+                    var endPosition = reader.AbsolutePosition();
+                    var info = new LineInfo(i + 1, i, startPosition, endPosition);
 
-                        yield return new Line(info, line, ontail);
-                    }
+                    var ontail = startPosition >= TailInfo.TailStartsAt && DateTime.UtcNow.Subtract(TailInfo.LastTail).TotalSeconds < 1
+                        ? DateTime.UtcNow
+                        : (DateTime?)null;
+
+                    yield return new Line(info, line, ontail);
                 }
             }
         }

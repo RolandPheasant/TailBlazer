@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace TailBlazer.Views.Searching
 {
-    public class SearchHintMessage: INotifyPropertyChanged
+    public sealed  class SearchHintMessage: INotifyPropertyChanged
     {
         //implemented to prevent memory leaks
         public event PropertyChangedEventHandler PropertyChanged;

@@ -341,7 +341,7 @@
                           Height="5" 
                           ResizeDirection="Rows"
                           Visibility="{Binding Path=DataContext.InlineViewerVisible.Value, ElementName=Control,Converter={StaticResource BooleanToVisibilityConverter}}"
-                          Background="{StaticResource PrimaryHueMidBrush}"
+                          Background="{DynamicResource PrimaryHueMidBrush}"
                           BorderThickness="1" HorizontalAlignment="Stretch"/>
 
 
@@ -349,13 +349,13 @@
                     ContentTemplate="{StaticResource LinesDataTemplate}"
                     Content="{Binding InlineViewer,Mode=OneWay}" />
 
-                <Grid    Grid.Row="4" Margin = "0 0 0 -4"   Background="{StaticResource PrimaryHueMidBrush}">
+                <Grid    Grid.Row="4" Margin = "0 0 0 -4"   Background="{DynamicResource PrimaryHueMidBrush}">
 
                     <Grid.Resources>
                         <Style TargetType="{x:Type TextBlock}">
                             <Setter Property="Opacity" Value="0.76"/>
                             <Setter Property="VerticalAlignment" Value="Center"/>
-                            <Setter Property="Foreground" Value="{StaticResource PrimaryHueMidForegroundBrush}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}"/>
                         </Style>
                     </Grid.Resources>
 
@@ -370,7 +370,7 @@
                     <StackPanel Grid.Column="1" Margin="4 2 6 2"
                          Orientation="Horizontal" 
                          Visibility="Visible"       
-                                
+                         TextElement.Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"
                          HorizontalAlignment="Left">
 
                         <wpf:PopupBox 
@@ -378,7 +378,7 @@
                                 PopupMode="Click"
                                 PlacementMode="TopAndAlignLeftEdges">
                             <wpf:PopupBox.ToggleContent>
-                                <TextBlock FontSize="10" Text="{Binding Name}"/>
+                                <TextBlock FontSize="10" Text="{Binding Name}" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"/>
                             </wpf:PopupBox.ToggleContent>
                             
                             
@@ -456,10 +456,12 @@
                         <TextBlock  
                             Margin="4 0 0 0"
                             Text="{Binding  CountText.Value, StringFormat='\{0}.'}"
+                            Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"
                             VerticalAlignment="Center"/>
 
 
-                        <TextBlock Margin="6 0 0 0" Text="{Binding FileSizeText.Value}" />
+                        <TextBlock Margin="6 0 0 0" Text="{Binding FileSizeText.Value}" 
+                                   Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"/>
 
                     </StackPanel>
 
@@ -472,7 +474,7 @@
                         <Button Width="22" Height="22"
                                 Margin="4 0 0 0" 
                                 Padding="0"
-                                Foreground="White"
+                                Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"
                                 Opacity="0.76"
                                 ToolTip="Un-clear to monitor entire file"
                                 Style="{StaticResource MaterialDesignFlatButton}" 
@@ -485,7 +487,7 @@
                                  Padding="0"
                                  Opacity="0.76"
                                  ToolTip="Clear to monitor tail only"
-                                 Foreground="White"
+                                 Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"
                                 Style="{StaticResource MaterialDesignFlatButton}" 
                                 Command="{Binding ClearCommand}">
                             <wpf:PackIcon Kind="Eraser" Width="16" Height="16"/>
