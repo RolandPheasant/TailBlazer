@@ -82,7 +82,6 @@ For me to produce this application I have used several community led open source
  - [Dynamic Data](https://github.com/RolandPheasant/DynamicData) Rx based collections developed by me.
  - [Material Design ToolKit](https://github.com/ButchersBoy/MaterialDesignInXamlToolkit) by my friend and work colleage ButchersBoy. This brings WPF into the 21st century.
  - [Dragablz](https://github.com/ButchersBoy/Dragablz)  also by ButchersBoy. I think he is showing off now.
- - [MahApps](https://github.com/MahApps/MahApps.Metro) which was the first open source project to make WPF truly modern.
  - [Structure Map](https://github.com/structuremap/structuremap) which is a dependency injection library which defines what a good API is all about.
 
 I have used more projects than these but these are the ones which I feel to be indispensable for any desk top project.

@@ -47,7 +47,7 @@ namespace TailBlazer.Views.Formatting
             yield return new DefaultIcons("INFO", PackIconKind.InformationOutline.ToString());
             yield return new DefaultIcons("WARN", PackIconKind.AlertOutline.ToString());
             yield return new DefaultIcons("WARNING", PackIconKind.AlertOutline.ToString());
-            yield return new DefaultIcons("ERROR", PackIconKind.SquareInc.ToString());
+            yield return new DefaultIcons("ERROR", PackIconKind.SquareRootBox.ToString());
             yield return new DefaultIcons("FATAL", PackIconKind.ExitToApp.ToString());
 
             yield return new DefaultIcons("BANK", PackIconKind.Bank.ToString());

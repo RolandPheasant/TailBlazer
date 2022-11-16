@@ -1,8 +1,7 @@
-﻿<controls:MetroWindow
+﻿<controls1:TailBlazerWindow
     x:Class="TailBlazer.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:controls1="clr-namespace:TailBlazer.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dockablz="clr-namespace:Dragablz.Dockablz;assembly=Dragablz"
@@ -21,25 +20,21 @@
     d:DataContext="{d:DesignInstance windowManagement:WindowViewModel,
                                      IsDesignTimeCreatable=False}"
     infrastucture:WindowAssist.ApplicationClosing="{Binding WindowExiting}"
-    Background="{DynamicResource MaterialDesignPaper}"
+    Background="#FF37474F"
     FontFamily="{StaticResource MaterialDesignFont}"
-    GlowBrush="{DynamicResource AccentColorBrush3}"
-    NonActiveWindowTitleBrush="{DynamicResource WindowTitleColorBrush}"
-    SaveWindowPosition="False"
     TextElement.FontSize="12"
     TextElement.FontWeight="Regular"
     TextElement.Foreground="{DynamicResource MaterialDesignBody}"
     TextOptions.TextFormattingMode="Ideal"
     TextOptions.TextRenderingMode="Auto"
     WindowStartupLocation="CenterScreen"
-    WindowTitleBrush="{DynamicResource WindowTitleColorBrush}"
-    WindowTransitionsEnabled="False"
+    FadeContentIfInactive="False"
+ 
     mc:Ignorable="d">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/controls.buttons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToggleButton.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Font.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/MaterialDesign.xaml" />
@@ -75,9 +70,45 @@
         <KeyBinding Key="F8" Command="{Binding CollectMemoryCommand}" />
     </Window.InputBindings>
 
-    <controls:MetroWindow.RightWindowCommands>
-        <controls:WindowCommands>
-            <StackPanel Orientation="Horizontal">
+
+    <tailBlazer:MainWindow.LeftHeaderContent>
+        <StackPanel Orientation="Horizontal" >
+            <StackPanel.Resources>
+                <ResourceDictionary>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource WindowButtonStyle}">
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="ToolTipService.ShowOnDisabled" Value="True"/>
+
+                    </Style>
+                </ResourceDictionary>
+            </StackPanel.Resources>
+
+            <ToggleButton
+                    x:Name="MenuToggleButton"
+                    Width="24"
+                    Height="24"
+                    IsChecked="{Binding MenuIsOpen}"
+                    Cursor="Hand"
+                    Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
+
+            <Button Command="{Binding ShowInGitHubCommand}" 
+                    ToolTip="Tail Blazer on GitHub" >
+
+                <Path Width="22" Height="22"
+                        Data="F1 M 32.415,38.1721C 32.415,39.9319 31.4232,41.3581 30.2009,41.3581C 28.9778,41.3581 27.9872,39.9319 27.9872,38.1721C 27.9872,36.4115 28.9778,34.9845 30.2009,34.9845C 31.4232,34.9845 32.415,36.4115 32.415,38.1721 Z M 50.2302,38.1721C 50.2302,39.9319 49.2388,41.3581 48.0161,41.3581C 46.7938,41.3581 45.8024,39.9319 45.8024,38.1721C 45.8024,36.4115 46.7938,34.9845 48.0161,34.9845C 49.2388,34.9845 50.2302,36.4115 50.2302,38.1721 Z M 39.6652,42.3574C 39.6652,42.816 39.2933,43.1879 38.8346,43.1879C 38.3756,43.1879 38.0041,42.816 38.0041,42.3574C 38.0041,41.8987 38.3756,41.5268 38.8346,41.5268C 39.2933,41.5268 39.6652,41.8987 39.6652,42.3574 Z M 36.8997,44.457C 36.8507,44.3176 36.924,44.1655 37.0625,44.1166C 37.2015,44.0672 37.3544,44.1404 37.4034,44.279C 37.6168,44.8822 38.1889,45.2875 38.8276,45.2875C 39.4662,45.2875 40.0383,44.8822 40.2521,44.279C 40.3011,44.1397 40.4536,44.0672 40.593,44.1166C 40.7319,44.1655 40.8044,44.3176 40.7554,44.457C 40.4667,45.2728 39.6915,45.8211 38.8276,45.8211C 37.9636,45.8211 37.1892,45.2728 36.8997,44.457 Z M 71.9887,40.9911C 66.0857,39.8105 62.6635,39.8089 59.0383,39.9638C 58.9069,40.4022 58.7592,40.8286 58.5896,41.2383C 62.1674,41.3426 65.8607,42.8405 71.9234,44.5506L 71.851,44.8074C 65.7536,43.087 62.0181,41.5998 58.4761,41.5027C 56.6876,45.5599 52.8072,48.171 44.7207,48.9728C 46.1079,49.9145 47.5265,51.6986 47.5265,55.0674L 47.5265,63.7061C 47.5265,63.7061 47.7045,65.8438 49.6642,66.5561C 49.6642,66.5561 50.8212,67.3579 49.5746,67.8027C 49.5746,67.8027 44.1422,68.2482 44.1422,63.7953L 44.1422,57.205C 44.1422,57.205 44.3568,54.7755 43.0736,53.7761L 43.0736,64.5076C 43.0736,64.5076 43.1624,67.0904 44.4982,68.0702C 44.4982,68.0702 45.3884,69.6728 43.4299,69.2281C 43.4299,69.2281 39.6893,68.6937 39.5113,64.3296L 39.4257,53.3752L 38.5271,53.3752L 38.4419,64.3296C 38.2635,68.6937 34.5232,69.2281 34.5232,69.2281C 32.5639,69.6728 33.4546,68.0702 33.4546,68.0702C 34.7908,67.0904 34.8792,64.5076 34.8792,64.5076L 34.8792,53.683C 33.5959,54.5912 33.8109,57.205 33.8109,57.205L 33.8109,63.7953C 33.8109,68.2482 28.3782,67.8027 28.3782,67.8027C 27.1311,67.3579 28.289,66.5561 28.289,66.5561C 30.2487,65.8438 30.4266,63.7061 30.4266,63.7061L 30.4266,57.6621C 22.0125,59.5394 20.269,53.6886 20.269,53.6886C 18.9328,50.2581 16.995,49.3451 16.995,49.3451C 14.3003,47.4969 17.1952,47.5411 17.1952,47.5411C 20.1798,47.7644 21.739,50.6152 21.739,50.6152C 24.5244,55.4062 29.1669,53.6937 30.6333,52.9926C 31.0788,50.9122 32.1761,49.6827 33.2527,48.9597C 25.6699,48.1423 21.4077,45.5396 19.2457,41.5099C 15.6623,41.6193 9.43005,43.6522 3.46254,45.3352L 3.39007,45.0784C 9.31101,43.4081 15.4887,41.3637 19.1072,41.2471C 18.8957,40.8286 18.707,40.3954 18.5378,39.9491C 14.8784,39.8105 9.02832,39.3226 3.32478,40.4633L 3.27222,40.2013C 8.94192,39.0674 14.7557,39.5438 18.4375,39.6776C 17.6682,37.5212 17.3529,35.0403 17.3529,32.2743C 17.3529,28.6109 18.6772,25.6228 20.8463,23.282C 20.4995,22.4335 19.3584,19.017 21.2042,14.4024C 21.2042,14.4024 24.0311,13.5074 30.4358,17.8771C 33.1225,17.1401 36.0032,16.777 38.854,16.777C 41.4451,16.777 44.0323,17.0768 46.4635,17.6844C 52.6691,13.5312 55.4123,14.4024 55.4123,14.4024C 56.9679,18.2912 56.4017,21.3295 55.9777,22.6971C 58.4029,25.1175 59.8967,28.2983 59.8967,32.2743C 59.8967,35.0466 59.7164,37.5327 59.1168,39.6931C 62.767,39.5414 66.1618,39.5533 72.0417,40.7291L 71.9887,40.9911 Z M 51.9869,32.0871C 49.1134,29.4859 44.2751,30.8866 38.7877,30.8866C 33.2785,30.8866 28.4218,29.4999 25.5527,32.1189C 23.8323,33.6904 22.8274,35.584 22.8274,37.6234C 22.8274,46.1414 29.9726,47.4689 38.7877,47.4689C 47.6017,47.4689 54.7477,47.2089 54.7477,37.6234C 54.7477,35.5705 53.7288,33.6649 51.9869,32.0871 Z "
+                        Fill="{DynamicResource  MaterialDesignBody}"
+                        Stretch="Uniform" />
+            </Button>
+
+            <Button Command="{Binding OpenFileCommand}"
+                    ToolTip="Open file">
+                <controls1:FileIcon Width="16" Height="16"/>
+            </Button>
+        </StackPanel>
+    </tailBlazer:MainWindow.LeftHeaderContent>
+
+    <tailBlazer:MainWindow.RightHeaderContent>
+            <StackPanel Orientation="Horizontal" >
                 <TextBlock
                     VerticalAlignment="Center"
                     Opacity="0.6"
@@ -106,58 +137,18 @@
 
                 </materialDesign:PopupBox>
             </StackPanel>
-        </controls:WindowCommands>
-    </controls:MetroWindow.RightWindowCommands>
+    </tailBlazer:MainWindow.RightHeaderContent>
 
-    <controls:MetroWindow.LeftWindowCommands>
-        <controls:WindowCommands>
-            <StackPanel Orientation="Horizontal">
-
-                <ToggleButton
-                    x:Name="MenuToggleButton"
-                    Width="24"
-                    Height="24"
-                    IsChecked="{Binding MenuIsOpen}"
-                    Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
-
-                <Button Command="{Binding ShowInGitHubCommand}" ToolTip="Tail Blazer on GitHub">
-                    <Rectangle
-                        Width="22"
-                        Height="22"
-                        Fill="White">
-                        <Rectangle.OpacityMask>
-                            <VisualBrush Stretch="Uniform">
-                                <VisualBrush.Visual>
-                                    <Canvas
-                                        Width="76"
-                                        Height="76"
-                                        Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
-                                        <Path
-                                            Canvas.Left="3.27222"
-                                            Canvas.Top="14.3263"
-                                            Data="F1 M 32.415,38.1721C 32.415,39.9319 31.4232,41.3581 30.2009,41.3581C 28.9778,41.3581 27.9872,39.9319 27.9872,38.1721C 27.9872,36.4115 28.9778,34.9845 30.2009,34.9845C 31.4232,34.9845 32.415,36.4115 32.415,38.1721 Z M 50.2302,38.1721C 50.2302,39.9319 49.2388,41.3581 48.0161,41.3581C 46.7938,41.3581 45.8024,39.9319 45.8024,38.1721C 45.8024,36.4115 46.7938,34.9845 48.0161,34.9845C 49.2388,34.9845 50.2302,36.4115 50.2302,38.1721 Z M 39.6652,42.3574C 39.6652,42.816 39.2933,43.1879 38.8346,43.1879C 38.3756,43.1879 38.0041,42.816 38.0041,42.3574C 38.0041,41.8987 38.3756,41.5268 38.8346,41.5268C 39.2933,41.5268 39.6652,41.8987 39.6652,42.3574 Z M 36.8997,44.457C 36.8507,44.3176 36.924,44.1655 37.0625,44.1166C 37.2015,44.0672 37.3544,44.1404 37.4034,44.279C 37.6168,44.8822 38.1889,45.2875 38.8276,45.2875C 39.4662,45.2875 40.0383,44.8822 40.2521,44.279C 40.3011,44.1397 40.4536,44.0672 40.593,44.1166C 40.7319,44.1655 40.8044,44.3176 40.7554,44.457C 40.4667,45.2728 39.6915,45.8211 38.8276,45.8211C 37.9636,45.8211 37.1892,45.2728 36.8997,44.457 Z M 71.9887,40.9911C 66.0857,39.8105 62.6635,39.8089 59.0383,39.9638C 58.9069,40.4022 58.7592,40.8286 58.5896,41.2383C 62.1674,41.3426 65.8607,42.8405 71.9234,44.5506L 71.851,44.8074C 65.7536,43.087 62.0181,41.5998 58.4761,41.5027C 56.6876,45.5599 52.8072,48.171 44.7207,48.9728C 46.1079,49.9145 47.5265,51.6986 47.5265,55.0674L 47.5265,63.7061C 47.5265,63.7061 47.7045,65.8438 49.6642,66.5561C 49.6642,66.5561 50.8212,67.3579 49.5746,67.8027C 49.5746,67.8027 44.1422,68.2482 44.1422,63.7953L 44.1422,57.205C 44.1422,57.205 44.3568,54.7755 43.0736,53.7761L 43.0736,64.5076C 43.0736,64.5076 43.1624,67.0904 44.4982,68.0702C 44.4982,68.0702 45.3884,69.6728 43.4299,69.2281C 43.4299,69.2281 39.6893,68.6937 39.5113,64.3296L 39.4257,53.3752L 38.5271,53.3752L 38.4419,64.3296C 38.2635,68.6937 34.5232,69.2281 34.5232,69.2281C 32.5639,69.6728 33.4546,68.0702 33.4546,68.0702C 34.7908,67.0904 34.8792,64.5076 34.8792,64.5076L 34.8792,53.683C 33.5959,54.5912 33.8109,57.205 33.8109,57.205L 33.8109,63.7953C 33.8109,68.2482 28.3782,67.8027 28.3782,67.8027C 27.1311,67.3579 28.289,66.5561 28.289,66.5561C 30.2487,65.8438 30.4266,63.7061 30.4266,63.7061L 30.4266,57.6621C 22.0125,59.5394 20.269,53.6886 20.269,53.6886C 18.9328,50.2581 16.995,49.3451 16.995,49.3451C 14.3003,47.4969 17.1952,47.5411 17.1952,47.5411C 20.1798,47.7644 21.739,50.6152 21.739,50.6152C 24.5244,55.4062 29.1669,53.6937 30.6333,52.9926C 31.0788,50.9122 32.1761,49.6827 33.2527,48.9597C 25.6699,48.1423 21.4077,45.5396 19.2457,41.5099C 15.6623,41.6193 9.43005,43.6522 3.46254,45.3352L 3.39007,45.0784C 9.31101,43.4081 15.4887,41.3637 19.1072,41.2471C 18.8957,40.8286 18.707,40.3954 18.5378,39.9491C 14.8784,39.8105 9.02832,39.3226 3.32478,40.4633L 3.27222,40.2013C 8.94192,39.0674 14.7557,39.5438 18.4375,39.6776C 17.6682,37.5212 17.3529,35.0403 17.3529,32.2743C 17.3529,28.6109 18.6772,25.6228 20.8463,23.282C 20.4995,22.4335 19.3584,19.017 21.2042,14.4024C 21.2042,14.4024 24.0311,13.5074 30.4358,17.8771C 33.1225,17.1401 36.0032,16.777 38.854,16.777C 41.4451,16.777 44.0323,17.0768 46.4635,17.6844C 52.6691,13.5312 55.4123,14.4024 55.4123,14.4024C 56.9679,18.2912 56.4017,21.3295 55.9777,22.6971C 58.4029,25.1175 59.8967,28.2983 59.8967,32.2743C 59.8967,35.0466 59.7164,37.5327 59.1168,39.6931C 62.767,39.5414 66.1618,39.5533 72.0417,40.7291L 71.9887,40.9911 Z M 51.9869,32.0871C 49.1134,29.4859 44.2751,30.8866 38.7877,30.8866C 33.2785,30.8866 28.4218,29.4999 25.5527,32.1189C 23.8323,33.6904 22.8274,35.584 22.8274,37.6234C 22.8274,46.1414 29.9726,47.4689 38.7877,47.4689C 47.6017,47.4689 54.7477,47.2089 54.7477,37.6234C 54.7477,35.5705 53.7288,33.6649 51.9869,32.0871 Z "
-                                            Fill="{DynamicResource BlackBrush}"
-                                            Stretch="Uniform" />
-                                    </Canvas>
-                                </VisualBrush.Visual>
-                            </VisualBrush>
-                        </Rectangle.OpacityMask>
-                    </Rectangle>
-                </Button>
-
-                <Button
-                    Command="{Binding OpenFileCommand}"
-                    ToolTip="Open file"
-                    ToolTipService.ShowOnDisabled="True">
-                    <controls1:FileIcon
-                        Width="14"
-                        Height="14"
-                        Foreground="White" />
-                </Button>
-            </StackPanel>
+    <!--<controls:MetroWindow.RightWindowCommands>
 
         </controls:WindowCommands>
-    </controls:MetroWindow.LeftWindowCommands>
+    </controls:MetroWindow.RightWindowCommands>-->
+
+    <!--<mde:MaterialWindow.TitleTemplate>
+
+    </mde:MaterialWindow.TitleTemplate>-->
+
+
 
 
     <AdornerDecorator>
@@ -171,7 +162,7 @@
                 <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
                     <materialDesign:DrawerHost.LeftDrawerContent>
 
-                        <Grid>
+                        <Grid TextElement.Foreground="{DynamicResource  MaterialDesignBody}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
@@ -222,7 +213,7 @@
                                 Width="50"
                                 Height="50"
                                 BorderThickness="0"
-                                Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                                Foreground="{DynamicResource  PrimaryHueMidBrush}" />
                             <TextBlock
                                 Margin="0,4,0,0"
                                 HorizontalAlignment="Center"
@@ -235,4 +226,4 @@
             </Grid>
         </materialDesign:DialogHost>
     </AdornerDecorator>
-</controls:MetroWindow>
+</controls1:TailBlazerWindow>

@@ -14,12 +14,6 @@ namespace System.Collections
             yield return source;
         }
 
-        public static HashSet<T> ToHashSet<T>([NotNull] this IEnumerable<T> source)
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            return new HashSet<T>(source);
-        }
-
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));

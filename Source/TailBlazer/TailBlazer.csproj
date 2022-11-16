@@ -1,396 +1,45 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EBF74AA2-F4C2-4AE9-A6CF-33F3414893B7}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TailBlazer</RootNamespace>
-    <AssemblyName>TailBlazer</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>TailBlazer.BootStrap</StartupObject>
-  </PropertyGroup>
-  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
     <ApplicationIcon>tailblazer.ico</ApplicationIcon>
+    
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dragablz, Version=0.0.3.197, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dragablz.0.0.3.197\lib\net45\Dragablz.dll</HintPath>
-    </Reference>
-    <Reference Include="DynamicData, Version=6.2.0.2388, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DynamicData.6.2.0.2388\lib\net45\DynamicData.dll</HintPath>
-    </Reference>
-    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="MahApps.Metro, Version=1.5.0.23, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.1.5.0\lib\net45\MahApps.Metro.dll</HintPath>
-    </Reference>
-    <Reference Include="MaterialDesignColors, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignColors.1.1.2\lib\net45\MaterialDesignColors.dll</HintPath>
-    </Reference>
-    <Reference Include="MaterialDesignThemes.Wpf, Version=2.1.0.657, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignThemes.2.1.0.657\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
-    </Reference>
-    <Reference Include="StructureMap, Version=4.5.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\StructureMap.4.5.3\lib\net45\StructureMap.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Reactive.Core, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reactive.Core.3.1.1\lib\net45\System.Reactive.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Interfaces, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reactive.Interfaces.3.1.1\lib\net45\System.Reactive.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Linq, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reactive.Linq.3.1.1\lib\net45\System.Reactive.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.PlatformServices, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reactive.PlatformServices.3.1.1\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Windows.Threading, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reactive.Windows.Threading.3.1.1\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Windows" />
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.1.5.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
+    <None Remove="tailblazer.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Compile Include="Controls\ExitIcon.cs" />
-    <Compile Include="Controls\FilterIcon.cs" />
-    <Compile Include="Controls\ListboxItemHighlightAssist.cs" />
-    <Compile Include="Infrastucture\ISelectedAware.cs" />
-    <Compile Include="Infrastucture\Virtualisation\LineScrollDelegate.cs" />
-    <Compile Include="Infrastucture\Virtualisation\LinesScrollPanel.cs" />
-    <Compile Include="Controls\RegexIcon.cs" />
-    <Compile Include="Controls\RegexMatchedIcon.cs" />
-    <Compile Include="Controls\SaveLayoutIcon.cs" />
-    <Compile Include="Controls\SearchIcon.cs" />
-    <Compile Include="Controls\SearchResultIndicator.cs" />
-    <Compile Include="Controls\TextMatchedIcon.cs" />
-    <Compile Include="DialogNames.cs" />
-    <Compile Include="Infrastucture\AppState\ApplicationState.cs" />
-    <Compile Include="Infrastucture\AppState\ApplicationStateBroker.cs" />
-    <Compile Include="Infrastucture\AppState\IApplicationStatePublisher.cs" />
-    <Compile Include="Infrastucture\CheckedToLengthConverter.cs" />
-    <Compile Include="Infrastucture\ClipboardHandler.cs" />
-    <Compile Include="Infrastucture\FileHeader.cs" />
-    <Compile Include="Controls\HighlightTextControl.cs" />
-    <Compile Include="Infrastucture\IClipboardHandler.cs" />
-    <Compile Include="Infrastucture\IAttachedListBox.cs" />
-    <Compile Include="Infrastucture\IViewFactoryProvider.cs" />
-    <Compile Include="Infrastucture\ListBoxHelper.cs" />
-    <Compile Include="Infrastucture\LogFactory.cs" />
-    <Compile Include="Infrastucture\FileNamer.cs" />
-    <Compile Include="Infrastucture\MouseWheelGesture.cs" />
-    <Compile Include="Infrastucture\SelectionMonitor.cs" />
-    <Compile Include="Infrastucture\StartupController.cs" />
-    <Compile Include="Infrastucture\Virtualisation\TextScrollEx.cs" />
-    <Compile Include="Infrastucture\Virtualisation\TextScrollInfo.cs" />
-    <Compile Include="Infrastucture\UhandledExceptionHandler.cs" />
-    <Compile Include="Infrastucture\IViewFactoryRegister.cs" />
-    <Compile Include="Infrastucture\ViewFactoryService.cs" />
-    <Compile Include="Infrastucture\Virtualisation\VirtualizingWrapPanel.cs" />
-    <Compile Include="Infrastucture\WindowAssist.cs" />
-    <Compile Include="Infrastucture\KeyboardNavigation\IKeyboardNavigationHandler.cs" />
-    <Compile Include="Infrastucture\KeyboardNavigation\IPageProvider.cs" />
-    <Compile Include="Infrastucture\KeyboardNavigation\KeyboardNavigationHandler.cs" />
-    <Compile Include="Infrastucture\KeyboardNavigation\KeyboardNavigationType.cs" />
-    <Compile Include="Views\DialogServices\IDialogCoordinator.cs" />
-    <Compile Include="Views\DialogServices\IDialogViewModel.cs" />
-    <Compile Include="Views\Formatting\DefaultColourSelector.cs" />
-    <Compile Include="Views\Formatting\IconDescription.cs" />
-    <Compile Include="Views\Formatting\IIconProvider.cs" />
-    <Compile Include="Views\Formatting\DefaultIconSelector.cs" />
-    <Compile Include="Views\Formatting\SystemSetterJob.cs" />
-    <Compile Include="Views\IViewFactory.cs" />
-    <Compile Include="Views\Layout\ILayoutConverter.cs" />
-    <Compile Include="Views\Layout\ILayoutService.cs" />
-    <Compile Include="Views\Layout\LayoutService.cs" />
-    <Compile Include="Views\Layout\LayoutConverter.cs" />
-    <Compile Include="Views\Layout\ShellSettings.cs" />
-    <Compile Include="Views\Options\GeneralOptionsView.xaml.cs">
-      <DependentUpon>GeneralOptionsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Options\GeneralOptionsViewModel.cs" />
-    <Compile Include="Views\Formatting\ColourProvider.cs" />
-    <Compile Include="Views\Formatting\IconProvider.cs" />
-    <Compile Include="Views\Searching\GlobalSearchOptions.cs" />
-    <Compile Include="Views\Searching\IconSelector.cs" />
-    <Compile Include="Views\Searching\IconSelectorView.xaml.cs">
-      <DependentUpon>IconSelectorView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Searching\IRecentSearchCollection.cs" />
-    <Compile Include="Views\Recent\RecentSearch.cs" />
-    <Compile Include="Views\Recent\RecentSearchCollection.cs" />
-    <Compile Include="Views\Recent\RecentFilesToStateConverter.cs" />
-    <Compile Include="Views\Searching\ISearchProxyCollection.cs" />
-    <Compile Include="Views\Searching\ISearchProxyCollectionFactory.cs" />
-    <Compile Include="Views\Searching\IsGlobalToIconConverter.cs" />
-    <Compile Include="Views\Searching\SearchHintMessage.cs" />
-    <Compile Include="Views\Searching\SearchOptionsProxy.cs" />
-    <Compile Include="Views\Searching\SearchOptionsView.xaml.cs">
-      <DependentUpon>SearchOptionsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Searching\SearchOptionsViewModel.cs" />
-    <Compile Include="Views\FileDrop\FileDropContainer.cs" />
-    <Compile Include="Views\FileDrop\FileDropMonitor.cs" />
-    <Compile Include="Views\Searching\SearchProxyCollection.cs" />
-    <Compile Include="Views\Searching\SearchProxyCollectionFactory.cs" />
-    <Compile Include="Views\DialogServices\DialogCoordinator.cs" />
-    <Compile Include="Views\Tail\GeneralOptionBindings.cs" />
-    <Compile Include="Views\Tail\ILinesVisualisation.cs" />
-    <Compile Include="Views\Searching\ISearchStateToMetadataMapper.cs" />
-    <Compile Include="Views\Tail\ITailViewStateControllerFactory.cs" />
-    <Compile Include="Views\Tail\ITailViewStateRestorer.cs" />
-    <Compile Include="Views\Tail\LineMatchProxy.cs" />
-    <Compile Include="Views\Searching\SearchState.cs" />
-    <Compile Include="Views\Searching\SearchStateToMetadataMapper.cs" />
-    <Compile Include="Views\Searching\SearchMetadataToStateConverter.cs" />
-    <Compile Include="Views\Tail\TailViewModelConstants.cs" />
-    <Compile Include="Views\Tail\TailViewPersister.cs" />
-    <Compile Include="Views\Tail\TailViewState.cs" />
-    <Compile Include="Views\Tail\TailViewStateController.cs" />
-    <Compile Include="Views\Tail\TailViewStateControllerFactory.cs" />
-    <Compile Include="Views\Tail\TailViewStateRestorer.cs" />
-    <Compile Include="Views\Tail\TailViewToStateConverter.cs" />
-    <Compile Include="Views\WindowManagement\FileHeaderNamingJob.cs" />
-    <Compile Include="Controls\FileIcon.cs" />
-    <Compile Include="Infrastucture\SchedulerProvider.cs" />
-    <Compile Include="Infrastucture\SolidColorAnimation.cs" />
-    <Compile Include="Views\Tail\TailView.xaml.cs">
-      <DependentUpon>TailView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Tail\TailViewModel.cs" />
-    <Compile Include="Views\Tail\TailViewModelFactory.cs" />
-    <Compile Include="Controls\TextBlockFormatter.cs" />
-    <Compile Include="Views\Tail\IInlineViewerFactory.cs" />
-    <Compile Include="Views\Tail\ILineProxyFactory.cs" />
-    <Compile Include="Views\Tail\InlineViewer.cs" />
-    <Compile Include="Views\Tail\InlineViewerFactory.cs" />
-    <Compile Include="Infrastucture\Virtualisation\IScrollReceiver.cs" />
-    <Compile Include="Infrastucture\AppState\IApplicationStateNotifier.cs" />
-    <Compile Include="Views\WindowManagement\IViewOpener.cs" />
-    <Compile Include="Views\WindowManagement\IWindowsController.cs" />
-    <Compile Include="Views\Tail\LineProxy.cs" />
-    <Compile Include="Views\Tail\LineProxyFactory.cs" />
-    <Compile Include="Controls\OpenFileIcon.cs" />
-    <Compile Include="Views\Recent\RecentFileProxy.cs" />
-    <Compile Include="Views\Recent\RecentFilesView.xaml.cs">
-      <DependentUpon>RecentFilesView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Recent\RecentFilesViewModel.cs" />
-    <Compile Include="Controls\RemoveIcon.cs" />
-    <Compile Include="Infrastucture\Virtualisation\ScrollChangedArgs.cs" />
-    <Compile Include="Infrastucture\Virtualisation\ScrollDirection.cs" />
-    <Compile Include="Infrastucture\Virtualisation\ScrollBoundsArgs.cs" />
-    <Compile Include="Views\Searching\SearchHints.cs" />
-    <Compile Include="Views\Searching\SearchRequest.cs" />
-    <Compile Include="Views\Searching\SearchHintEx.cs" />
-    <Compile Include="Views\Searching\SearchViewModel.cs" />
-    <Compile Include="Controls\SettingsIcon.cs" />
-    <Compile Include="Controls\TailBlazerIcon.cs" />
-    <Compile Include="Views\Searching\SearchCollection.cs" />
-    <Compile Include="Infrastucture\Virtualisation\VirtualScrollPanel.cs" />
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Infrastucture\AppConventions.cs" />
-    <Compile Include="AppRegistry.cs" />
-    <Compile Include="Infrastucture\BooleanToVisibilityConverter.cs" />
-    <Compile Include="BootStrap.cs" />
-    <Compile Include="Infrastucture\Command.cs" />
-    <Compile Include="Infrastucture\DependencyObjectHook.cs" />
-    <Compile Include="Infrastucture\IntertabClient.cs" />
-    <Compile Include="Views\WindowManagement\IWindowFactory.cs" />
-    <Compile Include="Infrastucture\Log4NetLogger.cs" />
-    <Compile Include="Infrastucture\ObjectProvider.cs" />
-    <Compile Include="Infrastucture\HeaderedView.cs" />
-    <Compile Include="Views\WindowManagement\WindowFactory.cs" />
-    <Compile Include="Views\WindowManagement\WindowsController.cs" />
-    <Compile Include="Views\WindowManagement\WindowViewModel.cs" />
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="Themes\Dragable.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Lines.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\ListBox.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\SearchResultIndicator.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Options\GeneralOptionsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Searching\IconSelectorView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Searching\SearchOptionsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Buttons.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Colours.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Generic.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Themes\Icons.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\ProgressBar.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Themes\TextBoxes.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\ToggleButtons.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Tail\TailView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Recent\RecentFilesView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <Content Include="tailblazer.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
+    <EmbeddedResource Include="tailblazer.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ControlzEx" Version="5.0.2" />
+    <PackageReference Include="Dragablz" Version="0.0.3.234" />
+    <PackageReference Include="DynamicData" Version="7.12.1" />
+    <PackageReference Include="log4net" Version="2.0.15" />
+    <PackageReference Include="MaterialDesignExtensions" Version="3.3.0" />
+    <PackageReference Include="ReactiveUI.WPF" Version="18.3.1" />
+    <PackageReference Include="StructureMap" Version="4.7.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TailBlazer.Domain\TailBlazer.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <None Include="Log4Net.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Properties\Settings.settings">
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <AppDesigner Include="Properties\" />
-    <None Include="Resources\log4net.config" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TailBlazer.Domain\TailBlazer.Domain.csproj">
-      <Project>{332f8beb-1743-4b41-8953-a66a57f2503d}</Project>
-      <Name>TailBlazer.Domain</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="tailblazer.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="FodyWeavers.xml" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets" Condition="Exists('..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets'))" />
-  </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

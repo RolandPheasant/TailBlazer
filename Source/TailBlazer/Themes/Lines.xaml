@@ -4,7 +4,6 @@
     xmlns:controls="clr-namespace:TailBlazer.Controls"
     xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    xmlns:system="clr-namespace:System;assembly=mscorlib"
     xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
     xmlns:virtualisation="clr-namespace:TailBlazer.Infrastucture.Virtualisation">
 
@@ -19,7 +18,8 @@
     <DataTemplate DataType="{x:Type tail:LineProxy}">
         <Grid Margin="2,0,0,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
@@ -103,15 +103,16 @@
 
             </materialDesign:PopupBox>
 
-            <TextBlock Grid.Column="0"
-                       Opacity="0.5"
-                       TextAlignment="Right"
-                       VerticalAlignment="Center"
-                       Margin="8,0,0,0"
-                       Text="{Binding LineNumber.Value}"
-                       Visibility="{Binding Path=DataContext.GeneralOptionBindings.ShowLineNumbers.Value, ElementName=Control, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <TextBlock Grid.Column="1"
+                   Opacity="0.5"
+                   MinWidth="24" 
+                   TextAlignment="Right"
+                   VerticalAlignment="Center"
+                   Margin="8,0,0,0"
+                   Text="{Binding LineNumber.Value}"
+                   Visibility="{Binding Path=DataContext.GeneralOptionBindings.ShowLineNumbers.Value, ElementName=Control, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-            <Grid Grid.Column="1" Margin="16,0,0,0">
+            <Grid Grid.Column="2" Margin="8,0,0,0">
                 <controls:HighlightTextControl
                     VerticalAlignment="Center"
                     FormattedText="{Binding FormattedText.Value}"

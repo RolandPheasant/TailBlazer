@@ -109,7 +109,7 @@ namespace TailBlazer.Views.Options
         public double Scale
         {
             get { return _scale; }
-            set { SetAndRaise(ref _scale, value); }
+            set { SetAndRaise(ref _scale, (int)value); }
         }
 
         public bool OpenRecentOnStartup

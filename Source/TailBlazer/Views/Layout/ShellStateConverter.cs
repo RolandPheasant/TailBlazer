@@ -2,6 +2,7 @@
 using System.Windows;
 
 using System.Xml.Linq;
+using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 
 namespace TailBlazer.Views.Layout

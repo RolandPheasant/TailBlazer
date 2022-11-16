@@ -9,13 +9,13 @@ namespace TailBlazer.Domain.Infrastructure
     /// <typeparam name="T"></typeparam>
     internal class ImmutableArray<T>
     {
-        public static readonly ImmutableArray<T> Empty = new ImmutableArray<T>();
+        public static readonly ImmutableArray<T> Empty = new();
 
         private readonly T[] _data;
 
         public ImmutableArray()
         {
-            _data = new T[0];
+            _data = Array.Empty<T>();
         }
 
         public ImmutableArray(T[] data)
