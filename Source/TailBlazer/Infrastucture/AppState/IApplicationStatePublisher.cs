@@ -1,7 +1,6 @@
-namespace TailBlazer.Infrastucture.AppState
+namespace TailBlazer.Infrastucture.AppState;
+
+public interface IApplicationStatePublisher
 {
-    public interface IApplicationStatePublisher
-    {
-        void Publish(ApplicationState state);
-    }
+    void Publish(ApplicationState state);
 }

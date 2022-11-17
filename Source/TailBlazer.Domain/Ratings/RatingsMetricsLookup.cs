@@ -2,29 +2,28 @@
 using DynamicData.Kernel;
 using TailBlazer.Domain.Settings;
 
-namespace TailBlazer.Domain.Ratings
+namespace TailBlazer.Domain.Ratings;
+
+public class RatingsMetricsLookup : IRatingsMetricsLookup
 {
-    public class RatingsMetricsLookup : IRatingsMetricsLookup
+    private IDictionary<int, RatingsMetaData> RatingMetrics { get; }
+
+    public RatingsMetricsLookup()
     {
-       private IDictionary<int, RatingsMetaData> RatingMetrics { get; }
 
-        public RatingsMetricsLookup()
+        RatingMetrics = new Dictionary<int, RatingsMetaData>
         {
+            [1] = new RatingsMetaData(30, 1000),
+            [2] = new RatingsMetaData(30, 750),
+            [3] = new RatingsMetaData(45, 600),
+            [4] = new RatingsMetaData(60, 400),
+            [5] = new RatingsMetaData(60, 250)
+        };
+    }
 
-            RatingMetrics = new Dictionary<int, RatingsMetaData>
-            {
-                [1] = new RatingsMetaData(30, 1000),
-                [2] = new RatingsMetaData(30, 750),
-                [3] = new RatingsMetaData(45, 600),
-                [4] = new RatingsMetaData(60, 400),
-                [5] = new RatingsMetaData(60, 250)
-            };
-        }
-
-       public RatingsMetaData Lookup(int rating)
-       {
-           return RatingMetrics.Lookup(rating)
-               .ValueOr(() => RatingsMetaData.Default);
-       }
+    public RatingsMetaData Lookup(int rating)
+    {
+        return RatingMetrics.Lookup(rating)
+            .ValueOr(() => RatingsMetaData.Default);
     }
 }

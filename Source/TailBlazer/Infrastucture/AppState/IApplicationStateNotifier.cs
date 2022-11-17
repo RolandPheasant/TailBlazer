@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace TailBlazer.Infrastucture.AppState
+namespace TailBlazer.Infrastucture.AppState;
+
+public interface IApplicationStateNotifier
 {
-    public interface IApplicationStateNotifier
-    {
-        IObservable<ApplicationState> StateChanged { get; }
-    }
+    IObservable<ApplicationState> StateChanged { get; }
 }

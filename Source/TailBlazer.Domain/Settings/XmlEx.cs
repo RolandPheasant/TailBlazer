@@ -4,69 +4,68 @@ using System.Xml;
 using System.Xml.Linq;
 using DynamicData.Kernel;
 
-namespace TailBlazer.Domain.Settings
+namespace TailBlazer.Domain.Settings;
+
+public static class XmlEx
 {
-    public static class XmlEx
+    public static IDisposable WriteElement(this XmlTextWriter source, string elementName)
     {
-        public static IDisposable WriteElement(this XmlTextWriter source, string elementName)
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            if (elementName == null) throw new ArgumentNullException(nameof(elementName));
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        if (elementName == null) throw new ArgumentNullException(nameof(elementName));
 
-            source.WriteStartElement(elementName);
-            return Disposable.Create(source.WriteEndElement);
-        }
-
-        public static XElement ElementOrThrow(this XDocument source, string elementName)
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            if (elementName == null) throw new ArgumentNullException(nameof(elementName));
-
-            var element = source.Element(elementName);
-
-            if (element == null)
-                throw new ArgumentNullException($"{elementName} does not exist");
-
-
-            return element;
-        }
-
-        public static Optional<string> OptionalElement(this XElement source, string elementName)
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            if (elementName == null) throw new ArgumentNullException(nameof(elementName));
-
-            var element = source.Element(elementName);
-
-            return element?.Value ?? Optional<string>.None;
-        }
-
-        public static string ElementOrThrow(this XElement source, string elementName)
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            if (elementName == null) throw new ArgumentNullException(nameof(elementName));
-
-            var element = source.Element(elementName);
-
-            if (element==null)
-                throw new ArgumentNullException($"{elementName} does not exist");
-            return element.Value;
-        }
-
-
-        public static string AttributeOrThrow(this XElement source, string elementName)
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            if (elementName == null) throw new ArgumentNullException(nameof(elementName));
-
-            var element = source.Attribute(elementName);
-
-            if (element == null)
-                throw new ArgumentNullException($"{elementName} does not exist");
-
-            return element.Value;
-        }
-
-
+        source.WriteStartElement(elementName);
+        return Disposable.Create(source.WriteEndElement);
     }
+
+    public static XElement ElementOrThrow(this XDocument source, string elementName)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        if (elementName == null) throw new ArgumentNullException(nameof(elementName));
+
+        var element = source.Element(elementName);
+
+        if (element == null)
+            throw new ArgumentNullException($"{elementName} does not exist");
+
+
+        return element;
+    }
+
+    public static Optional<string> OptionalElement(this XElement source, string elementName)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        if (elementName == null) throw new ArgumentNullException(nameof(elementName));
+
+        var element = source.Element(elementName);
+
+        return element?.Value ?? Optional<string>.None;
+    }
+
+    public static string ElementOrThrow(this XElement source, string elementName)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        if (elementName == null) throw new ArgumentNullException(nameof(elementName));
+
+        var element = source.Element(elementName);
+
+        if (element==null)
+            throw new ArgumentNullException($"{elementName} does not exist");
+        return element.Value;
+    }
+
+
+    public static string AttributeOrThrow(this XElement source, string elementName)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        if (elementName == null) throw new ArgumentNullException(nameof(elementName));
+
+        var element = source.Attribute(elementName);
+
+        if (element == null)
+            throw new ArgumentNullException($"{elementName} does not exist");
+
+        return element.Value;
+    }
+
+
 }

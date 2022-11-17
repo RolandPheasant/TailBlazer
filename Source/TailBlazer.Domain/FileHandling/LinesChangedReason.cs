@@ -1,9 +1,8 @@
-﻿namespace TailBlazer.Domain.FileHandling
+﻿namespace TailBlazer.Domain.FileHandling;
+
+public enum LinesChangedReason
 {
-    public enum LinesChangedReason
-    {
-        Loaded,
-        Tailed,
-        Paged 
-    }
+    Loaded,
+    Tailed,
+    Paged 
 }

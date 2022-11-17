@@ -1,8 +1,7 @@
-﻿namespace TailBlazer.Infrastucture.KeyboardNavigation
+﻿namespace TailBlazer.Infrastucture.KeyboardNavigation;
+
+public interface IPageProvider
 {
-    public interface IPageProvider
-    {
-        int PageSize { get; }
-        int FirstIndex { get; }
-    }
+    int PageSize { get; }
+    int FirstIndex { get; }
 }

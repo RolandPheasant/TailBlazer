@@ -1,9 +1,8 @@
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Domain.FileHandling;
+
+public enum FileStatus
 {
-    public enum FileStatus
-    {
-        Loading,
-        Error,
-        Loaded
-    }
+    Loading,
+    Error,
+    Loaded
 }

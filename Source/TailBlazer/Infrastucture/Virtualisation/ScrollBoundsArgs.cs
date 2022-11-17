@@ -1,15 +1,14 @@
-namespace TailBlazer.Infrastucture.Virtualisation
+namespace TailBlazer.Infrastucture.Virtualisation;
+
+public class ScrollBoundsArgs
 {
-    public class ScrollBoundsArgs
+    public int PageSize { get; }
+
+    public int FirstIndex { get; }
+
+    public ScrollBoundsArgs(int pageSize, int firstIndex)
     {
-        public int PageSize { get; }
-
-        public int FirstIndex { get; }
-
-        public ScrollBoundsArgs(int pageSize, int firstIndex)
-        {
-            PageSize = pageSize;
-            FirstIndex = firstIndex;
-        }
+        PageSize = pageSize;
+        FirstIndex = firstIndex;
     }
 }

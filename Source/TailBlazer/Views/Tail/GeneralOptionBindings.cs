@@ -6,39 +6,38 @@ using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 
-namespace TailBlazer.Views.Tail
+namespace TailBlazer.Views.Tail;
+
+public class GeneralOptionBindings: IDisposable
 {
-    public class GeneralOptionBindings: IDisposable
-    {
-        public IProperty<bool> HighlightTail { get; }
-        public IProperty<bool> UsingDarkTheme { get; }
-        public IProperty<bool> ShowLineNumbers { get; }
+    public IProperty<bool> HighlightTail { get; }
+    public IProperty<bool> UsingDarkTheme { get; }
+    public IProperty<bool> ShowLineNumbers { get; }
         
-        private readonly IDisposable _cleanUp;
+    private readonly IDisposable _cleanUp;
 
-        public GeneralOptionBindings([NotNull] ISetting<GeneralOptions> generalOptions, ISchedulerProvider schedulerProvider)
-        {
-            UsingDarkTheme = generalOptions.Value
-                    .ObserveOn(schedulerProvider.MainThread)
-                    .Select(options => options.Theme == Theme.Dark)
-                    .ForBinding();
+    public GeneralOptionBindings([NotNull] ISetting<GeneralOptions> generalOptions, ISchedulerProvider schedulerProvider)
+    {
+        UsingDarkTheme = generalOptions.Value
+            .ObserveOn(schedulerProvider.MainThread)
+            .Select(options => options.Theme == Theme.Dark)
+            .ForBinding();
 
-            HighlightTail = generalOptions.Value
-                .ObserveOn(schedulerProvider.MainThread)
-                .Select(options => options.HighlightTail)
-                .ForBinding();
+        HighlightTail = generalOptions.Value
+            .ObserveOn(schedulerProvider.MainThread)
+            .Select(options => options.HighlightTail)
+            .ForBinding();
 
-            ShowLineNumbers = generalOptions.Value
-                .ObserveOn(schedulerProvider.MainThread)
-                .Select(options => options.ShowLineNumbers)
-                .ForBinding();
+        ShowLineNumbers = generalOptions.Value
+            .ObserveOn(schedulerProvider.MainThread)
+            .Select(options => options.ShowLineNumbers)
+            .ForBinding();
 
-            _cleanUp = new CompositeDisposable(UsingDarkTheme, HighlightTail, ShowLineNumbers);
-        }
+        _cleanUp = new CompositeDisposable(UsingDarkTheme, HighlightTail, ShowLineNumbers);
+    }
 
-        public void Dispose()
-        {
-            _cleanUp.Dispose();
-        }
+    public void Dispose()
+    {
+        _cleanUp.Dispose();
     }
 }

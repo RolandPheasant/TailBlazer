@@ -1,9 +1,8 @@
 using System;
 
-namespace TailBlazer.Domain.Formatting
+namespace TailBlazer.Domain.Formatting;
+
+public interface ILineMatches
 {
-    public interface ILineMatches
-    {
-        IObservable<LineMatchCollection> GetMatches(string inputText);
-    }
+    IObservable<LineMatchCollection> GetMatches(string inputText);
 }

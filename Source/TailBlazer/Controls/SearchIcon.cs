@@ -2,14 +2,12 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace TailBlazer.Controls
-{
+namespace TailBlazer.Controls;
 
-    public class SearchIcon : Control
+public class SearchIcon : Control
+{
+    static SearchIcon()
     {
-        static SearchIcon()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(SearchIcon), new FrameworkPropertyMetadata(typeof(SearchIcon)));
-        }
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(SearchIcon), new FrameworkPropertyMetadata(typeof(SearchIcon)));
     }
 }

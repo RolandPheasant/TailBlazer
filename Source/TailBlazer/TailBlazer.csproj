@@ -4,10 +4,11 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>tailblazer.ico</ApplicationIcon>
-
+    <Version>0.9.5</Version>
     <PublishReadyToRun>true</PublishReadyToRun>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>false</SelfContained>
+    <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>

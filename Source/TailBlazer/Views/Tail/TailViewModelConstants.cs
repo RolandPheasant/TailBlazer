@@ -1,7 +1,6 @@
-namespace TailBlazer.Views.Tail
+namespace TailBlazer.Views.Tail;
+
+public static class TailViewModelConstants
 {
-    public static class TailViewModelConstants
-    {
-        public const string ViewKey = "TailViewModel";
-    }
+    public const string ViewKey = "TailViewModel";
 }

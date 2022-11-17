@@ -1,16 +1,15 @@
 using System.Collections.Generic;
 using DynamicData.Kernel;
 
-namespace TailBlazer.Domain.Formatting
+namespace TailBlazer.Domain.Formatting;
+
+public interface IColourProvider
 {
-    public interface IColourProvider
-    {
-        IEnumerable<Hue> Hues { get; }
+    IEnumerable<Hue> Hues { get; }
 
-        Hue DefaultAccent { get; }
+    Hue DefaultAccent { get; }
 
-        Optional<Hue> Lookup(HueKey key);
+    Optional<Hue> Lookup(HueKey key);
 
-        Hue GetAccent(Theme theme);
-    }
+    Hue GetAccent(Theme theme);
 }

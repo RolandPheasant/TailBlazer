@@ -1,12 +1,11 @@
-namespace TailBlazer.Infrastucture.KeyboardNavigation
+namespace TailBlazer.Infrastucture.KeyboardNavigation;
+
+public enum KeyboardNavigationType
 {
-    public enum KeyboardNavigationType
-    {
-        Up,
-        Down,
-        PageUp,
-        PageDown,
-        Home,
-        End
-    }
+    Up,
+    Down,
+    PageUp,
+    PageDown,
+    Home,
+    End
 }

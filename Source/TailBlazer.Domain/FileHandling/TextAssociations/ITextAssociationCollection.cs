@@ -1,15 +1,14 @@
 using DynamicData;
 using DynamicData.Kernel;
 
-namespace TailBlazer.Domain.FileHandling.TextAssociations
+namespace TailBlazer.Domain.FileHandling.TextAssociations;
+
+public interface ITextAssociationCollection
 {
-    public interface ITextAssociationCollection
-    {
-        IObservableList<TextAssociation> Items { get; }
+    IObservableList<TextAssociation> Items { get; }
 
-        void MarkAsChanged(TextAssociation file);
+    void MarkAsChanged(TextAssociation file);
 
-        Optional<TextAssociation> Lookup(string key);
+    Optional<TextAssociation> Lookup(string key);
 
-    }
 }

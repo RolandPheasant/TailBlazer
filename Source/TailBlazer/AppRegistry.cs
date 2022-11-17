@@ -12,82 +12,80 @@ using TailBlazer.Views.Options;
 using TailBlazer.Views.Tail;
 using ILogger = TailBlazer.Domain.Infrastructure.ILogger;
 
-namespace TailBlazer.Infrastucture
-{
-    internal class AppRegistry : Registry
-    {
-        public AppRegistry()
-        {
-            //set up logging
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
-            if (!File.Exists(path))
-            {
-                // should use the default config which is a resource
-                using var stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(TailBlazer.Properties.Resources.log4net));
-                log4net.Config.XmlConfigurator.Configure(stream);
-            }
-            else
-            {
-                log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(path));
-            }
-            For<ILogger>().Use<Log4NetLogger>().Ctor<Type>("type").Is(x => x.ParentType).AlwaysUnique();
+namespace TailBlazer.Infrastucture;
 
-            For<ISelectionMonitor>().Use<SelectionMonitor>();
-            For<ISearchInfoCollection>().Use<SearchInfoCollection>();
-            For<ISearchMetadataCollection>().Use<SearchMetadataCollection>().Transient();
-            For<ICombinedSearchMetadataCollection>().Use<CombinedSearchMetadataCollection>().Transient();
+internal class AppRegistry : Registry
+{
+    public AppRegistry()
+    {
+        //set up logging
+        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
+        if (!File.Exists(path))
+        {
+            // should use the default config which is a resource
+            using var stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(TailBlazer.Properties.Resources.log4net));
+            log4net.Config.XmlConfigurator.Configure(stream);
+        }
+        else
+        {
+            log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(path));
+        }
+        For<ILogger>().Use<Log4NetLogger>().Ctor<Type>("type").Is(x => x.ParentType).AlwaysUnique();
+
+        For<ISelectionMonitor>().Use<SelectionMonitor>();
+        For<ISearchInfoCollection>().Use<SearchInfoCollection>();
+        For<ISearchMetadataCollection>().Use<SearchMetadataCollection>().Transient();
+        For<ICombinedSearchMetadataCollection>().Use<CombinedSearchMetadataCollection>().Transient();
              
 
-            For<ITextFormatter>().Use<TextFormatter>().Transient();
-            For<ILineMatches>().Use<LineMatches>();
-            For<ISettingsStore>().Use<FileSettingsStore>().Singleton();
-            For<IFileWatcher>().Use<FileWatcher>();
+        For<ITextFormatter>().Use<TextFormatter>().Transient();
+        For<ILineMatches>().Use<LineMatches>();
+        For<ISettingsStore>().Use<FileSettingsStore>().Singleton();
+        For<IFileWatcher>().Use<FileWatcher>();
 
 
-            For<GeneralOptionsViewModel>().Singleton();
-            For<UhandledExceptionHandler>().Singleton();
-            For<ObjectProvider>().Singleton();
-            Forward<ObjectProvider, IObjectProvider>();
-            Forward<ObjectProvider, IObjectRegister>();
+        For<GeneralOptionsViewModel>().Singleton();
+        For<UhandledExceptionHandler>().Singleton();
+        For<ObjectProvider>().Singleton();
+        Forward<ObjectProvider, IObjectProvider>();
+        Forward<ObjectProvider, IObjectRegister>();
 
 
-            For<ViewFactoryService>().Singleton();
-            Forward<ViewFactoryService, IViewFactoryRegister>();
-            Forward<ViewFactoryService, IViewFactoryProvider>();
+        For<ViewFactoryService>().Singleton();
+        Forward<ViewFactoryService, IViewFactoryRegister>();
+        Forward<ViewFactoryService, IViewFactoryProvider>();
 
-            For<ApplicationStateBroker>().Singleton();
-            Forward<ApplicationStateBroker, IApplicationStateNotifier>();
-            Forward<ApplicationStateBroker, IApplicationStatePublisher>();
+        For<ApplicationStateBroker>().Singleton();
+        Forward<ApplicationStateBroker, IApplicationStateNotifier>();
+        Forward<ApplicationStateBroker, IApplicationStatePublisher>();
 
             
-            For<TailViewModelFactory>().Singleton();
+        For<TailViewModelFactory>().Singleton();
 
-            For<IKeyboardNavigationHandler>().Use<KeyboardNavigationHandler>();
+        For<IKeyboardNavigationHandler>().Use<KeyboardNavigationHandler>();
 
-            Scan(scanner =>
-            {
-                scanner.ExcludeType<ILogger>();
+        Scan(scanner =>
+        {
+            scanner.ExcludeType<ILogger>();
 
-                //to do, need a auto-exclude these from AppConventions
-                scanner.ExcludeType<SelectionMonitor>();
-                scanner.ExcludeType<SearchInfoCollection>();
-                scanner.ExcludeType<SearchMetadataCollection>();
-                scanner.ExcludeType<CombinedSearchMetadataCollection>();
-                scanner.ExcludeType<TextFormatter>();
-                scanner.ExcludeType<LineMatches>();
-                scanner.ExcludeType<ViewFactoryService>();
+            //to do, need a auto-exclude these from AppConventions
+            scanner.ExcludeType<SelectionMonitor>();
+            scanner.ExcludeType<SearchInfoCollection>();
+            scanner.ExcludeType<SearchMetadataCollection>();
+            scanner.ExcludeType<CombinedSearchMetadataCollection>();
+            scanner.ExcludeType<TextFormatter>();
+            scanner.ExcludeType<LineMatches>();
+            scanner.ExcludeType<ViewFactoryService>();
 
                 
 
-                scanner.ExcludeType<FileWatcher>();
-                scanner.LookForRegistries();
-                scanner.Convention<AppConventions>();
+            scanner.ExcludeType<FileWatcher>();
+            scanner.LookForRegistries();
+            scanner.Convention<AppConventions>();
 
-                scanner.AssemblyContainingType<ILogFactory>();
-                scanner.AssemblyContainingType<AppRegistry>();
-            });
-        }
-
+            scanner.AssemblyContainingType<ILogFactory>();
+            scanner.AssemblyContainingType<AppRegistry>();
+        });
     }
-}
 
+}

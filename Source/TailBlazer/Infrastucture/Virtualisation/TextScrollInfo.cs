@@ -1,60 +1,59 @@
 ﻿using System;
 
-namespace TailBlazer.Infrastucture.Virtualisation
+namespace TailBlazer.Infrastucture.Virtualisation;
+
+public delegate void TextScrollDelegate(TextScrollInfo textScrollInfo);
+
+public class TextScrollInfo : IEquatable<TextScrollInfo>
 {
-    public delegate void TextScrollDelegate(TextScrollInfo textScrollInfo);
+    public int FirstIndex { get;  }
+    public int TotalChars { get;  }
 
-    public class TextScrollInfo : IEquatable<TextScrollInfo>
+    public TextScrollInfo(int firstIndex, int totalChars)
     {
-        public int FirstIndex { get;  }
-        public int TotalChars { get;  }
+        FirstIndex = firstIndex;
+        TotalChars = totalChars;
+    }
 
-        public TextScrollInfo(int firstIndex, int totalChars)
+    #region Equality
+
+    public bool Equals(TextScrollInfo other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return FirstIndex == other.FirstIndex && TotalChars == other.TotalChars;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(null, obj)) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != this.GetType()) return false;
+        return Equals((TextScrollInfo) obj);
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
         {
-            FirstIndex = firstIndex;
-            TotalChars = totalChars;
+            return (FirstIndex*397) ^ TotalChars;
         }
+    }
 
-        #region Equality
+    public static bool operator ==(TextScrollInfo left, TextScrollInfo right)
+    {
+        return Equals(left, right);
+    }
 
-        public bool Equals(TextScrollInfo other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return FirstIndex == other.FirstIndex && TotalChars == other.TotalChars;
-        }
+    public static bool operator !=(TextScrollInfo left, TextScrollInfo right)
+    {
+        return !Equals(left, right);
+    }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((TextScrollInfo) obj);
-        }
+    #endregion
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (FirstIndex*397) ^ TotalChars;
-            }
-        }
-
-        public static bool operator ==(TextScrollInfo left, TextScrollInfo right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(TextScrollInfo left, TextScrollInfo right)
-        {
-            return !Equals(left, right);
-        }
-
-        #endregion
-
-        public override string ToString()
-        {
-            return $"{FirstIndex} Take {TotalChars}";
-        }
+    public override string ToString()
+    {
+        return $"{FirstIndex} Take {TotalChars}";
     }
 }

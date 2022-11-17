@@ -1,92 +1,91 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace TailBlazer.Infrastucture
+namespace TailBlazer.Infrastucture;
+
+/// <summary>
+/// A command wich accepts no parameter - assumes the view model will do the work
+/// </summary>
+public class Command<T> : ICommand
 {
-    /// <summary>
-    /// A command wich accepts no parameter - assumes the view model will do the work
-    /// </summary>
-    public class Command<T> : ICommand
+    private readonly Action<T> _execute;
+    private readonly Func<T,bool> _canExecute;
+
+
+    public Command(Action<T> execute, Func<T,bool> canExecute = null)
     {
-        private readonly Action<T> _execute;
-        private readonly Func<T,bool> _canExecute;
+        _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+        _canExecute = canExecute ?? (t => true);
+    }
 
 
-        public Command(Action<T> execute, Func<T,bool> canExecute = null)
+    public bool CanExecute(object parameter)
+    {
+        return _canExecute((T)parameter);
+    }
+
+    public void Execute(object parameter)
+    {
+        _execute((T)parameter);
+    }
+
+    public event EventHandler CanExecuteChanged
+    {
+        add
         {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute ?? (t => true);
+            CommandManager.RequerySuggested += value;
         }
-
-
-        public bool CanExecute(object parameter)
+        remove
         {
-            return _canExecute((T)parameter);
-        }
-
-        public void Execute(object parameter)
-        {
-            _execute((T)parameter);
-        }
-
-        public event EventHandler CanExecuteChanged
-        {
-            add
-            {
-                CommandManager.RequerySuggested += value;
-            }
-            remove
-            {
-                CommandManager.RequerySuggested -= value;
-            }
-        }
-
-        public void Refresh()
-        {
-            CommandManager.InvalidateRequerySuggested();
+            CommandManager.RequerySuggested -= value;
         }
     }
 
-    public class Command : ICommand
+    public void Refresh()
     {
-        private readonly Action _execute;
-        private readonly Func<bool> _canExecute;
+        CommandManager.InvalidateRequerySuggested();
+    }
+}
+
+public class Command : ICommand
+{
+    private readonly Action _execute;
+    private readonly Func<bool> _canExecute;
 
 
-        public Command(Action execute, Func<bool> canExecute = null)
+    public Command(Action execute, Func<bool> canExecute = null)
+    {
+        if (execute == null) throw new ArgumentNullException(nameof(execute));
+
+        _execute = execute;
+        _canExecute = canExecute ?? (() => true);
+    }
+
+
+    public bool CanExecute(object parameter)
+    {
+        return _canExecute();
+    }
+
+    public void Execute(object parameter)
+    {
+        _execute();
+    }
+
+    public event EventHandler CanExecuteChanged
+    {
+        add
         {
-            if (execute == null) throw new ArgumentNullException(nameof(execute));
-
-            _execute = execute;
-            _canExecute = canExecute ?? (() => true);
+            CommandManager.RequerySuggested += value;
         }
-
-
-        public bool CanExecute(object parameter)
+        remove
         {
-            return _canExecute();
+            CommandManager.RequerySuggested -= value;
         }
+    }
 
-        public void Execute(object parameter)
-        {
-            _execute();
-        }
-
-        public event EventHandler CanExecuteChanged
-        {
-            add
-            {
-                CommandManager.RequerySuggested += value;
-            }
-            remove
-            {
-                CommandManager.RequerySuggested -= value;
-            }
-        }
-
-        public void Refresh()
-        {
-            CommandManager.InvalidateRequerySuggested();
-        }
+    public void Refresh()
+    {
+        CommandManager.InvalidateRequerySuggested();
     }
 }

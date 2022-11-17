@@ -1,11 +1,10 @@
 using System;
 
-namespace TailBlazer.Domain.Settings
+namespace TailBlazer.Domain.Settings;
+
+public interface ISetting<T>
 {
-    public interface ISetting<T>
-    {
-        IObservable<T> Value { get; }
+    IObservable<T> Value { get; }
          
-        void Write(T item);
-    }
+    void Write(T item);
 }

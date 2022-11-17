@@ -1,9 +1,8 @@
-namespace TailBlazer.Domain.FileHandling.Search
+namespace TailBlazer.Domain.FileHandling.Search;
+
+public enum SearchType
 {
-    public enum SearchType
-    {
-        All,
-        Current,
-        User
-    }
+    All,
+    Current,
+    User
 }

@@ -1,8 +1,7 @@
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Domain.FileHandling;
+
+public enum LineIndexType
 {
-    public enum LineIndexType
-    {
-        Absolute,
-        Relative
-    }
+    Absolute,
+    Relative
 }

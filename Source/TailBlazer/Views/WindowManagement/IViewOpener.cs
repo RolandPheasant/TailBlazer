@@ -1,9 +1,8 @@
 using TailBlazer.Infrastucture;
 
-namespace TailBlazer.Views.WindowManagement
+namespace TailBlazer.Views.WindowManagement;
+
+public interface IViewOpener
 {
-    public interface IViewOpener
-    {
-        void OpenView(HeaderedView headeredView);
-    }
+    void OpenView(HeaderedView headeredView);
 }

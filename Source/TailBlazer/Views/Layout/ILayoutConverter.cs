@@ -1,10 +1,9 @@
 using System.Xml.Linq;
 
-namespace TailBlazer.Views.Layout
+namespace TailBlazer.Views.Layout;
+
+public interface ILayoutConverter
 {
-    public interface ILayoutConverter
-    {
-        XElement CaptureState();
-        void Restore(XElement element);
-    }
+    XElement CaptureState();
+    void Restore(XElement element);
 }

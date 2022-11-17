@@ -1,8 +1,7 @@
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Domain.FileHandling;
+
+public enum FileSegmentChangedReason
 {
-    public enum FileSegmentChangedReason
-    {
-        Loaded,
-        Tailed
-    }
+    Loaded,
+    Tailed
 }

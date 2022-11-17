@@ -1,12 +1,11 @@
 using DynamicData;
 using TailBlazer.Domain.FileHandling.Search;
 
-namespace TailBlazer.Views.Formatting
-{
-    public interface IIconProvider
-    {
-        IObservableList<IconDescription> Icons { get; }
+namespace TailBlazer.Views.Formatting;
 
-        IDefaultIconSelector DefaultIconSelector { get; }
-    }
+public interface IIconProvider
+{
+    IObservableList<IconDescription> Icons { get; }
+
+    IDefaultIconSelector DefaultIconSelector { get; }
 }

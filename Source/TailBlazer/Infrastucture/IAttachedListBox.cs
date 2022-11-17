@@ -4,20 +4,19 @@ using System.Windows.Controls;
 using DynamicData;
 using TailBlazer.Views.Tail;
 
-namespace TailBlazer.Infrastucture
+namespace TailBlazer.Infrastucture;
+
+public interface IAttachedListBox
 {
-    public interface IAttachedListBox
-    {
-        void Receive(ListBox selector);
-    }
+    void Receive(ListBox selector);
+}
 
 
-    public interface ISelectionMonitor: IDisposable
-    {
-        string GetSelectedText();
+public interface ISelectionMonitor: IDisposable
+{
+    string GetSelectedText();
 
-        IEnumerable<string> GetSelectedItems();
+    IEnumerable<string> GetSelectedItems();
 
-        IObservableList<LineProxy> Selected { get; }
-    }
+    IObservableList<LineProxy> Selected { get; }
 }

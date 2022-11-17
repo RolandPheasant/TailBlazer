@@ -1,10 +1,9 @@
 using System;
 using TailBlazer.Domain.Settings;
 
-namespace TailBlazer.Domain.Ratings
+namespace TailBlazer.Domain.Ratings;
+
+public interface IRatingService
 {
-    public interface IRatingService
-    {
-        IObservable<RatingsMetaData> Metrics { get; }
-    }
+    IObservable<RatingsMetaData> Metrics { get; }
 }

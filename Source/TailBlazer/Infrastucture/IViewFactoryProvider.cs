@@ -1,10 +1,9 @@
 ﻿using DynamicData.Kernel;
 using TailBlazer.Views;
 
-namespace TailBlazer.Infrastucture
+namespace TailBlazer.Infrastucture;
+
+public interface IViewFactoryProvider
 {
-    public interface IViewFactoryProvider
-    {
-        Optional<IViewModelFactory> Lookup(string key);
-    }
+    Optional<IViewModelFactory> Lookup(string key);
 }

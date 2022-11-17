@@ -1,10 +1,9 @@
 using System.ComponentModel;
 
-namespace TailBlazer.Views.DialogServices
+namespace TailBlazer.Views.DialogServices;
+
+public interface IDialogViewModel : INotifyPropertyChanged
 {
-    public interface IDialogViewModel : INotifyPropertyChanged
-    {
-        bool IsDialogOpen { get; set; }
-        object DialogContent { get; set; }
-    }
+    bool IsDialogOpen { get; set; }
+    object DialogContent { get; set; }
 }

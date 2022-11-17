@@ -1,9 +1,8 @@
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Domain.FileHandling;
+
+public interface IProgressInfo
 {
-    public interface IProgressInfo
-    {
-        int SegmentsCompleted { get; }
-        int Segments { get; }
-        bool IsSearching { get; }
-    }
+    int SegmentsCompleted { get; }
+    int Segments { get; }
+    bool IsSearching { get; }
 }

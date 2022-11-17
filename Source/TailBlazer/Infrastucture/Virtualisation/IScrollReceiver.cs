@@ -1,12 +1,9 @@
-﻿namespace TailBlazer.Infrastucture.Virtualisation
+﻿namespace TailBlazer.Infrastucture.Virtualisation;
+
+public interface IScrollReceiver
 {
-    public interface IScrollReceiver
-    {
-        void ScrollBoundsChanged(ScrollBoundsArgs boundsArgs);
-        void ScrollChanged(ScrollChangedArgs scrollChangedArgs);
+    void ScrollBoundsChanged(ScrollBoundsArgs boundsArgs);
+    void ScrollChanged(ScrollChangedArgs scrollChangedArgs);
 
-        void ScrollDiff(int lineChanged);
-    }
-
-
+    void ScrollDiff(int lineChanged);
 }

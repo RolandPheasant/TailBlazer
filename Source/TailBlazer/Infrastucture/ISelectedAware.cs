@@ -1,8 +1,7 @@
 ﻿using System;
-namespace TailBlazer.Infrastucture
+namespace TailBlazer.Infrastucture;
+
+public interface ISelectedAware
 {
-    public interface ISelectedAware
-    {
-        bool IsSelected { get; set; }
-    }
+    bool IsSelected { get; set; }
 }

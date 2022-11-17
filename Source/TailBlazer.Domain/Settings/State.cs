@@ -1,57 +1,56 @@
 ﻿using System;
 
-namespace TailBlazer.Domain.Settings
+namespace TailBlazer.Domain.Settings;
+
+public class State : IEquatable<State>
 {
-    public class State : IEquatable<State>
+    public static readonly State Empty = new State(0,String.Empty);
+
+    public int Version { get; }
+    public string Value { get; }
+
+    public State(int version, string value)
     {
-        public static readonly State Empty = new State(0,String.Empty);
+        Version = version;
+        Value = value;
+    }
 
-        public int Version { get; }
-        public string Value { get; }
+    #region Equality members
 
-        public State(int version, string value)
-        {
-            Version = version;
-            Value = value;
-        }
+    public bool Equals(State other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return string.Equals(Value, other.Value);
+    }
 
-        #region Equality members
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(null, obj)) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != this.GetType()) return false;
+        return Equals((State) obj);
+    }
 
-        public bool Equals(State other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return string.Equals(Value, other.Value);
-        }
+    public override int GetHashCode()
+    {
+        return Value?.GetHashCode() ?? 0;
+    }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((State) obj);
-        }
+    public static bool operator ==(State left, State right)
+    {
+        return Equals(left, right);
+    }
 
-        public override int GetHashCode()
-        {
-            return Value?.GetHashCode() ?? 0;
-        }
+    public static bool operator !=(State left, State right)
+    {
+        return !Equals(left, right);
+    }
 
-        public static bool operator ==(State left, State right)
-        {
-            return Equals(left, right);
-        }
+    #endregion
 
-        public static bool operator !=(State left, State right)
-        {
-            return !Equals(left, right);
-        }
-
-        #endregion
-
-        public override string ToString()
-        {
-            return $"Version: {Version}, Value: {Value}";
-        }
+    public override string ToString()
+    {
+        return $"Version: {Version}, Value: {Value}";
     }
 }

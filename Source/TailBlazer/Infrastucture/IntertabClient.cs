@@ -3,28 +3,27 @@ using System.Windows;
 using Dragablz;
 using TailBlazer.Views.WindowManagement;
 
-namespace TailBlazer.Infrastucture
+namespace TailBlazer.Infrastucture;
+
+public class InterTabClient : IInterTabClient
 {
-    public class InterTabClient : IInterTabClient
+    private readonly IWindowFactory _factory;
+
+    public InterTabClient(IWindowFactory tradeWindowFactory)
     {
-        private readonly IWindowFactory _factory;
+        _factory = tradeWindowFactory;
+    }
 
-        public InterTabClient(IWindowFactory tradeWindowFactory)
-        {
-            _factory = tradeWindowFactory;
-        }
+    public INewTabHost<Window> GetNewHost(IInterTabClient interTabClient, object partition, TabablzControl source)
+    {
+        var window = _factory.Create();
+        return new NewTabHost<Window>(window, window.InitialTabablzControl);
+    }
 
-        public INewTabHost<Window> GetNewHost(IInterTabClient interTabClient, object partition, TabablzControl source)
-        {
-            var window = _factory.Create();
-            return new NewTabHost<Window>(window, window.InitialTabablzControl);
-        }
-
-        public TabEmptiedResponse TabEmptiedHandler(TabablzControl tabControl, Window window)
-        {
-            return Application.Current.Windows.OfType<MainWindow>().Count() == 1
-                ? TabEmptiedResponse.DoNothing
-                : TabEmptiedResponse.CloseWindowOrLayoutBranch;
-        }
+    public TabEmptiedResponse TabEmptiedHandler(TabablzControl tabControl, Window window)
+    {
+        return Application.Current.Windows.OfType<MainWindow>().Count() == 1
+            ? TabEmptiedResponse.DoNothing
+            : TabEmptiedResponse.CloseWindowOrLayoutBranch;
     }
 }

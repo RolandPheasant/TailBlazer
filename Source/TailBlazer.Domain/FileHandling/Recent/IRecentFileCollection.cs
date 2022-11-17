@@ -1,13 +1,12 @@
 ﻿using DynamicData;
 
-namespace TailBlazer.Domain.FileHandling.Recent
+namespace TailBlazer.Domain.FileHandling.Recent;
+
+public interface IRecentFileCollection
 {
-    public interface IRecentFileCollection
-    {
-        IObservableList<RecentFile> Items { get; }
+    IObservableList<RecentFile> Items { get; }
 
-        void Add(RecentFile file);
+    void Add(RecentFile file);
 
-        void Remove(RecentFile file);
-    }
+    void Remove(RecentFile file);
 }

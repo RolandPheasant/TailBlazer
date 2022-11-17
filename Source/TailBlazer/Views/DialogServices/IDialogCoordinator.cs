@@ -1,10 +1,9 @@
 using System;
 
-namespace TailBlazer.Views.DialogServices
+namespace TailBlazer.Views.DialogServices;
+
+public interface IDialogCoordinator
 {
-    public interface IDialogCoordinator
-    {
-        void Show(IDialogViewModel view, object content, Action<object> onClosed);
-        void Close();
-    }
+    void Show(IDialogViewModel view, object content, Action<object> onClosed);
+    void Close();
 }

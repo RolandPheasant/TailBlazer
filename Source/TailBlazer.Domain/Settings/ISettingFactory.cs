@@ -1,7 +1,6 @@
-namespace TailBlazer.Domain.Settings
+namespace TailBlazer.Domain.Settings;
+
+public interface ISettingFactory
 {
-    public interface ISettingFactory
-    {
-        ISetting<T> Create<T>(IConverter<T> converter, string key);
-    }
+    ISetting<T> Create<T>(IConverter<T> converter, string key);
 }

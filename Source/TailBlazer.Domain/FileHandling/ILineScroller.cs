@@ -4,23 +4,21 @@ using DynamicData;
 using DynamicData.Aggregation;
 using TailBlazer.Domain.Annotations;
 
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Domain.FileHandling;
+
+public interface ILineScroller : IDisposable
 {
-    public interface ILineScroller : IDisposable
-    {
-        IObservableCache<Line, LineKey> Lines { get; }
-    }
+    IObservableCache<Line, LineKey> Lines { get; }
+}
 
-    public static class LineScrollerEx
+public static class LineScrollerEx
+{
+    public static IObservable<int> MaximumLines([NotNull] this ILineScroller source)
     {
-        public static IObservable<int> MaximumLines([NotNull] this ILineScroller source)
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            return source.Lines.Connect()
-                           .Maximum(l => l.Text?.Length ?? 0)
-                           .StartWith(0)
-                           .DistinctUntilChanged();
-        }
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        return source.Lines.Connect()
+            .Maximum(l => l.Text?.Length ?? 0)
+            .StartWith(0)
+            .DistinctUntilChanged();
     }
-
 }

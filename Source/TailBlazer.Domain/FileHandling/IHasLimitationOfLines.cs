@@ -1,9 +1,8 @@
-﻿namespace TailBlazer.Domain.FileHandling
-{
-    public interface IHasLimitationOfLines
-    {
-        bool HasReachedLimit { get; }
+﻿namespace TailBlazer.Domain.FileHandling;
 
-        int Maximum { get; }
-    }
+public interface IHasLimitationOfLines
+{
+    bool HasReachedLimit { get; }
+
+    int Maximum { get; }
 }

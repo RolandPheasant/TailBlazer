@@ -1,14 +1,12 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace TailBlazer.Controls
-{
+namespace TailBlazer.Controls;
 
-    public class RemoveIcon : Control
+public class RemoveIcon : Control
+{
+    static RemoveIcon()
     {
-        static RemoveIcon()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(RemoveIcon), new FrameworkPropertyMetadata(typeof(RemoveIcon)));
-        }
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(RemoveIcon), new FrameworkPropertyMetadata(typeof(RemoveIcon)));
     }
 }

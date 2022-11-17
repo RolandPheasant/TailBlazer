@@ -1,14 +1,12 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace TailBlazer.Controls
-{
+namespace TailBlazer.Controls;
 
-    public class RegexMatchedIcon : Control
+public class RegexMatchedIcon : Control
+{
+    static RegexMatchedIcon()
     {
-        static RegexMatchedIcon()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(RegexMatchedIcon), new FrameworkPropertyMetadata(typeof(RegexMatchedIcon)));
-        }
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(RegexMatchedIcon), new FrameworkPropertyMetadata(typeof(RegexMatchedIcon)));
     }
 }

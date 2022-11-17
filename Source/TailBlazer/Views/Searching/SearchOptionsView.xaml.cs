@@ -1,16 +1,15 @@
 ﻿
 using System.Windows.Controls;
 
-namespace TailBlazer.Views.Searching
+namespace TailBlazer.Views.Searching;
+
+/// <summary>
+/// Interaction logic for SearchOptionsView.xaml
+/// </summary>
+public partial class SearchOptionsView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for SearchOptionsView.xaml
-    /// </summary>
-    public partial class SearchOptionsView : UserControl
+    public SearchOptionsView()
     {
-        public SearchOptionsView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

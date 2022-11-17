@@ -4,24 +4,24 @@ using TailBlazer.Domain.Formatting;
 using TailBlazer.Infrastucture.Virtualisation;
 using Xunit;
 
-namespace TailBlazer.Fixtures
+namespace TailBlazer.Fixtures;
+
+public class DisplayTextFixture
 {
-    public class DisplayTextFixture
+    [Fact]
+    public void CanVirtualise()
     {
-        [Fact]
-        public void CanVirtualise()
-        {
-            var input = new[]
+        var input = new[]
             {
                 new MatchedString("The cat "),
                 new MatchedString("sat "),
                 new MatchedString("on the mat"),
-                 new MatchedString(" and slept like a bat")
+                new MatchedString(" and slept like a bat")
             }.Select(ms => new DisplayText(ms))
             .ToArray();
 
 
-            var expected = new[]
+        var expected = new[]
             {
                 new MatchedString("at "),
                 new MatchedString("sat "),
@@ -30,26 +30,26 @@ namespace TailBlazer.Fixtures
             .Select(ms => new DisplayText(ms))
             .ToArray();
 
-            var result = input.Virtualise(new TextScrollInfo(5, 15)).ToArray();
+        var result = input.Virtualise(new TextScrollInfo(5, 15)).ToArray();
 
 
-            result.Should().BeEquivalentTo(expected);
-        }
+        result.Should().BeEquivalentTo(expected);
+    }
 
-        [Fact]
-        public void CanVirtualise2()
-        {
-            var input = new[]
+    [Fact]
+    public void CanVirtualise2()
+    {
+        var input = new[]
             {
                 new MatchedString("The cat "),
                 new MatchedString("sat "),
                 new MatchedString("on the mat"),
-                 new MatchedString(" and slept like a bat")
+                new MatchedString(" and slept like a bat")
             }.Select(ms => new DisplayText(ms))
             .ToArray();
 
 
-            var expected = new[]
+        var expected = new[]
             {
                 new MatchedString("t "),
                 new MatchedString("on the m")
@@ -57,10 +57,9 @@ namespace TailBlazer.Fixtures
             .Select(ms => new DisplayText(ms))
             .ToArray();
 
-            var result = input.Virtualise(new TextScrollInfo(10, 10)).ToArray();
+        var result = input.Virtualise(new TextScrollInfo(10, 10)).ToArray();
 
 
-            result.Should().BeEquivalentTo(expected);
-        }
+        result.Should().BeEquivalentTo(expected);
     }
 }

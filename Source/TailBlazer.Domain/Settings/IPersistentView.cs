@@ -1,10 +1,9 @@
-namespace TailBlazer.Domain.Settings
+namespace TailBlazer.Domain.Settings;
+
+public interface IPersistentView
 {
-    public interface IPersistentView
-    {
-        ViewState CaptureState();
+    ViewState CaptureState();
 
-        void Restore(ViewState state);
+    void Restore(ViewState state);
 
-    }
 }
