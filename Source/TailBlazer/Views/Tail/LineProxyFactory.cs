@@ -3,7 +3,7 @@ using System.Reactive.Linq;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.Formatting;
-using TailBlazer.Infrastucture.Virtualisation;
+using TailBlazer.Infrastructure.Virtualisation;
 
 namespace TailBlazer.Views.Tail;
 

@@ -17,9 +17,9 @@ using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Domain.StateHandling;
-using TailBlazer.Infrastucture;
-using TailBlazer.Infrastucture.KeyboardNavigation;
-using TailBlazer.Infrastucture.Virtualisation;
+using TailBlazer.Infrastructure;
+using TailBlazer.Infrastructure.KeyboardNavigation;
+using TailBlazer.Infrastructure.Virtualisation;
 using TailBlazer.Views.DialogServices;
 using TailBlazer.Views.Searching;
 

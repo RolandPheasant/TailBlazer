@@ -8,7 +8,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:system="clr-namespace:System;assembly=mscorlib"
-    xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
+    xmlns:infrastucture="clr-namespace:TailBlazer.Infrastructure"
     xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
     MinHeight="375"
     d:DataContext="{d:DesignInstance searching:SearchOptionsViewModel}"

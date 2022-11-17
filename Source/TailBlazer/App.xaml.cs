@@ -3,8 +3,8 @@ using System.Windows;
 using System.Windows.Threading;
 using StructureMap;
 using TailBlazer.Domain.Infrastructure;
-using TailBlazer.Infrastucture;
-using TailBlazer.Infrastucture.AppState;
+using TailBlazer.Infrastructure;
+using TailBlazer.Infrastructure.AppState;
 using TailBlazer.Views.Layout;
 using TailBlazer.Views.WindowManagement;
 

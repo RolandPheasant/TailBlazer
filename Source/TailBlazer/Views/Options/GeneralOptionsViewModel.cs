@@ -8,7 +8,7 @@ using DynamicData.Binding;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
-using TailBlazer.Infrastucture;
+using TailBlazer.Infrastructure;
 
 namespace TailBlazer.Views.Options;
 

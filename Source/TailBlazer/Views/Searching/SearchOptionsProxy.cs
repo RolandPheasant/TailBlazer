@@ -12,7 +12,7 @@ using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
-using TailBlazer.Infrastucture;
+using TailBlazer.Infrastructure;
 
 namespace TailBlazer.Views.Searching;
 

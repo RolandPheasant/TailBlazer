@@ -1,4 +1,4 @@
-using TailBlazer.Infrastucture;
+using TailBlazer.Infrastructure;
 
 namespace TailBlazer.Views.WindowManagement;
 

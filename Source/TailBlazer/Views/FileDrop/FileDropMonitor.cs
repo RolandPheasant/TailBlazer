@@ -9,7 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using TailBlazer.Domain.Infrastructure;
-using TailBlazer.Infrastucture;
+using TailBlazer.Infrastructure;
 
 namespace TailBlazer.Views.FileDrop;
 

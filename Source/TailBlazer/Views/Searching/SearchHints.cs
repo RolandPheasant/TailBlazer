@@ -10,7 +10,7 @@ using DynamicData;
 using DynamicData.Binding;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Infrastructure;
-using TailBlazer.Infrastucture;
+using TailBlazer.Infrastructure;
 using TailBlazer.Views.Recent;
 
 namespace TailBlazer.Views.Searching;

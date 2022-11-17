@@ -5,7 +5,7 @@ using System.Windows.Input;
 using DynamicData.Binding;
 using TailBlazer.Domain.FileHandling;
 using TailBlazer.Domain.FileHandling.Search;
-using TailBlazer.Infrastucture;
+using TailBlazer.Infrastructure;
 
 namespace TailBlazer.Views.Searching;
 

@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using TailBlazer.Infrastucture;
+using TailBlazer.Infrastructure;
 using Xunit;
 using static System.IO.Path;
 

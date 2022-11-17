@@ -1,5 +1,5 @@
 ﻿using TailBlazer.Domain.Settings;
-using TailBlazer.Infrastucture;
+using TailBlazer.Infrastructure;
 
 namespace TailBlazer.Views;
 

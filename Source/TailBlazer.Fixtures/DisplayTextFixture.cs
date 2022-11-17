@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using FluentAssertions;
 using TailBlazer.Domain.Formatting;
-using TailBlazer.Infrastucture.Virtualisation;
+using TailBlazer.Infrastructure.Virtualisation;
 using Xunit;
 
 namespace TailBlazer.Fixtures;

@@ -11,7 +11,7 @@ using DynamicData.Kernel;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
-using TailBlazer.Infrastucture;
+using TailBlazer.Infrastructure;
 using TailBlazer.Views.WindowManagement;
 using TailBlazer.Views.Options;
 

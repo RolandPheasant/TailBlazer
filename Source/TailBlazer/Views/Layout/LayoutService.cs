@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 using System.Xml.Linq;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;
-using TailBlazer.Infrastucture.AppState;
+using TailBlazer.Infrastructure.AppState;
 
 namespace TailBlazer.Views.Layout;
 

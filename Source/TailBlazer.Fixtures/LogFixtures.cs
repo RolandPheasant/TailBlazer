@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using FluentAssertions;
-using TailBlazer.Infrastucture;
+using TailBlazer.Infrastructure;
 using Xunit;
 
 namespace TailBlazer.Fixtures;

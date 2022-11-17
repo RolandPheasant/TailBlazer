@@ -1,7 +1,7 @@
 using System;
 using DynamicData;
 using TailBlazer.Domain.Infrastructure;
-using TailBlazer.Infrastucture;
+using TailBlazer.Infrastructure;
 
 namespace TailBlazer.Views.WindowManagement;
 

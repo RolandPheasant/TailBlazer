@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using DynamicData;
-using TailBlazer.Infrastucture;
+using TailBlazer.Infrastructure;
 
 namespace TailBlazer.Views.WindowManagement;
 
