@@ -1,9 +1,6 @@
-using System.Collections.Generic;
+namespace TailBlazer.Views.WindowManagement;
 
-namespace TailBlazer.Views.WindowManagement
+public interface IWindowFactory
 {
-    public interface IWindowFactory
-    {
-        MainWindow Create(IEnumerable<string> files = null);
-    }
+    MainWindow Create(IEnumerable<string> files = null);
 }

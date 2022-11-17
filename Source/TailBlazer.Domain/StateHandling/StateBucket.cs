@@ -1,26 +1,24 @@
-using System;
 using TailBlazer.Domain.Settings;
 
-namespace TailBlazer.Domain.StateHandling
+namespace TailBlazer.Domain.StateHandling;
+
+public class StateBucket
 {
-    public class StateBucket
+    public string Type { get; }
+    public string Id { get; }
+    public State State { get; }
+    public StateBucketKey Key { get;  }
+
+    public DateTime TimeStamp { get; }
+
+    public StateBucket(string type, string id, State state, DateTime timeStamp)
     {
-        public string Type { get; }
-        public string Id { get; }
-        public State State { get; }
-        public StateBucketKey Key { get;  }
-
-        public DateTime TimeStamp { get; }
-
-        public StateBucket(string type, string id, State state, DateTime timeStamp)
-        {
-            Key = new StateBucketKey(type,id);
-            Type = type;
-            Id = id;
-            State = state;
-            TimeStamp = timeStamp;
-        }
-
-
+        Key = new StateBucketKey(type,id);
+        Type = type;
+        Id = id;
+        State = state;
+        TimeStamp = timeStamp;
     }
+
+
 }

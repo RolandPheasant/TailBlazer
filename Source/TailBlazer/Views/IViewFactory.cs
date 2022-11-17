@@ -1,13 +1,11 @@
 ﻿using TailBlazer.Domain.Settings;
-using TailBlazer.Infrastucture;
+using TailBlazer.Infrastructure;
 
-namespace TailBlazer.Views
+namespace TailBlazer.Views;
+
+public interface IViewModelFactory
 {
+    HeaderedView Create(ViewState state);
 
-    public interface IViewModelFactory
-    {
-        HeaderedView Create(ViewState state);
-
-        string Key { get; }
-    }
+    string Key { get; }
 }

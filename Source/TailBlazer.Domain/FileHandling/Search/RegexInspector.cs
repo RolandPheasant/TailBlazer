@@ -1,22 +1,20 @@
-using System;
 using System.Text.RegularExpressions;
 
-namespace TailBlazer.Domain.FileHandling.Search
+namespace TailBlazer.Domain.FileHandling.Search;
+
+public class RegexInspector
 {
-    public class RegexInspector
+
+    private readonly Regex _isPlainText;
+
+    public RegexInspector()
     {
+        _isPlainText = new Regex("^[a-zA-Z0-9 ]*$", RegexOptions.Compiled);
+    }
 
-        private readonly Regex _isPlainText;
-
-        public RegexInspector()
-        {
-            _isPlainText = new Regex("^[a-zA-Z0-9 ]*$", RegexOptions.Compiled);
-        }
-
-        public bool DoesThisLookLikeRegEx(string text)
-        {
-            var withNegation = text.WithNegation();
-            return !string.IsNullOrEmpty(text) && !_isPlainText.IsMatch(withNegation.Text);
-        }
+    public bool DoesThisLookLikeRegEx(string text)
+    {
+        var withNegation = text.WithNegation();
+        return !string.IsNullOrEmpty(text) && !_isPlainText.IsMatch(withNegation.Text);
     }
 }

@@ -2,14 +2,12 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace TailBlazer.Controls
-{
+namespace TailBlazer.Controls;
 
-    public class FilterIcon : Control
+public class FilterIcon : Control
+{
+    static FilterIcon()
     {
-        static FilterIcon()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(FilterIcon), new FrameworkPropertyMetadata(typeof(FilterIcon)));
-        }
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(FilterIcon), new FrameworkPropertyMetadata(typeof(FilterIcon)));
     }
 }

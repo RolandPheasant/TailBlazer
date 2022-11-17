@@ -1,9 +1,8 @@
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Domain.FileHandling;
+
+public enum FileSegmentSearchStatus
 {
-    public enum FileSegmentSearchStatus
-    {
-        Pending,
-        Searching,
-        Complete
-    }
+    Pending,
+    Searching,
+    Complete
 }

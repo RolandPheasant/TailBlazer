@@ -1,10 +1,9 @@
-namespace TailBlazer.Domain.Settings
-{
-    public interface IConverter<T> 
-    {
-        T Convert(State state);
-        State Convert(T state);
+namespace TailBlazer.Domain.Settings;
 
-        T GetDefaultValue();
-    }
+public interface IConverter<T> 
+{
+    T Convert(State state);
+    State Convert(T state);
+
+    T GetDefaultValue();
 }

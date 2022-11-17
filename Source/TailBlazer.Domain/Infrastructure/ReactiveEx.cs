@@ -1,110 +1,108 @@
-﻿using System;
-using System.Reactive;
-using System.Reactive.Concurrency;
+﻿using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using DynamicData.Kernel;
 using TailBlazer.Domain.Annotations;
 
-namespace TailBlazer.Domain.Infrastructure
+namespace TailBlazer.Domain.Infrastructure;
+
+public enum PropertyType
 {
-    public enum PropertyType
+    EagerSubscription,
+    LazySubscription
+}
+
+public static class ReactiveEx
+{
+
+    public static IDisposable SetAsComplete<T>(this ISubject<T> source)
     {
-        EagerSubscription,
-        LazySubscription
+        return Disposable.Create(source.OnCompleted);
     }
 
-    public static class ReactiveEx
+
+    public static IProperty<T> ForBinding<T>(this IObservable<T> source, PropertyType type = PropertyType.EagerSubscription)
     {
+        return new HungryProperty<T>(source);
+    }
 
-        public static IDisposable SetAsComplete<T>(this ISubject<T> source)
-        {
-            return Disposable.Create(source.OnCompleted);
-        }
-
-
-        public static IProperty<T> ForBinding<T>(this IObservable<T> source, PropertyType type = PropertyType.EagerSubscription)
-        {
-            return new HungryProperty<T>(source);
-        }
-
-        public static IObservable<TSource> Previous<TSource>(this IObservable<TSource> source)
-        {
-            return source.PairWithPrevious().Select(pair => pair.Previous);
-        }
+    public static IObservable<TSource> Previous<TSource>(this IObservable<TSource> source)
+    {
+        return source.PairWithPrevious().Select(pair => pair.Previous);
+    }
 
 
-        public static IObservable<CurrentAndPrevious<TSource>> PairWithPrevious<TSource>(this IObservable<TSource> source)
-        {
-            return source.Scan(Tuple.Create(default(TSource), default(TSource)),
+    public static IObservable<CurrentAndPrevious<TSource>> PairWithPrevious<TSource>(this IObservable<TSource> source)
+    {
+        return source.Scan(Tuple.Create(default(TSource), default(TSource)),
                 (acc, current) => Tuple.Create(acc.Item2, current))
-                .Select(pair=>new CurrentAndPrevious<TSource>(pair.Item1,pair.Item2));
-        }
+            .Select(pair=>new CurrentAndPrevious<TSource>(pair.Item1,pair.Item2));
+    }
 
-        public class CurrentAndPrevious<T>
+    public class CurrentAndPrevious<T>
+    {
+        public T Currrent { get;  }
+        public T Previous { get;  }
+
+        public CurrentAndPrevious(T currrent, T previous)
         {
-            public T Currrent { get;  }
-            public T Previous { get;  }
+            Currrent = currrent;
+            Previous = previous;
+        }
+    }
 
-            public CurrentAndPrevious(T currrent, T previous)
+    public static IObservable<Unit> ToUnit<T>(this IObservable<T> source)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        return source.Select(_ => Unit.Default);
+    }
+
+    public static IObservable<Unit> StartWithUnit(this IObservable<Unit> source)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        return source.StartWith(Unit.Default);
+    }
+
+    public static void Once(this ISubject<Unit> source)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        source.OnNext(Unit.Default);
+    }
+
+    /// <summary>
+    /// from here http://haacked.com/archive/2012/10/08/writing-a-continueafter-method-for-rx.aspx/
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TRet"></typeparam>
+    /// <param name="observable"></param>
+    /// <param name="selector"></param>
+    /// <returns></returns>
+    public static IObservable<TRet> WithContinuation<T, TRet>(
+        this IObservable<T> observable, Func<IObservable<TRet>> selector)
+    {
+        return observable.AsCompletion().SelectMany(_ => selector());
+    }
+
+    public static IObservable<Unit> AsCompletion<T>(this IObservable<T> observable)
+    {
+        return Observable.Create<Unit>(observer =>
+        {
+            void OnCompleted()
             {
-                Currrent = currrent;
-                Previous = previous;
+                observer.OnNext(Unit.Default);
+                observer.OnCompleted();
             }
-        }
 
-        public static IObservable<Unit> ToUnit<T>(this IObservable<T> source)
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            return source.Select(_ => Unit.Default);
-        }
+            return observable.Subscribe(_ => { }, observer.OnError, OnCompleted);
+        });
+    }
 
-        public static IObservable<Unit> StartWithUnit(this IObservable<Unit> source)
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            return source.StartWith(Unit.Default);
-        }
-
-        public static void Once(this ISubject<Unit> source)
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            source.OnNext(Unit.Default);
-        }
-
-        /// <summary>
-        /// from here http://haacked.com/archive/2012/10/08/writing-a-continueafter-method-for-rx.aspx/
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="TRet"></typeparam>
-        /// <param name="observable"></param>
-        /// <param name="selector"></param>
-        /// <returns></returns>
-        public static IObservable<TRet> WithContinuation<T, TRet>(
-          this IObservable<T> observable, Func<IObservable<TRet>> selector)
-        {
-            return observable.AsCompletion().SelectMany(_ => selector());
-        }
-
-        public static IObservable<Unit> AsCompletion<T>(this IObservable<T> observable)
-        {
-            return Observable.Create<Unit>(observer =>
-            {
-                void OnCompleted()
-                {
-                    observer.OnNext(Unit.Default);
-                    observer.OnCompleted();
-                }
-
-                return observable.Subscribe(_ => { }, observer.OnError, OnCompleted);
-            });
-        }
-
-        public static IObservable<bool> HasChanged<T>([NotNull] this IObservable<T> source)
-        {
-            if (source == null) throw new ArgumentNullException(nameof(source));
+    public static IObservable<bool> HasChanged<T>([NotNull] this IObservable<T> source)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
             
-            return source.Scan((InitialAndCurrent<T>)null, (acc, current) =>
+        return source.Scan((InitialAndCurrent<T>)null, (acc, current) =>
             {
                 return acc==null ? new InitialAndCurrent<T>(current) : new InitialAndCurrent<T>(acc.Initial, current);
             })
@@ -113,25 +111,24 @@ namespace TailBlazer.Domain.Infrastructure
                 if (!initalAndCurrent.Latest.HasValue) return false;
                 return !initalAndCurrent.Initial.Equals(initalAndCurrent.Latest.Value);
             });
-        }
-
-        private class InitialAndCurrent<T>
-        {
-            public Optional<T> Latest { get; }
-            public T Initial { get; }
-
-            public InitialAndCurrent(T initial, Optional<T> current)
-            {
-                Latest = current;
-                Initial = initial;
-            }
-
-            public InitialAndCurrent(T initial)
-            {
-                Latest = Optional<T>.None;
-                Initial = initial;
-            }
-        }
-
     }
+
+    private class InitialAndCurrent<T>
+    {
+        public Optional<T> Latest { get; }
+        public T Initial { get; }
+
+        public InitialAndCurrent(T initial, Optional<T> current)
+        {
+            Latest = current;
+            Initial = initial;
+        }
+
+        public InitialAndCurrent(T initial)
+        {
+            Latest = Optional<T>.None;
+            Initial = initial;
+        }
+    }
+
 }

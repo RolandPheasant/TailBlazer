@@ -1,14 +1,12 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace TailBlazer.Controls
-{
+namespace TailBlazer.Controls;
 
-    public class SaveLayoutIcon : Control
+public class SaveLayoutIcon : Control
+{
+    static SaveLayoutIcon()
     {
-        static SaveLayoutIcon()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(SaveLayoutIcon), new FrameworkPropertyMetadata(typeof(SaveLayoutIcon)));
-        }
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(SaveLayoutIcon), new FrameworkPropertyMetadata(typeof(SaveLayoutIcon)));
     }
 }

@@ -3,31 +3,30 @@ using FluentAssertions;
 using TailBlazer.Views.Formatting;
 using Xunit;
 
-namespace TailBlazer.Fixtures
+namespace TailBlazer.Fixtures;
+
+public class DefaultColourSelectorFixture
 {
-    public class DefaultColourSelectorFixture
+    [Fact]
+    public void DefaultColourSelectorLookupShouldWork()
     {
-        [Fact]
-        public void DefaultColourSelectorLookupShouldWork()
-        {
-            var provider = new ColourProvider();
-            var selector = new DefaultColourSelector(provider);
-            var key = provider.Hues.First().Key;
+        var provider = new ColourProvider();
+        var selector = new DefaultColourSelector(provider);
+        var key = provider.Hues.First().Key;
 
-            var result = selector.Lookup(key);
+        var result = selector.Lookup(key);
 
-            result.Key.Should().Be(key);
-        }
+        result.Key.Should().Be(key);
+    }
 
-        [Fact]
-        public void DefaultColourSelectorSelectShouldWork()
-        {
-            var provider = new ColourProvider();
-            var selector = new DefaultColourSelector(provider);
+    [Fact]
+    public void DefaultColourSelectorSelectShouldWork()
+    {
+        var provider = new ColourProvider();
+        var selector = new DefaultColourSelector(provider);
 
-            var result = selector.Select("DEBUG");
+        var result = selector.Select("DEBUG");
 
-            result.Should().NotBeNull();
-        }
+        result.Should().NotBeNull();
     }
 }

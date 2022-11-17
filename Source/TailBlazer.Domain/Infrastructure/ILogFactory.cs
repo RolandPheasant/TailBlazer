@@ -1,8 +1,7 @@
-﻿namespace TailBlazer.Domain.Infrastructure
+﻿namespace TailBlazer.Domain.Infrastructure;
+
+public interface ILogFactory
 {
-    public interface ILogFactory
-    {
-        ILogger Create(string name);
-        ILogger Create<T>();
-    }
+    ILogger Create(string name);
+    ILogger Create<T>();
 }

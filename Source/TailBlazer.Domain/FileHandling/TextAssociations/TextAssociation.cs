@@ -1,5 +1,3 @@
-using System;
-
 namespace TailBlazer.Domain.FileHandling.TextAssociations;
 
 public sealed  class TextAssociation

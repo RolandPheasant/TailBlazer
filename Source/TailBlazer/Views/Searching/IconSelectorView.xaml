@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:TailBlazer.Views.Searching"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:formatting="clr-namespace:TailBlazer.Views.Formatting"
-             xmlns:virtualisation="clr-namespace:TailBlazer.Infrastucture.Virtualisation"
+             xmlns:virtualisation="clr-namespace:TailBlazer.Infrastructure.Virtualisation"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:IconSelector}">
 

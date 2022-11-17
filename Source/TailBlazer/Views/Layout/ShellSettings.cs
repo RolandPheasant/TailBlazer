@@ -1,75 +1,71 @@
-﻿
-using System;
-using System.Windows;
+﻿using System.Windows;
 
-namespace TailBlazer.Views.Layout
+namespace TailBlazer.Views.Layout;
+
+public class ShellSettings :  IEquatable<ShellSettings>
 {
+    public double Top { get; }
+    public double Left { get; }
 
-    public class ShellSettings :  IEquatable<ShellSettings>
+    public double Width { get; }
+
+    public double Height { get; }
+
+    public WindowState State { get; }
+
+    public ShellSettings(double top, double left, double width, double height, WindowState state)
     {
-        public double Top { get; }
-        public double Left { get; }
+        Top = top;
+        Left = left;
+        Width = width;
+        Height = height;
+        State = state;
+    }
 
-        public double Width { get; }
+    #region Equality
 
-        public double Height { get; }
+    public bool Equals(ShellSettings other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return Top.Equals(other.Top) && Left.Equals(other.Left) && Width.Equals(other.Width) && Height.Equals(other.Height) && State == other.State;
+    }
 
-        public WindowState State { get; }
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(null, obj)) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != this.GetType()) return false;
+        return Equals((ShellSettings) obj);
+    }
 
-        public ShellSettings(double top, double left, double width, double height, WindowState state)
+    public override int GetHashCode()
+    {
+        unchecked
         {
-            Top = top;
-            Left = left;
-            Width = width;
-            Height = height;
-            State = state;
+            var hashCode = Top.GetHashCode();
+            hashCode = (hashCode*397) ^ Left.GetHashCode();
+            hashCode = (hashCode*397) ^ Width.GetHashCode();
+            hashCode = (hashCode*397) ^ Height.GetHashCode();
+            hashCode = (hashCode*397) ^ (int) State;
+            return hashCode;
         }
+    }
 
-        #region Equality
+    public static bool operator ==(ShellSettings left, ShellSettings right)
+    {
+        return Equals(left, right);
+    }
 
-        public bool Equals(ShellSettings other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return Top.Equals(other.Top) && Left.Equals(other.Left) && Width.Equals(other.Width) && Height.Equals(other.Height) && State == other.State;
-        }
+    public static bool operator !=(ShellSettings left, ShellSettings right)
+    {
+        return !Equals(left, right);
+    }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((ShellSettings) obj);
-        }
+    #endregion
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = Top.GetHashCode();
-                hashCode = (hashCode*397) ^ Left.GetHashCode();
-                hashCode = (hashCode*397) ^ Width.GetHashCode();
-                hashCode = (hashCode*397) ^ Height.GetHashCode();
-                hashCode = (hashCode*397) ^ (int) State;
-                return hashCode;
-            }
-        }
-
-        public static bool operator ==(ShellSettings left, ShellSettings right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(ShellSettings left, ShellSettings right)
-        {
-            return !Equals(left, right);
-        }
-
-        #endregion
-
-        public override string ToString()
-        {
-            return $"Location: ({Top},{Left}).  Size({Width},{Height}). State: {State}";
-        }
+    public override string ToString()
+    {
+        return $"Location: ({Top},{Left}).  Size({Width},{Height}). State: {State}";
     }
 }

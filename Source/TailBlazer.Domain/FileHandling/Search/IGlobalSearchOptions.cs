@@ -1,7 +1,6 @@
-namespace TailBlazer.Domain.FileHandling.Search
+namespace TailBlazer.Domain.FileHandling.Search;
+
+public interface IGlobalSearchOptions
 {
-    public interface IGlobalSearchOptions
-    {
-        ISearchMetadataCollection Metadata { get; }
-    }
+    ISearchMetadataCollection Metadata { get; }
 }

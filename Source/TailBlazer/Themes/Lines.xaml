@@ -2,10 +2,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:TailBlazer.Controls"
-    xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
+    xmlns:infrastucture="clr-namespace:TailBlazer.Infrastructure"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
-    xmlns:virtualisation="clr-namespace:TailBlazer.Infrastucture.Virtualisation"
+    xmlns:virtualisation="clr-namespace:TailBlazer.Infrastructure.Virtualisation"
     xmlns:system="clr-namespace:System;assembly=System.Runtime">
 
     <ResourceDictionary.MergedDictionaries>

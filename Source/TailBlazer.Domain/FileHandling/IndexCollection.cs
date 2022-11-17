@@ -1,281 +1,277 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Domain.FileHandling;
+
+public class IndexCollection: ILineProvider
 {
-    public class IndexCollection: ILineProvider
+    public int Count { get; }
+    public int Diff { get; }
+    public bool IsEmpty => Count != 0;
+    private Index[] Indicies { get; }
+    private FileInfo Info { get; }
+    private Encoding Encoding { get; }
+    private TailInfo TailInfo { get; }
+
+    public IndexCollection(IReadOnlyCollection<Index> latest,
+        IndexCollection previous,
+        FileInfo info,
+        Encoding encoding)
     {
-        public int Count { get; }
-        public int Diff { get; }
-        public bool IsEmpty => Count != 0;
-        private Index[] Indicies { get; }
-        private FileInfo Info { get; }
-        private Encoding Encoding { get; }
-        private TailInfo TailInfo { get; }
-
-        public IndexCollection(IReadOnlyCollection<Index> latest,
-                                    IndexCollection previous,
-                                    FileInfo info,
-                                    Encoding encoding)
-        {
-            Info = info;
-            Encoding = encoding;
-            Count = latest.Select(idx => idx.LineCount).Sum();
-            Indicies = latest.ToArray();
-            Diff = Count - (previous?.Count ?? 0);
+        Info = info;
+        Encoding = encoding;
+        Count = latest.Select(idx => idx.LineCount).Sum();
+        Indicies = latest.ToArray();
+        Diff = Count - (previous?.Count ?? 0);
             
-            //need to check whether
-            if (previous == null)
+        //need to check whether
+        if (previous == null)
+        {
+            TailInfo = new TailInfo(latest.Max(idx => idx.End));
+        }
+        else
+        {
+            TailInfo = new TailInfo(previous.Indicies.Max(idx => idx.End));
+        }
+    }
+
+    /// <summary>
+    /// Reads the lines.
+    /// </summary>
+    /// <param name="scroll">The scroll.</param>
+    /// <returns></returns>
+    public IEnumerable<Line> ReadLines(ScrollRequest scroll)
+    {
+        if (scroll.SpecifiedByPosition)
+        {
+            foreach (var line in ReadLinesByPosition(scroll))
+                yield return line;
+        }
+        else
+        {
+            foreach (var line in ReadLinesByIndex(scroll))
+                yield return line;
+        }
+    }
+
+    private IEnumerable<Line> ReadLinesByIndex(ScrollRequest scroll)
+    {
+
+        var page = GetPage(scroll);
+
+        var relativeIndex = CalculateRelativeIndex(page.Start);
+        if (relativeIndex == null) yield break;
+
+        var offset = relativeIndex.LinesOffset;
+
+        using var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite);
+        using (var reader = new StreamReaderExtended(stream, Encoding, false))
+        {
+            //go to starting point
+            stream.Seek(relativeIndex.Start, SeekOrigin.Begin);
+            if (offset > 0)
             {
-                TailInfo = new TailInfo(latest.Max(idx => idx.End));
+                //skip number of lines offset
+                for (int i = 0; i < offset; i++)
+                    reader.ReadLine();
             }
-            else
+
+            //if estimate move to the next start of line
+            if (relativeIndex.IsEstimate && relativeIndex.Start != 0)
+                reader.ReadLine();
+
+            foreach (var i in Enumerable.Range(page.Start, page.Size))
             {
-                TailInfo = new TailInfo(previous.Indicies.Max(idx => idx.End));
+                var startPosition = reader.AbsolutePosition();
+                var line = reader.ReadLine();
+                var endPosition = reader.AbsolutePosition();
+                var info = new LineInfo(i + 1, i, startPosition, endPosition);
+
+                var ontail = startPosition >= TailInfo.TailStartsAt && DateTime.UtcNow.Subtract(TailInfo.LastTail).TotalSeconds < 1
+                    ? DateTime.UtcNow
+                    : (DateTime?)null;
+
+                yield return new Line(info, line, ontail);
             }
         }
+    }
 
-        /// <summary>
-        /// Reads the lines.
-        /// </summary>
-        /// <param name="scroll">The scroll.</param>
-        /// <returns></returns>
-        public IEnumerable<Line> ReadLines(ScrollRequest scroll)
+    private IEnumerable<Line> ReadLinesByPosition(ScrollRequest scroll)
+    {
+
+        //TODO: Calculate initial index of first item.
+
+   
+        //scroll from specified position
+
+        using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read,FileShare.Delete | FileShare.ReadWrite))
         {
-            if (scroll.SpecifiedByPosition)
-            {
-                foreach (var line in ReadLinesByPosition(scroll))
-                    yield return line;
-            }
-            else
-            {
-                foreach (var line in ReadLinesByIndex(scroll))
-                    yield return line;
-            }
-        }
-
-        private IEnumerable<Line> ReadLinesByIndex(ScrollRequest scroll)
-        {
-
-            var page = GetPage(scroll);
-
-            var relativeIndex = CalculateRelativeIndex(page.Start);
-            if (relativeIndex == null) yield break;
-
-            var offset = relativeIndex.LinesOffset;
-
-            using var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite);
+            int taken = 0;
             using (var reader = new StreamReaderExtended(stream, Encoding, false))
             {
-                //go to starting point
-                stream.Seek(relativeIndex.Start, SeekOrigin.Begin);
-                if (offset > 0)
-                {
-                    //skip number of lines offset
-                    for (int i = 0; i < offset; i++)
-                        reader.ReadLine();
-                }
 
-                //if estimate move to the next start of line
-                if (relativeIndex.IsEstimate && relativeIndex.Start != 0)
-                    reader.ReadLine();
+                var startPosition = scroll.Position;
+                var first = (int)CalculateIndexByPositon(startPosition);
+                reader.BaseStream.Seek(startPosition, SeekOrigin.Begin);
 
-                foreach (var i in Enumerable.Range(page.Start, page.Size))
+                do
                 {
-                    var startPosition = reader.AbsolutePosition();
+
                     var line = reader.ReadLine();
-                    var endPosition = reader.AbsolutePosition();
-                    var info = new LineInfo(i + 1, i, startPosition, endPosition);
+                    if (line==null) yield break;
 
-                    var ontail = startPosition >= TailInfo.TailStartsAt && DateTime.UtcNow.Subtract(TailInfo.LastTail).TotalSeconds < 1
+                    var endPosition = reader.AbsolutePosition();
+
+                    var info = new LineInfo(first + taken + 1, first + taken, startPosition, endPosition);
+                    var ontail = endPosition >= TailInfo.TailStartsAt && DateTime.UtcNow.Subtract(TailInfo.LastTail).TotalSeconds < 1
                         ? DateTime.UtcNow
                         : (DateTime?)null;
 
                     yield return new Line(info, line, ontail);
-                }
+
+                    startPosition = endPosition;
+                    taken++;
+
+                } while (taken < scroll.PageSize);
             }
         }
+    }
 
-        private IEnumerable<Line> ReadLinesByPosition(ScrollRequest scroll)
+    private Page GetPage(ScrollRequest scroll)
+    {
+        var first = scroll.FirstIndex;
+        var size = scroll.PageSize;
+
+
+        if (scroll.Mode == ScrollReason.Tail)
+        {
+            first = size > Count ? 0 : Count - size;
+        }
+        else
         {
 
-            //TODO: Calculate initial index of first item.
+            if (scroll.FirstIndex + size >= Count)
+                first = Count - size;
 
-   
-            //scroll from specified position
+        }
 
-            using (var stream = File.Open(Info.FullName, FileMode.Open, FileAccess.Read,FileShare.Delete | FileShare.ReadWrite))
+        first = Math.Max(0, first);
+        size = Math.Min(size, Count);
+
+        return new Page(first, size);
+    }
+
+    private long CalculateIndexByPositon(long position)
+    {
+        long firstLineInContainer = 0;
+        long lastLineInContainer = 0;
+
+        foreach (var sparseIndex in Indicies)
+        {
+            lastLineInContainer += sparseIndex.End;
+            if (position < lastLineInContainer)
             {
-                int taken = 0;
-                using (var reader = new StreamReaderExtended(stream, Encoding, false))
+                if (sparseIndex.LineCount != 0 && sparseIndex.Indicies.Count == 0)
                 {
+                    var lines = sparseIndex.LineCount;
+                    var bytes = sparseIndex.End - sparseIndex.Start;
+                    var bytesPerLine = bytes / lines;
 
-                    var startPosition = scroll.Position;
-                    var first = (int)CalculateIndexByPositon(startPosition);
-                    reader.BaseStream.Seek(startPosition, SeekOrigin.Begin);
-
-                    do
-                    {
-
-                        var line = reader.ReadLine();
-                        if (line==null) yield break;
-
-                        var endPosition = reader.AbsolutePosition();
-
-                        var info = new LineInfo(first + taken + 1, first + taken, startPosition, endPosition);
-                        var ontail = endPosition >= TailInfo.TailStartsAt && DateTime.UtcNow.Subtract(TailInfo.LastTail).TotalSeconds < 1
-                            ? DateTime.UtcNow
-                            : (DateTime?)null;
-
-                        yield return new Line(info, line, ontail);
-
-                        startPosition = endPosition;
-                        taken++;
-
-                    } while (taken < scroll.PageSize);
+                    return position / bytesPerLine;
                 }
-            }
-        }
-
-        private Page GetPage(ScrollRequest scroll)
-        {
-            var first = scroll.FirstIndex;
-            var size = scroll.PageSize;
 
 
-            if (scroll.Mode == ScrollReason.Tail)
-            {
-                first = size > Count ? 0 : Count - size;
-            }
-            else
-            {
-
-                    if (scroll.FirstIndex + size >= Count)
-                        first = Count - size;
-
-            }
-
-            first = Math.Max(0, first);
-            size = Math.Min(size, Count);
-
-            return new Page(first, size);
-        }
-
-        private long CalculateIndexByPositon(long position)
-        {
-            long firstLineInContainer = 0;
-            long lastLineInContainer = 0;
-
-            foreach (var sparseIndex in Indicies)
-            {
-                lastLineInContainer += sparseIndex.End;
-                if (position < lastLineInContainer)
+                if (sparseIndex.Compression == 1)
                 {
-                    if (sparseIndex.LineCount != 0 && sparseIndex.Indicies.Count == 0)
-                    {
-                        var lines = sparseIndex.LineCount;
-                        var bytes = sparseIndex.End - sparseIndex.Start;
-                        var bytesPerLine = bytes / lines;
-
-                        return position / bytesPerLine;
-                    }
-
-
-                    if (sparseIndex.Compression == 1)
-                    {
-                       return firstLineInContainer + sparseIndex.Indicies.IndexOf(position);
-                    }
+                    return firstLineInContainer + sparseIndex.Indicies.IndexOf(position);
+                }
              
-                    //find nearest, then work out offset
-                    var nearest = sparseIndex.Indicies.Data
-                        .Select((value,index)=>new {value,index})
-                        .OrderByDescending(x=>x.value)
-                        .FirstOrDefault(i => i.value <= position);
+                //find nearest, then work out offset
+                var nearest = sparseIndex.Indicies.Data
+                    .Select((value,index)=>new {value,index})
+                    .OrderByDescending(x=>x.value)
+                    .FirstOrDefault(i => i.value <= position);
 
-                    if (nearest != null)
-                    {
-                        //index depends of how far in container
-                        var relativeIndex = nearest.index * sparseIndex.Compression;
-
-                        //remaining size
-                        var size = (sparseIndex.End - sparseIndex.Start);
-                        var offset =   (position - nearest.value);
-                        var estimateOffset = (offset/size) * sparseIndex.Compression;
-                        return firstLineInContainer + relativeIndex + estimateOffset;
-                    }
-                    else
-                    {
-                        //index depends of how far in container
-                        var relativeIndex = 0;
-
-                        //remaining size
-                        var size = (sparseIndex.End - sparseIndex.Start);
-                        var offset = position;
-                        var estimateOffset = (offset / size) * sparseIndex.Compression;
-                        return firstLineInContainer +  relativeIndex + estimateOffset;
-                    }
-                }
-                firstLineInContainer = firstLineInContainer + sparseIndex.LineCount;
-            }
-            return -1;
-        }
-        private RelativeIndex CalculateRelativeIndex(int index)
-        {
-            int firstLineInContainer = 0;
-            int lastLineInContainer = 0;
-
-            foreach (var sparseIndex in Indicies)
-            {
-                lastLineInContainer += sparseIndex.LineCount;
-                if (index < lastLineInContainer)
+                if (nearest != null)
                 {
-                    //It could be that the user is scrolling into a part of the file
-                    //which is still being indexed [or will never be indexed]. 
-                    //In this case we need to estimate where to scroll to
-                    if (sparseIndex.LineCount != 0 && sparseIndex.Indicies.Count == 0)
-                    {
-                        //return estimate here!
-                        var lines = sparseIndex.LineCount;
-                        var bytes = sparseIndex.End - sparseIndex.Start;
-                        var bytesPerLine = bytes/lines;
-                        var estimate = index*bytesPerLine;
+                    //index depends of how far in container
+                    var relativeIndex = nearest.index * sparseIndex.Compression;
 
-
-                        return new RelativeIndex(index, estimate, 0,true);
-                    }
-
-                    var relativePosition = (index - firstLineInContainer);
-                    var relativeIndex = relativePosition / sparseIndex.Compression;
-                    var offset = relativePosition % sparseIndex.Compression;
-
-                    if (relativeIndex >= sparseIndex.IndexCount)
-                        relativeIndex = sparseIndex.IndexCount - 1;
-                    var start = relativeIndex == 0 ? 0 : sparseIndex.Indicies[relativeIndex - 1];
-                    return new RelativeIndex(index, start, offset,false);
+                    //remaining size
+                    var size = (sparseIndex.End - sparseIndex.Start);
+                    var offset =   (position - nearest.value);
+                    var estimateOffset = (offset/size) * sparseIndex.Compression;
+                    return firstLineInContainer + relativeIndex + estimateOffset;
                 }
-                firstLineInContainer = firstLineInContainer + sparseIndex.LineCount;
+                else
+                {
+                    //index depends of how far in container
+                    var relativeIndex = 0;
+
+                    //remaining size
+                    var size = (sparseIndex.End - sparseIndex.Start);
+                    var offset = position;
+                    var estimateOffset = (offset / size) * sparseIndex.Compression;
+                    return firstLineInContainer +  relativeIndex + estimateOffset;
+                }
             }
-            return null;
+            firstLineInContainer = firstLineInContainer + sparseIndex.LineCount;
         }
+        return -1;
+    }
+    private RelativeIndex CalculateRelativeIndex(int index)
+    {
+        int firstLineInContainer = 0;
+        int lastLineInContainer = 0;
 
-        private class RelativeIndex
+        foreach (var sparseIndex in Indicies)
         {
-            public long Index { get; }
-            public long Start { get; }
-            public int LinesOffset { get; }
-            public bool IsEstimate { get;  }
-
-
-            public RelativeIndex(long index, long start, int linesOffset, bool isEstimate)
+            lastLineInContainer += sparseIndex.LineCount;
+            if (index < lastLineInContainer)
             {
-                Index = index;
-                Start = start;
-                LinesOffset = linesOffset;
-                IsEstimate = isEstimate;
+                //It could be that the user is scrolling into a part of the file
+                //which is still being indexed [or will never be indexed]. 
+                //In this case we need to estimate where to scroll to
+                if (sparseIndex.LineCount != 0 && sparseIndex.Indicies.Count == 0)
+                {
+                    //return estimate here!
+                    var lines = sparseIndex.LineCount;
+                    var bytes = sparseIndex.End - sparseIndex.Start;
+                    var bytesPerLine = bytes/lines;
+                    var estimate = index*bytesPerLine;
+
+
+                    return new RelativeIndex(index, estimate, 0,true);
+                }
+
+                var relativePosition = (index - firstLineInContainer);
+                var relativeIndex = relativePosition / sparseIndex.Compression;
+                var offset = relativePosition % sparseIndex.Compression;
+
+                if (relativeIndex >= sparseIndex.IndexCount)
+                    relativeIndex = sparseIndex.IndexCount - 1;
+                var start = relativeIndex == 0 ? 0 : sparseIndex.Indicies[relativeIndex - 1];
+                return new RelativeIndex(index, start, offset,false);
             }
+            firstLineInContainer = firstLineInContainer + sparseIndex.LineCount;
+        }
+        return null;
+    }
+
+    private class RelativeIndex
+    {
+        public long Index { get; }
+        public long Start { get; }
+        public int LinesOffset { get; }
+        public bool IsEstimate { get;  }
+
+
+        public RelativeIndex(long index, long start, int linesOffset, bool isEstimate)
+        {
+            Index = index;
+            Start = start;
+            LinesOffset = linesOffset;
+            IsEstimate = isEstimate;
         }
     }
 }

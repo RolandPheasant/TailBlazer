@@ -1,8 +1,7 @@
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Domain.FileHandling;
+
+public enum IndexType
 {
-    public enum IndexType
-    {
-        Tail,
-        Page
-    }
+    Tail,
+    Page
 }

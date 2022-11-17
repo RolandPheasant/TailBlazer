@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
+﻿namespace TailBlazer.Domain.FileHandling;
 
-namespace TailBlazer.Domain.FileHandling
+public interface ILineProvider
 {
-    public interface ILineProvider
-    {
-        int Count { get; }
+    int Count { get; }
 
-        IEnumerable<Line> ReadLines(ScrollRequest scroll);
-    }
+    IEnumerable<Line> ReadLines(ScrollRequest scroll);
 }

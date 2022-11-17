@@ -1,8 +1,7 @@
-namespace TailBlazer.Views.Layout
+namespace TailBlazer.Views.Layout;
+
+public interface ILayoutService
 {
-    public interface ILayoutService
-    {
-        void Write();
-        void Restore();
-    }
+    void Write();
+    void Restore();
 }

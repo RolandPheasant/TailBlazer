@@ -1,10 +1,8 @@
-using System;
 using TailBlazer.Domain.Annotations;
 
-namespace TailBlazer.Views.Tail
+namespace TailBlazer.Views.Tail;
+
+public interface ITailViewStateControllerFactory
 {
-    public interface ITailViewStateControllerFactory
-    {
-        IDisposable Create([NotNull] TailViewModel tailView, bool loadDefaults);
-    }
+    IDisposable Create([NotNull] TailViewModel tailView, bool loadDefaults);
 }

@@ -1,9 +1,8 @@
 using TailBlazer.Domain.Annotations;
 
-namespace TailBlazer.Domain.FileHandling.Search
+namespace TailBlazer.Domain.FileHandling.Search;
+
+public interface ISearchMetadataFactory
 {
-    public interface ISearchMetadataFactory
-    {
-        SearchMetadata Create([NotNull] string searchText, bool useRegex, int index, bool filter, bool isGlobal = false);
-    }
+    SearchMetadata Create([NotNull] string searchText, bool useRegex, int index, bool filter, bool isGlobal = false);
 }

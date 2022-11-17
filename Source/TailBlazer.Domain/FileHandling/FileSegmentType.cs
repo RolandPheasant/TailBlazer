@@ -1,8 +1,7 @@
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Domain.FileHandling;
+
+public enum FileSegmentType
 {
-    public enum FileSegmentType
-    {
-        Head,
-        Tail
-    }
+    Head,
+    Tail
 }

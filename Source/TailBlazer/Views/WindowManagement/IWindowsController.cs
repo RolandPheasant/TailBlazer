@@ -1,14 +1,12 @@
-using System;
 using DynamicData;
-using TailBlazer.Infrastucture;
+using TailBlazer.Infrastructure;
 
-namespace TailBlazer.Views.WindowManagement
+namespace TailBlazer.Views.WindowManagement;
+
+public interface IWindowsController
 {
-    public interface IWindowsController
-    {
-        IObservableCache<HeaderedView, Guid> Views { get; }
+    IObservableCache<HeaderedView, Guid> Views { get; }
 
-        void Register(HeaderedView item);
-        void Remove(HeaderedView item);
-    }
+    void Register(HeaderedView item);
+    void Remove(HeaderedView item);
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -9,49 +8,48 @@ using DynamicData.Binding;
 using TailBlazer.Domain.FileHandling.Recent;
 using TailBlazer.Domain.Infrastructure;
 
-namespace TailBlazer.Views.Recent
+namespace TailBlazer.Views.Recent;
+
+public class RecentFilesViewModel: AbstractNotifyPropertyChanged, IDisposable
 {
-    public class RecentFilesViewModel: AbstractNotifyPropertyChanged, IDisposable
+    private readonly IRecentFileCollection _recentFileCollection;
+    private readonly IDisposable _cleanUp;
+    private readonly ISubject<FileInfo> _fileOpenRequest = new Subject<FileInfo>();
+
+    public ReadOnlyObservableCollection<RecentFileProxy> Files {get;}
+
+    public RecentFilesViewModel(IRecentFileCollection recentFileCollection, ISchedulerProvider schedulerProvider)
     {
-        private readonly IRecentFileCollection _recentFileCollection;
-        private readonly IDisposable _cleanUp;
-        private readonly ISubject<FileInfo> _fileOpenRequest = new Subject<FileInfo>();
+        _recentFileCollection = recentFileCollection;
+        if (recentFileCollection == null) throw new ArgumentNullException(nameof(recentFileCollection));
+        if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
 
-        public ReadOnlyObservableCollection<RecentFileProxy> Files {get;}
+        var recentLoader = recentFileCollection.Items
+            .Connect()
+            .Transform(rf => new RecentFileProxy(rf, toOpen => _fileOpenRequest.OnNext(new FileInfo(toOpen.Name)),recentFileCollection.Remove))
+            .Sort(SortExpressionComparer<RecentFileProxy>.Descending(proxy => proxy.Timestamp))
+            .ObserveOn(schedulerProvider.MainThread)
+            .Bind(out var data)
+            .Subscribe();
 
-        public RecentFilesViewModel(IRecentFileCollection recentFileCollection, ISchedulerProvider schedulerProvider)
+        Files = data;
+
+        _cleanUp = Disposable.Create(() =>
         {
-            _recentFileCollection = recentFileCollection;
-            if (recentFileCollection == null) throw new ArgumentNullException(nameof(recentFileCollection));
-            if (schedulerProvider == null) throw new ArgumentNullException(nameof(schedulerProvider));
+            recentLoader.Dispose();
+            _fileOpenRequest.OnCompleted();
+        }) ;
+    }
 
-            var recentLoader = recentFileCollection.Items
-                .Connect()
-                .Transform(rf => new RecentFileProxy(rf, toOpen => _fileOpenRequest.OnNext(new FileInfo(toOpen.Name)),recentFileCollection.Remove))
-                .Sort(SortExpressionComparer<RecentFileProxy>.Descending(proxy => proxy.Timestamp))
-                .ObserveOn(schedulerProvider.MainThread)
-                .Bind(out var data)
-                .Subscribe();
+    public IObservable<FileInfo> OpenFileRequest => _fileOpenRequest.AsObservable();
 
-            Files = data;
+    public void Add(FileInfo fileInfo)
+    {
+        _recentFileCollection.Add(new RecentFile(fileInfo));
+    }
 
-            _cleanUp = Disposable.Create(() =>
-            {
-                recentLoader.Dispose();
-                _fileOpenRequest.OnCompleted();
-            }) ;
-        }
-
-        public IObservable<FileInfo> OpenFileRequest => _fileOpenRequest.AsObservable();
-
-        public void Add(FileInfo fileInfo)
-        {
-            _recentFileCollection.Add(new RecentFile(fileInfo));
-        }
-
-        public void Dispose()
-        {
-            _cleanUp.Dispose();
-        }
+    public void Dispose()
+    {
+        _cleanUp.Dispose();
     }
 }

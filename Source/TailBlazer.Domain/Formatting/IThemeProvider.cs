@@ -1,11 +1,8 @@
-using System;
+namespace TailBlazer.Domain.Formatting;
 
-namespace TailBlazer.Domain.Formatting
+public interface IThemeProvider
 {
-    public interface IThemeProvider
-    {
-        IObservable<Theme> Theme { get; }
-        IObservable<Hue> Accent { get; }
+    IObservable<Theme> Theme { get; }
+    IObservable<Hue> Accent { get; }
 
-    }
 }

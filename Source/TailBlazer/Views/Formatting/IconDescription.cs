@@ -1,64 +1,62 @@
-using System;
 using System.Text.RegularExpressions;
 using MaterialDesignThemes.Wpf;
 
-namespace TailBlazer.Views.Formatting
+namespace TailBlazer.Views.Formatting;
+
+public class IconDescription : IEquatable<IconDescription>
 {
-    public class IconDescription : IEquatable<IconDescription>
+    public string Name { get; }
+    public PackIconKind Type { get; }
+
+    public string Description { get; }
+
+
+    public IconDescription(PackIconKind type, string name)
     {
-        public string Name { get; }
-        public PackIconKind Type { get; }
+        Type = type;
+        Name = name;
+        Description = Regex.Replace(name, "(\\B[A-Z])", " $1");
+    }
 
-        public string Description { get; }
+    #region Equality
 
+    public bool Equals(IconDescription other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return string.Equals(Name, other.Name) && Type == other.Type;
+    }
 
-        public IconDescription(PackIconKind type, string name)
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(null, obj)) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != this.GetType()) return false;
+        return Equals((IconDescription) obj);
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
         {
-            Type = type;
-            Name = name;
-            Description = Regex.Replace(name, "(\\B[A-Z])", " $1");
+            return ((Name?.GetHashCode() ?? 0)*397) ^ (int) Type;
         }
+    }
 
-        #region Equality
+    public static bool operator ==(IconDescription left, IconDescription right)
+    {
+        return Equals(left, right);
+    }
 
-        public bool Equals(IconDescription other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return string.Equals(Name, other.Name) && Type == other.Type;
-        }
+    public static bool operator !=(IconDescription left, IconDescription right)
+    {
+        return !Equals(left, right);
+    }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((IconDescription) obj);
-        }
+    #endregion
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return ((Name?.GetHashCode() ?? 0)*397) ^ (int) Type;
-            }
-        }
-
-        public static bool operator ==(IconDescription left, IconDescription right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(IconDescription left, IconDescription right)
-        {
-            return !Equals(left, right);
-        }
-
-        #endregion
-
-        public override string ToString()
-        {
-            return Name;
-        }
+    public override string ToString()
+    {
+        return Name;
     }
 }

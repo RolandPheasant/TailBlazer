@@ -1,35 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using Dragablz;
+﻿using Dragablz;
 using TailBlazer.Domain.Infrastructure;
 
-namespace TailBlazer.Views.WindowManagement
+namespace TailBlazer.Views.WindowManagement;
+
+public class WindowFactory : IWindowFactory
 {
-    public class WindowFactory : IWindowFactory
+    private readonly IObjectProvider _objectProvider;
+
+    public WindowFactory(IObjectProvider objectProvider)
     {
-        private readonly IObjectProvider _objectProvider;
+        _objectProvider = objectProvider;
+    }
 
-        public WindowFactory(IObjectProvider objectProvider)
+    public MainWindow Create(IEnumerable<string> files = null)
+    {
+        var window = new MainWindow();
+        var model = _objectProvider.Get<WindowViewModel>();
+        model.OpenFiles(files);
+        window.DataContext = model;
+
+        window.Closing += (sender, e) =>
         {
-            _objectProvider = objectProvider;
-        }
+            if (TabablzControl.GetIsClosingAsPartOfDragOperation(window)) return;
 
-        public MainWindow Create(IEnumerable<string> files = null)
-        {
-            var window = new MainWindow();
-            var model = _objectProvider.Get<WindowViewModel>();
-            model.OpenFiles(files);
-            window.DataContext = model;
+            var todispose = ((MainWindow) sender).DataContext as IDisposable;
+            todispose?.Dispose();
+        };
 
-            window.Closing += (sender, e) =>
-                              {
-                                  if (TabablzControl.GetIsClosingAsPartOfDragOperation(window)) return;
-
-                                  var todispose = ((MainWindow) sender).DataContext as IDisposable;
-                                  todispose?.Dispose();
-                              };
-
-            return window;
-        }
+        return window;
     }
 }

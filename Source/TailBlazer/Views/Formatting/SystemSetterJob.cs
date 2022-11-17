@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
@@ -14,65 +12,64 @@ using TailBlazer.Domain.Settings;
 using Hue = MaterialDesignColors.Hue;
 using UserTheme = TailBlazer.Domain.Formatting.Theme;
 
-namespace TailBlazer.Views.Formatting
+namespace TailBlazer.Views.Formatting;
+
+public sealed class SystemSetterJob: IDisposable
 {
-    public sealed class SystemSetterJob: IDisposable
+    private readonly IDisposable _cleanUp;
+
+    public SystemSetterJob(ISetting<GeneralOptions> setting,
+        IRatingService ratingService,
+        ISchedulerProvider schedulerProvider)
     {
-        private readonly IDisposable _cleanUp;
+        var swatches = new SwatchesProvider().Swatches.ToDictionary(s => s.Name);
 
-        public SystemSetterJob(ISetting<GeneralOptions> setting,
-            IRatingService ratingService,
-            ISchedulerProvider schedulerProvider)
-        {
-            var swatches = new SwatchesProvider().Swatches.ToDictionary(s => s.Name);
-
-            var themeSetter = setting.Value.Select(options => options.Theme)
-                .DistinctUntilChanged()
-                .ObserveOn(schedulerProvider.MainThread)
-                .Subscribe(userTheme =>
-                {
-                    var isDark = userTheme == UserTheme.Dark;
-
-                    ModifyTheme(theme => theme.SetBaseTheme(isDark ? MaterialDesignThemes.Wpf.Theme.Dark : MaterialDesignThemes.Wpf.Theme.Light));
-                    ApplyAccent(isDark ? swatches["yellow"] : swatches["indigo"]);
-                });
-
-            var frameRate = ratingService.Metrics
-                .Take(1)
-                .Select(metrics => metrics.FrameRate)
-                .Wait();
-
-            schedulerProvider.MainThread.Schedule(() =>
+        var themeSetter = setting.Value.Select(options => options.Theme)
+            .DistinctUntilChanged()
+            .ObserveOn(schedulerProvider.MainThread)
+            .Subscribe(userTheme =>
             {
-                Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = frameRate });
+                var isDark = userTheme == UserTheme.Dark;
 
+                ModifyTheme(theme => theme.SetBaseTheme(isDark ? MaterialDesignThemes.Wpf.Theme.Dark : MaterialDesignThemes.Wpf.Theme.Light));
+                ApplyAccent(isDark ? swatches["yellow"] : swatches["indigo"]);
             });
 
-            _cleanUp = new CompositeDisposable( themeSetter);
-        }
+        var frameRate = ratingService.Metrics
+            .Take(1)
+            .Select(metrics => metrics.FrameRate)
+            .Wait();
 
-        private static void ApplyAccent(Swatch swatch)
+        schedulerProvider.MainThread.Schedule(() =>
         {
-            if (swatch.AccentExemplarHue is Hue accentHue)
-            {
-                ModifyTheme(theme => theme.SetSecondaryColor(accentHue.Color));
-            }
-        }
+            Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = frameRate });
 
-        private static void ModifyTheme(Action<ITheme> modificationAction)
+        });
+
+        _cleanUp = new CompositeDisposable( themeSetter);
+    }
+
+    private static void ApplyAccent(Swatch swatch)
+    {
+        if (swatch.AccentExemplarHue is Hue accentHue)
         {
-            PaletteHelper paletteHelper = new PaletteHelper();
-            ITheme theme = paletteHelper.GetTheme();
-
-            modificationAction?.Invoke(theme);
-
-            paletteHelper.SetTheme(theme);
+            ModifyTheme(theme => theme.SetSecondaryColor(accentHue.Color));
         }
+    }
+
+    private static void ModifyTheme(Action<ITheme> modificationAction)
+    {
+        PaletteHelper paletteHelper = new PaletteHelper();
+        ITheme theme = paletteHelper.GetTheme();
+
+        modificationAction?.Invoke(theme);
+
+        paletteHelper.SetTheme(theme);
+    }
 
 
-        public void Dispose()
-        {
-            _cleanUp.Dispose();
-        }
+    public void Dispose()
+    {
+        _cleanUp.Dispose();
     }
 }

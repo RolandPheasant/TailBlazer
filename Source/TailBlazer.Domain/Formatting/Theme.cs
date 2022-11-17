@@ -1,8 +1,7 @@
-﻿namespace TailBlazer.Domain.Formatting
+﻿namespace TailBlazer.Domain.Formatting;
+
+public enum Theme
 {
-    public enum Theme
-    {
-        Dark,
-        Light
-    }
+    Dark,
+    Light
 }

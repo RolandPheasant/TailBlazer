@@ -1,17 +1,14 @@
-using System;
+namespace TailBlazer.Domain.FileHandling;
 
-namespace TailBlazer.Domain.FileHandling
+public interface IFileWatcher
 {
-    public interface IFileWatcher
-    {
-        IObservable<FileNotification> Latest { get; }
-        IObservable<FileStatus> Status { get; }
-        string FullName { get; }
-        string Name { get; }
-        string Folder { get; }
+    IObservable<FileNotification> Latest { get; }
+    IObservable<FileStatus> Status { get; }
+    string FullName { get; }
+    string Name { get; }
+    string Folder { get; }
 
-        void ScanFrom(long scanFrom);
-        void Clear();
-        void Reset();
-    }
+    void ScanFrom(long scanFrom);
+    void Clear();
+    void Reset();
 }

@@ -1,9 +1,8 @@
 using TailBlazer.Domain.FileHandling;
 
-namespace TailBlazer.Views.Tail
+namespace TailBlazer.Views.Tail;
+
+public interface ILineProxyFactory
 {
-    public interface ILineProxyFactory
-    {
-        LineProxy Create(Line line);
-    }
+    LineProxy Create(Line line);
 }

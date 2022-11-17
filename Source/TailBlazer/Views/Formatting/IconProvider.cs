@@ -1,42 +1,39 @@
-using System;
-using System.Linq;
 using System.Reactive.Disposables;
 using DynamicData;
 using MaterialDesignThemes.Wpf;
 using TailBlazer.Domain.FileHandling.Search;
 
-namespace TailBlazer.Views.Formatting
+namespace TailBlazer.Views.Formatting;
+
+public class IconProvider : IIconProvider, IDisposable
 {
-    public class IconProvider : IIconProvider, IDisposable
+    public IDefaultIconSelector DefaultIconSelector { get;  }
+
+    private readonly IDisposable _cleanUp;
+    private readonly ISourceList<IconDescription> _icons = new SourceList<IconDescription>();
+
+    public IconProvider(IDefaultIconSelector defaultIconSelector)
     {
-        public IDefaultIconSelector DefaultIconSelector { get;  }
+        DefaultIconSelector = defaultIconSelector;
 
-        private readonly IDisposable _cleanUp;
-        private readonly ISourceList<IconDescription> _icons = new SourceList<IconDescription>();
+        Icons = _icons.AsObservableList();
 
-        public IconProvider(IDefaultIconSelector defaultIconSelector)
-        {
-            DefaultIconSelector = defaultIconSelector;
+        var icons = Enum.GetNames(typeof(PackIconKind))
+            .Select(str =>
+            {
+                var value = (PackIconKind) Enum.Parse(typeof (PackIconKind), str);
+                return new IconDescription(value, str);
+            });
 
-            Icons = _icons.AsObservableList();
+        _icons.AddRange(icons);
 
-            var icons = Enum.GetNames(typeof(PackIconKind))
-                        .Select(str =>
-                        {
-                            var value = (PackIconKind) Enum.Parse(typeof (PackIconKind), str);
-                            return new IconDescription(value, str);
-                        });
+        _cleanUp = new CompositeDisposable(Icons, _icons);
+    }
 
-            _icons.AddRange(icons);
+    public IObservableList<IconDescription> Icons { get; }
 
-            _cleanUp = new CompositeDisposable(Icons, _icons);
-        }
-
-        public IObservableList<IconDescription> Icons { get; }
-
-        public void Dispose()
-        {
-            _cleanUp.Dispose();
-        }
+    public void Dispose()
+    {
+        _cleanUp.Dispose();
     }
 }

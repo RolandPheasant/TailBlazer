@@ -2,52 +2,51 @@
 using System.Linq;
 using System.Text;
 
-namespace TailBlazer.Fixtures
+namespace TailBlazer.Fixtures;
+
+public class LargeFileGenerator
 {
-    public class LargeFileGenerator
+    //  [Fact]
+    public void GenerateFile()
     {
-     //  [Fact]
-        public void GenerateFile()
+        string fileName = @"U:\Large Files\SuperGiantFile.txt";
+
+        //var file = File.Create(@"U:\GigFile.txt");
+
+        for (int i = 0; i < 1000; i++)
         {
-            string fileName = @"U:\Large Files\SuperGiantFile.txt";
+            int start = 1000000 * i + 1;
+            File.AppendAllLines(fileName,Enumerable.Range(start,1000000).Select(line=>$"This is line number {line.ToString("0000000000")} in a very large file"));
+        } 
+    }
 
-            //var file = File.Create(@"U:\GigFile.txt");
+    //  [Fact]
+    public void GenerateWideLinesInFile()
+    {
+        // string fileName = @"U:\Large Files\WideFile.txt";
+        string fileName = @"c:\work\LargeFiles\WideFile.txt";
+        //s var file = File.Create();
 
-            for (int i = 0; i < 1000; i++)
-            {
-                int start = 1000000 * i + 1;
-                File.AppendAllLines(fileName,Enumerable.Range(start,1000000).Select(line=>$"This is line number {line.ToString("0000000000")} in a very large file"));
-            } 
-        }
+        var template = "0123456789abcdefghijklmnopqrstuvwxyz";
+        var sb = new StringBuilder();
 
-     //  [Fact]
-        public void GenerateWideLinesInFile()
+        for (int i = 0; i < 1000; i++)
         {
-           // string fileName = @"U:\Large Files\WideFile.txt";
-            string fileName = @"c:\work\LargeFiles\WideFile.txt";
-           //s var file = File.Create();
-
-            var template = "0123456789abcdefghijklmnopqrstuvwxyz";
-            var sb = new StringBuilder();
-
-            for (int i = 0; i < 1000; i++)
+            for (int j = 0; i < 200; i++)
             {
-                for (int j = 0; i < 200; i++)
-                {
-                    sb.Append(j);
-                    sb.Append("_");
-                    sb.Append(template);
-                }
-
-                File.AppendAllLines(fileName,new[] {sb.Append(i).ToString()});
+                sb.Append(j);
+                sb.Append("_");
+                sb.Append(template);
             }
+
+            File.AppendAllLines(fileName,new[] {sb.Append(i).ToString()});
         }
+    }
 
-        public void AddToFile()
-        {
+    public void AddToFile()
+    {
 
 
 
-        }
     }
 }

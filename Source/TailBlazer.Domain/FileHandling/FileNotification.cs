@@ -1,134 +1,132 @@
-using System;
 using System.IO;
 
-namespace TailBlazer.Domain.FileHandling
+namespace TailBlazer.Domain.FileHandling;
+
+public sealed class FileNotification : IEquatable<FileNotification>
 {
-    public sealed class FileNotification : IEquatable<FileNotification>
+    private FileInfo Info { get; }
+    public bool Exists { get; }
+    public long Size { get; }
+    public string FullName => Info.FullName;
+    public string Name => Info.Name;
+    public string Folder => Info.DirectoryName;
+    public FileNotificationType NotificationType { get; }
+    public Exception Error { get; }
+
+
+    public FileNotification(FileInfo fileInfo)
     {
-        private FileInfo Info { get; }
-        public bool Exists { get; }
-        public long Size { get; }
-        public string FullName => Info.FullName;
-        public string Name => Info.Name;
-        public string Folder => Info.DirectoryName;
-        public FileNotificationType NotificationType { get; }
-        public Exception Error { get; }
+        fileInfo.Refresh();
+        Info = fileInfo;
+        Exists = fileInfo.Exists;
 
-
-        public FileNotification(FileInfo fileInfo)
+        if (Exists)
         {
-            fileInfo.Refresh();
-            Info = fileInfo;
-            Exists = fileInfo.Exists;
+            NotificationType = FileNotificationType.CreatedOrOpened;
+            Size = Info.Length;
+        }
+        else
+        {
+            NotificationType = FileNotificationType.Missing;
+        }
+    }
 
-            if (Exists)
+    public FileNotification(FileInfo fileInfo, Exception error)
+    {
+        Info = fileInfo;
+        Error = error;
+        Exists = false;
+        NotificationType = FileNotificationType.Error;
+    }
+
+    public FileNotification(FileNotification previous)
+    {
+        previous.Info.Refresh();
+
+        Info = previous.Info;
+        Exists = Info.Exists;
+
+        if (Exists)
+        {
+            Size = Info.Length;
+
+            if (!previous.Exists)
             {
                 NotificationType = FileNotificationType.CreatedOrOpened;
-                Size = Info.Length;
             }
+            else if (Size > previous.Size)
+            {
+                NotificationType = FileNotificationType.Changed;
+            }
+            else if (Size < previous.Size)
+            {
+                //File has shrunk. We need it's own notification
+                NotificationType = FileNotificationType.CreatedOrOpened;
+            }
+
             else
             {
-                NotificationType = FileNotificationType.Missing;
+                NotificationType = FileNotificationType.None;
             }
-        }
 
-        public FileNotification(FileInfo fileInfo, Exception error)
+        }
+        else
         {
-            Info = fileInfo;
-            Error = error;
-            Exists = false;
-            NotificationType = FileNotificationType.Error;
+            NotificationType = FileNotificationType.Missing;
         }
+    }
 
-        public FileNotification(FileNotification previous)
+    #region Equality
+
+    public static explicit operator FileInfo(FileNotification source)
+    {
+        return source.Info;
+    }
+
+    public bool Equals(FileNotification other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return Equals(FullName, other.FullName) 
+               && Exists == other.Exists 
+               && Size == other.Size 
+               && NotificationType == other.NotificationType;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(null, obj)) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != this.GetType()) return false;
+        return Equals((FileNotification) obj);
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
         {
-            previous.Info.Refresh();
-
-            Info = previous.Info;
-            Exists = Info.Exists;
-
-            if (Exists)
-            {
-                Size = Info.Length;
-
-                if (!previous.Exists)
-                {
-                    NotificationType = FileNotificationType.CreatedOrOpened;
-                }
-                else if (Size > previous.Size)
-                {
-                    NotificationType = FileNotificationType.Changed;
-                }
-                else if (Size < previous.Size)
-                {
-                    //File has shrunk. We need it's own notification
-                    NotificationType = FileNotificationType.CreatedOrOpened;
-                }
-
-                else
-                {
-                    NotificationType = FileNotificationType.None;
-                }
-
-            }
-            else
-            {
-                NotificationType = FileNotificationType.Missing;
-            }
+            var hashCode = FullName?.GetHashCode() ?? 0;
+            hashCode = (hashCode*397) ^ Exists.GetHashCode();
+            hashCode = (hashCode*397) ^ Size.GetHashCode();
+            hashCode = (hashCode*397) ^ (int) NotificationType;
+            return hashCode;
         }
+    }
 
-        #region Equality
+    public static bool operator ==(FileNotification left, FileNotification right)
+    {
+        return Equals(left, right);
+    }
 
-        public static explicit operator FileInfo(FileNotification source)
-        {
-            return source.Info;
-        }
+    public static bool operator !=(FileNotification left, FileNotification right)
+    {
+        return !Equals(left, right);
+    }
 
-        public bool Equals(FileNotification other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return Equals(FullName, other.FullName) 
-                   && Exists == other.Exists 
-                   && Size == other.Size 
-                   && NotificationType == other.NotificationType;
-        }
+    #endregion
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((FileNotification) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = FullName?.GetHashCode() ?? 0;
-                hashCode = (hashCode*397) ^ Exists.GetHashCode();
-                hashCode = (hashCode*397) ^ Size.GetHashCode();
-                hashCode = (hashCode*397) ^ (int) NotificationType;
-                return hashCode;
-            }
-        }
-
-        public static bool operator ==(FileNotification left, FileNotification right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(FileNotification left, FileNotification right)
-        {
-            return !Equals(left, right);
-        }
-
-        #endregion
-
-        public override string ToString()
-        {
-            return $"{Name}  Size: {Size}, Type: {NotificationType}";
-        }
+    public override string ToString()
+    {
+        return $"{Name}  Size: {Size}, Type: {NotificationType}";
     }
 }

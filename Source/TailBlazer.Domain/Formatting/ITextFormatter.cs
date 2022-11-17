@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
+namespace TailBlazer.Domain.Formatting;
 
-namespace TailBlazer.Domain.Formatting
+public interface ITextFormatter
 {
-    public interface ITextFormatter
-    {
-        IObservable<IEnumerable<DisplayText>> GetFormatter(string inputText);
-    }
+    IObservable<IEnumerable<DisplayText>> GetFormatter(string inputText);
 }
