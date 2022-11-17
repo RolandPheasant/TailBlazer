@@ -1,5 +1,3 @@
-using System;
-
 namespace TailBlazer.Views.DialogServices;
 
 public interface IDialogCoordinator

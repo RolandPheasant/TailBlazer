@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 
 namespace TailBlazer.Domain.FileHandling.Recent;

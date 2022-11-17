@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TailBlazer.Infrastructure.Virtualisation;
+﻿namespace TailBlazer.Infrastructure.Virtualisation;
 
 public delegate void TextScrollDelegate(TextScrollInfo textScrollInfo);
 

@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Reactive.Disposables;
 using DynamicData;
 using DynamicData.Kernel;

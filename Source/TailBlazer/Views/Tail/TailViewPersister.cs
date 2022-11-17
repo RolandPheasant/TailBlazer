@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using TailBlazer.Domain.Settings;
+﻿using TailBlazer.Domain.Settings;
 
 namespace TailBlazer.Views.Tail;
 

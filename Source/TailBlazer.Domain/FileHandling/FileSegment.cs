@@ -1,5 +1,3 @@
-using System;
-
 namespace TailBlazer.Domain.FileHandling;
 
 public sealed class FileSegment : IEquatable<FileSegment>

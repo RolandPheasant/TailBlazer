@@ -1,4 +1,3 @@
-using System;
 using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Domain.FileHandling.Search;

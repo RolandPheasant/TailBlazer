@@ -1,5 +1,4 @@
 using FluentAssertions;
-using TailBlazer.Domain.FileHandling.Recent;
 using Xunit;
 using TailBlazer.Views.Searching;
 

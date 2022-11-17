@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using DynamicData.Kernel;
 
 namespace TailBlazer.Domain.Formatting;

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TailBlazer.Infrastructure.AppState;
+﻿namespace TailBlazer.Infrastructure.AppState;
 
 public interface IApplicationStateNotifier
 {

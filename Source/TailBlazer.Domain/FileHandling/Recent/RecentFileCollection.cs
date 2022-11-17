@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Reactive.Disposables;
+﻿using System.Reactive.Disposables;
 using DynamicData;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Settings;

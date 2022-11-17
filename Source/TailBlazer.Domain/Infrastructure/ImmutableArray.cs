@@ -1,7 +1,4 @@
-﻿using System;
-
-
-namespace TailBlazer.Domain.Infrastructure;
+﻿namespace TailBlazer.Domain.Infrastructure;
 
 /// <summary>
 /// whipped straight from rx.net

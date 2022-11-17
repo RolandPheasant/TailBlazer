@@ -1,4 +1,3 @@
-using System;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.FileHandling.TextAssociations;

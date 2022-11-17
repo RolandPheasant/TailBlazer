@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TailBlazer.Domain.StateHandling;
+﻿namespace TailBlazer.Domain.StateHandling;
 
 public struct StateBucketKey : IEquatable<StateBucketKey>
 {

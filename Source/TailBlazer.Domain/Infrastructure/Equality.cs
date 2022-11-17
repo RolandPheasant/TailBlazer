@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace TailBlazer.Domain.Infrastructure;
+﻿namespace TailBlazer.Domain.Infrastructure;
 
 public  static class Equality
 {

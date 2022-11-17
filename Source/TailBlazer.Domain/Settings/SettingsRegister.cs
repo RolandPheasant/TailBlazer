@@ -1,5 +1,4 @@
-﻿using System;
-using TailBlazer.Domain.Annotations;
+﻿using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.Settings;

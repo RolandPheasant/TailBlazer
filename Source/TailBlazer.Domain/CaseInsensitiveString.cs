@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TailBlazer.Domain;
+﻿namespace TailBlazer.Domain;
 
 public struct CaseInsensitiveString : IEquatable<CaseInsensitiveString>
 {

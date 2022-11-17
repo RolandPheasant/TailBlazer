@@ -1,5 +1,3 @@
-
-using System.Linq;
 using DynamicData.Binding;
 
 namespace TailBlazer.Domain.Formatting;

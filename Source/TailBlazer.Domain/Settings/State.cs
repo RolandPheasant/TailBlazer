@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TailBlazer.Domain.Settings;
+﻿namespace TailBlazer.Domain.Settings;
 
 public class State : IEquatable<State>
 {

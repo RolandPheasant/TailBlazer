@@ -1,5 +1,4 @@
-﻿using System;
-using TailBlazer.Domain.Infrastructure;
+﻿using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Infrastructure;
 

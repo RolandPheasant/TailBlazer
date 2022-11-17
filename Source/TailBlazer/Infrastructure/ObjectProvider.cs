@@ -1,11 +1,9 @@
 ﻿#region Usings
 
 using System.Collections;
-using System.Collections.Generic;
 using StructureMap;
 using StructureMap.Pipeline;
 using TailBlazer.Domain.Infrastructure;
-using Argument = TailBlazer.Domain.Infrastructure.Argument;
 
 #endregion
 

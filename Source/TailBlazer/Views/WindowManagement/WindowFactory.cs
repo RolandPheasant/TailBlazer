@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Dragablz;
+﻿using Dragablz;
 using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Views.WindowManagement;

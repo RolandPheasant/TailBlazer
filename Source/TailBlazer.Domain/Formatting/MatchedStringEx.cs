@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using TailBlazer.Domain.FileHandling.Search;
 
 namespace TailBlazer.Domain.Formatting;

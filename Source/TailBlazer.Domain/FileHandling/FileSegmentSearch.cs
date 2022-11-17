@@ -1,4 +1,3 @@
-using System;
 using TailBlazer.Domain.Infrastructure;
 
 namespace TailBlazer.Domain.FileHandling;

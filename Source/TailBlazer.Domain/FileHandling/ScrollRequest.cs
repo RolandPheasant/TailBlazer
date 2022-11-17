@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TailBlazer.Domain.FileHandling;
+﻿namespace TailBlazer.Domain.FileHandling;
 
 public sealed class ScrollRequest : IEquatable<ScrollRequest>
 {

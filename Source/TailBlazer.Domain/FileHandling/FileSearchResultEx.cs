@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace TailBlazer.Domain.FileHandling;
 
 public static class FileSearchResultEx

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TailBlazer.Domain.Infrastructure;
+﻿namespace TailBlazer.Domain.Infrastructure;
 
 public class NullLogger : ILogger
 {

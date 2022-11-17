@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TailBlazer.Infrastructure;
+﻿namespace TailBlazer.Infrastructure;
 
 public class HeaderedView : IEquatable<HeaderedView>
 {

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using DynamicData.Kernel;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Views;

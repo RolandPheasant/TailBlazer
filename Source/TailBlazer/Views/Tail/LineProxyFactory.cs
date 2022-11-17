@@ -1,4 +1,3 @@
-using System;
 using System.Reactive.Linq;
 using TailBlazer.Domain.Annotations;
 using TailBlazer.Domain.FileHandling;

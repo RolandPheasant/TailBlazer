@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace TailBlazer.Domain.FileHandling;
+﻿namespace TailBlazer.Domain.FileHandling;
 
 public sealed class EmptyLineProvider: ILineProvider
 {

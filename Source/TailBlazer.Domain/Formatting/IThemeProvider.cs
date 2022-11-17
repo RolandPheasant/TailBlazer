@@ -1,5 +1,3 @@
-using System;
-
 namespace TailBlazer.Domain.Formatting;
 
 public interface IThemeProvider

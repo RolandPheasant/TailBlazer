@@ -1,4 +1,3 @@
-using System;
 using TailBlazer.Domain.FileHandling.TextAssociations;
 using TailBlazer.Domain.Formatting;
 

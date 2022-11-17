@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using DynamicData;
 
 namespace TailBlazer.Domain.FileHandling.Search;

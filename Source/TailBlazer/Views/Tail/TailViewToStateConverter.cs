@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 using TailBlazer.Domain.FileHandling.Search;
 using TailBlazer.Domain.Settings;
 using TailBlazer.Views.Searching;

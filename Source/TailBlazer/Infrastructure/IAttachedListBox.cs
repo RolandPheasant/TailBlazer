@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Windows.Controls;
 using DynamicData;
 using TailBlazer.Views.Tail;

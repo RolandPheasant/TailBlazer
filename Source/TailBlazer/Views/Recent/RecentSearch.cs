@@ -1,5 +1,3 @@
-using System;
-
 namespace TailBlazer.Views.Recent;
 
 public class RecentSearch : IEquatable<RecentSearch>

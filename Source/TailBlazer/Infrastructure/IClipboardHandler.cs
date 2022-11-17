@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using TailBlazer.Domain.Annotations;
 
 namespace TailBlazer.Infrastructure;

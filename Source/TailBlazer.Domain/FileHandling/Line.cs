@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace TailBlazer.Domain.FileHandling;
+﻿namespace TailBlazer.Domain.FileHandling;
 
 public class Line : IEquatable<Line>
 {

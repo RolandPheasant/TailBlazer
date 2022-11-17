@@ -1,5 +1,3 @@
-using System;
-
 namespace TailBlazer.Domain.FileHandling;
 
 public class FileSegmentSearchResult

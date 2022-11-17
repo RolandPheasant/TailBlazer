@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using DynamicData.Binding;
 using TailBlazer.Domain.FileHandling.Recent;
 using TailBlazer.Infrastructure;

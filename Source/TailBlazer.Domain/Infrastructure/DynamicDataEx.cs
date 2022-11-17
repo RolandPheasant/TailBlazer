@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using System.Reactive.Linq;
 using TailBlazer.Domain.Annotations;

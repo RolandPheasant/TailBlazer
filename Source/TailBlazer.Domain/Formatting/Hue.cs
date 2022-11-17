@@ -1,4 +1,3 @@
-using System;
 using System.Windows.Media;
 using TailBlazer.Domain.Annotations;
 

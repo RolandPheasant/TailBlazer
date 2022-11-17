@@ -1,5 +1,3 @@
-using System;
-
 namespace TailBlazer.Domain.Formatting;
 
 public struct HueKey : IEquatable<HueKey>

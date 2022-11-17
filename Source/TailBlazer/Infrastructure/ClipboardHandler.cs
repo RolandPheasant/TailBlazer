@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Windows;
 using DynamicData.Kernel;
 using TailBlazer.Domain.Annotations;

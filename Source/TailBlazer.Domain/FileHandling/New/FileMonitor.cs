@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using TailBlazer.Domain.Ratings;

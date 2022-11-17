@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using DynamicData.Kernel;
+﻿using DynamicData.Kernel;
 using TailBlazer.Domain.Settings;
 
 namespace TailBlazer.Domain.Ratings;

@@ -1,4 +1,3 @@
-using System;
 using System.Text.RegularExpressions;
 
 namespace TailBlazer.Domain.FileHandling.Search;

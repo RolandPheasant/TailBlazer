@@ -1,9 +1,7 @@
-using System;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using System.Security;
 using System.Text;
 
 namespace TailBlazer.Domain.FileHandling;

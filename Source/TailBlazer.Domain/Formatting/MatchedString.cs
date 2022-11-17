@@ -1,4 +1,3 @@
-using System;
 using TailBlazer.Domain.FileHandling.Search;
 
 namespace TailBlazer.Domain.Formatting;

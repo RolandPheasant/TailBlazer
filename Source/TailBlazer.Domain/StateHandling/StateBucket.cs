@@ -1,4 +1,3 @@
-using System;
 using TailBlazer.Domain.Settings;
 
 namespace TailBlazer.Domain.StateHandling;

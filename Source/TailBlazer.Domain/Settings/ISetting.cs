@@ -1,5 +1,3 @@
-using System;
-
 namespace TailBlazer.Domain.Settings;
 
 public interface ISetting<T>

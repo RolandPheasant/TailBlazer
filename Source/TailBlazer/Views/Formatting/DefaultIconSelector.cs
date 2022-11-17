@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using MaterialDesignThemes.Wpf;
 using TailBlazer.Domain.FileHandling.Search;
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reactive.Disposables;
+﻿using System.Reactive.Disposables;
 using DynamicData.Binding;
 
 namespace TailBlazer.Domain.Infrastructure;

@@ -1,5 +1,4 @@
-﻿using System;
-namespace TailBlazer.Infrastructure;
+﻿namespace TailBlazer.Infrastructure;
 
 public interface ISelectedAware
 {

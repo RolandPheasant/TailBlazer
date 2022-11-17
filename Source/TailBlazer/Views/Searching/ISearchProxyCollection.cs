@@ -1,4 +1,3 @@
-using System;
 using System.Collections.ObjectModel;
 using Dragablz;
 using TailBlazer.Domain.Infrastructure;
