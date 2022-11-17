@@ -1,24 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TailBlazer", "TailBlazer\TailBlazer.csproj", "{EBF74AA2-F4C2-4AE9-A6CF-33F3414893B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TailBlazer", "TailBlazer\TailBlazer.csproj", "{EBF74AA2-F4C2-4AE9-A6CF-33F3414893B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TailBlazer.Domain", "TailBlazer.Domain\TailBlazer.Domain.csproj", "{332F8BEB-1743-4B41-8953-A66A57F2503D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TailBlazer.Domain", "TailBlazer.Domain\TailBlazer.Domain.csproj", "{332F8BEB-1743-4B41-8953-A66A57F2503D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TailBlazer.Fixtures", "TailBlazer.Fixtures\TailBlazer.Fixtures.csproj", "{B7A99C2B-9833-4B7F-BE91-2329B22517B3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7F9C22D5-F3FA-47BE-ADBA-57D7EF3A1DA8}"
 	ProjectSection(SolutionItems) = preProject
 		..\README.md = ..\README.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{7279DB67-E1FA-4923-A236-9EF21758D0A1}"
-	ProjectSection(SolutionItems) = preProject
-		..\.nuget\NuGet.Config = ..\.nuget\NuGet.Config
-		..\.nuget\NuGet.exe = ..\.nuget\NuGet.exe
-		..\.nuget\NuGet.targets = ..\.nuget\NuGet.targets
 	EndProjectSection
 EndProject
 Global
@@ -42,5 +35,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E53BE403-54EE-4D0B-82B3-459C329E3FD3}
 	EndGlobalSection
 EndGlobal

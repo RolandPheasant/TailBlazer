@@ -10,7 +10,10 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib"
     xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
     xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
+    MinHeight="375"
     d:DataContext="{d:DesignInstance searching:SearchOptionsViewModel}"
+    
+    Background="{DynamicResource MaterialDesignPaper}"
     mc:Ignorable="d">
 
     <Control.Resources>

@@ -21,7 +21,7 @@ namespace TailBlazer.Fixtures
             long x = 1024 * 1024;
             var result = x.FormatWithAbbreviation();
 
-            result.ShouldBeEquivalentTo("1 MB");
+            result.Should().BeEquivalentTo("1 MB");
         }
 
         [Fact]
@@ -29,7 +29,7 @@ namespace TailBlazer.Fixtures
         {
             var result = long.MinValue.FormatWithAbbreviation();
 
-            result.ShouldBeEquivalentTo("-9223372036854775808 B");
+            result.Should().BeEquivalentTo("-9223372036854775808 B");
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace TailBlazer.Fixtures
         {
             var result = long.MaxValue.FormatWithAbbreviation();
 
-            result.ShouldBeEquivalentTo("8 EB");
+            result.Should().BeEquivalentTo("8 EB");
         }
 
         [Theory

@@ -35,7 +35,7 @@ namespace TailBlazer.Domain.FileHandling.New
     {
 
 
-        public FileMonitor(string fullPath, IRatingService ratingsMetrics, IScheduler scheduler = null)
+        public  FileMonitor(string fullPath, IRatingService ratingsMetrics, IScheduler scheduler = null)
         {
             if (fullPath == null) throw new ArgumentNullException(nameof(fullPath));
             if (ratingsMetrics == null) throw new ArgumentNullException(nameof(ratingsMetrics));

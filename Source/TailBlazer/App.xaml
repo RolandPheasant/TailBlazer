@@ -5,12 +5,22 @@
     xmlns:controls="clr-namespace:TailBlazer.Controls"
     xmlns:fileDrop="clr-namespace:TailBlazer.Views.FileDrop"
     xmlns:searching="clr-namespace:TailBlazer.Views.Searching"
-    xmlns:tail="clr-namespace:TailBlazer.Views.Tail">
+    xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    ShutdownMode="OnLastWindowClose"
+    >
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Colours.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+                <materialDesign:BundledTheme BaseTheme="Dark" 
+                                             PrimaryColor="Green" 
+                                             SecondaryColor="Amber" />
+
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/materialdesign.xaml" />
+
+                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Generic.xaml" />
+                <!--<ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Colours.xaml" />-->
             </ResourceDictionary.MergedDictionaries>
 
             <DataTemplate DataType="{x:Type searching:SearchOptionsViewModel}">

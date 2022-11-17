@@ -1,35 +1,40 @@
 using System;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
 using System.Windows;
 using System.Windows.Media.Animation;
+using MaterialDesignColors;
 using MaterialDesignThemes.Wpf;
 using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Ratings;
 using TailBlazer.Domain.Settings;
+using Hue = MaterialDesignColors.Hue;
+using UserTheme = TailBlazer.Domain.Formatting.Theme;
 
 namespace TailBlazer.Views.Formatting
 {
     public sealed class SystemSetterJob: IDisposable
     {
         private readonly IDisposable _cleanUp;
-        
+
         public SystemSetterJob(ISetting<GeneralOptions> setting,
             IRatingService ratingService,
             ISchedulerProvider schedulerProvider)
         {
-             var themeSetter =  setting.Value.Select(options => options.Theme)
+            var swatches = new SwatchesProvider().Swatches.ToDictionary(s => s.Name);
+
+            var themeSetter = setting.Value.Select(options => options.Theme)
                 .DistinctUntilChanged()
                 .ObserveOn(schedulerProvider.MainThread)
-                .Subscribe(theme =>
+                .Subscribe(userTheme =>
                 {
-                    var dark = theme == Theme.Dark;
-                    var paletteHelper = new PaletteHelper();
+                    var isDark = userTheme == UserTheme.Dark;
 
-                    paletteHelper.SetLightDark(dark);
-                    paletteHelper.ReplaceAccentColor(theme.GetAccentColor());
+                    ModifyTheme(theme => theme.SetBaseTheme(isDark ? MaterialDesignThemes.Wpf.Theme.Dark : MaterialDesignThemes.Wpf.Theme.Light));
+                    ApplyAccent(isDark ? swatches["yellow"] : swatches["indigo"]);
                 });
 
             var frameRate = ratingService.Metrics
@@ -44,6 +49,24 @@ namespace TailBlazer.Views.Formatting
             });
 
             _cleanUp = new CompositeDisposable( themeSetter);
+        }
+
+        private static void ApplyAccent(Swatch swatch)
+        {
+            if (swatch.AccentExemplarHue is Hue accentHue)
+            {
+                ModifyTheme(theme => theme.SetSecondaryColor(accentHue.Color));
+            }
+        }
+
+        private static void ModifyTheme(Action<ITheme> modificationAction)
+        {
+            PaletteHelper paletteHelper = new PaletteHelper();
+            ITheme theme = paletteHelper.GetTheme();
+
+            modificationAction?.Invoke(theme);
+
+            paletteHelper.SetTheme(theme);
         }
 
 

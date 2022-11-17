@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel;
-using MahApps.Metro.Controls;
+using TailBlazer.Controls;
 using TailBlazer.Views.WindowManagement;
 
 namespace TailBlazer
@@ -8,7 +8,7 @@ namespace TailBlazer
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : MetroWindow
+    public partial class MainWindow : TailBlazerWindow
     {
 
         public MainWindow()

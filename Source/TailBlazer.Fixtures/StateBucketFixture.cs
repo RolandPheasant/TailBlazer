@@ -24,7 +24,7 @@ namespace TailBlazer.Fixtures
             
             var state = converter.Convert(buckets);
             var restored = converter.Convert(state);
-            buckets.ShouldBeEquivalentTo(restored);
+            buckets.Should().BeEquivalentTo(restored);
        }
 
         //[Fact]

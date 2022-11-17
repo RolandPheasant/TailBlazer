@@ -33,7 +33,7 @@ namespace TailBlazer.Fixtures
             var result = input.Virtualise(new TextScrollInfo(5, 15)).ToArray();
 
 
-            result.ShouldBeEquivalentTo(expected);
+            result.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
@@ -60,7 +60,7 @@ namespace TailBlazer.Fixtures
             var result = input.Virtualise(new TextScrollInfo(10, 10)).ToArray();
 
 
-            result.ShouldBeEquivalentTo(expected);
+            result.Should().BeEquivalentTo(expected);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace TailBlazer.Domain.FileHandling
         private long Start { get; }
         public LineKey Key { get; }
 
-        [Obsolete("Only used for testing")]
+
         public Line(int number, string text, DateTime? timestamp)
         {
             Number = number;

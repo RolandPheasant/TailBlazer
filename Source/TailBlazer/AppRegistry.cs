@@ -23,10 +23,8 @@ namespace TailBlazer.Infrastucture
             if (!File.Exists(path))
             {
                 // should use the default config which is a resource
-                using (var stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(TailBlazer.Properties.Resources.log4net)))
-                {
-                    log4net.Config.XmlConfigurator.Configure(stream);
-                }
+                using var stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(TailBlazer.Properties.Resources.log4net));
+                log4net.Config.XmlConfigurator.Configure(stream);
             }
             else
             {

@@ -5,7 +5,7 @@
 
 
     <Style TargetType="{x:Type controls:SearchResultIndicator}">
-        <Setter Property="Foreground" Value="{DynamicResource SecondaryAccentBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryHueMidBrush}" />
         <Setter Property="Width" Value="18" />
         <Setter Property="Height" Value="18" />
         <Setter Property="Padding" Value="4" />

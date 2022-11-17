@@ -33,17 +33,17 @@ namespace TailBlazer.Fixtures
                         var head = result.ReadLines(new ScrollRequest(10, 0));
                         var headText = head.Select(l => l.Text).ToArray();
                         var headExpected = Enumerable.Range(1, 10).Select(i => $"This is line number {i.ToString("00000000")}");
-                        headText.ShouldAllBeEquivalentTo(headExpected);
+                        headText.Should().BeEquivalentTo(headExpected);
 
                         var tail = result.ReadLines(new ScrollRequest(10));
                         var tailText = tail.Select(l => l.Text).ToArray();
                         var tailExpected = Enumerable.Range(91, 10).Select(i => $"This is line number {i.ToString("00000000")}").ToArray();
-                        tailText.ShouldAllBeEquivalentTo(tailExpected);
+                        tailText.Should().BeEquivalentTo(tailExpected);
 
                         var mid = result.ReadLines(new ScrollRequest(10, 20));
                         var midText = mid.Select(l => l.Text).ToArray();
                         var midExpected = Enumerable.Range(21, 10).Select(i => $"This is line number {i.ToString("00000000")}").ToArray();
-                        midText.ShouldAllBeEquivalentTo(midExpected);
+                        midText.Should().BeEquivalentTo(midExpected);
                     }
                 }
             }
@@ -72,17 +72,17 @@ namespace TailBlazer.Fixtures
                         var head = result.ReadLines(new ScrollRequest(10, 0));
                         var headText =head.Select(l=>l.Text).ToArray();
                         var headExpected =Enumerable.Range(1, 10).Select(i => $"This is line number {i.ToString("00000000")}");
-                        headText.ShouldAllBeEquivalentTo(headExpected);
+                        headText.Should().BeEquivalentTo(headExpected);
 
                         var tail = result.ReadLines(new ScrollRequest(10));
                         var tailText = tail.Select(l => l.Text).ToArray();
                         var tailExpected =Enumerable.Range(9991, 10).Select(i => $"This is line number {i.ToString("00000000")}").ToArray();
-                        tailText.ShouldAllBeEquivalentTo(tailExpected);
+                        tailText.Should().BeEquivalentTo(tailExpected);
 
                         var mid = result.ReadLines(new ScrollRequest(10, 100));
                         var midText = mid.Select(l => l.Text).ToArray();
                         var midExpected =Enumerable.Range(101, 10).Select(i => $"This is line number {i.ToString("00000000")}").ToArray();
-                        midText.ShouldAllBeEquivalentTo(midExpected);
+                        midText.Should().BeEquivalentTo(midExpected);
                     }
                 }
             }

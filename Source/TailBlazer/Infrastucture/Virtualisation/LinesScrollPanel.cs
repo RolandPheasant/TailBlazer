@@ -13,21 +13,21 @@ namespace TailBlazer.Infrastucture.Virtualisation
 
     //TODO: 1) Clamp offset.X. 
 {
-    public static class MeasureEx
-    {public static Size MeasureString(this Control source, string candidate)
-        {
-            var formattedText = new FormattedText(
-                candidate,
-                CultureInfo.CurrentUICulture,
-                FlowDirection.LeftToRight,
-                new Typeface(source.FontFamily, source.FontStyle, source.FontWeight, source.FontStretch),
-                source.FontSize,
-                Brushes.Black);
+    //public static class MeasureEx
+    //{public static Size MeasureString(this Control source, string candidate)
+    //    {
+    //        var formattedText = new FormattedText(
+    //            candidate,
+    //            CultureInfo.CurrentUICulture,
+    //            FlowDirection.LeftToRight,
+    //            new Typeface(source.FontFamily, source.FontStyle, source.FontWeight, source.FontStretch),
+    //            source.FontSize,
+    //            Brushes.Black);
 
-            return new Size(formattedText.Width, formattedText.Height);
-        }
+    //        return new Size(formattedText.Width, formattedText.Height);
+    //    }
 
-    }
+    //}
 
     /// <summary>
     /// This is adapted (butchered!) from VirtualWrapPanel in https://github.com/samueldjack/VirtualCollection
@@ -207,6 +207,8 @@ namespace TailBlazer.Infrastucture.Virtualisation
             var layoutInfo = GetLayoutInfo(availableSize, ItemHeight, _extentInfo);
 
             RecycleItems(layoutInfo);
+
+            if (_itemsGenerator is null) return availableSize;
 
             // Determine where the first item is in relation to previously realized items
             var generatorStartPosition = _itemsGenerator.GeneratorPositionFromIndex(layoutInfo.FirstRealizedItemIndex);

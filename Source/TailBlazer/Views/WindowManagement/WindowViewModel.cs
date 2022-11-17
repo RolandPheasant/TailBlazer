@@ -71,8 +71,8 @@ namespace TailBlazer.Views.WindowManagement
             OpenFileCommand =  new Command(OpenFile);
 
             ShowInGitHubCommand = new Command(()=>   Process.Start("https://github.com/RolandPheasant"));
-            ZoomOutCommand= new Command(()=> { GeneralOptions.Scale = GeneralOptions.Scale + 5; });
-            ZoomInCommand = new Command(() => { GeneralOptions.Scale = GeneralOptions.Scale - 5; });
+            ZoomOutCommand= new Command(()=> { GeneralOptions.Scale = (int)GeneralOptions.Scale + 5; });
+            ZoomInCommand = new Command(() => { GeneralOptions.Scale = (int)GeneralOptions.Scale - 5; });
             CollectMemoryCommand = new Command(() =>
             {
                 //Diagnostics [useful for memory testing]

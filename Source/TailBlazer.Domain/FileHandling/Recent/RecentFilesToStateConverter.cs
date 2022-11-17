@@ -20,7 +20,7 @@ namespace TailBlazer.Domain.FileHandling.Recent
         public RecentFile[] Convert(State state)
         {
             if (state == null || state == State.Empty)
-                return new RecentFile[0];
+                return Array.Empty<RecentFile>();
 
             //v1 format is csv
             if (state.Version== 1)
