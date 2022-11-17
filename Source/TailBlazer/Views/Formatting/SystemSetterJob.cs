@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -12,39 +11,30 @@ using TailBlazer.Domain.Formatting;
 using TailBlazer.Domain.Infrastructure;
 using TailBlazer.Domain.Ratings;
 using TailBlazer.Domain.Settings;
-using Theme = TailBlazer.Domain.Formatting.Theme;
+using Hue = MaterialDesignColors.Hue;
+using UserTheme = TailBlazer.Domain.Formatting.Theme;
 
 namespace TailBlazer.Views.Formatting
 {
     public sealed class SystemSetterJob: IDisposable
     {
         private readonly IDisposable _cleanUp;
-        private readonly List<Swatch> _swatches;
 
         public SystemSetterJob(ISetting<GeneralOptions> setting,
             IRatingService ratingService,
             ISchedulerProvider schedulerProvider)
         {
+            var swatches = new SwatchesProvider().Swatches.ToDictionary(s => s.Name);
 
-            var paletteHelper = new PaletteHelper();
-     
-
-
-            _swatches = new SwatchesProvider().Swatches.ToList();
-
-            var themeSetter =  setting.Value.Select(options => options.Theme)
+            var themeSetter = setting.Value.Select(options => options.Theme)
                 .DistinctUntilChanged()
                 .ObserveOn(schedulerProvider.MainThread)
-                .Subscribe(theme =>
+                .Subscribe(userTheme =>
                 {
+                    var isDark = userTheme == UserTheme.Dark;
 
-                    var dark = theme == Theme.Dark;
-
-                    var baseTheme = paletteHelper.GetTheme();
-
-                    baseTheme.SetBaseTheme(dark ? MaterialDesignThemes.Wpf.Theme.Dark : MaterialDesignThemes.Wpf.Theme.Light);
-                    // paletteHelper.SetTheme((ITheme)MaterialDesignThemes.Wpf.Theme.Dark);
-                    //paletteHelper.ReplaceAccentColor(theme.GetAccentColor());
+                    ModifyTheme(theme => theme.SetBaseTheme(isDark ? MaterialDesignThemes.Wpf.Theme.Dark : MaterialDesignThemes.Wpf.Theme.Light));
+                    ApplyAccent(isDark ? swatches["yellow"] : swatches["indigo"]);
                 });
 
             var frameRate = ratingService.Metrics
@@ -59,6 +49,24 @@ namespace TailBlazer.Views.Formatting
             });
 
             _cleanUp = new CompositeDisposable( themeSetter);
+        }
+
+        private static void ApplyAccent(Swatch swatch)
+        {
+            if (swatch.AccentExemplarHue is Hue accentHue)
+            {
+                ModifyTheme(theme => theme.SetSecondaryColor(accentHue.Color));
+            }
+        }
+
+        private static void ModifyTheme(Action<ITheme> modificationAction)
+        {
+            PaletteHelper paletteHelper = new PaletteHelper();
+            ITheme theme = paletteHelper.GetTheme();
+
+            modificationAction?.Invoke(theme);
+
+            paletteHelper.SetTheme(theme);
         }
 
 

@@ -117,7 +117,8 @@ namespace TailBlazer.Domain.Formatting
             else
             {
                 var strings = _itemsToMatch.AsArray();
-                var matches = new MatchedString[0];
+                var matches = Array.Empty<MatchedString>();
+                
                 for (int i = 0; i < strings.Length; i++)
                 {
                     var stringToMatch = strings[i];
