@@ -25,7 +25,7 @@
     TextOptions.TextRenderingMode="Auto"
     WindowStartupLocation="CenterScreen"
     FadeContentIfInactive="False"
- 
+   
     mc:Ignorable="d">
 
     <!--Background="#FF37474F"
@@ -70,6 +70,9 @@
             Command="{Binding OpenFileCommand}"
             Modifiers="Ctrl" />
         <KeyBinding Key="F8" Command="{Binding CollectMemoryCommand}" />
+
+        <MouseBinding Command="{Binding ZoomInCommand}" Gesture="{x:Static infrastucture:MouseWheelGesture.ControlDown}" />
+        <MouseBinding Command="{Binding ZoomOutCommand}" Gesture="{x:Static infrastucture:MouseWheelGesture.ControlUp}" />
     </Window.InputBindings>
 
 
@@ -148,10 +151,7 @@
         <materialDesign:DialogHost Identifier="{x:Static tailBlazer:DialogNames.EntireWindow}">
 
             <Grid infrastucture:DependencyObjectHook.Receiver="{Binding DropMonitor}">
-                <Grid.InputBindings>
-                    <MouseBinding Command="{Binding ZoomInCommand}" Gesture="{x:Static infrastucture:MouseWheelGesture.ControlDown}" />
-                    <MouseBinding Command="{Binding ZoomOutCommand}" Gesture="{x:Static infrastucture:MouseWheelGesture.ControlUp}" />
-                </Grid.InputBindings>
+
                 <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
                     <materialDesign:DrawerHost.LeftDrawerContent>
 

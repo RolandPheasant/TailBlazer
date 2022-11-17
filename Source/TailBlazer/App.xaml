@@ -17,14 +17,10 @@
                                              SecondaryColor="Amber" />
 
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
-
                 <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/materialdesign.xaml" />
 
                 <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Generic.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Colours.xaml" />
-
-
-
+                <!--<ResourceDictionary Source="pack://application:,,,/TailBlazer;component/Themes/Colours.xaml" />-->
             </ResourceDictionary.MergedDictionaries>
 
             <DataTemplate DataType="{x:Type searching:SearchOptionsViewModel}">

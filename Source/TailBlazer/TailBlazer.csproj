@@ -4,10 +4,18 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>tailblazer.ico</ApplicationIcon>
-    
+
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>false</SelfContained>
   </PropertyGroup>
+
   <ItemGroup>
     <None Remove="tailblazer.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="Themes\ComboBox.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="tailblazer.ico" />
@@ -17,18 +25,21 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
+
   <ItemGroup>
-    <PackageReference Include="ControlzEx" Version="5.0.2" />
     <PackageReference Include="Dragablz" Version="0.0.3.234" />
     <PackageReference Include="DynamicData" Version="7.12.1" />
     <PackageReference Include="log4net" Version="2.0.15" />
     <PackageReference Include="MaterialDesignExtensions" Version="3.3.0" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.7.0-ci364" />
     <PackageReference Include="ReactiveUI.WPF" Version="18.3.1" />
     <PackageReference Include="StructureMap" Version="4.7.1" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\TailBlazer.Domain\TailBlazer.Domain.csproj" />
   </ItemGroup>
+
   <ItemGroup>
     <Compile Update="Properties\Settings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -37,6 +48,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Update="Log4Net.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

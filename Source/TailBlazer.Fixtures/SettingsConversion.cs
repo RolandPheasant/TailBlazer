@@ -25,7 +25,7 @@ namespace TailBlazer.Fixtures
             var converter = new RecentFilesToStateConverter();
             var state = converter.Convert(files);
             var restored = converter.Convert(state);
-            restored.ShouldAllBeEquivalentTo(files);
+            restored.Should().BeEquivalentTo(files);
         }
 
         [Fact]
@@ -45,7 +45,7 @@ namespace TailBlazer.Fixtures
         {
             var converter = new SearchMetadataToStateConverter();
             var state = converter.Convert(State.Empty);
-            state.ShouldAllBeEquivalentTo(converter.GetDefaultValue());
+            state.Should().BeEquivalentTo(converter.GetDefaultValue());
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace TailBlazer.Fixtures
             var converter = new SearchMetadataToStateConverter();
             State nullState = null;
             var state = converter.Convert(nullState);
-            state.ShouldAllBeEquivalentTo(converter.GetDefaultValue());
+            state.Should().BeEquivalentTo(converter.GetDefaultValue());
         }
 
         private void SerializeAndDeserializeWithCulture(string cultureName)
@@ -65,7 +65,7 @@ namespace TailBlazer.Fixtures
             var converter = new GeneralOptionsConverter();
             var state = converter.Convert(original);
             var restored = converter.Convert(state);
-            restored.ShouldBeEquivalentTo(original);
+            restored.Should().BeEquivalentTo(original);
         }
     }
 }

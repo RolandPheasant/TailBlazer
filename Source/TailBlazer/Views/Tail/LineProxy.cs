@@ -97,11 +97,16 @@ namespace TailBlazer.Views.Tail
                         return lmc.Matches.Select(m => new LineMatchProxy(m, themeProvider)).ToList();
                     }).ForBinding();
 
-            if (Line.Timestamp.HasValue && DateTime.UtcNow.Subtract(Line.Timestamp.Value).TotalSeconds < 0.25)
+            if (Line.Timestamp.HasValue )
             {
-                IsRecent =true;
-                Observable.Timer(TimeSpan.FromSeconds(1))
-                    .Subscribe(_ => IsRecent = false);
+
+                var secondsSince = DateTime.UtcNow.Subtract(Line.Timestamp.Value).TotalSeconds;
+                if (secondsSince < 0.25)
+                {
+                    IsRecent = true;
+                    Observable.Timer(TimeSpan.FromSeconds(1))
+                        .Subscribe(_ => IsRecent = false);
+                }
             }
 
             _cleanUp = new CompositeDisposable(FormattedText, 

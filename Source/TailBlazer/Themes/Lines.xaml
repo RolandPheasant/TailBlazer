@@ -5,7 +5,8 @@
     xmlns:infrastucture="clr-namespace:TailBlazer.Infrastucture"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:tail="clr-namespace:TailBlazer.Views.Tail"
-    xmlns:virtualisation="clr-namespace:TailBlazer.Infrastucture.Virtualisation">
+    xmlns:virtualisation="clr-namespace:TailBlazer.Infrastucture.Virtualisation"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.listbox.xaml" />
@@ -116,8 +117,8 @@
                 <controls:HighlightTextControl
                     VerticalAlignment="Center"
                     FormattedText="{Binding FormattedText.Value}"
-                    HighlightBackgroundBrush="{DynamicResource SecondaryAccentBrush}"
-                    HighlightForegroundBrush="{DynamicResource SecondaryAccentForegroundBrush}"
+                    HighlightBackgroundBrush="{DynamicResource SecondaryHueMidBrush}"
+                    HighlightForegroundBrush="{DynamicResource SecondaryHueMidForegroundBrush}"
                     Text="{Binding PlainText.Value}" />
 
                 <!--  TODO: Move the underline to the fading text effect  -->
@@ -126,17 +127,16 @@
                            Grid.ColumnSpan="2"
                            IsActive="{Binding IsRecent}"
                            Height="1"
-                           Background="{DynamicResource SecondaryAccentBrush}"
+                           Background="{DynamicResource SecondaryHueMidBrush}"
                            Visibility="Visible" />-->
             </Grid>
 
         </Grid>
     </DataTemplate>
 
-    <Style
-        x:Key="BaseLinesItemContainerStyle"
-        BasedOn="{StaticResource MaterialDesignListBoxItem}"
-        TargetType="{x:Type ListBoxItem}">
+    <Style x:Key="BaseLinesItemContainerStyle"
+           BasedOn="{StaticResource MaterialDesignListBoxItem}"
+           TargetType="{x:Type ListBoxItem}">
         <Style.Setters>
             <Setter Property="Padding" Value="0" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -149,11 +149,39 @@
                     <Condition Binding="{Binding IsRecent}" Value="True" />
                     <Condition Binding="{Binding Path=DataContext.GeneralOptionBindings.HighlightTail.Value, ElementName=Control}" Value="True" />
                 </MultiDataTrigger.Conditions>
-                <Setter Property="Background" Value="{DynamicResource SecondaryAccentBrush}" />
-                <Setter Property="Foreground" Value="{DynamicResource SecondaryAccentForegroundBrush}" />
+                <Setter Property="Background" Value="{DynamicResource SecondaryHueMidBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource SecondaryHueMidForegroundBrush}" />
             </MultiDataTrigger>
         </Style.Triggers>
     </Style>
+
+    <!--<Style x:Key="BaseLinesItemContainerStyle" TargetType="{x:Type ListBoxItem}" >
+        <Style.Setters>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Height" Value="20"/>
+        </Style.Setters>
+
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsRecent}" Value="{x:Static system:Boolean.TrueString}">
+                <Setter Property="Background" Value="{DynamicResource SecondaryHueMidBrush}"/>
+                <Setter Property="Foreground"  Value="{DynamicResource SecondaryHueMidForegroundBrush}"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="LinesItemContainerStyle" TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource  MaterialDesignListBoxItem}">
+        <Style.Setters>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="controls:ListboxItemHighlightAssist.BaseStyle" Value="{StaticResource BaseLinesItemContainerStyle}"/>
+            <Setter Property="controls:ListboxItemHighlightAssist.IsEnabled" Value="{Binding Path=DataContext.GeneralOptionBindings.HighlightTail.Value, ElementName=Control}"/>
+            <Setter Property="controls:ListboxItemHighlightAssist.IsRecent" Value="{Binding Path=IsRecent}"/>
+            <Setter Property="controls:ListboxItemHighlightAssist.HighlightForegroundBrush" Value="{DynamicResource SecondaryHueMidForegroundBrush}"/>
+            <Setter Property="controls:ListboxItemHighlightAssist.HighlightBackgroundBrush" Value="{DynamicResource SecondaryHueMidBrush}"/>
+        </Style.Setters>
+    </Style>-->
 
     <Style x:Key="LinesListBoxStyle" TargetType="{x:Type ListBox}">
         <Setter Property="IsTextSearchEnabled" Value="False" />

@@ -94,7 +94,7 @@ namespace TailBlazer.Fixtures
 
                     scheduler.AdvanceBySeconds(1);
 
-                    tailer.Lines.Items.Select(l => l.Text).ShouldAllBeEquivalentTo(expectedLines);
+                    tailer.Lines.Items.Select(l => l.Text).Should().BeEquivalentTo(expectedLines);
 
 
                     file.Append( Enumerable.Range(101, 10).Select(i => i%2 == 1 ? $"{i} is an odd number" : $"{i} is an even number").ToArray());
@@ -113,7 +113,7 @@ namespace TailBlazer.Fixtures
                     scheduler.AdvanceBySeconds(1);
 
 
-                    tailer.Lines.Items.Select(l => l.Text).ShouldAllBeEquivalentTo(expectedLines);
+                    tailer.Lines.Items.Select(l => l.Text).Should().BeEquivalentTo(expectedLines);
                 }
             }
         }

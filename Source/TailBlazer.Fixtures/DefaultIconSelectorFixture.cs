@@ -26,8 +26,7 @@ namespace TailBlazer.Fixtures
             InlineData("DEBUG", false, "INFO"),
             InlineData("DEBUG", true, "xxxxxxx"),
             InlineData("DEBUG", false, "xxxxxxx"),
-            InlineData("Bug", false, "xxxxxxx"),
-            InlineData("DEBUG", false, "xxxxxxx")
+            InlineData("Bug", false, "xxxxxxx")
             ]
         public void GetIconOrDefaultShouldWork(string text, bool useRegex, string iconKind)
         {

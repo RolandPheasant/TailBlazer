@@ -119,10 +119,28 @@ namespace TailBlazer.Domain.FileHandling
 
         public static long GetFileLength(this FileInfo source)
         {
-            using (var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))
+            using var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite);
+            return stream.Length;
+        }
+
+        public static IEnumerable<Line> ReadLinesByPosition(this FileInfo source, long[] positions, Func<int, bool> isEndOfTail = null)
+        {
+            using var stream = File.Open(source.FullName, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite);
+            using (var reader = new StreamReaderExtended(stream, Encoding.Default, true))
             {
-                return stream.Length;
+                foreach (var position in positions)
+                {
+                    if (reader.AbsolutePosition() != position)
+                    {
+                        reader.DiscardBufferedData();
+                        stream.Seek(position, SeekOrigin.Begin);
+
+                    }
+                    var line = reader.ReadLine();
+                    yield return new Line((int)position, line, null);
+                }
             }
         }
+
     }
 }

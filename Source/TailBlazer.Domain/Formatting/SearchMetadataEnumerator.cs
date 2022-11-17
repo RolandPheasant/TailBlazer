@@ -78,7 +78,7 @@ namespace TailBlazer.Domain.Formatting
                     yield break;
                 }
 
-                var childMatches = new MatchedStringEnumerator2(input, matches.Cast<Match>()
+                var childMatches = new MatchedStringEnumerator2(input, matches
                     .Select(match => match.Value)
                     .ToArray(),
                     tomatch);

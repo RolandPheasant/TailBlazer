@@ -44,7 +44,7 @@ namespace TailBlazer.Views.Options
 
             RestartCommand = new Command(() =>
             {
-                Process.Start(Application.ResourceAssembly.Location);
+                Process.Start($@"TailBlazor.exe");
                 Application.Current.Shutdown();
             });
 

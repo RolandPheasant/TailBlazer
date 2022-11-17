@@ -36,7 +36,7 @@ namespace TailBlazer.Fixtures
         public void ColourProviderLookupWithNullKeyShouldReturnEmptyValue()
         {
             var provider = new ColourProvider();
-            HueKey key; 
+            HueKey key = default; 
             var result = provider.Lookup(key);
 
             result.HasValue.Should().Be(false);
