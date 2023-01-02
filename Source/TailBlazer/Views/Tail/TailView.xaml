@@ -173,6 +173,9 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type searching:SearchViewModel}">
                                 <Grid x:Name="Selection" VerticalAlignment="Center">
+                                    <Grid.InputBindings>
+                                        <MouseBinding Command="{Binding RemoveCommand}" Gesture="MiddleClick" />
+                                    </Grid.InputBindings>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition  Width="Auto"/>
