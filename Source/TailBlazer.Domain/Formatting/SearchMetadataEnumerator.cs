@@ -39,13 +39,6 @@ public class SearchMetadataEnumerator : IEnumerable<MatchedString>
 
     }
 
-    private const RegexOptions CaseInsensitiveOptions = RegexOptions.IgnorePatternWhitespace
-                                                        | RegexOptions.Compiled
-                                                        | RegexOptions.IgnoreCase;
-
-    private const RegexOptions CaseSensitiveOptions = RegexOptions.IgnorePatternWhitespace
-                                                      | RegexOptions.Compiled;
-
     private static IEnumerable<MatchedString> Yield(string input, SearchMetadata tomatch)
     {
 
@@ -109,13 +102,13 @@ public class SearchMetadataEnumerator : IEnumerable<MatchedString>
     private static IEnumerable<MatchedString> Yield2(string input, SearchMetadata meta)
     {
         var tomatch = meta.SearchText;
-        var ignoreCase = meta.IgnoreCase;
+        var options = meta.RegexOptions;
 
         if (string.IsNullOrEmpty(input))
             yield break;
 
         string pattern = "(" + Regex.Escape(tomatch) + ")";
-        var split = Regex.Split(input, pattern, ignoreCase ? CaseInsensitiveOptions : CaseSensitiveOptions);
+        var split = Regex.Split(input, pattern, options);
         var length = split.Length;
 
         if (length == 0) yield break;

@@ -63,7 +63,7 @@ public class MatchedStringEnumerator2 : IEnumerable<MatchedString>
 
         foreach (var item in split)
         {
-            if (item.Equals(tomatch, StringComparison.OrdinalIgnoreCase))
+            if (item.Equals(tomatch, _tomatch.StringComparison))
             {
                 yield return new MatchedString(item, _tomatch);
             }

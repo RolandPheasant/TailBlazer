@@ -7,6 +7,13 @@ namespace TailBlazer.Domain.FileHandling.Search;
 
 public class SearchMetadata : IEquatable<SearchMetadata>
 {
+    const RegexOptions caseInsensitiveOptions = RegexOptions.IgnorePatternWhitespace
+                                                   | RegexOptions.Compiled
+                                                   | RegexOptions.IgnoreCase;
+
+    const RegexOptions caseSensitiveOptions = RegexOptions.IgnorePatternWhitespace
+                                              | RegexOptions.Compiled;
+
     public int Position { get;  }
     public string SearchText { get; }
     public bool Filter { get; }
@@ -19,6 +26,9 @@ public class SearchMetadata : IEquatable<SearchMetadata>
     public string IconKind { get; }
     public bool IsGlobal { get;  }
     public bool IsExclusion { get;  }
+    public RegexOptions RegexOptions => IgnoreCase ? caseInsensitiveOptions : caseSensitiveOptions;
+    public StringComparison StringComparison => IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+    public StringComparer StringComparer => IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
 
     public SearchMetadata([NotNull] SearchMetadata searchMetadata, int newPosition)
     {
@@ -144,7 +154,7 @@ public class SearchMetadata : IEquatable<SearchMetadata>
             if (ReferenceEquals(y, null)) return false;
             if (x.GetType() != y.GetType()) return false;
 
-            var stringComparison = x.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+            var stringComparison = x.StringComparison;
             return string.Equals(x.SearchText, y.SearchText, stringComparison)
                    && x.Highlight == y.Highlight
                    && x.HighlightHue == y.HighlightHue
@@ -158,7 +168,7 @@ public class SearchMetadata : IEquatable<SearchMetadata>
         {
             unchecked
             {
-                var comparer = obj.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+                var comparer = obj.StringComparer;
                 var hashCode = (obj.SearchText != null ? comparer.GetHashCode(obj.SearchText) : 0);
                 hashCode = (hashCode*397) ^ obj.Highlight.GetHashCode();
                 hashCode = (hashCode * 397) ^ obj.HighlightHue.GetHashCode();
@@ -182,7 +192,7 @@ public class SearchMetadata : IEquatable<SearchMetadata>
             if (ReferenceEquals(y, null)) return false;
             if (x.GetType() != y.GetType()) return false;
 
-            var stringComparison = x.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+            var stringComparison = x.StringComparison;
             return string.Equals(x.SearchText, y.SearchText, stringComparison)
                    && x.Filter == y.Filter
                    && x.UseRegex == y.UseRegex
@@ -194,7 +204,7 @@ public class SearchMetadata : IEquatable<SearchMetadata>
         {
             unchecked
             {
-                var comparer = obj.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+                var comparer = obj.StringComparer;
                 var hashCode = (obj.SearchText != null ? comparer.GetHashCode(obj.SearchText) : 0);
                 hashCode = (hashCode*397) ^ obj.Filter.GetHashCode();
                 hashCode = (hashCode*397) ^ obj.UseRegex.GetHashCode();
