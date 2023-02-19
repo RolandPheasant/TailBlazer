@@ -67,7 +67,7 @@ public class WindowViewModel: AbstractNotifyPropertyChanged, IDisposable, IViewO
         InterTabClient = new InterTabClient(windowFactory);
         OpenFileCommand =  new Command(OpenFile);
 
-        ShowInGitHubCommand = new Command(()=>   Process.Start("https://github.com/RolandPheasant"));
+        ShowInGitHubCommand = new Command(() => Process.Start(new ProcessStartInfo("https://github.com/RolandPheasant") { UseShellExecute = true }));
         ZoomOutCommand= new Command(()=> { GeneralOptions.Scale = (int)GeneralOptions.Scale + 5; });
         ZoomInCommand = new Command(() => { GeneralOptions.Scale = (int)GeneralOptions.Scale - 5; });
         CollectMemoryCommand = new Command(() =>
