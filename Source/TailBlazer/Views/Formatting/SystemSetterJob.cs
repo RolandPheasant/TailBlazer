@@ -32,7 +32,8 @@ public sealed class SystemSetterJob: IDisposable
                 var isDark = userTheme == UserTheme.Dark;
 
                 ModifyTheme(theme => theme.SetBaseTheme(isDark ? MaterialDesignThemes.Wpf.Theme.Dark : MaterialDesignThemes.Wpf.Theme.Light));
-                ApplyAccent(isDark ? swatches["yellow"] : swatches["indigo"]);
+                ApplyPrimaryColor(isDark ? System.Windows.Media.Color.FromRgb(90,90,90) : System.Windows.Media.Color.FromRgb(0,170,0));
+                ApplySecondaryColor(isDark ? System.Windows.Media.Colors.Blue : System.Windows.Media.Colors.Blue);
             });
 
         var frameRate = ratingService.Metrics
@@ -47,6 +48,16 @@ public sealed class SystemSetterJob: IDisposable
         });
 
         _cleanUp = new CompositeDisposable( themeSetter);
+    }
+
+    private static void ApplyPrimaryColor(System.Windows.Media.Color color)
+    {
+        ModifyTheme(theme => theme.SetPrimaryColor(color));
+    }
+
+    private static void ApplySecondaryColor(System.Windows.Media.Color color)
+    {
+        ModifyTheme(theme => theme.SetSecondaryColor(color));
     }
 
     private static void ApplyAccent(Swatch swatch)
