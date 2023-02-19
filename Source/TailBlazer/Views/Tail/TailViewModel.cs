@@ -110,8 +110,8 @@ public class TailViewModel: AbstractNotifyPropertyChanged, ILinesVisualisation, 
         SearchHints = searchHints ?? throw new ArgumentNullException(nameof(searchHints));
 
         CopyToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(selectionMonitor.GetSelectedText()));
-        OpenFileCommand = new Command(() => Process.Start(fileWatcher.FullName));
-        OpenFolderCommand = new Command(() => Process.Start(fileWatcher.Folder));
+        OpenFileCommand = new Command(() => Process.Start(new ProcessStartInfo(fileWatcher.FullName) { UseShellExecute = true }));
+        OpenFolderCommand = new Command(() => Process.Start(new ProcessStartInfo(fileWatcher.Folder) { UseShellExecute = true }));
         CopyPathToClipboardCommand = new Command(() => clipboardHandler.WriteToClipboard(fileWatcher.FullName));
         UnClearCommand = new Command(fileWatcher.Reset);
         ClearCommand = new Command(fileWatcher.Clear);
