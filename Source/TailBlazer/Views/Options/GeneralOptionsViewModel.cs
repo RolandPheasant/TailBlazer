@@ -43,7 +43,7 @@ public sealed class GeneralOptionsViewModel : AbstractNotifyPropertyChanged, IDi
 
         RestartCommand = new Command(() =>
         {
-            Process.Start($@"TailBlazor.exe");
+            Process.Start($@"TailBlazer.exe");
             Application.Current.Shutdown();
         });
 
