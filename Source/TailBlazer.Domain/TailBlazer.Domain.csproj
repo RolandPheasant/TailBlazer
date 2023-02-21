@@ -6,6 +6,10 @@
     <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="DynamicData" Version="7.12.1" />
   </ItemGroup>

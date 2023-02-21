@@ -10,20 +10,16 @@
     <SelfContained>false</SelfContained>
     <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="tailblazer.ico" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
 
   <ItemGroup>
     <Page Remove="Themes\ComboBox.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="tailblazer.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="tailblazer.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
 
