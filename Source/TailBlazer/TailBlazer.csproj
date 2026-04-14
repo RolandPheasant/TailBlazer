@@ -30,7 +30,7 @@
   <ItemGroup>
     <PackageReference Include="Dragablz" Version="0.0.3.234" />
     <PackageReference Include="DynamicData" Version="7.12.1" />
-    <PackageReference Include="log4net" Version="2.0.15" />
+    <PackageReference Include="log4net" Version="3.3.0" />
     <PackageReference Include="MaterialDesignExtensions" Version="3.3.0" />
     <PackageReference Include="MaterialDesignThemes" Version="4.7.0-ci364" />
     <PackageReference Include="ReactiveUI.WPF" Version="18.3.1" />
